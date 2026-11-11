@@ -69,6 +69,7 @@ import type { BuildingSource } from './lieu/batiments';
 import { Spaces } from './lieu/espaces';
 import { type TileStats, TiledPlace } from './lieu/grand-lieu';
 import { type ModelSource, PlaceScene } from './lieu/lieu';
+import { mapSignature, mapStates } from './lieu/presents';
 import {
   fenceVolumes,
   fieldVolumes,
@@ -277,6 +278,8 @@ class Engine implements GameRenderer {
   private signature = Number.NaN;
   /** Empreinte de ce que montrent les récoltables (`recoltes.ts`), lue à chaque image. */
   private harvested = Number.NaN;
+  /** Empreinte des meubles absents et des portes fermées (`presents.ts`), lue à chaque image. */
+  private mapped = Number.NaN;
   /** Contenu et monde de l'image, relus par les récoltables (gardé: aucune allocation par image). */
   private harvestLook: { content: Content; world: ReadonlyWorld } | null = null;
   private resolutionStep = 0;
@@ -631,6 +634,7 @@ class Engine implements GameRenderer {
     this.tiled = null;
     this.signature = Number.NaN;
     this.harvested = Number.NaN;
+    this.mapped = Number.NaN;
     this.lights = null;
     this.spaces = null;
     this.room = undefined;
@@ -774,13 +778,20 @@ class Engine implements GameRenderer {
     const look = (this.harvestLook ??= { content: view.content, world });
     look.world = world;
     const harvested = placeContent === undefined ? 0 : harvestSignature(look, placeContent, state);
-    if (signature !== this.signature || harvested !== this.harvested) {
+    const local = view.localIndex() ?? 0;
+    const mapped = placeContent === undefined ? 0 : mapSignature(look, placeContent, local);
+    if (signature !== this.signature || harvested !== this.harvested || mapped !== this.mapped) {
       this.signature = signature;
       this.harvested = harvested;
+      this.mapped = mapped;
       this.highlight.release();
-      // États des récoltables (souche, buisson cueilli...) et cases du potager: lus dans l'état
-      // déjà transmis, les mêmes chez l'hôte et chez l'invité.
-      if (placeContent !== undefined) place.setStates(placeStates(look, placeContent, state));
+      // États des récoltables (souche, buisson cueilli...), cases du potager, meubles que
+      // l'histoire n'a pas encore posés et portes qu'elle tient fermées: lus dans l'état déjà
+      // transmis, les mêmes chez l'hôte et chez l'invité.
+      if (placeContent !== undefined)
+        place.setStates(
+          mapStates(look, placeContent, local, placeStates(look, placeContent, state)),
+        );
       place.setDynamic([
         ...describeDynamic(view.content, state, undefined, placeContent),
         ...(placeContent === undefined ? [] : fieldVolumes(view.content, placeContent, state)),
@@ -788,7 +799,6 @@ class Engine implements GameRenderer {
       this.refreshLights(place);
     }
 
-    const local = view.localIndex() ?? 0;
     const body = world.players[local].body;
     // Passage de porte: l'image d'avant reste et s'éteint, puis tout se pose d'un coup au noir.
     const step = this.passage.update(dt, this.trackJumps(world, local));

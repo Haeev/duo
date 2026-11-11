@@ -8,9 +8,12 @@ import { expect, it } from 'vitest';
 import { createWorld } from '../../src/simulation/noyau/monde';
 import { gameDataFiles, MEMBERS, SEED } from '../aides';
 import { loadContent } from '../../src/donnees/charger';
-import { contentWith, wait } from '../aides-l3';
+import { contentWith, contextOf, wait } from '../aides-l3';
 import { createSim } from '../../src/simulation/noyau/pas';
 import type { WorldState } from '../../src/etat/monde';
+import { remember } from '../../src/simulation/regles/memoire';
+import { equipBag } from '../../src/simulation/sac/actions';
+import { addItem } from '../../src/simulation/sac/inventaire';
 import { FIXTURES } from './serveur';
 
 type Json = Record<string, unknown>;
@@ -112,4 +115,52 @@ it('fabrique la sauvegarde « aubrune-acte2 » (acte 1 fini, acte 2 commencé pa
   wait(sim, 2);
   expect(sim.world.progress.quests['la-minute-d-ecart'], 'l’acte 2 démarre seul').toBeDefined();
   write('aubrune-acte2', 'Aubrune, acte 2', sim.world);
+});
+
+it('fabrique la sauvegarde « aubrune-briques » (histoire principale finie, la Baronne à décider, 10 h)', () => {
+  // Pour les captures des briques (`tests/rendu-encre/briques.spec.ts`): tout le bourg est là et
+  // ouvert, la maison du garde n'a pas encore sa cuisine, la décision de la Baronne attend les deux.
+  const content = contentWith((files) => {
+    const settings = files['commun/reglages.json'] as { start: Json };
+    settings.start = { ...settings.start, place: 'aubrune', minute: 600 };
+  });
+  const sim = createSim(content, createWorld(content, SEED, MEMBERS));
+  wait(sim, 0.5);
+  const quests = content.places.aubrune?.quests ?? {};
+  const DECISION = 'la-baronne';
+  for (const [id, line] of Object.entries(quests)) {
+    const steps = line.chapters.flatMap((c) => c.steps.map((st) => ({ chapter: c.id, id: st.id })));
+    // La suite qui déclare une décision à deux s'arrête à cette étape; les autres sont finies.
+    const at = steps.findIndex((st) =>
+      line.chapters.some((c) => c.steps.some((x) => x.id === st.id && x.decision !== undefined)),
+    );
+    const open = id === DECISION && at >= 0;
+    const last = steps[open ? at : steps.length - 1];
+    sim.world.progress.quests[id] = {
+      chapter: last?.chapter ?? '',
+      step: last?.id ?? '',
+      done: !open,
+      passed: (open ? steps.slice(0, at) : steps).map((st) => st.id),
+    };
+  }
+  const story = sim.world.common.story;
+  if (story !== undefined) story.scene = null;
+  const facts = ['acte1.fini', 'acte2.train', 'acte2.fini', 'acte3.train2', 'halte.pendule'];
+  for (let n = 1; n <= 11; n++) facts.push(`verrou.v${String(n)}`);
+  for (const key of [...facts, 'verrou.v2b'])
+    remember(contextOf(sim), `aubrune.${key}`, true, 'duo');
+  remember(contextOf(sim), 'aubrune.baronne.legende', 'fait', 'duo');
+  remember(contextOf(sim), 'aubrune.baronne.decision', 'ouvert', 'duo');
+  for (const p of [0, 1] as const) {
+    expect(equipBag(contextOf(sim), p, 'besace')).toBe(true);
+    const player = sim.world.players[p];
+    player.money = 2000;
+    // De quoi vendre (des œufs) et de quoi se faire refuser (une planche) à l'épicerie.
+    addItem(content, player, 'oeuf', 3);
+    addItem(content, player, 'planche', 1);
+  }
+  sim.world.minutes = 600;
+  wait(sim, 2);
+  expect(sim.world.progress.quests[DECISION]?.step).toBe('decision');
+  write('aubrune-briques', 'Aubrune, les briques', sim.world);
 });

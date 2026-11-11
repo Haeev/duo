@@ -59,6 +59,11 @@
     }
   ],
   "refusal": "Ça ne lève pas, ça ne cuit pas. Je ne saurais pas quoi lui dire.",
+  "lines": {
+    "bought": "Tiens. Porte-le doucement, il dort encore un peu.",
+    "sold": "Mmh... c'est beau. Je le paie ce que ça vaut, la pâte me dira merci.",
+    "noMoney": "Il te manque quelques sous. Rien ne presse: ici, tout lève lentement."
+  },
   "talk": {
     "open": "Je regarde ton étal.",
     "leave": "Je te laisse à ta pâte."

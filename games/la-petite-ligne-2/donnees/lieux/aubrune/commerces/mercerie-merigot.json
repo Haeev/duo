@@ -45,6 +45,11 @@
     }
   ],
   "refusal": "Ça ? Ça sent la vase, ou la sciure. Pas de ça dans mon répertoire.",
+  "lines": {
+    "bought": "Et voilà ! Porte-le comme un premier rôle, pas comme un figurant.",
+    "sold": "Superbe ! Teinture ou bouton, le public n'y verra que du feu.",
+    "noMoney": "Ta bourse sonne creux, mon public. Reviens après la recette, je te garde la place."
+  },
   "talk": {
     "open": "Je regarde tes rayons.",
     "leave": "Je ne fais que passer."

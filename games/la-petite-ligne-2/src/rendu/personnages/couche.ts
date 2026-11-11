@@ -45,8 +45,9 @@ import { approach } from '../camera';
 import { RELIEF_SETTINGS } from '../lieu/reglages-relief';
 import type { Aimable } from '../cible';
 import { Fadable } from '../fondu';
+import { jumped } from '../passage';
 import { RENDER_SETTINGS } from '../reglages';
-import { type LyingPose, lyingPose } from './allonge';
+import { type LyingPose, lyingOn, lyingPose } from './allonge';
 import {
   Face,
   blendWeights,
@@ -113,6 +114,8 @@ interface Figure extends Aimable {
   lean: number;
   phase: number;
   far: boolean;
+  /** Où l'état le posait à l'image passée (`seen`: connu), pour reconnaître une porte franchie. */
+  readonly last: { x: number; y: number; seen: boolean };
   /** Pixels par mètre à l'écran, relevés au dernier rendu de son ombre de contact. */
   pixelsPerMeter: number;
 }
@@ -405,6 +408,7 @@ export class AssembledCharacters implements CharacterLayer {
       lean: 0,
       phase: 0,
       far: false,
+      last: { x: 0, y: 0, seen: false },
       pixelsPerMeter: 0,
       setGlow: (glow) => {
         fadable.apply(1, glow);
@@ -786,9 +790,39 @@ export class AssembledCharacters implements CharacterLayer {
       this.villagers.set(id, figure);
       // La vie de l'habitant (planning): absent, assis sur une vraie place, ou en plein geste.
       const life = villagerView({ content: this.view.content, world: frame.world }, id);
+      // Porte franchie (`villager_door`): l'état le pose d'un coup de l'autre côté, à 200 m. Il
+      // ne glisse pas d'un seuil à l'autre: caché le temps du saut (chez l'invité, sa position
+      // est interpolée entre les deux pendant quelques images), puis posé devant l'autre porte.
+      const last = figure.last;
+      const crossing = jumped(last.seen ? last : null, state.body);
+      last.x = state.body.x;
+      last.y = state.body.y;
+      last.seen = true;
+      if (crossing) figure.placed = false;
       figure.object.visible =
-        (life?.visible ?? true) && (frame.visibleAt?.(state.body.x, state.body.y) ?? true);
-      const seatId = state.life?.seat?.[0] ?? null;
+        !crossing &&
+        (life?.visible ?? true) &&
+        (frame.visibleAt?.(state.body.x, state.body.y) ?? true);
+      const [seatId, seatIndex] = state.life?.seat ?? [null, 0];
+      // Couché sur un lit (planning `bed`): la même pose qu'un joueur qui dort, à sa place du meuble.
+      const lies =
+        life?.pose === 'lie' && seatId !== null
+          ? lyingOn(
+              this.view.content,
+              frame.world,
+              frame.place,
+              seatId,
+              seatIndex,
+              this.tallness(figure) * (1 - this.settings.lie.headBelowTop / ADULT_HEIGHT),
+              this.settings.lie.fallback,
+              lying,
+            )
+          : null;
+      figure.face.hold(lies === null ? null : this.settings.lie.expression);
+      if (lies !== null) {
+        this.lie(figure, lies, frame.dt);
+        continue;
+      }
       const seated = life?.pose === 'sit' && seatId !== null;
       const posture: Posture = seated
         ? { kind: 'sit' }

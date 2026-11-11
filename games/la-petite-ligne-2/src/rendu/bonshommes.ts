@@ -27,6 +27,7 @@ import { approach } from './camera';
 import type { Aimable } from './cible';
 import type { InkKit } from './encre/index';
 import { Fadable } from './fondu';
+import { jumped } from './passage';
 import { RENDER_SETTINGS } from './reglages';
 
 /** Ce que le moteur donne à une couche de personnages à chaque image. */
@@ -119,6 +120,8 @@ interface Figure extends Aimable {
   x: number;
   y: number;
   facing: number;
+  /** Où l'état le posait à l'image passée (`seen`: connu), pour reconnaître une porte franchie. */
+  readonly last: { x: number; y: number; seen: boolean };
 }
 
 class StandInCharacters implements CharacterLayer {
@@ -181,6 +184,7 @@ class StandInCharacters implements CharacterLayer {
       x: 0,
       y: 0,
       facing: 0,
+      last: { x: 0, y: 0, seen: false },
       setGlow: (glow) => {
         fadable.apply(1, glow);
       },
@@ -241,8 +245,14 @@ class StandInCharacters implements CharacterLayer {
         figure = this.create(this.settings.villagerColor);
         this.villagers.set(id, figure);
       }
+      // Porte franchie: il ne glisse pas d'un seuil à l'autre, il se pose de l'autre côté.
+      const crossing = jumped(figure.last.seen ? figure.last : null, state.body);
+      figure.last.x = state.body.x;
+      figure.last.y = state.body.y;
+      figure.last.seen = true;
+      if (crossing) figure.placed = false;
       this.follow(figure, state.body, frame.dt);
-      figure.object.visible = frame.visibleAt?.(state.body.x, state.body.y) ?? true;
+      figure.object.visible = !crossing && (frame.visibleAt?.(state.body.x, state.body.y) ?? true);
     }
     if (this.villagers.size > 0) {
       for (const [id, figure] of this.villagers) {

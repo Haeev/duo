@@ -59,6 +59,11 @@
     }
   ],
   "refusal": "C'est gentil, mais on n'en a pas l'usage à la ferme. Demande au bourg.",
+  "lines": {
+    "bought": "C'est du jour, ça sent encore la terre. Si Paulin demande, tu as marchandé dur.",
+    "sold": "Oh, les belles ! Ça partira par le train du samedi, et tout le monde croira que c'est de moi.",
+    "noMoney": "Il manque quelques sous. Je te le mets de côté, à l'ombre: reviens quand tu veux."
+  },
   "talk": {
     "open": "Je regarde ton étal.",
     "leave": "Je passais voir la cour."

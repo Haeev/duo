@@ -15,6 +15,7 @@ import { remember } from '../src/simulation/regles/memoire';
 import { RULES } from '../src/simulation/regles/reglages';
 import { addItem, countItem } from '../src/simulation/sac/inventaire';
 import { act, contentWith, contextOf, wait } from './aides-l3';
+import { visit, visitObject } from './aides-visite';
 import { newSim } from './aides';
 
 type Json = Record<string, unknown>;
@@ -69,18 +70,16 @@ function lateGame(): Sim {
 /** Pose le joueur devant le comptoir du commerce, ou à côté du commerçant s'il vend dehors. */
 function goTo(sim: Sim, player: PlayerIndex, shop: ShopDef): void {
   const counter = SHOPS[shop.id];
-  const body = sim.world.players[player].body;
   if (counter === null || counter === undefined) {
     const keeper = sim.world.places[AUBRUNE]?.villagers[shop.keeper];
     if (keeper === undefined) throw new Error(`commerçant ${shop.keeper} absent`);
-    body.x = keeper.body.x + 0.8;
-    body.y = keeper.body.y;
+    visit(sim, player, shop.keeper);
     return;
   }
   const prop = aubrune().map.objects.find((o) => o.type === counter);
   if (prop === undefined) throw new Error(`comptoir ${counter} absent de la carte`);
-  body.x = prop.x;
-  body.y = prop.y;
+  // Comme un joueur: par la porte de la boutique, puis devant le comptoir, qui est sa cible.
+  visitObject(sim, player, prop.id);
 }
 
 function emptyPockets(sim: Sim, player: PlayerIndex): void {

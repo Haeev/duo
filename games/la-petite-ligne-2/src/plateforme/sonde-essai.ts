@@ -10,6 +10,7 @@ import type { PlayerState } from '../etat/joueur';
 import type { PlaceState } from '../etat/lieu';
 import type { GameRenderer } from '../rendu/moteur';
 import type { Session } from '../session';
+import { isFactKey } from '../simulation/regles/memoire';
 
 type NeedId = 'hunger' | 'sleep' | 'hygiene';
 type GroundItem = PlaceState['ground'][number];
@@ -35,6 +36,11 @@ export interface TestProbe {
   setMinutes(minutes: number): boolean;
   /** Hôte seulement: fixe la bourse d'un joueur (centimes). */
   setMoney(player: number, cents: number): boolean;
+  /**
+   * Hôte seulement: retient un fait d'histoire au nom des deux (une pièce de logement restaurée,
+   * par exemple), comme le ferait l'effet `remember` d'une quête. Faux si la clé est refusée.
+   */
+  remember(key: string): boolean;
   /** Cadre la vue de cette machine: lacet (degrés) et largeur (m). Faux sans rendu. */
   setCamera(yawDeg: number, width: number): boolean;
   /**
@@ -106,6 +112,13 @@ export function installTestProbe(options: ProbeOptions): TestProbe {
       if (target === null || s === null) return false;
       target.money = cents;
       s.revisions.players += 1;
+      return true;
+    },
+    remember(key) {
+      const s = sim();
+      if (s === null || !isFactKey(key)) return false;
+      s.world.progress.memory[key] = { v: true, by: 'duo', day: s.world.common.day };
+      s.revisions.progress += 1;
       return true;
     },
     patchPlace(patch) {
