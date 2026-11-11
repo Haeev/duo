@@ -366,7 +366,7 @@
         }
       ],
       "tags": ["quotidien"],
-      "triangles": 384
+      "triangles": 480
     },
     {
       "id": "dress-simple",
@@ -408,7 +408,7 @@
         }
       ],
       "tags": ["quotidien"],
-      "triangles": 952
+      "triangles": 1080
     },
     {
       "id": "shoes-pebble",
@@ -734,8 +734,8 @@
     },
     {
       "id": "bottom-long-skirt",
-      "name": "Jupe longue",
-      "description": "Une jupe ample jusqu'au mollet, qui tourne quand on danse à la fête.",
+      "name": "Jupe de fête",
+      "description": "Une jupe ample qui tombe au genou et tourne quand on danse à la fête.",
       "slot": "bottom",
       "file": "bottom.glb",
       "node": "bottom-long-skirt",
@@ -748,7 +748,7 @@
         }
       ],
       "tags": ["a-gagner", "mercerie", "quotidien"],
-      "triangles": 608
+      "triangles": 448
     },
     {
       "id": "bottom-overalls",
@@ -792,7 +792,7 @@
         }
       ],
       "tags": ["a-gagner", "fete"],
-      "triangles": 1760
+      "triangles": 1664
     },
     {
       "id": "shoes-clogs",

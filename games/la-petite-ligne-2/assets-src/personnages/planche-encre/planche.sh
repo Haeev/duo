@@ -4,6 +4,7 @@
 #   planche  -> sortie.png (défaut: la planche de la bible); controle -> sortie.png;
 #   etude    -> dossier de feuilles (trois silhouettes, six poses, cinq angles par pièce);
 #   avant    -> dossier des vues « avant » d'une pièce à reprendre (à lancer avant de la modifier, vers avant/).
+#   ourlet-avant -> vues « avant » de la course de près (vers avant/, chemin absolu); ourlet -> planche avant et après.
 # Lance son propre Vite sur un port libre, sans rechargement à chaud (vite.planche.config.mjs): la page charge
 # tout au départ, on peut reconstruire pendant une capture. Un port donné en 4e argument est repris s'il
 # répond: ne le faire que pour un serveur lancé depuis CET arbre. VUES_DIR=<dossier> garde les captures.

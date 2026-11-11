@@ -227,6 +227,7 @@ slot = "bottom"
 base = "jambes"
 couche = 0.008
 longueur = 1.0
+droite = true
 zones = [{ id = "principale", famille = "tissus", defaut = "marine" }]
 tags = ["quotidien"]
 
@@ -237,11 +238,16 @@ slot = "bottom"
 base = "jambes"
 couche = 0.008
 longueur = 0.3
+droite = true
 zones = [{ id = "principale", famille = "tissus", defaut = "olive" }]
 tags = ["ete"]
 
 # --- base "jupe": cône depuis la taille. bas = hauteur de l'ourlet au-dessus du sol (genou à 0.46: rien de
-# rigide sous le genou); evasement = élargissement à l'ourlet.
+# rigide sous le genou); evasement = élargissement à l'ourlet; suivi = part donnée aux jambes à l'ourlet;
+# buste = la taille prend les poids du buste (elle reste sous le haut quand on court, à mettre partout);
+# doublure = envers jusqu'à mi-cuisse (assise, on voit l'intérieur de l'étoffe et non au travers), jusqu'à
+# doublure_haut (0.60) pour une jupe courte; flancs = part gardée du suivi des jambes sur les côtés (assise, ils
+# tombent du bassin au lieu de se relever en abat-jour; 0.55 pour une jupe courte, 0.3 au genou).
 [[pieces]]
 id = "bottom-skirt"
 nom = "Jupe trapèze"
@@ -251,6 +257,10 @@ couche = 0.008
 bas = 0.50
 evasement = 0.10
 suivi = 0.8
+buste = true
+doublure = true
+doublure_haut = 0.75
+flancs = 0.55
 zones = [{ id = "principale", famille = "tissus", defaut = "prune" }]
 tags = ["quotidien"]
 
@@ -266,6 +276,10 @@ col = 1.337
 bas = 0.48
 evasement = 0.11
 suivi = 0.8
+buste = true
+doublure = true
+doublure_haut = 0.75
+flancs = 0.55
 zones = [{ id = "principale", famille = "tissus", defaut = "coquelicot" }]
 tags = ["quotidien"]
 
@@ -478,22 +492,31 @@ zones = [{ id = "principale", famille = "tissus", couleurs = ["noisette", "choco
 tags = ["a-gagner", "mercerie", "travail", "froid"]
 prix = 2400
 
-# --- base "jupe" (voir plus haut). Une jupe qui descend sous le genou est « portée par les jambes »
-# (portee = true): chaque moitié suit la cuisse puis le tibia de son côté, elle se pose sur les cuisses assise
-# et se soulève avec le mollet en course. Il lui faut alors profondeur = évasement d'avant en arrière à l'ourlet,
-# nettement plus petit que evasement (les côtés): 0.08 à 0.10; anneaux = nombre de rangs (11 par défaut).
+# --- base "jupe" (voir plus haut). Jupe au genou (décision du client q35, 2026-11-11: l'ourlet juste sous
+# le genou, à 0.42; plus bas, le genou plié de la course sortait par une échancrure ou par l'ourlet):
+# devant = le devant, d'un seul tenant, suit les deux jambes à parts égales (partage = demi-largeur du
+# partage en mètres, 0.2) et ne s'ouvre pas entre elles; côtés et dos sont portés par les jambes (ils se posent
+# sur les cuisses assise, le mollet soulève le dos en course); la valeur de devant est la profondeur où commence
+# le passage (0.02); flancs à 0.3. profondeur = évasement d'avant en arrière à l'ourlet (0.12, le genou
+# levé ne perce pas le devant); anneaux = nombre de rangs (11 par défaut).
+# Ancienne forme sous le genou (portee = true, chaque moitié suit sa jambe): plus utilisée, gardée pour mémoire.
 [[pieces]]
 id = "bottom-long-skirt"
-nom = "Jupe longue"
-description = "Une jupe ample jusqu'au mollet, qui tourne quand on danse à la fête."
+nom = "Jupe de fête"
+description = "Une jupe ample qui tombe au genou et tourne quand on danse à la fête."
 slot = "bottom"
 base = "jupe"
 couche = 0.010
-bas = 0.30
-evasement = 0.20
-profondeur = 0.09
-anneaux = 14
-portee = true
+bas = 0.42
+evasement = 0.18
+profondeur = 0.12
+anneaux = 11
+suivi = 0.9
+partage = 0.2
+devant = 0.02
+flancs = 0.3
+buste = true
+doublure = true
 zones = [{ id = "principale", famille = "tissus", couleurs = ["prune", "marine", "bouteille", "brique", "lin", "ocre"], defaut = "prune" }]
 tags = ["a-gagner", "mercerie", "quotidien"]
 prix = 2200
@@ -520,8 +543,8 @@ bavette = 1.22
 zones = [{ id = "principale", famille = "tissus", couleurs = ["bleu_de_travail", "marine", "olive", "ficelle", "brique"], defaut = "bleu_de_travail" }, { id = "boutons", famille = "fixes", couleurs = ["laiton", "acier"], defaut = "laiton" }]
 tags = ["a-gagner", "travail"]
 
-# --- base "robe" (voir plus haut), avec bouffant = renflement des manches, suivi (comme "jupe"),
-# col_claudine et ceinture (vrai ou faux) dans la deuxième zone.
+# --- base "robe" (voir plus haut), avec bouffant = renflement des manches, champs de la jupe au genou
+# (comme la jupe de fête), col_claudine et ceinture (vrai ou faux) dans la deuxième zone.
 [[pieces]]
 id = "dress-sunday"
 nom = "Robe du dimanche"
@@ -532,11 +555,16 @@ couche = 0.019
 manches = 0.36
 bouffant = 0.012
 col = 1.337
-bas = 0.36
-evasement = 0.17
-profondeur = 0.10
-anneaux = 13
-portee = true
+bas = 0.42
+evasement = 0.16
+profondeur = 0.12
+anneaux = 11
+suivi = 0.9
+partage = 0.2
+devant = 0.02
+flancs = 0.3
+buste = true
+doublure = true
 col_claudine = true
 ceinture = true
 zones = [{ id = "principale", famille = "tissus", couleurs = ["ciel", "coquelicot", "rose_ancien", "lilas", "sauge", "marine", "moutarde"], defaut = "ciel" }, { id = "garniture", famille = "tissus", couleurs = ["craie", "lin", "marine", "encre"], defaut = "craie" }]
