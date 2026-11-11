@@ -18,6 +18,9 @@ Modes:
   profil, de trois quarts dos et en marche: contrôle des couches. Sortie: un dossier, une feuille par mariage.
 - `avant`: les vues « avant » des pièces à reprendre, à capturer AVANT de toucher à leur forme, puis à
   copier dans `avant/` (la planche les relit).
+- `ourlet-avant` puis `ourlet`: les pièces de OURLET (ourlet au genou, jambes amples) debout et en course, de
+  face et de profil, de près, sur deux silhouettes. `ourlet-avant` écrit les vues « avant » dans le dossier
+  donné en sortie (`avant/`, chemin absolu), `ourlet` monte la planche avant et après.
 """
 import json
 import os
@@ -48,6 +51,27 @@ PIECES = [
     ("accessory-neckerchief", ["coquelicot"], "adult-m-medium", "adult-f-round", ["bleu_de_travail"]),
     ("accessory-apron", ["lin", "ficelle"], "adult-f-round", "adult-m-slim", ["ciel", "craie"]),
 ]
+
+# Pièces du départ, hors de la planche de la garde-robe: seulement pour les modes `etude`, `essai` et `ourlet`.
+AUTRES = [
+    ("bottom-trousers", ["marine"], "adult-m-medium", "adult-f-round", ["anthracite"]),
+    ("bottom-shorts", ["olive"], "adult-m-slim", "adult-f-round", ["marine"]),
+    ("bottom-skirt", ["prune"], "adult-f-medium", "adult-f-round", ["marine"]),
+    ("dress-simple", ["coquelicot"], "adult-f-slim", "child-medium", ["ciel"]),
+]
+
+# Ourlet au genou (décision du client q35) et jambes amples: la course de près, avant et après la reprise.
+# Les vues « avant » se capturent avec le mode `ourlet-avant` AVANT de reconstruire, vers `avant/`.
+OURLET = ["bottom-long-skirt", "dress-sunday", "bottom-skirt", "dress-simple", "bottom-trousers", "bottom-shorts"]
+OURLET_CADRE = {"centre": 0.68, "hauteur": 1.2}
+OURLET_POSES = [("debout, profil", 90, {}), ("course 1, face", 0, {"clip": "run", "instant": 0.3}),
+                ("course 1, profil", 90, {"clip": "run", "instant": 0.3}), ("course 2, face", 0, {"clip": "run", "instant": 0.8}),
+                ("course 2, profil", 90, {"clip": "run", "instant": 0.8})]
+
+
+def toutes():
+    return PIECES + AUTRES
+
 
 # Pièces reprises: ligne « avant », ligne « après », gros plans (centre et hauteur du cadre en mètres).
 REPRISES = {
@@ -161,7 +185,16 @@ def vues(mode, only):
                 out.append(view(f"{nom}--{lacet}", full(shape, pieces), lacet))
             out.append(view(f"{nom}--marche", full(shape, pieces), 60, clip="walk", instant=0.25))
         return out
-    for pid, ca, a, b, cb in PIECES:
+    if mode in ("ourlet", "ourlet-avant"):
+        tag = "avant" if mode == "ourlet-avant" else "vue"
+        for pid, ca, a, b, cb in toutes():
+            if pid not in OURLET or (only and pid not in only):
+                continue
+            for k, (shape, colors) in enumerate(((a, ca), (b, cb))):
+                for j, (_, lacet, pose) in enumerate(OURLET_POSES):
+                    out.append(view(f"{pid}--ourlet-{tag}-{k}-{j}", look(shape, pid, colors), lacet, cadre=OURLET_CADRE, **pose))
+        return out
+    for pid, ca, a, b, cb in (toutes() if mode in ("etude", "essai") else PIECES):
         if only and pid not in only:
             continue
         if mode == "avant":
@@ -212,7 +245,7 @@ def monter_etude(folder, target, only):
     os.makedirs(target, exist_ok=True)
     font = ImageFont.truetype(FONT, 13)
     cw, ch = 128, 244  # cases recadrées sur le personnage (sauf couché: il prend toute la largeur)
-    for pid, *_ in PIECES:
+    for pid, *_ in toutes():
         if only and pid not in only:
             continue
         sheet = Image.new("RGB", (cw * len(ANGLES) * len(ETUDE), 20 + ch * len(POSES)), "#231a17")
@@ -235,7 +268,7 @@ def monter_etude(folder, target, only):
 
 def monter_essai(folder, target, only):
     os.makedirs(target, exist_ok=True)
-    for pid, *_ in PIECES:
+    for pid, *_ in toutes():
         if only and pid not in only:
             continue
         cells = []
@@ -272,14 +305,54 @@ def monter_mariages(folder, target, only):
         print(path, sheet.size)
 
 
+def monter_ourlet(folder, target, only):
+    """Une planche: par pièce, une ligne « avant » (images de `avant/`) et une ligne « après », les poses de
+    OURLET_POSES de près sur les deux silhouettes de la pièce."""
+    with open(CATALOGUE, encoding="utf-8") as fh:
+        names = {p["id"]: p for p in json.load(fh)["pieces"]}
+    font, bold, small = ImageFont.truetype(FONT, 15), ImageFont.truetype(FONT_BOLD, 16), ImageFont.truetype(FONT, 13)
+    pids = [p for p in toutes() if p[0] in OURLET and (not only or p[0] in only)]
+    n = len(OURLET_POSES)
+    width = 2 * n * W + 2 * 16 + 12
+    block = 46 + 18 + 2 * (22 + H) + 16
+    sheet = Image.new("RGB", (width, 60 + block * len(pids)), "#231a17")
+    d = ImageDraw.Draw(sheet)
+    d.text((16, 18), "Ourlet au genou et jambes amples: la course de près, avant et après", fill="#efe6d2", font=bold)
+    y = 60
+    for pid, ca, a, b, cb in pids:
+        p = names[pid]
+        d.text((16, y), f"{p['name']} ({pid}), {p['triangles']} triangles", fill="#efe6d2", font=font)
+        d.text((16, y + 20), p.get("description", ""), fill="#b9b7b0", font=small)
+        y += 46
+        for k, shape in enumerate((a, b)):
+            for j, (label, _, _) in enumerate(OURLET_POSES):
+                d.text((16 + k * (n * W + 12) + j * W + 4, y), f"{shape}, {label}" if j == 0 else label, fill="#b9b7b0", font=small)
+        y += 18
+        for title, tag, src in (("Avant", "avant", AVANT), ("Après", "vue", folder)):
+            d.text((16, y + 3), title, fill="#e3b04b", font=small)
+            y += 22
+            for k in range(2):
+                for j in range(n):
+                    nom = f"{pid}--ourlet-{tag}-{k}-{j}.png"
+                    img = Image.open(os.path.join(src, nom)).convert("RGB").resize((W, H), Image.LANCZOS)
+                    sheet.paste(img, (16 + k * (n * W + 12) + j * W, y))
+            y += H
+        y += 16
+    # palette de 256 teintes: le rendu encré n'en a guère plus, et la planche passe de 4,5 à moins de 2 Mo
+    sheet.quantize(256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).save(target, optimize=True)
+    print(target, sheet.size)
+
+
 def monter(mode, folder, target, only):
+    if mode == "ourlet":
+        return monter_ourlet(folder, target, only)
     if mode == "mariages":
         return monter_mariages(folder, target, only)
     if mode == "etude":
         return monter_etude(folder, target, only)
     if mode == "essai":
         return monter_essai(folder, target, only)
-    if mode == "avant":
+    if mode in ("avant", "ourlet-avant"):
         os.makedirs(target, exist_ok=True)
         for v in vues(mode, only):
             load(folder, v).save(os.path.join(target, v["nom"] + ".png"), optimize=True)

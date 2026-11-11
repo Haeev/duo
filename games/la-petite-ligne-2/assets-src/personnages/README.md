@@ -29,7 +29,7 @@ Douze pièces à gagner (étiquette `a-gagner`), toutes faites par le script, au
 |---|---|---|
 | `top-cardigan` | Gilet de laine | mercerie, 28 € |
 | `bottom-corduroy` | Pantalon de velours | mercerie, 24 € |
-| `bottom-long-skirt` | Jupe longue | mercerie, 22 € |
+| `bottom-long-skirt` | Jupe de fête (au genou) | mercerie, 22 € |
 | `shoes-clogs` | Sabots | mercerie, 16 € |
 | `accessory-scarf` | Écharpe | mercerie, 12 € |
 | `hat-cap` | Casquette | mercerie, 9 € |
@@ -52,8 +52,8 @@ Toutes les pièces de la garde-robe, le gilet et le débardeur ont été reprise
 - **Les détails se lisent par la teinte, pas par le relief**: le trait du rendu ne cerne que les silhouettes et les arêtes de plus de 70 degrés; une poche en relief de 6 mm donnait un pointillé. Coutures, bords de poche, bord de col et de revers, côtes: des traits d'encre en géométrie (teinte fixe `encre_trait` du nuancier, `Body.trait` et le liseré de `Body.plaque`), larges de 7 à 8 mm.
 - **Les couches** (table en tête des pièces de `gabarits.toml`): près du corps, puis gilet et bavette, puis veste, puis tablier, 4 mm d'écart au moins; une coque posée sur un tour à seize pans a des arcs fins (ou ses colonnes sur les pans).
 - **Une largeur d'étoffe se compte sur l'étoffe** (`Body.meridien`): un col défini en hauteur s'étalait sur tout le plat de l'épaule.
-- **Jupe sous le genou** (`portee = true`): chaque moitié suit la cuisse puis le tibia de son côté, colonnes serrées au milieu, envers jusqu'à mi-cuisse (`doublure`), et peu de profondeur d'avant en arrière. Assise, elle se pose sur les cuisses et retombe des genoux; en marche rien ne sort. Limite connue: en course (genou plié à 113 degrés dans le clip), la jambe d'appui se découvre par une échancrure au milieu du devant et la jambe levée sort par l'ourlet soulevé; sans simulation d'étoffe, c'est le moins mauvais partage (voir `w_porte`).
-- **Jambes amples** (`droite = true`): le côté de la jambe prolonge la hanche; sans cela le bassin déborde en boule au-dessus de deux jambes étroites (c'était la « couche » de la salopette).
+- **Jupe au genou** (décision du client q35: la jupe de fête et la robe du dimanche s'arrêtent juste sous le genou, `bas = 0.42`): le devant, d'un seul tenant, suit les deux jambes à parts égales (`devant`, `partage`) et ne s'ouvre plus entre elles en course; côtés et dos restent portés par les jambes (`w_porte`), les côtés tombent du bassin assis (`flancs`); envers jusqu'à mi-cuisse (`doublure`), taille liée au buste (`buste`, sinon elle perce le haut en course). La jupe trapèze et la robe t-shirt, qui perçaient le haut en course et s'ouvraient en abat-jour transparent assises, ont reçu `buste`, `doublure` (jusqu'à `doublure_haut = 0.75`) et `flancs = 0.55`. L'ancienne forme sous le genou (`portee = true` seule) laissait sortir la jambe d'appui en course par une échancrure: ne plus l'employer.
+- **Jambes amples** (`droite = true`): le côté de la jambe prolonge la hanche; sans cela le bassin déborde en boule au-dessus de deux jambes étroites (c'était la « couche » de la salopette). Posé aussi sur le pantalon droit et le short le 2026-11-11.
 - **Soudure par distance** (`Builder.weld`): les vecteurs sont en simple précision; l'arrondi à 7 chiffres donnait des topologies différentes d'une corpulence à l'autre. En cas de refus (« n'a pas la topologie de la base »), le script nomme les sommets en cause.
 - **Coiffes au lit**: le moteur ne retire aucune pièce en posture couchée (les pièces sont fusionnées à l'assemblage). Mesure avec `python3 assets-src/personnages/verifier_couche.py assets/commun/personnages/hat.glb`: le bord du chapeau de paille passe 17 cm sous le couchage, le pompon du bonnet dépasse la tête de lit. Brique à écrire côté moteur: assembler le dormeur sans son emplacement `hat` en posture `lie`.
 
@@ -70,7 +70,7 @@ Toutes les pièces de la garde-robe, le gilet et le débardeur ont été reprise
 | `nuancier.json` | copie de `docs/jeux/jeu-1/refonte/planches/source/nuancier.json` (à recopier si la bible change) |
 | `source/squelette-meshy.glb` | squelette de 24 os et clips `walk` et `run` du rig de Meshy (tâche `01a1c4e7-6e4d-754d-884c-8c8d594ec9ad`), par `extraire_squelette.py` |
 | `meshy/` | pièces rigides générées par Meshy et leurs fiches |
-| `planche-encre/` | planches des tenues dans l'aperçu encré du jeu (`planche.sh`: modes `planche`, `essai`, `etude`, `mariages`, `controle`, `avant`; page servie par un Vite sans rechargement, `planche_tenues.py` pour la liste des vues et le montage, `avant/` pour les vues d'avant reprise que la planche relit) |
+| `planche-encre/` | planches des tenues dans l'aperçu encré du jeu (`planche.sh`: modes `planche`, `essai`, `etude`, `mariages`, `controle`, `avant`, `ourlet-avant` et `ourlet` (course de près avant et après, planche `tenues-ourlet-genou.png`); page servie par un Vite sans rechargement, `planche_tenues.py` pour la liste des vues et le montage, `avant/` pour les vues d'avant reprise que la planche relit) |
 
 ## Conventions lues par l'assemblage (L6)
 

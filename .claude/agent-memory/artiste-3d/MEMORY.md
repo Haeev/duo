@@ -394,3 +394,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Voie: dessus du rail à 0,26 m au-dessus de l'origine d'un véhicule (posé à la hauteur du terrain). Un brief qui met l'essieu à 0,25 avec des roues de 0,25 enterre les roues: tout remonter de 0,26 et changer la fiche (`deck`, `height`).
 - Planche de l'après-midi: `planche/apres-midi.sh controle|planche <dossier> [vues]` (cinq vues de près ou trois angles, mannequin de 1,80 m par `echelle` des silhouettes de planche.mjs). Vite recharge à toute écriture dans le paquet: construire les objets dans un dossier du scratchpad pendant une capture (`construire_objets.py <dossier>`).
 - Garde-fou: `python3 - a b <<EOF` (deux fichiers en arguments) est refusé, un seul passe; une boucle `sleep` de plus d'une commande aussi (attendre une tâche lancée en arrière-plan).
+
+## Jupes au genou et jupes courtes (q35, vérifié le 2026-11-11)
+
+- Échancrure en course d'une jupe dont chaque moitié suit sa jambe: le milieu partagé sur quelques cm fait un pli qui recule derrière la jambe d'appui. Remède: le DEVANT seul prend des poids partagés sur toute la largeur (`partage` 0.2, profondeur 0.12), côtés et dos restent portés (`w_porte`), mélange linéaire des deux jeux de poids selon y (`devant`).
+- Jupe assise en abat-jour (côtés relevés avec les cuisses, intérieur vu au travers): mêler les poids du buste sur les côtés (`flancs`, 0.3 au genou, 0.55 court: plus bas, la cuisse perce le côté) et une doublure retournée de 3 mm. Taille d'une jupe en `Hips` seuls: elle perce le t-shirt dès que le buste penche (`buste`).
+- Une robe dont la jupe a des colonnes resserrées (PORTEE) et le corsage seize pans égaux montre des tirets d'encre à la couture de taille; la ceinture les cache (robe du dimanche), sinon garder les pans égaux.
+- Le nom `cotes` existait déjà (relief des côtes des vestes): vérifier qu'un nouveau champ de gabarits.toml n'existe pas ailleurs.
+- `sonde.py` sans section du corps nommée ne voit pas l'assise: passer `body-base/thigh-a+thigh-b+shin` pour juger un réglage assis. Les paires « dos 0,15 à 0,2 m, hauteur 0,5 » en course sont le mollet contre la doublure du dos d'une jupe au genou.
+- Planche avant et après d'une pièce déjà modifiée: remettre les GLB et le catalogue de HEAD (`git show HEAD:...`), capturer, reconstruire (script `avant_head.sh` du scratchpad, refait facilement). Chemin de sortie de `planche.sh` relatif = relatif au paquet (il fait `cd`): donner un chemin absolu.

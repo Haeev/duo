@@ -991,9 +991,11 @@ class Body:
         return out
 
     @staticmethod
-    def w_skirt(top_z, hem, suivi=None, spread=0.6):
+    def w_skirt(top_z, hem, suivi=None, spread=0.6, buste=False):
         """Poids d'une jupe: le bassin en haut, les cuisses vers l'ourlet (moitié par défaut). suivi = part donnée aux
-        jambes à l'ourlet; avec suivi, sous le genou l'ourlet suit aussi le tibia (jupe longue, robe ample)."""
+        jambes à l'ourlet; avec suivi, sous le genou l'ourlet suit aussi le tibia (jupe longue, robe ample).
+        buste: le haut prend les poids du buste au lieu du bassin seul (la taille reste sous le haut porté
+        par-dessus, ou sous le corsage de la robe, quand le buste penche en course)."""
         def w(p):
             t = min(max((top_z - p.z) / (top_z - hem), 0.0), 1.0)
             if suivi is None:
@@ -1006,7 +1008,7 @@ class Body:
                 legs = suivi * smooth(0.06, 0.55, t) * (1 - 0.45 * smooth(-0.02, 0.12, p.y))
                 side = smooth(-spread, spread, p.x)
             low = 0.0 if suivi is None else 0.35 * smooth(KNEE + 0.06, KNEE - 0.12, p.z)
-            out = {"Hips": 1 - legs}
+            out = {bone: w * (1 - legs) for bone, w in Body.w_torso(p).items()} if buste else {"Hips": 1 - legs}
             for name, k in (("Left", side), ("Right", 1 - side)):
                 out[name + "UpLeg"] = legs * k * (1 - low)
                 out[name + "Leg"] = legs * k * low
@@ -1018,11 +1020,38 @@ class Body:
     # s'étalait sur 28 cm, à 10 degrés du milieu encore sur 13: la jambe d'appui se découvrait en course).
     PORTEE = [0, 40, 66, 85, 90, 95, 114, 140, 180, 220, 246, 265, 270, 275, 294, 320]
 
-    def doublure(self, b, st, tg, ws, n=16, up=0.60):
-        """Envers d'une jupe portée par les jambes, jusqu'à mi-cuisse: quand l'ourlet se soulève (course, assise),
-        on voit l'intérieur de l'étoffe et non au travers."""
+    def doublure(self, b, st, tg, ws, n=16, up=0.60, angles=PORTEE):
+        """Envers d'une jupe portée par les jambes (ou au genou), jusqu'à mi-cuisse: quand l'ourlet se soulève
+        (course, assise), on voit l'intérieur de l'étoffe et non au travers. Mêmes colonnes que l'endroit."""
         inner = [(c, d, hint, ru - 0.003, rv - 0.003) for c, d, hint, ru, rv in st if c.z <= up]
-        b.sweep(inner, n, tg, ws, flip=True, angles=self.PORTEE)
+        b.sweep(inner, n, tg, ws, flip=True, angles=angles)
+
+    def colonnes(self, spec):
+        """Colonnes resserrées au milieu (PORTEE) dès qu'une part de la jupe est portée par les jambes."""
+        return self.PORTEE if spec.get("portee") or "devant" in spec else None
+
+    def w_jupe(self, spec, top_z):
+        """Poids d'une jupe ou d'une robe non portée (champs suivi, partage, buste). Avec `devant`
+        (jupe au genou), seul le devant prend ces poids partagés sur toute la largeur; côtés et dos sont portés
+        par les jambes (`w_porte`): assise, l'étoffe se pose sur les cuisses et retombe des genoux, en course le
+        mollet soulève le dos; le devant, d'un seul tenant, ne s'ouvre pas entre les deux jambes. `devant`:
+        profondeur (m, depuis le milieu) où commence le passage au devant partagé, sur 6 cm. `flancs` vaut aussi
+        sans `devant` (jupe courte)."""
+        ws = self.w_skirt(top_z, spec["bas"], spec.get("suivi"), spec.get("partage", 0.6), buste=spec.get("buste", False))
+        if "devant" not in spec and "flancs" not in spec:
+            return ws
+        y0, flancs = -spec.get("devant", 0.0), spec.get("flancs", 1.0)
+
+        def mix(a, b, f):
+            return {k: f * a.get(k, 0.0) + (1 - f) * b.get(k, 0.0) for k in sorted(set(a) | set(b))}
+
+        def w(p):
+            out = mix(ws(p), self.w_porte(p), smooth(y0, y0 - 0.06, p.y)) if "devant" in spec else ws(p)
+            # côtés: `flancs` = part gardée du suivi des jambes (assise, ils tombent du bassin au lieu de se
+            # relever en abat-jour avec les cuisses)
+            side = abs(p.x) / max(math.hypot(p.x, p.y), 1e-6)
+            return mix(Body.w_torso(p), out, (1 - flancs) * smooth(0.55, 0.92, side))
+        return w
 
     def jupe(self, spec):
         b = Builder()
@@ -1033,8 +1062,12 @@ class Body:
             b.sweep(rim(st, spec["couche"] - 0.002, end=True), 16, tg, self.w_porte, angles=self.PORTEE)
             self.doublure(b, st, tg, self.w_porte)
         else:
-            st = rim(rim(st, 0.02, start=True), spec["couche"] - 0.002, end=True)
-            b.sweep(st, 16, tg, self.w_skirt(top_z, spec["bas"], spec.get("suivi")))
+            ws, cols = self.w_jupe(spec, top_z), self.colonnes(spec)
+            if spec.get("doublure"):
+                self.doublure(b, st, tg, ws, up=spec.get("doublure_haut", 0.60), angles=cols)
+            else:
+                st = rim(st, 0.02, start=True)
+            b.sweep(rim(st, spec["couche"] - 0.002, end=True), 16, tg, ws, angles=cols)
         return b
 
     def robe(self, spec):
@@ -1044,9 +1077,12 @@ class Body:
             ws = self.w_porte
             self.doublure(b, st, tag(0, color_of(spec["zones"][0])), ws)
         else:
-            st = rim(st, 0.02, start=True)
-            ws = self.w_skirt(WAIST, spec["bas"], spec.get("suivi"))
-        b.sweep(st, 16, tag(0, color_of(spec["zones"][0])), ws, angles=self.PORTEE if spec.get("portee") else None)
+            ws = self.w_jupe(spec, WAIST)
+            if spec.get("doublure"):
+                self.doublure(b, st, tag(0, color_of(spec["zones"][0])), ws, up=spec.get("doublure_haut", 0.60), angles=self.colonnes(spec))
+            else:
+                st = rim(st, 0.02, start=True)
+        b.sweep(st, 16, tag(0, color_of(spec["zones"][0])), ws, angles=self.colonnes(spec))
         b = self.torse(spec, b, hem_z=WAIST)
         if len(spec["zones"]) > 1:
             trim = tag(1, color_of(spec["zones"][1]))
