@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "id": "cuisine",
+  "name": "Cuisine",
+  "pourquoi": "Les plats que le duo a déjà réussis (la ligne n'apparaît qu'après le premier). Un plat rapporte plus que ses ingrédients livrés crus, pour que cuisiner paie. Garde-fous (economie-aubrune.md, 2): sous le prix du café quand il le vend (omelette sous 3,50), et sous le prix d'achat de ses ingrédients quand tous s'achètent (pommes sautées sous 2,80, soupe de légumes sous 2,40 la part). Le pot-au-feu et la tourte, repas spéciaux, ne se vendent nulle part: ils ne se commandent pas.",
+  "lines": [
+    {
+      "id": "omelette",
+      "item": "omelette",
+      "count": {
+        "min": 4,
+        "max": 6
+      },
+      "price": 340,
+      "when": []
+    },
+    {
+      "id": "oeuf-au-plat",
+      "item": "oeuf-au-plat",
+      "count": {
+        "min": 4,
+        "max": 8
+      },
+      "price": 150,
+      "when": []
+    },
+    {
+      "id": "pommes-sautees",
+      "item": "pommes-sautees",
+      "count": {
+        "min": 3,
+        "max": 5
+      },
+      "price": 250,
+      "when": []
+    },
+    {
+      "id": "soupe-de-legumes",
+      "item": "soupe-de-legumes",
+      "count": {
+        "min": 3,
+        "max": 5
+      },
+      "price": 230,
+      "when": []
+    },
+    {
+      "id": "salade-de-radis",
+      "item": "salade-de-radis",
+      "count": {
+        "min": 2,
+        "max": 4
+      },
+      "price": 300,
+      "when": []
+    },
+    {
+      "id": "friture",
+      "item": "friture",
+      "count": {
+        "min": 2,
+        "max": 3
+      },
+      "price": 960,
+      "when": []
+    },
+    {
+      "id": "perche-meuniere",
+      "item": "perche-meuniere",
+      "count": {
+        "min": 2,
+        "max": 3
+      },
+      "price": 720,
+      "when": []
+    },
+    {
+      "id": "truite-grillee",
+      "item": "truite-grillee",
+      "count": {
+        "min": 2,
+        "max": 3
+      },
+      "price": 990,
+      "when": []
+    },
+    {
+      "id": "gratin",
+      "item": "gratin",
+      "count": {
+        "min": 2,
+        "max": 4
+      },
+      "price": 420,
+      "when": []
+    },
+    {
+      "id": "matelote",
+      "item": "matelote",
+      "count": {
+        "min": 1,
+        "max": 2
+      },
+      "price": 900,
+      "when": []
+    },
+    {
+      "id": "tarte-aux-pommes",
+      "item": "tarte-aux-pommes",
+      "count": {
+        "min": 2,
+        "max": 3
+      },
+      "price": 220,
+      "when": []
+    },
+    {
+      "id": "compotee-de-mures",
+      "item": "compotee-de-mures",
+      "count": {
+        "min": 2,
+        "max": 3
+      },
+      "price": 250,
+      "when": []
+    },
+    {
+      "id": "tomates-farcies",
+      "item": "tomates-farcies",
+      "count": {
+        "min": 2,
+        "max": 3
+      },
+      "price": 450,
+      "when": []
+    }
+  ]
+}

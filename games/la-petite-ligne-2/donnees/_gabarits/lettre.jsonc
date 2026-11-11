@@ -1,0 +1,27 @@
+// GABARIT: une lettre du courrier, apportée par l'événement du guichet (le train du samedi).
+// Créer: pnpm nouveau lettre <id> <lieu>   -> donnees/lieux/<lieu>/lettres/<id>.json
+// Schéma: src/donnees/schemas/commande.ts. Moteur: src/simulation/commandes/ (rien à y toucher).
+// Le lieu doit avoir un guichet (commande.json). À chaque passage, les lettres prêtes (conditions
+// vraies) arrivent dans l'ordre de « order », « mailPerVisit » au plus; qui reçoit les remet à
+// qui ouvre l'écran de livraison (« Prendre le courrier »), on les lit là et on les relit ensuite.
+{
+  "schema": 1,
+  "id": "exemple-lettre",
+  // Expéditeur, lu sur l'enveloppe (40 caractères au plus).
+  "from": "Une cousine de la ville",
+  // Rang d'arrivée quand plusieurs lettres sont prêtes le même jour: la plus petite d'abord.
+  "order": 100,
+  // Quand elle part (mêmes conditions que les dialogues); [] = au premier passage. Une lettre qui
+  // se souvient de ce qu'a fait le duo lit un fait: { "type": "remembered", "key": "objets.obtenu.brochet" }.
+  "when": [],
+  // Paragraphes (400 caractères chacun au plus, 5 au plus). On écrit au duo: « vous ».
+  "text": ["Bonjour à vous deux. Il paraît que le train s'arrête de nouveau chez vous."],
+  "signature": "Votre cousine",
+  // Facultatif, avec « attach »: ce que contient l'enveloppe, lu sous la lettre.
+  "enclosed": "Une pomme",
+  // Effets appliqués une fois, à qui prend le courrier: give_item, give_money, give_recipe,
+  // remember... ([] = une lettre seule). Mêmes effets que les dialogues.
+  "attach": [{ "type": "give_item", "item": "pomme", "count": 1 }],
+  // Facultatif: pourquoi elle arrive à ce moment, qui l'écrit.
+  "pourquoi": "Exemple de lettre.",
+}

@@ -12,6 +12,11 @@ export interface DialogueTuning {
    */
   readonly shopClosed: { readonly node: string };
   /**
+   * Page « livrer la commande » ajoutée à la fin d'une conversation avec qui reçoit la commande de
+   * la semaine (`commande.json` du lieu, `simulation/commandes/`): nœud réservé et deux options.
+   */
+  readonly orderOffer: { readonly node: string; readonly open: string; readonly leave: string };
+  /**
    * Priorité à partir de laquelle un dialogue a quelque chose à dire (histoire, quête, souvenir,
    * première rencontre, remarque sur l'hygiène): au comptoir tenu, il passe avant la boutique, et
    * l'offre de la boutique ne le suit pas. En dessous: conversation ordinaire (quotidien).
@@ -29,6 +34,7 @@ export interface DialogueTuning {
 export const DIALOGUES: DialogueTuning = {
   shopOffer: { node: 'offre-du-commerce', open: 'voir-le-commerce', leave: 'au-revoir' },
   shopClosed: { node: 'commerce-ferme' },
+  orderOffer: { node: 'offre-de-la-commande', open: 'livrer-la-commande', leave: 'pas-maintenant' },
   pendingPriority: 10,
   heardPrefix: 'entendu',
 };

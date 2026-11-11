@@ -25,6 +25,7 @@ import { TRAVEL_EVENTS } from '../voyage/evenements';
 import { FARM_EVENTS } from '../elevage/evenements';
 import { VEHICLE_EVENTS } from '../vehicules/evenements';
 import { MUSIC_EVENTS } from '../musique/evenements';
+import { ORDER_EVENTS } from '../commandes/evenements';
 
 export const CORE_EVENTS = [
   /**
@@ -83,5 +84,6 @@ export const GameEventSchema = v.variant('type', [
   ...VEHICLE_EVENTS,
   ...FARM_EVENTS,
   ...MUSIC_EVENTS,
+  ...ORDER_EVENTS,
 ]);
 export type GameEvent = v.InferOutput<typeof GameEventSchema>;

@@ -22,6 +22,14 @@ import {
   type PlaceDef,
 } from './schemas/lieu';
 import { HousingSchema, type HousingDef } from './schemas/logement';
+import {
+  LetterSchema,
+  OrderDeskSchema,
+  OrderTableSchema,
+  type LetterDef,
+  type OrderDeskDef,
+  type OrderTableDef,
+} from './schemas/commande';
 import { PropSchema, type PropDef } from './schemas/meuble';
 import { ItemSchema, type ItemDef } from './schemas/objets';
 import {
@@ -69,6 +77,19 @@ export interface PlaceContent {
   readonly housings: ById<HousingDef>;
   /** Véhicules de voie du lieu (`vehicules/<id>.json`): la draisine. */
   readonly vehicles: ById<RailVehicleDef>;
+  /**
+   * Commande de la semaine et courrier (`commande.json`, `commandes/`, `lettres/`), `null` si le
+   * lieu n'a pas de guichet (`simulation/commandes/`).
+   */
+  readonly orders: OrderContent | null;
+}
+
+/** Le guichet d'un lieu, ses tables de lignes et ses lettres. */
+export interface OrderContent {
+  readonly desk: OrderDeskDef;
+  /** Dans l'ordre des noms de fichiers. */
+  readonly tables: readonly OrderTableDef[];
+  readonly letters: ById<LetterDef>;
 }
 
 /** Tout le contenu du jeu, lu et contrôlé. Il ne change jamais pendant une partie. */
@@ -200,6 +221,14 @@ export function loadContent(files: Files): Content {
     const scenes = parseFolder(SceneSchema, files, `${base}/scenes`, problems);
     const housings = parseFolder(HousingSchema, files, `${base}/logements`, problems);
     const vehicles = parseFolder(RailVehicleSchema, files, `${base}/vehicules`, problems);
+    const deskPath = `${base}/commande.json`;
+    const desk = deskPath in files ? parse(OrderDeskSchema, files, deskPath, problems) : null;
+    const tables = Object.values(
+      parseFolder(OrderTableSchema, files, `${base}/commandes`, problems),
+    );
+    const letters = parseFolder(LetterSchema, files, `${base}/lettres`, problems);
+    if (desk === null && (tables.length > 0 || Object.keys(letters).length > 0))
+      problems.push(`${base}: tables de commande ou lettres sans guichet (commande.json)`);
     if (def === null || map === null) continue;
     // Un point ou une porte d'intérieur qui porterait le nom d'un autre l'écraserait à la fusion.
     const seen = new Set([...Object.keys(map.points), ...Object.keys(map.doors ?? {})]);
@@ -227,6 +256,7 @@ export function loadContent(files: Files): Content {
       scenes,
       housings,
       vehicles,
+      orders: desk === null ? null : { desk, tables, letters },
     };
   }
 

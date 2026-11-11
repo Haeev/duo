@@ -443,6 +443,10 @@ export function createKitchen(
       case 'tool_ordered':
       case 'tool_sharpened':
       case 'workshop_opened':
+      case 'order_opened':
+      case 'order_renewed':
+      case 'order_delivered':
+      case 'mail_taken':
       case 'ate':
       case 'bag_changed':
       case 'brick_used':

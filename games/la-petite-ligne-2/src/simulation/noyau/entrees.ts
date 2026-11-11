@@ -18,6 +18,7 @@ import { SCENE_INTENTS } from '../scenes/intentions';
 import { TRAVEL_INTENTS } from '../voyage/intentions';
 import { FARM_INTENTS } from '../elevage/intentions';
 import { MUSIC_INTENTS } from '../musique/intentions';
+import { ORDER_INTENTS } from '../commandes/intentions';
 import { CORE_INTENTS } from './intentions';
 
 const Unit = v.pipe(FiniteSchema, v.minValue(-1), v.maxValue(1));
@@ -61,5 +62,6 @@ export const IntentSchema = v.variant('type', [
   ...FISHING_INTENTS,
   ...FARM_INTENTS,
   ...MUSIC_INTENTS,
+  ...ORDER_INTENTS,
 ]);
 export type Intent = v.InferOutput<typeof IntentSchema>;

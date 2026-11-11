@@ -30,6 +30,7 @@ import { validateHousings } from '../simulation/logement/valider';
 import { validatePassages } from '../simulation/lieux/valider';
 import { checkPlans } from '../simulation/fabrication/valider';
 import { validateMusic } from '../simulation/musique/valider';
+import { validateOrders } from '../simulation/commandes/valider';
 
 /** Décision à deux citée par une condition ou un effet: déclarée par une étape, option connue. */
 function checkDecision(
@@ -806,6 +807,7 @@ export function validateContent(content: Content): string[] {
   // Suites de quêtes et scènes: références, et aucune suite qui puisse se bloquer.
   problems.push(...validateStory(content, { condition: checkCondition, effect: checkEffect }));
   problems.push(...validateHousings(content));
+  problems.push(...validateOrders(content, { condition: checkCondition, effect: checkEffect }));
   problems.push(...validatePassages(content));
   problems.push(...validateMusic(content));
   return problems;

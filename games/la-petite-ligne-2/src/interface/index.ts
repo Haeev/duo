@@ -12,6 +12,8 @@ import type { GameEvent } from '../simulation/noyau/evenements';
 import { formatEuros } from '../simulation/sac/argent';
 import { createShopScreen } from './boutique/ecran';
 import { createWorkshopScreen } from './atelier/ecran';
+import { createOrderScreen } from './commande/ecran';
+import { ORDER_REFUSALS, ORDER_TEXTS } from './commande/textes';
 import { shopRefusalText } from './boutique/textes';
 import { createNotebook, type NotebookExtras } from './carnet';
 import { UI_SCALE_FACTOR } from './carnet/lectures';
@@ -255,6 +257,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     UI_TUNING.openGuardMs,
     reduced,
   );
+  // Commande de la semaine: écran ouvert par « Livrer la commande » (événement `order_opened`).
+  const orderScreen = createOrderScreen(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs);
   layer.dataset.motion = reduced() ? 'reduced' : 'full';
   const playerColors = options.playerColors ?? EDITOR_SETTINGS.fallbackAccents;
   const editor = createCharacterEditor(layer, {
@@ -310,7 +314,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       const says = passageSays({ content: view.content, world }, target);
       if (says !== null) return says;
     }
-    return shopRefusalText(reason) ?? refusalText(reason);
+    return ORDER_REFUSALS[reason] ?? shopRefusalText(reason) ?? refusalText(reason);
   }
 
   function onEvent(event: GameEvent): void {
@@ -324,13 +328,20 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     const other: PlayerIndex = me === 0 ? 1 : 0;
     shop.onEvent(event, me, now);
     workshop.onEvent(event, me, now);
+    orderScreen.onEvent(event, me, now);
     const shownInNotebook = notebook.onEvent(event, me);
     const vehicleNotice = vehicleGauge.onEvent(event, me, now);
     if (vehicleNotice !== null) hud.notice(now, 'train', vehicleNotice);
     switch (event.type) {
       case 'refused':
         if (event.player === me) dialogue.unlock();
-        if (event.player === me && !shop.isOpen() && !workshop.isOpen() && !shownInNotebook)
+        if (
+          event.player === me &&
+          !shop.isOpen() &&
+          !workshop.isOpen() &&
+          !orderScreen.isOpen() &&
+          !shownInNotebook
+        )
           hud.refusal(now, refusalLine(event.reason, event.target));
         // Un train est attendu: la fiche du véhicule dit pourquoi il ne part pas.
         if (event.player === me && event.reason === 'train-due' && event.target !== null) {
@@ -418,6 +429,9 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         hud.notice(now, 'info', fill(TEXTS.notices.reward[event.kind], { nom: name ?? event.id }));
         break;
       }
+      case 'order_renewed':
+        hud.notice(now, 'info', ORDER_TEXTS.notice);
+        break;
       case 'mirror_opened': {
         const world = view.world();
         if (event.player === me && world !== null && lookRevealed(world, me))
@@ -526,6 +540,9 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'music_note':
       case 'music_finished':
       case 'music_closed':
+      case 'order_opened':
+      case 'order_delivered':
+      case 'mail_taken':
         break;
     }
   }
@@ -567,6 +584,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.isOpen() ||
       shop.isOpen() ||
       workshop.isOpen() ||
+      orderScreen.isOpen() ||
       notebook.isOpen() ||
       kitchen.isOpen() ||
       stage.isOpen() ||
@@ -589,6 +607,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.isOpen() ||
       shop.isOpen() ||
       workshop.isOpen() ||
+      orderScreen.isOpen() ||
       notebook.isOpen() ||
       kitchen.isOpen() ||
       stage.isOpen() ||
@@ -629,6 +648,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     else if (dialogue.isOpen()) used = dialogue.key(raw.code, now);
     else if (shop.isOpen()) used = shop.key(raw.code, now);
     else if (workshop.isOpen()) used = workshop.key(raw.code, now);
+    else if (orderScreen.isOpen()) used = orderScreen.key(raw.code, now);
     else if (notebook.isOpen()) used = notebook.key(raw.code, raw.shiftKey, now);
     else if (sceneLine.key(raw.code, now)) used = true;
     else if (raw.code === 'KeyG' && !raw.repeat) {
@@ -685,6 +705,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       }
       shop.frame(world, me, now);
       workshop.frame(world, me, now);
+      orderScreen.frame(world, me, now);
       kitchen.frame(dtMs);
       stage.frame(dtMs);
       deco.frame();
@@ -692,7 +713,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       chapterEnd.frame(world, me, now);
       sceneOverlay.frame(world, me, now);
       sceneLine.frame(world, me, now, dtMs);
-      const shopOpen = shop.isOpen() || workshop.isOpen();
+      const shopOpen = shop.isOpen() || workshop.isOpen() || orderScreen.isOpen();
       const menu = notebook.isOpen() || dialogue.isOpen() || shopOpen;
       // Pendant une scène (hors attente) ou un geste de scène, la touche d'action sert à la
       // scène: pas de bulle d'action.
@@ -734,6 +755,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         notebook.isOpen() ||
         shop.isOpen() ||
         workshop.isOpen() ||
+        orderScreen.isOpen() ||
         kitchen.isOpen() ||
         stage.isOpen() ||
         deco.isOpen() ||
@@ -756,6 +778,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       notebook.dispose();
       shop.dispose();
       workshop.dispose();
+      orderScreen.dispose();
       editor.dispose();
       kitchen.dispose();
       stage.dispose();

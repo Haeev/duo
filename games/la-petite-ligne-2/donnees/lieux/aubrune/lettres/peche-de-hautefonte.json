@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "peche-de-hautefonte",
+  "from": "Les Pêcheurs de Hautefonte",
+  "order": 45,
+  "when": [{ "type": "remembered", "key": "objets.obtenu.brochet" }],
+  "text": [
+    "Le bruit court jusqu'à Hautefonte qu'un brochet a été sorti des eaux d'Aubrune. Notre société ne croit les bruits qu'à moitié, et les brochets aux trois quarts.",
+    "Si le poisson est vrai, vous voilà membres d'honneur. La carte ne donne droit à rien, mais elle fait très bien dans un portefeuille."
+  ],
+  "signature": "Le secrétaire, qui pêche aussi",
+  "attach": [],
+  "pourquoi": "Un souvenir de ce que le duo a fait (réponse 41): la première prise d'un brochet, objet que le moteur retient (objets.obtenu.brochet). Pas de carte en pièce jointe: aucun objet n'existe pour elle, la lettre suffit."
+}

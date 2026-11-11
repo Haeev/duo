@@ -21,6 +21,7 @@ import { greet } from './amitie';
 import { faceToFace, shopClosedLine, shopOffered, talkingShop } from './commerce';
 import { exchangeRefusal, type ExchangeRefusal } from './echanges';
 import { DIALOGUES } from './reglages';
+import { orderOffered } from '../commandes/lecture';
 
 /** Au-delà, un parcours sans texte est une faute de données: on s'arrête plutôt que boucler. */
 const MAX_SILENT_NODES = 32;
@@ -193,7 +194,9 @@ function offerShop(sim: SimContext, player: PlayerIndex, dialogue: DialogueDef):
   if (talk === null) return false;
   const again = heardAgain(sim, player, dialogue) && faceToFace(sim, player, talk.villager);
   let speaker = 'player';
-  if (shopOffered(sim, talk.villager, dialogue, again) !== null)
+  // Qui reçoit la commande de la semaine la propose d'abord, tant qu'il y a de quoi faire.
+  if (orderOffered(sim, talk.villager)) talk.node = DIALOGUES.orderOffer.node;
+  else if (shopOffered(sim, talk.villager, dialogue, again) !== null)
     talk.node = DIALOGUES.shopOffer.node;
   else if (shopClosedLine(sim, talk.villager, dialogue, again) !== null) {
     // Fermé par un événement: le commerçant le dit, à la place de l'offre.
@@ -327,6 +330,14 @@ export function talkChoose(sim: SimContext, player: PlayerIndex, optionId: strin
   const talk = sim.world.players[player].talk;
   const dialogue = currentDialogue(sim, player);
   if (talk === null || dialogue === null) return;
+  if (talk.node === DIALOGUES.orderOffer.node) {
+    const { open, leave } = DIALOGUES.orderOffer;
+    if (optionId === open)
+      sim.emit({ type: 'order_opened', player, place: sim.world.common.place });
+    else if (optionId !== leave) return;
+    endTalk(sim, player);
+    return;
+  }
   if (talk.node === DIALOGUES.shopOffer.node) {
     const shop = talkingShop(sim, talk.villager);
     // L'effet refuse lui-même une boutique fermée entre-temps (`shop-closed`).
@@ -399,6 +410,30 @@ function shopOfferView(
   };
 }
 
+/** La page qui propose la livraison: deux options, textes du guichet (`commande.json`). */
+function orderOfferView(
+  content: Content,
+  world: ReadonlyWorld,
+  player: PlayerIndex,
+  villager: string,
+): TalkView | null {
+  const desk = content.places[world.common.place]?.orders?.desk;
+  if (desk === undefined) return null;
+  const { node, open, leave } = DIALOGUES.orderOffer;
+  return {
+    villager,
+    node,
+    speaker: 'player',
+    text: null,
+    emote: null,
+    options: [
+      { id: open, text: agreeFor(world, player, desk.talk.open), fails: null, blocked: null },
+      { id: leave, text: agreeFor(world, player, desk.talk.leave), fails: null, blocked: null },
+    ],
+    opens: null,
+  };
+}
+
 export function talkView(
   content: Content,
   world: ReadonlyWorld,
@@ -406,6 +441,8 @@ export function talkView(
 ): TalkView | null {
   const talk = world.players[player].talk;
   if (talk === null) return null;
+  if (talk.node === DIALOGUES.orderOffer.node)
+    return orderOfferView(content, world, player, talk.villager);
   if (talk.node === DIALOGUES.shopOffer.node)
     return shopOfferView(content, world, player, talk.villager);
   if (talk.node === DIALOGUES.shopClosed.node) {

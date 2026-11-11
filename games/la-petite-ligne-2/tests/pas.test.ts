@@ -90,6 +90,7 @@ describe('pas de simulation vide', () => {
       'peche',
       'elevage',
       'musique',
+      'commandes',
     ]);
   });
 });

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "compagnie-gratification",
+  "from": "La Compagnie de la Petite Ligne",
+  "order": 40,
+  "when": [{ "type": "fact_at_least", "key": "commande.aubrune.lignes-livrees", "value": 12 }],
+  "text": [
+    "Le service des haltes a relevé douze lignes livrées par la halte d'Aubrune. Le service ignorait qu'Aubrune avait autant de poules.",
+    "Une gratification est jointe, à partager entre les deux gardes. Le service n'a pas d'avis sur la façon de partager. Le service n'a d'avis sur rien: c'est reposant."
+  ],
+  "signature": "Le service des haltes, Hautefonte",
+  "enclosed": "Un mandat de 20,00 €",
+  "attach": [{ "type": "give_money", "amount": 2000 }],
+  "pourquoi": "Douze lignes complètes, c'est environ trois à quatre semaines de commandes: un merci de la Compagnie, une seule fois. 20 € à qui prend le courrier, à partager (le coffre commun est à deux pas)."
+}

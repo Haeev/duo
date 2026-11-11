@@ -1,0 +1,359 @@
+/*
+ * Écran de livraison de la commande de la semaine. Même gabarit que la boutique: panneau de
+ * 73,75 x 38 rem centré, qui rapetisse d'un même facteur sur un petit écran (1366 x 768 tient
+ * à l'échelle 1). Jetons du thème (`--paper`, `--ink`, `--accent`...): le thème sombre de
+ * `encre/encre.css` s'applique sans rien de plus. Seuls transform et opacity s'animent.
+ */
+.lpl-ui .lpl-order-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+}
+.lpl-ui .lpl-order {
+  --order-k: min(1, tan(atan2(100vw - 1.5rem, 73.75rem)), tan(atan2(100vh - 1rem, 38rem)));
+  position: absolute;
+  left: calc(50% - 36.875rem * var(--order-k));
+  top: max(0.5rem, min(6.75rem, calc(100% - 38.5rem * var(--order-k))));
+  width: 73.75rem;
+  height: 38rem;
+  transform-origin: 0 0;
+  scale: var(--order-k);
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: 14rem 1fr 15.5rem;
+  background: var(--paper);
+  color: var(--ink);
+  border: 0.1875rem solid var(--ink);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-3);
+  overflow: hidden;
+  animation: lpl-order-in var(--d-slow, 180ms) var(--ease, ease-out) both;
+}
+.lpl-ui[data-motion='reduced'] .lpl-order {
+  animation: none;
+}
+@keyframes lpl-order-in {
+  from {
+    transform: translateY(2rem) scale(0.96);
+    opacity: 0;
+  }
+}
+
+/* Qui reçoit: sa réplique au-dessus de son buste, son nom sur une plaque. */
+.lpl-ui .lpl-order-receiver {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.75rem 1rem;
+  background: var(--paper-sunken);
+  border-right: 0.1875rem solid var(--ink);
+}
+.lpl-ui .lpl-order-say {
+  position: relative;
+  padding: 0.625rem 0.75rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.875rem;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+}
+.lpl-ui .lpl-order-say::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -0.6875rem;
+  width: 1rem;
+  height: 1rem;
+  translate: -50% 0;
+  rotate: 45deg;
+  background: var(--paper-raised);
+  border-right: 0.125rem solid var(--ink);
+  border-bottom: 0.125rem solid var(--ink);
+}
+.lpl-ui .lpl-order-bust {
+  align-self: end;
+  width: 11rem;
+}
+.lpl-ui .lpl-order-bust svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.lpl-ui .lpl-order-plate {
+  padding: 0.25rem 1rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 62rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+/* La commande */
+.lpl-ui .lpl-order-main {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto auto;
+  min-width: 0;
+  padding: 1rem 1.25rem 0.75rem;
+}
+.lpl-ui .lpl-order-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1.1;
+}
+.lpl-ui .lpl-order-due,
+.lpl-ui .lpl-order-pay {
+  margin: 0.25rem 0 0;
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+}
+.lpl-ui .lpl-order-pay b {
+  margin-left: 0.75rem;
+  color: var(--primary);
+}
+.lpl-ui .lpl-order-cols,
+.lpl-ui .lpl-order-row {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) 6rem 6rem 6rem 7.5rem;
+  align-items: center;
+  column-gap: 0.625rem;
+}
+.lpl-ui .lpl-order-cols {
+  margin-top: 0.75rem;
+  padding: 0 0.75rem 0.25rem;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.lpl-ui .lpl-order-rows {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+.lpl-ui .lpl-order-row {
+  min-height: 3.75rem;
+  padding: 0.375rem 0.75rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.75rem;
+}
+.lpl-ui .lpl-order-row.lpl-order-on {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: inset 0 0 0 0.125rem var(--accent);
+}
+.lpl-ui .lpl-order-row--done {
+  opacity: 0.72;
+}
+.lpl-ui .lpl-order-row__thumb .obj {
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+}
+.lpl-ui .lpl-order-row__name,
+.lpl-ui .lpl-order-row__asked,
+.lpl-ui .lpl-order-row__have,
+.lpl-ui .lpl-order-row__price {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+.lpl-ui .lpl-order-row__name b {
+  font-size: 1.0625rem;
+  line-height: 1.15;
+}
+.lpl-ui .lpl-order-row__name small {
+  white-space: nowrap;
+}
+.lpl-ui .lpl-order-row small {
+  color: var(--ink-muted);
+  font-size: 0.8125rem;
+}
+.lpl-ui .lpl-order-row__asked b,
+.lpl-ui .lpl-order-row__price b {
+  font-size: 1.0625rem;
+}
+/* Part livrée: une barre pleine à proportion, lisible sans la couleur (hachures). */
+.lpl-ui .lpl-order-row__bar {
+  height: 0.375rem;
+  border: 0.0625rem solid var(--line);
+  border-radius: 62rem;
+  background:
+    linear-gradient(var(--primary), var(--primary)) 0 0 / calc(var(--part) * 100%) 100% no-repeat,
+    var(--paper-sunken);
+}
+.lpl-ui .lpl-order-row__have {
+  font-size: 0.875rem;
+}
+.lpl-ui .lpl-order-row__have.none {
+  color: var(--ink-muted);
+}
+.lpl-ui .lpl-order-row__state {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 2.25rem;
+  padding: 0 0.625rem;
+  border-radius: 62rem;
+  font-weight: 800;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+}
+.lpl-ui .lpl-order-row__state--go {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.lpl-ui .lpl-order-row__state--done {
+  border: 0.125rem solid var(--primary);
+  color: var(--primary);
+}
+.lpl-ui .lpl-order-row__state--miss {
+  border: 0.125rem dashed var(--line);
+  color: var(--ink-muted);
+}
+.lpl-ui .lpl-order-empty {
+  color: var(--ink-muted);
+}
+.lpl-ui .lpl-order-flash {
+  margin: 0.5rem 0 0;
+  color: var(--stamp);
+  font-weight: 800;
+}
+.lpl-ui .lpl-order-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 1.25rem;
+  margin-top: 0.625rem;
+  padding-top: 0.625rem;
+  border-top: 0.125rem solid var(--line);
+  font-size: 0.875rem;
+}
+.lpl-ui .lpl-order-keys > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* Le courrier */
+.lpl-ui .lpl-order-mail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 0.875rem;
+  background: var(--paper-sunken);
+  border-left: 0.1875rem solid var(--ink);
+  overflow: hidden;
+}
+.lpl-ui .lpl-order-mail h3,
+.lpl-ui .lpl-order-mail h4 {
+  margin: 0;
+  font-family: var(--font-display);
+}
+.lpl-ui .lpl-order-mail h3 {
+  font-size: 1.375rem;
+}
+.lpl-ui .lpl-order-mail h4 {
+  margin-top: 0.75rem;
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+}
+.lpl-ui .lpl-order-mail__none {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+.lpl-ui .lpl-order-mail__take {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.lpl-ui .lpl-order-envelope {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0.5rem 0.625rem;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.5rem;
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+}
+.lpl-ui .lpl-order-envelope--sealed {
+  border-style: dashed;
+}
+.lpl-ui .lpl-order-envelope.lpl-order-on,
+.lpl-ui .lpl-order-mail__take.lpl-order-on {
+  border-color: var(--accent);
+  outline: 0.1875rem solid var(--accent);
+  outline-offset: 0.125rem;
+}
+
+/* Une lettre ouverte, posée sur le panneau: du papier, comme les pages du carnet. */
+.lpl-ui .lpl-order-letter {
+  --paper-raised: #f7edd6;
+  --ink: #231a17;
+  --ink-muted: #5a4a3c;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34rem;
+  max-height: 33rem;
+  translate: -50% -50%;
+  rotate: -1deg;
+  padding: 1.5rem 1.75rem;
+  overflow: hidden;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.375rem;
+  box-shadow: var(--shadow-3);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.lpl-ui .lpl-order-letter p {
+  margin: 0 0 0.75rem;
+}
+.lpl-ui .lpl-order-letter__from {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+.lpl-ui .lpl-order-letter__sign {
+  text-align: right;
+  font-style: italic;
+}
+.lpl-ui .lpl-order-letter__enclosed {
+  padding-top: 0.5rem;
+  border-top: 0.0625rem dashed var(--ink-muted);
+  font-weight: 700;
+}
+.lpl-ui .lpl-order-letter__keys {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+/* Une touche sur le papier de la lettre: encre sur papier, aussi sous le thème sombre. */
+.lpl-ui .lpl-order-letter .key,
+[data-lpl-style='encre'] .lpl-ui .lpl-order-letter .key {
+  background: #efe2c4;
+  color: #231a17;
+  border: 0.125rem solid #231a17;
+  border-image: none;
+}
+.lpl-ui .lpl-order-prov {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.375rem;
+}

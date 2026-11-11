@@ -24,6 +24,7 @@ import { createQuestsTab, memoryFollow, type FollowStore } from './quetes';
 import { createOutfitsTab } from './tenues';
 import { decisionReminderTexts } from '../rappel-decision';
 import { agendaLines } from '../annonce';
+import { orderReminder } from '../commande/modele';
 
 export type { CarnetSources, SettingsPort, UiSettings } from './lectures';
 export type { FollowStore } from './quetes';
@@ -87,7 +88,14 @@ export function createCarnetTabs(options: CarnetTabsOptions): CarnetTabs {
       deps,
       (w, l) => sources.quests(w, l),
       follow,
-      (w, l) => decisionReminderTexts(w, options.content, l),
+      (w, l) => {
+        // La commande du samedi du lieu courant, en tête comme un rappel (affichée à l'avance).
+        const order = orderReminder(options.content, w, w.common.place);
+        return [
+          ...decisionReminderTexts(w, options.content, l),
+          ...(order === null ? [] : [{ quest: 'commande', ...order, split: false }]),
+        ];
+      },
       (w) => agendaLines(options.content, w),
     ),
     villagers: createVillagersTab(deps, (w, l) => sources.villagers(w, l), shared),

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "berthe-ma-meule",
+  "from": "Berthe Lavergne",
+  "order": 21,
+  "when": [
+    { "type": "remembered", "key": "aubrune.acte2.fini" },
+    { "type": "not", "condition": { "type": "remembered", "key": "aubrune.acte3.train2" } }
+  ],
+  "text": [
+    "Je reviens au moulin. Ne touchez pas à la meule: elle me connaît, vous non. Elle a mauvais caractère, comme moi, mais elle tourne juste.",
+    "Si le bief est encore plein de feuilles, laissez. Je le curerai moi-même. On ne confie pas son eau à n'importe qui. Sans vous vexer."
+  ],
+  "signature": "Berthe Lavergne, meunière",
+  "attach": [],
+  "pourquoi": "Berthe arrive avec les Delmas (aubrune.acte3.train2) et rouvre le moulin; elle parle à sa meule (cahier 6.2). Même condition que la lettre de Margot: les deux partent avant leur arrivée, un samedi chacune au plus tôt (deux lettres par passage)."
+}

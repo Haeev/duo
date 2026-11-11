@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "compagnie-horaire-d-hiver",
+  "from": "La Compagnie de la Petite Ligne",
+  "order": 60,
+  "when": [
+    { "type": "remembered", "key": "aubrune.acte2.fini" },
+    { "type": "season_is", "seasons": ["winter"] }
+  ],
+  "text": [
+    "Avis aux haltes: l'horaire d'hiver est le même que l'horaire d'été. Le service a beaucoup travaillé pour en arriver là.",
+    "Le service rappelle que le froid n'est pas une excuse pour un retard. Les locomotives, elles, en ont une: le service ne leur a jamais demandé leur avis."
+  ],
+  "signature": "Le service des haltes, Hautefonte",
+  "attach": [],
+  "pourquoi": "Une lettre de saison, au premier samedi d'hiver après l'acte 2: le courrier vit avec le calendrier, et le train du samedi garde ses heures toute l'année."
+}

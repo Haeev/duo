@@ -828,3 +828,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Enregistrement d'écoute fidèle au jeu: `OfflineAudioContext` dans Chromium avec le vrai moteur (`sessionNow` et `perfNow` à 0), attendre 50 ms après `start` (les tiges se branchent dans une microtâche), WAV en base64 par `page.evaluate`, puis ffmpeg. `spawnSync(...).stderr` pour lire les mesures de ffmpeg (`execFileSync` ne rend que la sortie standard).
 - Outil Bash isolé: un `cat > fichier <<EOF` suivi d'une autre commande est refusé en bloc; Write pour le script, puis une commande simple.
 
+
+## Commande du samedi et courrier (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Un type de contenu par lieu sans toucher au format: tout l'état en faits de `progress.memory` (clés à 4 segments au plus), l'hôte tire avec `world.seed` (`unitHash` de `monde/meteo.ts`), l'invité lit les faits. Test hôte/invité: `progressParts` puis `createProgressAssembler` sur un monde à `seed: 0`.
+- « Ce que le duo sait produire »: un système placé en dernier dans `SYSTEMS` lit `item_gained` de `sim.events` (tout passe par `giveItem`, achats et rangements compris).
+- Page ajoutée en fin de conversation (comme la boutique): nœud réservé dans `DIALOGUES`, ajouté à la liste `reserved` de `dialogues/valider.ts`, géré dans `offerShop`, `talkChoose` et `talkView` de `conversation.ts`.
+- Les poches ne tiennent pas 25 bûches: dans un test, ranger les grosses quantités dans un rangement (`objects[id].store[i] = { item, count }`).
+- Ports du serveur Vite: d'autres membres en tiennent (5391, 5947...); `ss -ltnp` avant, `--strictPort --host 127.0.0.1`, attendre « ready » avant la capture. Playwright global: `require('/opt/node22/lib/node_modules/playwright')`.
+- Thème sombre: la classe `focus` reçoit le contour global d'`encre.css` (décalé de 0,44 rem, il déborde sur la ligne voisine); prendre une classe à soi. Une `.key` posée sur du papier hors du carnet garde le cadre sombre: la redéfinir sous `[data-lpl-style='encre']`.
