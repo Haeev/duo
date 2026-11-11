@@ -17,5 +17,11 @@
       "wakeAt": 100,
       "lie": { "height": 0.52, "pillow": 0.7, "spacing": 0.72 }
     }
-  ]
+  ],
+  "deco": {
+    "layer": "floor",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 4
+  }
 }

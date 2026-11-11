@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "banc-de-table",
+  "name": "Banc de table",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "banc-de-table"
+}

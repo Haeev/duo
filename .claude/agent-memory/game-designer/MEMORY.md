@@ -38,6 +38,14 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Le validateur lit le nombre de jours dans `reglages.clock.lastDay.day` et accepte `order.trains` et `order_complete` avec `day`.
 - Le bois est fini (12 arbres, sans repousse, environ 7 abattus en semaine 1): ne pas remettre de planches dans une commande tardive.
 
+## Meubles et commerces de La Petite Ligne (vérifié le 2026-11-11)
+
+- `tests/commerces-aubrune.test.ts` achète chaque ligne `sells` dans une partie au printemps, sans amitié, avec seulement les faits de sa liste `STORY` (`aubrune.acte2.train`, `aubrune.acte3.repas`, `aubrune.acte3.train2`...): une ligne `unlock` de saison, d'amitié ou de pièce restaurée y est refusée (`locked`). En données seules, n'utiliser que ces faits; le reste demande d'adapter le test.
+- `tests/interface-plume.test.ts` refuse tout objet ou meuble posable sans vignette (sauf liste `WITHOUT_THUMB` du test): un meuble neuf sans dessin reste `placeable: false` et sans objet.
+- Le même test compte `objets + meubles posables` sans union: un objet meuble qui porte l'identifiant de sa fiche (pour reprendre la vignette) est compté deux fois. Signalé le 2026-11-11 (correction d'une ligne dans le test).
+- Pas de condition « semaine N »: `season_is` (saisons de 14 jours) et `weekday_is` seulement. Pas de récompense de collection complète, pas d'effet d'objet sur un bonus de besoin (`maxBonus` 1,25 dans `besoins.json`).
+- Les pièces d'un logement ne se chevauchent pas sur un même niveau: une pièce de plus demande la carte de l'intérieur.
+
 ## Repères de rythme (script `docs/jeux/jeu-1/simulations/rythme_et_collections.py`)
 
 - Une journée de jeu d'environ 17 minutes réelles et quatre saisons d'environ 20 jours donnent environ 24 heures par année de jeu: 100 heures font environ 4 années de jeu et 150 séances de 40 minutes.

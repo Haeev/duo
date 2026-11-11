@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "panier-a-linge",
+  "name": "Panier à linge",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "panier-a-linge"
+}

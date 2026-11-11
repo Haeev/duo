@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "lit-double",
+  "name": "Lit double",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "lit-double"
+}

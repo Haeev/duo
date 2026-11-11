@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "patere",
+  "name": "Patère",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "patere"
+}

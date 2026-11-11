@@ -613,6 +613,11 @@
               "key": "aubrune.lettres.fini",
               "value": true,
               "by": "duo"
+            },
+            {
+              "type": "give_item",
+              "item": "pendule",
+              "count": 1
             }
           ]
         }

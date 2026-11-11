@@ -15,5 +15,11 @@
       "brick": "store",
       "slots": 20
     }
-  ]
+  ],
+  "deco": {
+    "layer": "floor",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 3
+  }
 }

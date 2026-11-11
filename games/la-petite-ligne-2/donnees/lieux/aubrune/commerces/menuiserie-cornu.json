@@ -20,6 +20,130 @@
       "price": 500,
       "dailyStock": 1,
       "restockDays": 7
+    },
+    {
+      "item": "chaise",
+      "price": 900,
+      "dailyStock": 2,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "tabouret-de-ferme",
+      "price": 600,
+      "dailyStock": 2,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "table-a-manger",
+      "price": 3400,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "coffre",
+      "price": 1800,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "banc-de-table",
+      "price": 1600,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "tonnelet",
+      "price": 1400,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "cadre-paysage",
+      "price": 1000,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "cadre-ovale",
+      "price": 800,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "etagere-murale",
+      "price": 1200,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "miroir",
+      "price": 2600,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "lit-simple",
+      "price": 3800,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "banc",
+      "price": 2600,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte2.train"
+      },
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "horloge-murale",
+      "price": 2200,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte2.train"
+      },
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "lit-double",
+      "price": 5800,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte3.repas"
+      },
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "armoire",
+      "price": 5200,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte3.repas"
+      },
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "vaisselier",
+      "price": 4800,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte3.repas"
+      },
+      "payment": "purse-or-chest"
     }
   ],
   "buys": [

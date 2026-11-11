@@ -1,6 +1,6 @@
 # Économie d'Aubrune: commerces, prix, revenu, maison
 
-Version 2 du 2026-11-11 (game-designer), après la réponse du client sur le rythme de la maison (section 8). Complète le cahier des charges (4.2 et 4.6). Les valeurs vivent dans les données du jeu; ce document les explique. Les tableaux de prix et de revenu sortent du script `docs/jeux/jeu-1/simulations/economie_aubrune.py`, qui lit ces données: en cas d'écart, les données font foi et on relance le script.
+Version 2 du 2026-11-11 (game-designer), après la réponse du client sur le rythme de la maison (section 9). Complète le cahier des charges (4.2 et 4.6). Les valeurs vivent dans les données du jeu; ce document les explique. Les tableaux de prix et de revenu sortent du script `docs/jeux/jeu-1/simulations/economie_aubrune.py`, qui lit ces données: en cas d'écart, les données font foi et on relance le script.
 
 ## 1. Les sept commerces
 
@@ -227,7 +227,7 @@ Les jours suivants, le bonjour est celui du quotidien de l'habitant, suivi du ch
 | Commerce ou rachat conditionné par l'histoire | le comptoir du café rachète avant l'arrivée de Colette (ses articles, eux, sont verrouillés) |
 | Planning d'un habitant vers un point d'intérieur (deux tests chargent la carte sans les intérieurs) | les commerçants se tiennent devant leur porte; le comptoir se sert seul |
 | Meuble de la carte qui apparaît avec un fait ou une pièce restaurée | cuisinière et plan de travail sont posés dès le début: payer la cuisine ouvre la pose de meubles et le confort, pas l'usage |
-| Meubles vendus par un commerce, ou livrés à la fin d'une étape | les meubles viennent de l'inventaire de départ et de l'établi |
+| Meubles vendus par un commerce, ou livrés à la fin d'une étape | fait le 2026-11-11 (section 8): 45 meubles obtenables; la fin d'une étape de pièce ne livre toujours rien |
 | Escaliers fermés tant que la pièce n'existe pas (les portes sont écrites par l'assembleur du plan) | on peut monter à l'étage avant de l'avoir construit |
 | Pièce en sous-sol (`floor` au moins 0) | la cave est déclarée au niveau 0 |
 | Commande du train du samedi | branchée le 2026-11-11 (section 6.1), hors du revenu par jour du script |
@@ -262,7 +262,183 @@ Le courrier: au plus deux lettres par passage, quand leurs conditions sont vraie
 - ~~L'étal de l'épicerie donne encore une tourte du quai gratuite toutes les 12 heures.~~ Fait le 2026-11-11 (section 2, « La tourte du quai »): l'étal est retiré de `interieurs/epicerie-rdc.json` (une cagette de légumes à sa place, sous le rayonnage du mur nord); le plan du bourg cite encore `epicerie-etal` (`plan.json`, `carte-aubrune/plan.json`, `plan.md`, `construire_plan.py`): à aligner avant de relancer l'assembleur.
 - Le râtelier de Basile prête des haches de base sans fin: sans danger tant qu'aucun commerçant ne rachète d'outil (le test le garde).
 
-## 8. Historique des réglages
+## 8. Les meubles (2026-11-11)
+
+Audit du 11 novembre, lignes B.2, B.9, B.12 et B.20. Données: un objet du sac par meuble (`commun/objets/<id>.json`, famille `furniture`, champ `prop` vers la fiche du meuble posé, même identifiant que la fiche pour reprendre sa vignette), des lignes `sells` dans sept commerces, un plan de l'établi, deux récompenses de suites. Chiffres: `docs/jeux/jeu-1/simulations/meubles_aubrune.py`, qui lit ces données et reprend le modèle de revenu de la section 3.
+
+### 8.1 Le catalogue: 45 meubles en six séries
+
+37 meubles nouveaux, tous sur une fiche posable qui avait déjà son modèle et sa vignette (aucun modèle créé; ni fiches `*-essai`, ni lumignon de fête, ni comptoir, banquette de train, lanterne de quai ou plante), plus les 8 meubles de la série campagne de l'établi. Tout se paie de la bourse ou du coffre commun (`purse-or-chest`). Aucun commerçant ne rachète un meuble: pas de boucle d'argent (contrôles de `tests/commerces-aubrune.test.ts`). « 1 par semaine »: `dailyStock` 1, `restockDays` 7; sinon le rayon se refait chaque matin.
+
+| Série | Meuble | Prix | Source |
+|---|---|---|---|
+| Campagne | Chaise de ferme | 9,00 | Basile, 2 par jour |
+| Campagne | Tabouret de ferme | 6,00 | Basile, 2 par jour |
+| Campagne | Table de ferme | 34,00 | Basile, 1 par semaine |
+| Campagne | Coffre de chêne | 18,00 | Basile |
+| Campagne | Banc de table | 16,00 | Basile |
+| Campagne | Tonnelet | 14,00 | Basile |
+| Campagne | Tabouret, table de chevet, étagère, coffre à linge (miel ou sauge) | 3,20; 4,80; 7,00; 9,40 de matériaux | établi (plans existants) |
+| Campagne | Bûches rangées | 6 bûches (8,40 au rachat) | établi, plan `buches-rangees` donné par Basile avec sa première confidence (1 cœur) |
+| Chambre | Lit double | 58,00 | Basile, 1 par semaine, dès le repas de l'acte 3 (`aubrune.acte3.repas`) |
+| Chambre | Armoire | 52,00 | Basile, 1 par semaine, dès le repas de l'acte 3 |
+| Chambre | Lit simple | 38,00 | Basile, 1 par semaine |
+| Chambre | Miroir sur pied | 26,00 | Basile, 1 par semaine |
+| Chambre | Paysage encadré | 10,00 | Basile |
+| Chambre | Panier à linge | 7,00 | Solange |
+| Cuisine | Vaisselier | 48,00 | Basile, 1 par semaine, dès le repas de l'acte 3 |
+| Cuisine | Boîtes à provisions | 8,00 | Mado (fer-blanc) |
+| Cuisine | Pots de grès | 6,00 | Odette, 2 par jour |
+| Cuisine | Bocaux de confiture | 5,00 | Odette, 2 par jour |
+| Cuisine | Balai de genêt | 4,00 | Odette |
+| Cuisine | Seau en fer | 4,00 | Mado, 2 par jour |
+| Cuisine | Corbeille à pain | 4,00 | Achille |
+| Cuisine | Cagette | 4,00 | Margot, 2 par jour |
+| Murs et lumières | Poêle à bois | 56,00 | Mado, 1 par semaine, dès le retour du train (`aubrune.acte2.train`) |
+| Murs et lumières | Lampe à pétrole | 16,00 | Mado |
+| Murs et lumières | Lampe de table | 14,00 | Mado |
+| Murs et lumières | Étagère murale garnie | 12,00 | Basile |
+| Murs et lumières | Patère | 9,00 | Mado, 2 par jour |
+| Murs et lumières | Médaillon ovale | 8,00 | Basile |
+| Gare | Banc de quai | 26,00 | Basile, 1 par semaine, dès le retour du train |
+| Gare | Horloge de salle d'attente | 22,00 | Basile, 1 par semaine, dès le retour du train |
+| Gare | Pile de livres | 6,00 | Colette (dès son arrivée, avec le train) |
+| Gare | Le Petit Rail | 4,00 | Colette |
+| Gare | Pendule de la poste | rare | fin des « Lettres en retard » (Lucie), une seule |
+| Tapis et petits objets | Tapis rond tressé | 18,00 | Solange |
+| Tapis et petits objets | Chemin de couloir | 14,00 | Solange |
+| Tapis et petits objets | Rideau de passage | 10,00 | Solange, 2 par jour |
+| Tapis et petits objets | Bouquet des champs | 4,00 | Solange, 2 par jour |
+| Tapis et petits objets | Portrait encadré | rare | fin de « La robe et la cloche » (Marthe), un seul |
+
+Pourquoi ces sources: chacun vend ce que son métier fait ou fait venir. Basile le bois, et ce que la Compagnie a laissé dans la halte une fois le train revenu (banc de quai, horloge); Mado la fonte et le fer (poêle, lampes, patère, seau, boîtes en fer-blanc); Solange les étoffes, l'osier et les fleurs (elle rachète les coquelicots, elle en fait des bouquets); Odette, Achille et Margot l'objet de leur comptoir; Colette le journal de son dépôt et les livres oubliés par les voyageurs. L'établi est la voie économe: des matériaux et du temps au lieu de l'argent. Les deux pièces rares viennent de suites secondaires, aucune d'une fête. Le banc de quai est la seule assise du jardin (« dedans ou dehors »).
+
+Fiches retouchées (données seulement): section `deco` ajoutée à l'armoire (confort 3), à la table à manger (surface, confort 3: la lampe se pose dessus), au lit double (confort 4) et au banc (dedans ou dehors, confort 1). Les fiches de l'inventaire de départ (coffre, lit simple, chaise, miroir, établi) gardent leurs valeurs par défaut.
+
+### 8.2 La grille des prix
+
+| Catégorie | Prix | Raison |
+|---|---|---|
+| Petits objets (posés sur un meuble, ou au sol sans usage) | 4 à 8 € | le prix d'un repas: on en prend en passant, pour le plaisir |
+| Murs et rideaux | 8 à 12 € (horloge 22) | décor pur, confort 1 à 2 |
+| Lampes et tapis | 14 à 18 € | confort 2, se voient de loin, éclairent la nuit |
+| Sièges | 6 à 26 € | du tabouret au banc de quai à deux places |
+| Rangements et tables | 14 à 34 € | une fonction: ranger, manger, poser |
+| Grandes pièces | 38 à 58 € | dormir, ranger 20 cases, chauffer; confort 3 à 4 |
+| Établi | 3,20 à 9,40 € de matériaux | le temps et les bûches remplacent l'argent |
+
+Calage. Le revenu net du duo médian (section 3, pain et cuisine compris) est de 45 € par jour à l'acte 1 et de 123 € aux actes 2 et 3. La moitié va au coffre commun, qui paie les pièces; l'autre moitié, 61 € par jour, reste dans les bourses: c'est elle qui meuble, et c'est sur elle que se comptent les « deux à trois jours » d'une pièce. Listes d'emménagement (ce qu'une pièce « correctement meublée » contient, en gardant au moins 40 % du sol libre):
+
+| Pièce | Ce qu'on y met | Coût | Jours de bourse | Jours de revenu du duo |
+|---|---|---|---|---|
+| Salle commune | table, poêle, vaisselier, chemin de couloir, horloge, lampe à pétrole, patère, bouquet (plus les deux chaises de départ) | 203,00 € | 3,3 | 1,7 |
+| Cuisine | étagère murale, boîtes, bocaux, pots, corbeille, cagette | 39,00 € | 0,6 | 0,3 |
+| Chambre | lit double, armoire, deux chevets (établi), tapis rond, lampe de table, rideau, paysage, panier | 178,60 € | 2,9 | 1,5 |
+| Troisième pièce | coffre à linge (établi), miroir, rideau, seau, balai, chemin de couloir | 67,40 € | 1,1 | 0,5 |
+| Étage | les deux lits simples de départ montés, banc de table, étagère et deux tabourets (établi), coffre, lampe de table, tapis rond, médaillon, livres, journal, tonnelet | 111,40 € | 1,8 | 0,9 |
+| Cave | bûches rangées et coffre à linge (établi) | 17,80 € | 0,3 | 0,1 |
+| Jardin | banc de quai, deux tabourets (établi) | 32,40 € | 0,5 | 0,3 |
+| **Maison entière** | 45 pièces | **649,60 €** | 10,6 | 5,3 |
+
+Lecture: les deux pièces à vivre (salle, chambre) coûtent trois jours de bourse, les autres moins de deux. Toute la maison meublée coûte 650 €, moins que l'étage seul (800 €). Son confort atteint 82,5 points, bien au-delà du dernier palier (50): le plus fort bonus de sommeil ne demande pas tout le catalogue, le reste est pour le plaisir.
+
+### 8.3 Le jour de la maison meublée
+
+Modèle du script: la moitié des bourses va aux meubles (le reste: outils, sacs, vêtements, graines); une pièce se meuble dès qu'elle est restaurée, meuble par meuble, et un article encore verrouillé attend sans bloquer les autres; une fois l'étage payé, le coffre commun aide. Hypothèses: retour du train au jour 8, repas de l'acte 3 au jour 11. Chaque case: jour où la pièce est restaurée, puis jour où elle est meublée.
+
+| Pièce | Duo tranquille | Duo médian | Duo appliqué |
+|---|---|---|---|
+| Salle commune | 1, puis 13 | 1, puis 12 | 1, puis 12 |
+| Cuisine | 6, puis 14 | 6, puis 7 | 6, puis 7 |
+| Cave | 11, puis 15 | 11, puis 13 | 11, puis 13 |
+| Chambre | 12, puis 22 | 11, puis 18 | 11, puis 18 |
+| Troisième pièce | 22, puis 25 | 18, puis 21 | 18, puis 21 |
+| Étage | 39, puis 39 | 31, puis 31 | 31, puis 31 |
+| Jardin | 1, puis 14 | 1, puis 10 | 1, puis 10 |
+| **Maison meublée** | **jour 39** | **jour 31** | **jour 31** |
+
+Lecture: les meubles suivent les murs. Un duo médian a toute sa maison meublée au jour 31, le jour même où il paie l'étage (fin de la troisième saison); un duo tranquille au jour 39. Les meubles ne rallongent donc pas la maison que le client trouvait lente. Seule la chambre attend une semaine, parce qu'elle arrive en même temps que les grandes pièces de la salle (débloquées par le repas de l'acte 3). Avec 30 % des bourses seulement: jours 33 et 41. La commande du samedi (environ 60 € par semaine au coffre) n'est pas comptée: elle avance encore l'étage.
+
+### 8.4 Le rayon qui tourne (prêt, à brancher)
+
+Aujourd'hui tout le rayon de Basile reste en vente; les grandes pièces reviennent une fois par semaine. Un rayon qui change demande deux choses hors des données:
+
+1. Une condition de semaine. `season_is` et `weekday_is` ne disent pas « cette semaine-ci ». À demander: `{ "type": "week_is", "weeks": [1] }`, la semaine dans la saison (1 ou 2 avec des saisons de 14 jours). Faute de mieux, la saison seule fait un rayon qui change toutes les deux semaines.
+2. Le test « chaque commerce vend chaque article » (`tests/commerces-aubrune.test.ts`) achète chaque ligne dans une partie au printemps, sans amitié: une ligne de saison ou d'amitié y serait refusée (`locked`). Le test doit d'abord rendre vraie la condition de la ligne.
+
+Proposition, à poser une fois ces deux points réglés (champ `unlock` des lignes de Basile):
+
+| Quand | Pièces | Raison |
+|---|---|---|
+| Printemps | étagère murale garnie, paysage encadré | la cuisine (jour 6) et la chambre (jour 11) se meublent au printemps |
+| Été | miroir sur pied | la troisième pièce (jour 18) |
+| Automne | banc de table, médaillon ovale, tonnelet | l'étage (jour 31) |
+| Hiver | lit simple | la chambre d'amis de l'étage, les visites d'hiver |
+| Amitié de Basile, 2 cœurs (`bond_at_least` 200) | vaisselier | au lieu du repas de l'acte 3: il le garde pour qui revient le voir |
+| Chambre payée (`aubrune.maison-du-garde.chambre`) | lit double, armoire | au lieu du repas de l'acte 3: on les achète quand on a où les mettre |
+
+Effet estimé, non simulé: la salle commune passe du jour 12 au jour 16 environ pour le duo médian (deux cœurs vers le jour 16 avec une bûche offerte un jour sur deux); la maison meublée ne bouge pas (l'étage reste le dernier).
+
+### 8.5 La baignoire et la salle d'eau (B.9)
+
+Le contrat: une salle d'eau à 120 € payée au coffre, hygiène à 100 en 3 secondes, savon parfumé. Ce que permet le logement aujourd'hui: les pièces d'un même niveau ne se chevauchent pas (validateur), le rez-de-chaussée (10 x 7 m) est entièrement pris par la salle, la cuisine, la chambre et la troisième pièce, et l'étage est une seule pièce de 10 x 7 m. Une septième pièce ne tient pas sans changer la carte de l'intérieur. La troisième pièce et l'étage permettent déjà « se laver » (`unlocks: wash`).
+
+Fait: la fiche `commun/meubles/baignoire.json` (modèle `tub` refait ce matin, 2 x 1 m, brique `relieve` « Prendre un bain »: 3 s, hygiène +100 jusqu'à 100, comme la douche du cahier; confort 3, dedans seulement). Elle reste `placeable: false`, sans objet ni ligne de vente: un objet ou un meuble posable sans vignette fait échouer `tests/interface-plume.test.ts`, et le studio ne dessine pas ici. Pour l'ouvrir, une fois la vignette `baignoire` dessinée (artiste 2D): `placeable: true`, l'objet `baignoire` (famille `furniture`, `prop` `baignoire`) et, chez Mado (la fonte, les pieds de fonte), `{ "item": "baignoire", "price": 6000, "dailyStock": 1, "restockDays": 28, "unlock": { "type": "remembered", "key": "aubrune.acte3.train2" }, "payment": "purse-or-chest" }`. Elle se posera là où l'on peut se laver: troisième pièce, étage, puis salle d'eau.
+
+À demander au level designer pour la vraie salle d'eau: une pièce rectangulaire d'au moins 3 x 2 m (baignoire de 2 x 1, un mètre de passage, le coin du miroir), fermée par des murs dans `blocked`, avec une porte et une ardoise de chantier (`maison-chantier-salle-d-eau`). Deux places possibles: un appentis contre le mur sud de la troisième pièce, porte depuis elle (recommandé: la salle d'eau vient avant l'étage, comme son prix le dit; mais l'emprise de la maison grandit sur le plan du bourg); ou une cloison à l'étage côté est (x 34 à 37), loin de l'arrivée de l'escalier (32,5; 214,5), sans toucher au plan du bourg. La pièce, une fois la carte faite:
+
+```json
+{
+  "id": "salle-d-eau",
+  "name": "Salle d'eau",
+  "area": { "x": 0, "y": 0, "w": 3, "h": 2 },
+  "floor": 0,
+  "start": "absent",
+  "requires": ["troisieme-piece"],
+  "stages": [
+    {
+      "name": "Carreler et mener l'eau",
+      "materials": [{ "item": "planche", "count": 2 }, { "item": "pierre", "count": 6 }],
+      "cost": 12000,
+      "work": 24,
+      "when": []
+    }
+  ],
+  "unlocks": ["wash", "store"],
+  "clue": "Derrière un carreau descellé, une boîte à savon en fer-blanc. Dedans, un billet de quai plié en quatre, daté du dernier jour de la ligne.",
+  "site": "maison-chantier-salle-d-eau"
+}
+```
+
+(`area` et `floor` à reprendre de la carte.) Le savon parfumé (1,50 €, Solange) attend sa brique: l'effet n'existe pas (les objets n'ont que `food`, `tool`, `meal`). À demander: un champ d'objet `wash: { "bond": 1.25 }`, consommé à la fin d'un bain (brique `relieve` d'hygiène qui monte à 100) quand le joueur en a un sur lui; tant que son hygiène reste au-dessus de 50, son bonus « Soigné » vaut ce facteur au lieu de 1,2; il s'affiche dans le médaillon d'hygiène (« Soigné, parfumé »). Le cahier dit 1,3, mais `besoins.json` plafonne les bonus à 1,25 (`maxBonus`) et le cahier lui-même dit « aucun bonus ne dépasse 25 % »: recommandation, 1,25.
+
+### 8.6 Le nichoir (B.20)
+
+Existant: le plan `nichoir` (établi, 2 planches, `source: quest`, donné par personne) et l'objet `nichoir` (famille `material`, vignette dessinée). Manque: un modèle 3D (aucun nœud dans `decors.json`), donc une fiche de meuble. Le nichoir n'est pas branché: un objet qui ne sert à rien serait une fausse récompense.
+
+Proposition: **source**, Basile, à sa seconde confidence (`basile-secret-nichoirs`, 4 cœurs), où il raconte ses nichoirs de 1987 et dit « Le vôtre est resté »: un effet `{ "type": "give_plan", "plan": "nichoir" }` dans le nœud `retenir`. **Usage**: meuble du jardin (fiche `nichoir`: 1 x 1, non solide, couche `floor`, `where: outdoor`, confort 1), et l'objet passe en famille `furniture` avec `prop: "nichoir"`. À demander à l'artiste 3D: une boîte de planches de 25 cm, toit à deux pans, trou rond de 3 cm, sur un piquet de 1,6 m (hors de portée des chats, comme les posait Basile). Dix minutes de données une fois le modèle livré.
+
+### 8.7 Les trophées de collection (B.12)
+
+La brique n'existe pas: l'événement `collection_completed` part (`collections/registre.ts`), mais rien ne donne d'objet et aucun fait n'est écrit. À demander (dev gameplay): dans `commun/collections.json`, un champ facultatif `trophy` par catégorie, `{ "<lieu>": "<objet meuble>" }`. Quand une catégorie est complète dans un lieu, une seule fois par partie, le moteur range l'objet directement dans l'inventaire de la maison de ce lieu (pas dans un sac qui pourrait être plein), écrit le fait `collections.<lieu>.<catégorie>` (lu par les quêtes et les dialogues) et annonce `reward_given` aux deux joueurs. Le validateur refuse un trophée qui n'est pas un objet meuble posable. Test court: une catégorie factice de deux entrées, complétée par le test, livre son trophée. Les huit trophées d'Aubrune (modèles à faire, confort 3, uniques):
+
+| Collection | Trophée | Idée du modèle | Pose |
+|---|---|---|---|
+| Poissons | Brochet sur planchette | brochet sculpté et peint sur une planche de chêne, plaque de laiton gravée « Aubrune » | mur |
+| Insectes | Boîte d'entomologiste | coffret vitré de 16 cases, insectes épinglés, étiquettes à la plume | mur |
+| Fossiles et trésors | Cabinet de curiosités | petite vitrine à trois étagères: ammonite, dent, vieille pièce, bille d'agate | sol, 1 x 1 |
+| Fleurs | Arche fleurie | arceau de fer et de bois couvert des fleurs du carnet | jardin, 2 x 1 |
+| Tenues | Mannequin de couturière | buste sur pied de Solange, mètre ruban autour du cou | sol, 1 x 1 |
+| Recettes | Batterie de cuivre | barre murale de casseroles et de louches de cuivre | mur |
+| Cartes postales et photos | Tourniquet à cartes | présentoir tournant de dépôt de presse, garni de cartes d'Aubrune | sol, 1 x 1 |
+| Musiques | Phonographe à pavillon | phonographe à manivelle, pavillon en fleur de liseron | sur un meuble |
+
+### 8.8 Deux signalements pour le level designer
+
+- L'intérieur `maison-rdc` pose sans condition une vingtaine de meubles du catalogue (table, deux chaises, lit double, armoire, patère, horloge, médaillon, panier, deux seaux, chemin de couloir, balai, lampe, corbeille, journal, pots): la maison est meublée avant tout achat, et ces meubles de carte ne se déplacent pas en mode déco. Recommandation: ne garder sur la carte que les restes de la ruine (seau de gravats, balai) et l'ardoise de chantier; le nécessaire passe par l'inventaire de départ (`stock` du logement), le reste s'achète.
+- Le baquet de lessive de Margot (`baquet` dans `carte.json`, au bord de la rivière) montre le modèle `tub`, devenu ce matin une baignoire de fonte à robinet: il lui faut un baquet de bois.
+
+## 9. Historique des réglages
 
 | Date | Changement | Raison |
 |---|---|---|
@@ -272,3 +448,4 @@ Le courrier: au plus deux lettres par passage, quand leurs conditions sont vraie
 | 2026-11-11 | Collections d'Aubrune: 10 poissons nouveaux rachetés au café (2,00 à 9,60 €), graines de fleurs en rayon (0,30 à 0,50 €), 9 trésors « rares » ajoutés aux fouilles; fleurs, insectes, trésors et nouveaux plats sans rachat. | `collections-aubrune.md`. Le prix moyen d'une prise passe de 4,72 à 4,31 € (plus de poissons communs): duo tranquille 103,30 à 99,40 € (acte 2) et 104,90 à 101,10 € (acte 3); médian et appliqué inchangés (plafond du café). Les fouilles rendent environ 1,50 € de moins par jour en vieilles pièces (non compté par le script). |
 | 2026-11-11 | Tourte du quai: étal gratuit retiré de l'épicerie; recette à deux postes (farine, œuf; pommes de terre, poireau); en rayon chez Odette à 12,00 €, une par semaine, dès le retour du train. | audit B.11: le bonus « Mains sûres » était permanent et gratuit. Aucun effet sur le revenu (la tourte ne se revend pas). |
 | 2026-11-11 | Coquillages et rivière (cahier 4.7): 8 trouvailles de berge et la girolle, rachetées par Solange (coquille 1,20, escargot d'eau 0,40, galet veiné 0,90, bois flotté 0,70, plume de héron 0,80, plume de martin-pêcheur 2,40, perle 6,00) et le café (coquille 0,60, bois flotté 0,50, tesson 1,00, girolle 1,60); girolle 1,00 à l'épicerie. Coquille et plume de héron ajoutées aux besoins du jour de Solange. | audit B.7. Une tournée complète (19 points, 715 m, environ 9 minutes à deux) rapporte 10,80 € par temps sec en journée, 16 € à l'aube, 20 à 27 € sous la pluie, borné à 10 € par jour chez Solange (plafond): 1 à 2 € par minute, contre 5,90 € pour la pêche (11 poissons, 48,40 € en 8 minutes). Hors du script du revenu. Détail: `carte-aubrune/plan.md`, section 19. |
+| 2026-11-11 | Meubles (section 8): 37 meubles nouveaux rendus obtenables (45 en tout), de 4 à 58 € chez Basile, Mado, Solange, Odette, Achille, Margot et Colette, payables de la bourse ou du coffre; plan des bûches rangées donné par Basile (1 cœur); pendule et portrait offerts par deux suites secondaires; fiche de la baignoire (non posable tant que sa vignette manque). | audit B.2, B.9, B.12, B.20. Une pièce à vivre meublée coûte environ 3 jours de bourse (1,5 jour de revenu du duo); la maison entière 650 €, meublée au jour 31 pour un duo médian, le jour de l'étage: les meubles ne rallongent pas la maison. Aucun meuble racheté, donc aucun effet sur le revenu. |

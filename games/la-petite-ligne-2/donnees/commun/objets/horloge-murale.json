@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "horloge-murale",
+  "name": "Horloge de salle d'attente",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "horloge-murale"
+}

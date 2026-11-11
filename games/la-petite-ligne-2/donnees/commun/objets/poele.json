@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "poele",
+  "name": "Poêle à bois",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "poele"
+}

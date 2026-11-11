@@ -102,6 +102,24 @@
       "item": "bobine-de-fil",
       "price": 250,
       "dailyStock": 4
+    },
+    {
+      "item": "bocaux-de-confiture",
+      "price": 500,
+      "dailyStock": 2,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "pots-de-gres",
+      "price": 600,
+      "dailyStock": 2,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "balai",
+      "price": 400,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
     }
   ],
   "buys": [

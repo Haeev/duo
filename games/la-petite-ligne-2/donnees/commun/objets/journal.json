@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "journal",
+  "name": "Le Petit Rail",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "journal"
+}

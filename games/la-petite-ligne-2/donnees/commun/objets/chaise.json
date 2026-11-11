@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "chaise",
+  "name": "Chaise de ferme",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "chaise"
+}

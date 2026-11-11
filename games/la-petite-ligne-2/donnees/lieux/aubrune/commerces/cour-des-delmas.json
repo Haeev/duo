@@ -73,6 +73,12 @@
       "item": "graines-marguerite",
       "price": 30,
       "dailyStock": 5
+    },
+    {
+      "item": "caisse-de-legumes",
+      "price": 400,
+      "dailyStock": 2,
+      "payment": "purse-or-chest"
     }
   ],
   "buys": [

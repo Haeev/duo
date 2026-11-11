@@ -17,5 +17,11 @@
       "seats": 2,
       "restPerMinute": 4
     }
-  ]
+  ],
+  "deco": {
+    "layer": "floor",
+    "surface": true,
+    "where": "indoor",
+    "comfort": 3
+  }
 }
