@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "marthe-tradition-barriere",
+  "villager": "marthe",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.barrieres.premier",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.marthe-tradition-barriere",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.barrieres.premier",
+              "equals": "doyenne"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "enfants"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Honorine est passée la première. Elle a fait son vœu les yeux fermés. Elle les a rouverts pour vérifier qu'on la regardait.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "La doyenne, cette année. Honorine a dit que c'était la justice. Elle dit ça de tout ce qui l'arrange.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "doyenne"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Les enfants d'abord. C'est juste: ils ont plus de temps pour que leurs vœux se réalisent. Honorine, elle, doit se dépêcher.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Les enfants, cette fois. Honorine a perdu sa place, mais gagné une histoire à raconter. Elle n'y perd rien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

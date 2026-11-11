@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "id": "colette-don-omelette",
+  "id": "colette-don-tarte-du-dimanche",
   "villager": "colette",
   "priority": 51,
   "when": [
@@ -16,7 +16,7 @@
     "don": {
       "kind": "line",
       "speaker": "colette",
-      "text": "L'omelette aux herbes, ma mère la faisait le soir où la tarte ratait. Tiens, la recette. Garde-la pour les jours où tout rate.",
+      "text": "La tarte du dimanche, c'est la recette de maman. Elle est à toi, maintenant. Trois pommes, un œuf, et on n'ouvre pas le four.",
       "emote": "joy",
       "next": null
     }

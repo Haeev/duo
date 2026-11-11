@@ -111,7 +111,7 @@ Une recette s'inscrit au carnet à la première réussite en cuisine de ce plat 
 | Gratin de pommes de terre | cuisinière | pomme de terre x3, œuf x1 | livre de cuisine (Épicerie, 12 €) | ne se vend pas |
 | Matelote du bief | cuisinière | perche x1, goujon x2, poireau x1 | livre de cuisine (Épicerie, 12 €) | ne se vend pas |
 | Œuf au plat | réchaud | œuf x1 | en essayant ses ingrédients | 1,20 (Café de la Halte) |
-| Omelette aux herbes | cuisinière | œuf x2 | Les lettres en retard, étape « oeufs », ou la Fête des barrières fleuries, étape « levee » | 2,80 (Café de la Halte) |
+| Omelette aux herbes | cuisinière | œuf x2 | la Fête des barrières fleuries, étape « levee » (la première fois; seule source, 2026-11-11) | 2,80 (Café de la Halte) |
 | Pain perdu | réchaud | pain x1, œuf x1 | Le fantôme du moulin, étape « parrain » | ne se vend pas |
 | Perche meunière | réchaud | perche x1, farine x1 | La Baronne, étape « epilogue » | ne se vend pas |
 | Pomme cuite | réchaud | pomme x1 | connue dès le début | ne se vend pas |
@@ -120,7 +120,7 @@ Une recette s'inscrit au carnet à la première réussite en cuisine de ce plat 
 | Salade de radis | plan de travail | radis x3 | en essayant ses ingrédients | ne se vend pas |
 | Soupe de légumes | cuisinière | carotte x1, poireau x1, pomme de terre x1 | connue dès le début | 2,00 (Café de la Halte) |
 | Tarte aux mûres | four | mûres x4, farine x1, œuf x1 | livre de cuisine (Épicerie, 12 €) | ne se vend pas |
-| Tarte aux pommes | four | pomme x3, farine x1, œuf x1 | livre de cuisine (Épicerie, 12 €) | 1,70 (Fournil Pradel) |
+| Tarte aux pommes | four | pomme x3, farine x1, œuf x1 | Les lettres en retard, étape « oeufs » (la tarte du dimanche de la mère de Colette), ou livre de cuisine (Épicerie, 12 €) | 1,70 (Fournil Pradel) |
 | Tartine grillée | réchaud | pain x1 | connue dès le début | ne se vend pas |
 | Tomates farcies | cuisinière | tomate x2, morceau de bœuf x1 | La guerre de la soupe, étape « vexee » | ne se vend pas |
 | Truite grillée | réchaud | truite fario x1 | La guerre de la soupe, étape « truite » | ne se vend pas |
@@ -199,7 +199,7 @@ Effets ajoutés à la fin (`onDone`) d'étapes existantes; ils ne changent ni le
 | La guerre de la soupe, `concours` | air « Chanson des marmites » | le concours sur la place |
 | La Baronne, `epilogue` | recette « Perche meunière » | la fin de l'histoire de la perche, racontée à Colette |
 | Les lettres en retard, `odette` | 2 plants de violette | la lettre de Basile, trente ans de retard |
-| Les lettres en retard, `oeufs` | recette « Omelette aux herbes » | Colette refait la tarte de sa mère avec tes œufs |
+| Les lettres en retard, `oeufs` | recette « Tarte aux pommes » | Colette refait la tarte du dimanche de sa mère avec tes œufs, et t'en donne la recette (2026-11-11: l'omelette aux herbes ne s'apprend plus qu'à la Fête des barrières) |
 | Ceux qui partent, `repas` (dialogue `colette-repas`) | recette « Pot-au-feu du dimanche » | Honorine réclame un vrai pot-au-feu; Colette en donne la recette (légumes des Delmas, bœuf d'Odette) |
 | Ceux qui partent, `marthe-manque` | 1 bouture de rosier | une rose pour la dalle des Lacombe |
 | Ceux qui partent, `tunnel` | trésor « Lampe de mineur » | la première niche du tunnel (plan: `niche`) |
@@ -207,7 +207,7 @@ Effets ajoutés à la fin (`onDone`) d'étapes existantes; ils ne changent ni le
 | Ceux qui partent, `veillee` | air « Sonnerie de 5 h 12 » | la nuit de 5 h 12 |
 | Événement « Train du samedi » | air « Le sifflet du samedi » | chaque samedi, quand le train entre en gare |
 
-L'omelette et le pot-au-feu existaient sans que rien ne les apprenne à Aubrune: ces deux branchements comblent ce manque. Chaque don a sa réplique, dans la voix de qui le donne (2026-11-11: dialogues `<habitant>-don-<sujet>`, liste dans `ecriture-habitants.md`, section 9).
+L'omelette et le pot-au-feu existaient sans que rien ne les apprenne à Aubrune: le pot-au-feu vient de « Ceux qui partent », l'omelette de la Fête des barrières fleuries (sa seule source depuis le 2026-11-11). Chaque don a sa réplique, dans la voix de qui le donne (2026-11-11: dialogues `<habitant>-don-<sujet>`, liste dans `ecriture-habitants.md`, section 9).
 
 ## 10. Économie
 

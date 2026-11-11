@@ -97,7 +97,8 @@
   "lines": {
     "bought": "C'est du jour, ça sent encore la terre. Si Paulin demande, tu as marchandé dur.",
     "sold": "Oh, les belles ! Ça partira par le train du samedi, et tout le monde croira que c'est de moi.",
-    "noMoney": "Il manque quelques sous. Je te le mets de côté, à l'ombre: reviens quand tu veux."
+    "noMoney": "Il manque quelques sous. Je te le mets de côté, à l'ombre: reviens quand tu veux.",
+    "closed": "La cour est fermée pour la fête. Paulin a dit non à la fête, puis il a mis sa chemise propre. Les paniers attendront demain."
   },
   "talk": {
     "open": "Je regarde ton étal.",

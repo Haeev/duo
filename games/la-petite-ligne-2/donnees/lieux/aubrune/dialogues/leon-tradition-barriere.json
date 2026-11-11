@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "leon-tradition-barriere",
+  "villager": "leon",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.barrieres.premier",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.leon-tradition-barriere",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.barrieres.premier",
+              "equals": "doyenne"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "enfants"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Moi, je serais passé le premier, si on m'avait demandé. Enfin... sous les fleurs, avec les abeilles. Honorine a bien fait.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "La doyenne, cette année ? J'aurais tranché pareil. Enfin... je n'aurais rien tranché du tout. Mais j'aurais été d'accord.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "doyenne"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Les petits sont passés sous la barrière en courant. J'ai couru avec eux. Enfin... derrière eux. Pour surveiller.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Les enfants, cette fois ! J'ai failli passer avec eux. Enfin... Honorine m'a regardé. J'ai attendu.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

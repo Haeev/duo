@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "odette-tradition-devise",
+  "villager": "odette",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.halte.devise",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.odette-tradition-devise",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.halte.devise",
+              "equals": "a-l-heure"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "de-la-place"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "La devise d'Ambroise au tableau. Il passe devant tous les matins pour la relire. Il croit que je ne le vois pas.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ma devise est effacée, celle d'Ambroise est revenue. Je ne dirai rien. Je l'ai déjà dit à trois personnes, ça ne compte plus.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "a-l-heure"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "« On a de la place. » Ma proposition, au tableau. Bon, celle de Firmin. Mais c'est moi qui l'ai dite.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ma devise au tableau, cette année ! Je passe devant trois fois par jour pour vérifier que la craie tient.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

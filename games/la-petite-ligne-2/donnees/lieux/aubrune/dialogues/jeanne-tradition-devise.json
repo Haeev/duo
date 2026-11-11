@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "jeanne-tradition-devise",
+  "villager": "jeanne",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.halte.devise",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.jeanne-tradition-devise",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.halte.devise",
+              "equals": "a-l-heure"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "de-la-place"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "« À l'heure, ou presque. » J'ai parié que le train de 5 h 12 serait à l'heure un jour sur deux. Je gagne. Presque.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "La devise d'Ambroise est revenue. J'avais parié dessus. Je ne dis pas contre qui: on se fâcherait.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "a-l-heure"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "« On a de la place. » J'ai parié qu'un jour, quelqu'un descendrait à 5 h 12 rien que pour la lire. Personne ne m'a pris le pari.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "La devise a changé ! J'avais parié que non. Trois caramels de perdus. Je les garde pour qui descendra à 5 h 12.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

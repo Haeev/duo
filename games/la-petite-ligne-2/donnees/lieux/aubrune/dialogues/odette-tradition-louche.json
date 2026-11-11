@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "odette-tradition-louche",
+  "villager": "odette",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.concours.laureate",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.odette-tradition-louche",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.concours.laureate",
+              "equals": "meres"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "moulin"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "La louche des gardes chez nous ! Je l'ai dit à tout le bourg. Puis à Rosalie, pour les autres gares.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "La louche nous revient ! Je l'avais dit. À Colette. Tout bas. Elle confirmera.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "meres"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "La louche au moulin. Bon. La panade, c'est du pain mouillé. Du bon pain, je ne dis pas. Mais mouillé.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "La louche est partie au moulin. J'ai pleuré dans le sel, Colette dans le laurier. La soupe du soir était un peu forte.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

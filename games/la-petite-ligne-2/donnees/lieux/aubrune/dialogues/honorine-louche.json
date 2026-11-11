@@ -20,6 +20,11 @@
         "decision": "louche-des-gardes",
         "state": "agreed"
       }
+    },
+    {
+      "type": "days_since",
+      "key": "scenes.aubrune.les-marmites-de-la-place",
+      "atMost": 0
     }
   ],
   "once": null,
@@ -28,6 +33,28 @@
     "debut": {
       "kind": "branch",
       "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "meres"
+            }
+          ],
+          "next": "an-rappel-meres"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "moulin"
+            }
+          ],
+          "next": "an-rappel-moulin"
+        },
         {
           "when": [
             {
@@ -176,7 +203,7 @@
           "by": "duo"
         }
       ],
-      "next": "dit-meres"
+      "next": "an-quoi-meres"
     },
     "dit-meres": {
       "kind": "line",
@@ -195,12 +222,246 @@
           "by": "duo"
         }
       ],
-      "next": "dit-moulin"
+      "next": "an-quoi-moulin"
     },
     "dit-moulin": {
       "kind": "line",
       "speaker": "honorine",
       "text": "La panade ! Berthe va le dire à sa meule avant de le dire aux gens. Odette et Colette seront d'accord pour bouder: c'est déjà ça.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-rappel-meres": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "L'an dernier, la louche des gardes est allée aux mères. Elle pend entre leurs deux cuisines. Cette année, elle remet son titre en jeu.",
+      "emote": null,
+      "next": "an-invite-meres"
+    },
+    "an-invite-meres": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Elle reste où elle est, ou elle change de mur ? Vous n'avez pas goûté la même marmite: racontez-vous, et tranchez à deux.",
+      "emote": null,
+      "next": "an-moitie-meres"
+    },
+    "an-moitie-meres": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "theirs"
+            }
+          ],
+          "next": "an-autre-meres"
+        }
+      ],
+      "otherwise": "an-choix-meres"
+    },
+    "an-autre-meres": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié a déjà voté. Je ne dirai rien, même sous la torture. Sauf si la torture a de la crème.",
+      "emote": null,
+      "next": "an-choix-meres"
+    },
+    "an-choix-meres": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "meres",
+          "text": "Les mères gardent la louche.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "louche-des-gardes",
+              "option": "meres"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "moulin",
+          "text": "Cette fois, au moulin.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "louche-des-gardes",
+              "option": "moulin"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "an-quoi-meres": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "meres"
+            }
+          ],
+          "next": "an-garde-meres"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "moulin"
+            }
+          ],
+          "next": "an-change-meres"
+        }
+      ],
+      "otherwise": "dit-meres"
+    },
+    "an-garde-meres": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Les mères la gardent ! Odette dira que c'était évident, Colette qu'elle avait peur. Elles mentent un peu, l'une et l'autre.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-change-meres": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "La louche revient aux mères. Berthe la décrochera elle-même: elle l'a promis à sa meule. Belle perdante.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-rappel-moulin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "L'an dernier, la louche des gardes est allée au moulin. Elle pend au-dessus de la meule. Cette année, elle remet son titre en jeu.",
+      "emote": null,
+      "next": "an-invite-moulin"
+    },
+    "an-invite-moulin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Elle reste où elle est, ou elle change de mur ? Vous n'avez pas goûté la même marmite: racontez-vous, et tranchez à deux.",
+      "emote": null,
+      "next": "an-moitie-moulin"
+    },
+    "an-moitie-moulin": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "theirs"
+            }
+          ],
+          "next": "an-autre-moulin"
+        }
+      ],
+      "otherwise": "an-choix-moulin"
+    },
+    "an-autre-moulin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié a déjà voté. Je ne dirai rien, même sous la torture. Sauf si la torture a de la crème.",
+      "emote": null,
+      "next": "an-choix-moulin"
+    },
+    "an-choix-moulin": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "moulin",
+          "text": "Le moulin garde la louche.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "louche-des-gardes",
+              "option": "moulin"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "meres",
+          "text": "Cette fois, aux mères.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "louche-des-gardes",
+              "option": "meres"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "an-quoi-moulin": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "moulin"
+            }
+          ],
+          "next": "an-garde-moulin"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "meres"
+            }
+          ],
+          "next": "an-change-moulin"
+        }
+      ],
+      "otherwise": "dit-moulin"
+    },
+    "an-garde-moulin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Le moulin la garde, deux ans de suite ! Odette et Colette vont faire une soupe ensemble, rien que pour se venger.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-change-moulin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "La louche part au moulin. Odette et Colette la décrocheront ce soir, à quatre mains. Comme leur soupe.",
       "emote": "joy",
       "next": "fin"
     }

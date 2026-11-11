@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "martial-tradition-lumignon",
+  "villager": "martial",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.lumignons.pour",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.martial-tradition-lumignon",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.lumignons.pour",
+              "equals": "partent"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "reviennent"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Pour ceux qui partent: j'ai béni le lumignon en passant. Moi aussi, je suis parti un jour. Avec le vent de face.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Ceux qui partent, de nouveau. Une coutume qu'on reprend, c'est une côte qu'on remonte: plus dure, et plus belle d'en haut.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "partent"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Pour ceux qui reviennent. C'est une bonne intention: on revient toujours en roue libre. C'est la descente.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Ceux qui reviennent, cette fois. À vélo, on ne revient jamais par le même chemin. Ça fait de belles coutumes.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

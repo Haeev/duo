@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "berthe-tradition-louche",
+  "villager": "berthe",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.concours.laureate",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.berthe-tradition-louche",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.concours.laureate",
+              "equals": "meres"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "moulin"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Les mères ont la louche. La meule dit que c'est mérité. La meule est polie. Moi, je dis: l'an prochain.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "La louche est repartie chez les mères. La meule ne m'a pas adressé un clac de la journée. Elle boude mieux que moi.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "meres"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "La louche au moulin ! Je l'ai pendue au-dessus de la meule. Elle tourne mieux depuis. Je ne l'explique pas.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "La louche est au moulin, cette fois. La meule l'a saluée d'un clac. Odette et Colette ne m'ont pas saluée du tout. Ça viendra.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

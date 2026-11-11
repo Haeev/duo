@@ -40,7 +40,8 @@
   "lines": {
     "bought": "Bien. Ça tiendra.",
     "sold": "Bon bois. Tiens.",
-    "noMoney": "Pas les sous. Reviens."
+    "noMoney": "Pas les sous. Reviens.",
+    "closed": "Atelier fermé. C'est la fête. Reviens après."
   },
   "talk": {
     "open": "Je regarde ton bois.",

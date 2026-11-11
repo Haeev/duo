@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "jeanne-tradition-barriere",
+  "villager": "jeanne",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.barrieres.premier",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.jeanne-tradition-barriere",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.barrieres.premier",
+              "equals": "doyenne"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "enfants"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Honorine est passée la première sous les fleurs. J'avais parié sur les enfants: trois caramels de perdus. Je parie qu'elle a souhaité ça.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "La doyenne d'abord, cette année. J'avais parié sur les enfants, comme l'an dernier. Trois caramels de perdus, pour la tradition.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "doyenne"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Les enfants d'abord, sous la barrière: j'avais parié dessus. Trois caramels de gagnés. Je les ai partagés avec eux, c'est la règle.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Les enfants, cette année ! Honorine a fait mine de bouder. J'ai parié qu'elle tiendrait jusqu'au soir. Elle a tenu jusqu'au goûter.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -172,7 +172,8 @@
   "lines": {
     "bought": "Servi ! Ici on ne rend pas les assiettes pleines, c'est la règle de la maison.",
     "sold": "Ça, ça finit dans une assiette avant midi. Je paie franc, tu peux recompter.",
-    "noMoney": "Il te manque de quoi payer, et je ne fais pas crédit. Reviens les mains pleines: je rachète."
+    "noMoney": "Il te manque de quoi payer, et je ne fais pas crédit. Reviens les mains pleines: je rachète.",
+    "closed": "Le café est fermé: c'est la fête. Aujourd'hui je ne sers personne, je m'assois avec tout le monde. Le comptoir rouvre après."
   },
   "talk": {
     "open": "Je regarde ta carte.",

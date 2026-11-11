@@ -20,6 +20,11 @@
         "decision": "premier-passage",
         "state": "agreed"
       }
+    },
+    {
+      "type": "days_since",
+      "key": "scenes.aubrune.les-lisses-en-fleurs",
+      "atMost": 0
     }
   ],
   "once": null,
@@ -28,6 +33,28 @@
     "debut": {
       "kind": "branch",
       "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "doyenne"
+            }
+          ],
+          "next": "an-rappel-doyenne"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "enfants"
+            }
+          ],
+          "next": "an-rappel-enfants"
+        },
         {
           "when": [
             {
@@ -176,7 +203,7 @@
           "by": "duo"
         }
       ],
-      "next": "dit-doyenne"
+      "next": "an-quoi-doyenne"
     },
     "dit-doyenne": {
       "kind": "line",
@@ -195,12 +222,246 @@
           "by": "duo"
         }
       ],
-      "next": "dit-enfants"
+      "next": "an-quoi-enfants"
     },
     "dit-enfants": {
       "kind": "line",
       "speaker": "honorine",
       "text": "Les enfants. Bon. Je passerai deuxième et je ferai deux vœux: personne ne compte les vœux des vieilles.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-rappel-doyenne": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "L'an dernier, la doyenne est passée la première. Mon vœu s'est réalisé, je ne dirai pas lequel. Je ne dirais pas non à un deuxième.",
+      "emote": null,
+      "next": "an-invite-doyenne"
+    },
+    "an-invite-doyenne": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Une tradition, ça se garde ou ça se change: c'est vous qui tenez la barrière. À deux, et à voix haute.",
+      "emote": null,
+      "next": "an-moitie-doyenne"
+    },
+    "an-moitie-doyenne": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "theirs"
+            }
+          ],
+          "next": "an-autre-doyenne"
+        }
+      ],
+      "otherwise": "an-choix-doyenne"
+    },
+    "an-autre-doyenne": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié m'a déjà dit son idée. Je ne te la souffle pas: à toi de dire la tienne.",
+      "emote": null,
+      "next": "an-choix-doyenne"
+    },
+    "an-choix-doyenne": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "doyenne",
+          "text": "Comme l'an dernier: la doyenne.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "premier-passage",
+              "option": "doyenne"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "enfants",
+          "text": "On change: les enfants d'abord.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "premier-passage",
+              "option": "enfants"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "an-quoi-doyenne": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "doyenne"
+            }
+          ],
+          "next": "an-garde-doyenne"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "enfants"
+            }
+          ],
+          "next": "an-change-doyenne"
+        }
+      ],
+      "otherwise": "dit-doyenne"
+    },
+    "an-garde-doyenne": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Deux ans de suite: c'est une tradition, maintenant. Je ferai le même vœu. Il a marché.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-change-doyenne": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "La doyenne, cette fois. Jeanne va dire que c'est truqué. Elle aura raison, et je passerai quand même.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-rappel-enfants": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "L'an dernier, les enfants sont passés les premiers. Jeanne a gagné son pari: elle n'a parlé que de ça de toute l'année.",
+      "emote": null,
+      "next": "an-invite-enfants"
+    },
+    "an-invite-enfants": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Une tradition, ça se garde ou ça se change: c'est vous qui tenez la barrière. À deux, et à voix haute.",
+      "emote": null,
+      "next": "an-moitie-enfants"
+    },
+    "an-moitie-enfants": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "theirs"
+            }
+          ],
+          "next": "an-autre-enfants"
+        }
+      ],
+      "otherwise": "an-choix-enfants"
+    },
+    "an-autre-enfants": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié m'a déjà dit son idée. Je ne te la souffle pas: à toi de dire la tienne.",
+      "emote": null,
+      "next": "an-choix-enfants"
+    },
+    "an-choix-enfants": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "enfants",
+          "text": "Comme l'an dernier: les enfants.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "premier-passage",
+              "option": "enfants"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "doyenne",
+          "text": "On change: la doyenne d'abord.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "premier-passage",
+              "option": "doyenne"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "an-quoi-enfants": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "enfants"
+            }
+          ],
+          "next": "an-garde-enfants"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "last",
+              "option": "doyenne"
+            }
+          ],
+          "next": "an-change-enfants"
+        }
+      ],
+      "otherwise": "dit-enfants"
+    },
+    "an-garde-enfants": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Les enfants, encore. Deuxième année que je passe deuxième. Je commence à aimer la vue.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-change-enfants": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Les enfants, cette fois. Je leur laisse ma place, pas mon vœu: je le ferai en passant deuxième.",
       "emote": "joy",
       "next": "fin"
     }

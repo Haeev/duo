@@ -162,7 +162,7 @@ export const TEXTS = {
     otherSleeping: '{nom} veut dormir',
     youSleepWait: 'On attend {nom}',
     otherAtTrain: '{nom} t’attend au train',
-    otherLeftTrain: '{nom} est descendu·e',
+    otherLeftTrain: '{nom} a quitté le train',
     given: '{nom} te donne {objet}',
     toolBlunt: 'Outil émoussé',
     /** Décision à deux (`decision_changed`): l'autre a choisi, deux avis, décision prise. */

@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "ambroise-tradition-devise",
+  "villager": "ambroise",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.halte.devise",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.ambroise-tradition-devise",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.halte.devise",
+              "equals": "a-l-heure"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "de-la-place"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "« À l'heure, ou presque. » Le « presque » me gratte. Mais c'est ma devise, sous la bonne ligne. Bon.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Ma devise est revenue au tableau. J'ai remonté la pendule en son honneur. Ne le dis à personne: j'ai été ému. Presque.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "a-l-heure"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "« On a de la place. » Sous la ligne de 5 h 12. Ce n'est pas une heure, c'est une promesse. Je supporte. Tout juste.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Mon « presque » est effacé. Bon. Il y a de la place, comme dit le tableau. Pour un ronchon de plus, par exemple.",
+      "emote": null,
+      "next": null
+    }
+  }
+}
