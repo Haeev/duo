@@ -392,6 +392,69 @@ const dwell = (text: string): number => Math.min(2200, 500 + text.length * 22);
  * Un tour de lecture pour un joueur: referme l'éditeur, lit la réplique de scène ou de dialogue,
  * valide la fin de chapitre. Renvoie vrai si le joueur a fait quelque chose.
  */
+/** Délai avant de réappuyer sur la même réplique: l'invité reçoit la fermeture avec du retard. */
+const REPRESS_MS = 1500;
+
+/**
+ * Vrai si la même réplique a déjà reçu un appui il y a moins de `REPRESS_MS` (on attend alors
+ * au lieu de réappuyer: un second appui tardif rouvrirait une conversation). Sinon note l'appui.
+ */
+async function pressedRecently(ctx: UiContext, side: Side, line: string): Promise<boolean> {
+  const key = `appui:${side.who}:${line}`;
+  const last = ctx.shown.get(key);
+  if (last !== undefined && Date.now() - last < REPRESS_MS) {
+    await side.page.waitForTimeout(250);
+    return true;
+  }
+  ctx.shown.set(key, Date.now());
+  return false;
+}
+
+/**
+ * Attend que plus aucun dialogue ni scène ne soit ouvert, chez l'hôte (conversation de chaque
+ * joueur) comme chez l'invité (bandeaux), et que ce soit stable sur deux relevés espacés de
+ * `STABLE_MS`. Les répliques restantes sont lues en attendant.
+ */
+export async function waitDialoguesClosed(
+  duo: Duo,
+  ctx: UiContext,
+  timeoutMs = 60_000,
+): Promise<void> {
+  const STABLE_MS = 1500;
+  const t0 = Date.now();
+  let quietSince: number | null = null;
+  for (;;) {
+    const [w, sh, sg] = await Promise.all([
+      duo.host.world(),
+      snapshot(duo.host),
+      snapshot(duo.guest),
+    ]);
+    const quiet =
+      w !== null &&
+      w.players.every((p) => p.talk === null) &&
+      sh.dialogue === null &&
+      sh.scene === null &&
+      sg.dialogue === null &&
+      sg.scene === null;
+    if (quiet) {
+      quietSince ??= Date.now();
+      if (Date.now() - quietSince >= STABLE_MS) return;
+      await duo.host.page.waitForTimeout(250);
+      continue;
+    }
+    quietSince = null;
+    if (Date.now() - t0 > timeoutMs) {
+      await Promise.all([
+        duo.host.shot('delai-dialogues-hote'),
+        duo.guest.shot('delai-dialogues-invite'),
+      ]);
+      throw new Error('Délai dépassé: dialogues non fermés chez les deux joueurs');
+    }
+    const did = await Promise.all([playUi(duo.host, ctx), playUi(duo.guest, ctx)]);
+    if (!did.some(Boolean)) await duo.host.page.waitForTimeout(250);
+  }
+}
+
 export async function playUi(side: Side, ctx: UiContext): Promise<boolean> {
   const s = await snapshot(side);
   // Les bandeaux glissent à l'ouverture: on ne juge leur place qu'une fois posés.
@@ -456,6 +519,7 @@ export async function playUi(side: Side, ctx: UiContext): Promise<boolean> {
       await side.page.waitForTimeout(250);
       return true;
     }
+    if (await pressedRecently(ctx, side, `scène:${s.scene.text}`)) return true;
     await side.press('Space');
     await side.page.waitForTimeout(350);
     return true;
@@ -465,6 +529,7 @@ export async function playUi(side: Side, ctx: UiContext): Promise<boolean> {
       await side.page.waitForTimeout(250);
       return true;
     }
+    if (await pressedRecently(ctx, side, `dialogue:${s.dialogue.text}`)) return true;
     await side.press(s.dialogue.choices.length > 0 ? 'Enter' : 'Space');
     await side.page.waitForTimeout(350);
     return true;

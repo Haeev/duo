@@ -9,7 +9,6 @@
  */
 import * as v from 'valibot';
 import { DATA_SCHEMA, WorldSchema, type WorldState } from '../etat/monde';
-import { lookRevealedKey } from '../simulation/regles/apparence';
 
 /** Plus ancien format encore repris, dans l'étape en cours de la refonte. */
 export const STAGE_FLOOR = 1;
@@ -34,8 +33,11 @@ function revealBothLooks(data: unknown): unknown {
   if (!isRecord(memory)) throw new Error('mémoire des faits absente');
   const day = data.common.day;
   const revealed: Record<string, unknown> = {};
-  for (const player of [0, 1] as const)
-    revealed[lookRevealedKey(player)] = { v: true, by: player, day };
+  // Clés figées: une migration ne suit pas les réglages (`RULES.look.revealedPrefix`).
+  const keys = ['joueurs.apparence.j0', 'joueurs.apparence.j1'] as const;
+  keys.forEach((key, player) => {
+    revealed[key] = { v: true, by: player, day };
+  });
   return {
     ...data,
     schema: 2,

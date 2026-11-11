@@ -19,6 +19,7 @@ import {
   seats,
   shareSpots,
   snapshot,
+  waitDialoguesClosed,
   standSpots,
   walkBoth,
   windowSize,
@@ -137,10 +138,7 @@ test('P20 quitter et reprendre au milieu du prologue (CA-34)', async ({ browser 
       (w) => w.players[seat.index]?.toolbar.some((s) => s?.item === 'billet-poinconne') === true,
       60_000,
     );
-    await readAll(first, () => true, 1);
-    await first.host.page.waitForTimeout(2000);
-    for (let i = 0; i < 6 && (await snapshot(seat.side)).dialogue !== null; i++)
-      await playUi(seat.side, ctx);
+    await waitDialoguesClosed(first, ctx);
   }
   const before = await first.host.world();
   if (before === null) throw new Error('monde absent');

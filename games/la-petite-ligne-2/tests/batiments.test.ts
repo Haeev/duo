@@ -125,9 +125,14 @@ describe("bâtiments d'Aubrune", () => {
   // Règle des travées (remarque du client du 2026-11-10): ouvertures au milieu de leur travée,
   // étages sur les axes du rez-de-chaussée. Le contrôle assemble les fiches sans Blender.
   const hasNumpy = spawnSync('python3', ['-c', 'import numpy']).status === 0;
-  it.skipIf(!hasNumpy)(
+  // En CI (variable `CI`), un numpy absent fait échouer le test au lieu de le sauter en silence.
+  it.skipIf(!hasNumpy && process.env.CI === undefined)(
     'ont des façades réglées: ouvertures centrées dans leurs travées, étages alignés',
     () => {
+      expect(
+        hasNumpy,
+        'numpy est requis pour contrôler les façades (python3 -m pip install numpy)',
+      ).toBe(true);
       const output = execFileSync('python3', [join(SOURCES, 'controle_facades.py'), SHEETS], {
         encoding: 'utf8',
       });

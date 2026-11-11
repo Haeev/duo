@@ -9,6 +9,7 @@ import type { GameAction } from '../actions';
 import type { CameraInput } from '../rendu/camera';
 import type { GameView } from '../session';
 import type { StepInput } from '../simulation/noyau/entrees';
+import { INPUT_TUNING, type InputTuning } from './reglages';
 
 /** Ce que les commandes demandent au rendu 3D: la caméra et le repère de l'écran. */
 export interface ControlsCamera {
@@ -33,6 +34,9 @@ export interface ControlsOptions {
    * action, ni caméra ne partent à la simulation tant que c'est vrai.
    */
   readonly captured?: () => boolean;
+  /** Horloge en temps réel, en millisecondes (essais). */
+  readonly now?: () => number;
+  readonly tuning?: InputTuning;
 }
 
 export interface Controls {
@@ -73,6 +77,12 @@ export function createControls(options: ControlsOptions): Controls {
   const cameraInput = { turn: 0, zoom: 0, dragPixels: 0, wheel: 0 };
   /** Capture au pas précédent: l'appui qui referme un écran ne doit pas agir sur le monde. */
   let wasCaptured = false;
+  const now = options.now ?? (() => performance.now());
+  const tuning = options.tuning ?? INPUT_TUNING;
+  // Après la fermeture d'un écran, l'action reste verrouillée jusqu'à ce que la touche soit
+  // relâchée et que le délai en temps réel soit passé: un Espace tardif ne rouvre pas la conversation.
+  let actLocked = false;
+  let unlockAt = 0;
 
   return {
     step() {
@@ -82,7 +92,13 @@ export function createControls(options: ControlsOptions): Controls {
       const me = world === null || local === null ? null : world.players[local];
 
       const captured = wasCaptured || (options.captured?.() ?? false);
-      wasCaptured = options.captured?.() ?? false;
+      const nowCaptured = options.captured?.() ?? false;
+      if (wasCaptured && !nowCaptured) {
+        actLocked = true;
+        unlockAt = now() + tuning.actReleaseGuardMs;
+      }
+      if (nowCaptured) actLocked = false;
+      wasCaptured = nowCaptured;
 
       const forward = captured ? 0 : (input.isDown('up') ? 1 : 0) - (input.isDown('down') ? 1 : 0);
       const side = captured ? 0 : (input.isDown('right') ? 1 : 0) - (input.isDown('left') ? 1 : 0);
@@ -107,7 +123,11 @@ export function createControls(options: ControlsOptions): Controls {
       }
 
       // Les appuis sont toujours lus (ils ne restent pas en attente), mais ignorés sous capture.
-      const act = input.wasPressed('act');
+      let act = input.wasPressed('act');
+      if (actLocked) {
+        if (!input.isDown('act') && now() >= unlockAt) actLocked = false;
+        else act = false;
+      }
       const next = input.wasPressed('slot-next');
       const stow = input.wasPressed('stow');
       const picked = SLOTS.map((action) => input.wasPressed(action));
@@ -126,7 +146,7 @@ export function createControls(options: ControlsOptions): Controls {
         moveX: captured ? 0 : move.moveX,
         moveY: captured ? 0 : move.moveY,
         run: !captured && input.isDown('run'),
-        act: !captured && input.isDown('act'),
+        act: !captured && !actLocked && input.isDown('act'),
       };
     },
   };
