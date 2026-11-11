@@ -731,3 +731,10 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Un événement ajouté: ses `case` dans `interface/index.ts` et `interface/cuisine/index.ts` (lint seulement, `tsc` ne le voit pas). Une condition ou un effet ajouté: `donnees/valider.ts` (`checkCondition`, `checkEffect`) et la liste de `quetes/valider.ts` (`checkEffects`).
 - Meuble de carte conditionné (`when`): absent pour la simulation (`lieux/presents.ts`), mais le rendu le dessine tant qu'il ne lit pas `absentObjects`. Posture `lie` d'un habitant: le rendu ne connaît que `sit`.
 
+
+## Files de modules et repères livrés (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Contour encré sans trait aux raccords: fusionner les modules d'une file en un maillage posé à l'origine du lieu (le `turn` de `matiere.ts` vient de l'origine du maillage: à (0, 0, 0) il ne décale rien) et réécrire `aInk.y` = classe de taille du module * 64 + numéro de la file (tiré de sa première case: le même d'une tuile à l'autre). Le vent prend aussi sa phase de l'origine: la même pour toutes les tuiles, aucune fente au bord.
+- Poser un module sur le relief sommet par sommet (`y + heightAt(x, z)`): la hauteur est continue, deux modules voisins se rejoignent exactement, sur toute pente.
+- Module en miroir (`scale.x = -1`): inverser l'ordre de deux index par triangle, sinon les faces se retournent.
+- Lisière d'Aubrune: berges en escalier (cases reliées par un coin seulement) et cases seules entre un ru et une haie: le choix du module se fait par score (raccords, côté de l'eau, coin d'eau à moitié), pas par table de cas.

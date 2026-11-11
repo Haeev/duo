@@ -72,6 +72,13 @@ const VIEWS: readonly View[] = [
   { name: 'eglise', x: 252, y: 82, minutes: 16 * 60, yaw: 0, width: 28 },
   // L'orée du bois hors jeu, vue du couloir: arbres semés entiers au bord, allégés au fond.
   { name: 'oree', x: 104, y: 90, minutes: 16 * 60, yaw: 0, width: 22 },
+  // Repères livrés: le château d'eau de la halte (vidange côté voie) et la roue dans son bief.
+  { name: 'chateau-d-eau', x: 193, y: 85.5, minutes: 16 * 60, yaw: 0, width: 24 },
+  { name: 'moulin', x: 138.5, y: 131.5, minutes: 16 * 60, yaw: 0, width: 22 },
+  // Files livrées: la berge en talus au nord du bourg, les rangs du labour près du pigeonnier.
+  { name: 'talus', x: 196, y: 141.5, minutes: 16 * 60, yaw: 0, width: 18 },
+  { name: 'ferme', x: 220, y: 158, minutes: 16 * 60, yaw: 0, width: 26 },
+  { name: 'tunnel', x: 361, y: 59, minutes: 16 * 60, yaw: 0, width: 30 },
   // Le bois le plus dense du lieu (végétation semée): la vue du budget.
   { name: 'bois', x: 48, y: 16, minutes: 16 * 60, width: 18 },
 ];

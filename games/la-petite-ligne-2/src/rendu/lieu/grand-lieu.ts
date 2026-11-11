@@ -6,6 +6,7 @@
  * le joueur local; lueur des fenêtres la nuit; eau animée.
  */
 import {
+  Box3,
   BoxGeometry,
   type BufferGeometry,
   Color,
@@ -34,10 +35,13 @@ import { SHADOW_ONLY } from '../encre/ombres';
 import type { WindowLight } from '../encre/matiere';
 import { INK_SETTINGS } from '../encre/reglages';
 import { createGroundMap } from '../encre/sol';
+import { Fadable } from '../fondu';
 import { Occlusion, rayHitsBox, type Vec3 } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
-import { KeepOut } from './emprises';
+import { type Footprint, KeepOut } from './emprises';
+import { type LandmarkPose, landmarkPoses, layRuns, sortAvailable } from './files';
+import { RUN_SORTS } from './reglages-files';
 import { GeometryBuilder } from './geometrie';
 import { buildRoom } from './piece-geometrie';
 import { type RoomDef, roomFacades, type RoomObstacle, roomPlan } from './pieces';
@@ -162,6 +166,11 @@ export class TiledPlace {
   private readonly farRanges = new Map<number, { start: number; count: number }>();
   private farTriangles = 0;
   private landmarkTriangles = 0;
+  private landmarkCalls = 0;
+  /** Repères livrés (rendu encré): effaçables devant le joueur, comme un bâtiment. */
+  private readonly landmarkFades = new Map<string, Fadable>();
+  private readonly landmarkPoses: readonly LandmarkPose[];
+  private readonly plants: TilePlants | null;
   private farDirty = true;
   private readonly shadowed = new Map<number, boolean>();
   private readonly crownFades = new Map<string, CrownFade>();
@@ -283,6 +292,24 @@ export class TiledPlace {
     };
     const blob = mergeVertices(new IcosahedronGeometry(1, 1));
     blob.computeVertexNormals();
+    // Rendu encré: haies, talus et rangs en modules livrés, repères en modèles (sortes dont tous
+    // les modèles sont chargés; les autres gardent leurs volumes provisoires).
+    const has = (model: string): boolean => (plants?.geometryOf(model) ?? null) !== null;
+    const runs =
+      ink === null || plants === null
+        ? null
+        : layRuns(
+            this.field,
+            Object.fromEntries(
+              Object.entries(RUN_SORTS).filter(([, sort]) => sortAvailable(sort, has)),
+            ),
+          );
+    this.landmarkPoses = ink === null || plants === null ? [] : landmarkPoses(map, this.field, has);
+    this.plants = ink === null ? null : plants;
+    const kept: Footprint[] = [
+      ...(runs?.footprints() ?? []),
+      ...this.landmarkPoses.map((pose) => pose.footprint),
+    ];
     this.kit = {
       map,
       field: this.field,
@@ -292,6 +319,7 @@ export class TiledPlace {
       relief: this.relief,
       plants: ink === null ? null : plants,
       fences: !(ink !== null && modelledFences),
+      runs,
       // Rien ne se sème dans un meuble (un potager en est un), un repère ou un bâtiment.
       keepOut:
         ink === null
@@ -300,6 +328,7 @@ export class TiledPlace {
               this.field,
               [
                 ...obstacles,
+                ...kept,
                 ...Object.values(map.buildings ?? {}).map(({ rect }) => ({
                   x0: rect.x,
                   z0: rect.y,
@@ -524,10 +553,12 @@ export class TiledPlace {
   private buildLandmarks(): void {
     const s = this.settings;
     const builder = new GeometryBuilder();
-    for (const mark of Object.values(this.map.landmarks ?? {})) {
+    for (const [id, mark] of Object.entries(this.map.landmarks ?? {})) {
       // Le repère a déjà son volume dans le lieu (le Vieux Chêne est un arbre de la carte, le
       // clocher fait partie de l'église livrée): le volume provisoire le doublerait.
       if (this.landmarkShown(mark.x, mark.y)) continue;
+      const pose = this.landmarkPoses.find((p) => p.id === id);
+      if (pose !== undefined && this.placeLandmark(pose)) continue;
       const i = Math.floor(mark.y) * this.field.width + Math.floor(mark.x);
       const wild = this.field.wild[i] ?? 0;
       // Le pied du repère part d'un peu sous le sol en relief: il ne flotte sur aucune pente.
@@ -600,7 +631,36 @@ export class TiledPlace {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     this.outside.add(mesh);
-    this.landmarkTriangles = (geometry.index?.count ?? 0) / 3;
+    this.landmarkTriangles += (geometry.index?.count ?? 0) / 3;
+    this.landmarkCalls += 1;
+  }
+
+  /**
+   * Un repère en modèle livré (`files.ts`): posé au point du repère, sur le sol en relief, tourné
+   * selon sa nature; il s'efface devant le joueur comme un bâtiment (boîte du modèle posé). La
+   * géométrie reste à la source des décors.
+   */
+  private placeLandmark(pose: LandmarkPose): boolean {
+    const geometry = this.plants?.geometryOf(pose.model) ?? null;
+    if (geometry === null) return false;
+    const mesh = new Mesh(geometry, this.kit.materials.ground);
+    mesh.name = `repere-${pose.id}`;
+    const bury = this.relief?.settings.mesh.bury ?? 0;
+    mesh.position.set(pose.x, this.heightAt(pose.x, pose.z) - bury - pose.sink, pose.z);
+    mesh.rotation.y = pose.yaw;
+    mesh.scale.setScalar(pose.scale);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    this.outside.add(mesh);
+    mesh.updateMatrixWorld(true);
+    const box = new Box3().setFromObject(mesh);
+    const id = mesh.name;
+    if (this.occlusion.add({ id, min: box.min.clone(), max: box.max.clone() }))
+      this.landmarkFades.set(id, new Fadable(mesh, new Color(0, 0, 0)));
+    const count = geometry.index?.count ?? geometry.getAttribute('position').count;
+    this.landmarkTriangles += count / 3;
+    this.landmarkCalls += 1;
+    return true;
   }
 
   /** Un meuble de la carte ou un bâtiment livré tient-il déjà la place de ce repère ? */
@@ -719,6 +779,7 @@ export class TiledPlace {
     for (const id of this.occlusion.update(dt, subjects, toCamera)) {
       const view = this.views.get(this.partTile.get(id) ?? -1);
       const opacity = this.occlusion.opacity(id);
+      this.landmarkFades.get(id)?.apply(opacity, 0);
       if (view === undefined) continue;
       for (const mesh of view.fading) mesh.setOpacity(id, opacity);
       view.models.get(id)?.apply(opacity, 0);
@@ -902,6 +963,7 @@ export class TiledPlace {
     let worstTriangles = 0;
     let worstCalls = 0;
     let fading = this.crownFades.size;
+    for (const fade of this.landmarkFades.values()) fading += fade.copies;
     let geometries = 0;
     const tiles: { tile: number; triangles: number; calls: number }[] = [];
     for (const view of this.views.values()) {
@@ -922,7 +984,7 @@ export class TiledPlace {
       worstTriangles: Math.round(worstTriangles),
       worstCalls,
       farTriangles: Math.round(this.farTriangles + this.landmarkTriangles),
-      farCalls: (this.far?.geometry.groups.length ?? 0) + (this.landmarkTriangles > 0 ? 1 : 0),
+      farCalls: (this.far?.geometry.groups.length ?? 0) + this.landmarkCalls,
       fading,
       tiles,
       buildMs: this.buildMs,
@@ -932,6 +994,8 @@ export class TiledPlace {
   }
 
   dispose(): void {
+    for (const fade of this.landmarkFades.values()) fade.dispose();
+    this.landmarkFades.clear();
     for (const tile of [...this.views.keys()]) this.unload(tile);
     for (const tile of [...this.pending.keys()]) this.unload(tile);
     this.ring.clear();

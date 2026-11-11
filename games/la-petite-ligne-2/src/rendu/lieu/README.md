@@ -23,7 +23,7 @@ Une carte qui a un `terrain` (produite par `outils/plan-vers-lieu.ts`) est rendu
 
 Le moteur expose `surfaceAt(x, y)` (`null` hors grand lieu), `stats().tiles` (compteurs par tuile et au total) et `setOverview(largeur)` (vue haute de contrôle).
 
-Déductions provisoires, faute d'information dans la carte (à remplacer quand la carte la portera): les parcelles `champ` deviennent labour (1 000 cases et plus), pré, ou cour de terre battue (300 et moins); les rails suivent les arêtes `voie` et `interieur` du graphe; un repère est un grand arbre s'il est loin de tout aménagement, sinon une tour.
+Déductions provisoires, faute d'information dans la carte (à remplacer quand la carte la portera): les parcelles `champ` deviennent labour (1 000 cases et plus), pré, ou cour de terre battue (300 et moins); les rails suivent les arêtes `voie` et `interieur` du graphe; un repère sans modèle pour sa nature (`LANDMARK_LOOKS`) est un grand arbre s'il est loin de tout aménagement, sinon une tour.
 
 Page de démonstration: `pnpm exec vite --config src/rendu/lieu/demo/vite.config.ts`, puis `http://localhost:5174/src/rendu/lieu/demo/index.html` (Aubrune fabriquée dans la page depuis `plan.json`; touches et paramètres en tête de `demo/main.ts`; `window.tuiles.traverse(n)` pour le contrôle de fuite).
 
@@ -36,6 +36,22 @@ Végétation semée (rendu encré): les arbres et buissons tirés par `tileDecor
 Emprises (`emprises.ts`, logique pure): rien ne se sème (touffes, cailloux, arbres, buissons) dans l'emprise d'un meuble de la carte (un potager en est un), d'un repère ou d'un bâtiment, ni à cheval sur une autre surface que la sienne (une touffe ne dépasse pas sur un chemin ou un dallage, un caillou du chemin reste dans le chemin). Les gardes se règlent dans `semis.clear` de `reglages-tuiles.ts`. Aucun code pour un meuble de plus: son emprise vient de sa fiche. Les meubles posés par les joueurs en cours de partie ne déplacent pas le semis (il est construit avec la tuile).
 
 Budget du bois (`semis.light` de `reglages-recoltes.ts`): à plus de `beyond` cases hors du couloir de jeu (`GroundField.away`, natures `decor.outside`), un arbre semé prend sa version allégée (état `far` du manifeste: même graine, mêmes masses, mêmes festons). L'ombre de tous les arbres semés est portée par des maillages jamais dessinés (`SHADOW_ONLY`), rangés par morceaux de `shadowChunk`: la version `far` pour un arbre entier, la forme `shade` (sans festons) au fond du bois. Une essence sans ces états reste entière et porte son ombre elle-même. Mesures à 1366 x 768 (`ensemble.spec.ts`): bois le plus dense (48, 16) 582 000 triangles et 139 appels avant, 248 000 et 129 après; orée vue du couloir (104, 90) 562 000 et 185 avant, 312 000 et 180 après.
+
+### Files et repères livrés (`files.ts`, données dans `reglages-files.ts`)
+
+Haies, talus de berge et rangs du labour sont des modules d'un mètre du manifeste des décors (`assets-src/decors/recoltables-aubrune/`). `layRuns` prend les cases de chaque sorte (`RUN_SORTS`: natures, voisines voulues ou refusées, une colonne sur deux), puis choisit pour chaque case le module et son quart de tour (et son miroir) qui raccordent ses voisines de la même sorte et tournent les côtés `facing` vers l'eau; la forme est tirée de la case (la même chez l'hôte et l'invité). Chaque sorte est fusionnée en un maillage par tuile, posé à l'origine du lieu, chaque file avec son numéro de pièce (tiré de sa première case): aucun trait de contour aux raccords ni d'une tuile à l'autre. Les sommets suivent le relief. Une sorte dont un modèle manque garde ses boîtes.
+
+Repères: `LANDMARK_LOOKS` donne le modèle de chaque nature de repère de la carte (`landmarks.kind`), son orientation (vers la voie, le long de la voie, le long de l'eau, ou cap fixe) et son enfoncement. Il s'efface devant le joueur comme un bâtiment. Ses emprises et celles des modules écartent le semis (`KeepOut`) et les objets posés au sol (`hidingFootprints`).
+
+Ajouter une sorte de file ou une nature de repère (aucun code):
+
+1. Les modèles existent au manifeste (`construire.sh` du dossier des récoltables): modules de 1 m, le long de x, origine au milieu de la case.
+2. File: copie l'entrée de `RUN_SORTS` la plus proche et donne-lui un nom; sa place dans la table est sa priorité.
+3. `on`, `near`, `notNear`, `every`: les cases qu'elle prend. `pourquoi`: sa raison d'être.
+4. `modules`: le droit d'abord, puis le bout et l'angle, chacun avec ses `links` (côtés où la file continue), `facing` et `mirror` si besoin.
+5. Repère: une entrée de `LANDMARK_LOOKS` du nom de sa nature (`kind` de la carte), avec `model`, `facing` (`toward-rail`, `along-rail`, `along-water`, `fixed`), `snap`, `sink`, `fitHeight`.
+6. `pnpm exec vitest run tests/rendu/files.test.ts` (une sorte et une nature factices y sont posées).
+7. Regarde-le: `pnpm exec vite build`, puis `LPL2_VUES=lisiere,moulin pnpm exec playwright test --config tests/rendu-encre/playwright.config.ts ensemble`.
 
 Clôtures de la voie: les cases de lisière qui longent une voie reçoivent le modèle livré `decor.fenceModel` (`fenceRuns`, `fenceVolumes`), resserré pour tomber juste; sans ce modèle, les piquets en boîtes restent. Repères (`landmarks`): un repère qui a déjà son volume (un meuble de la carte à moins de `landmark.sameAs`, un bâtiment livré) n'a plus de volume provisoire.
 

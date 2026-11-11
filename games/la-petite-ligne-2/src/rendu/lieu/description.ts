@@ -13,10 +13,12 @@ import type { OccluderBox } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { DECOR_MANIFEST } from './decors-manifeste';
 import { clearOf, type Footprint } from './emprises';
+import { tallFootprints } from './files';
 import { groundModelOf } from './recoltes';
 import { HARVEST_LOOK } from './reglages-recoltes';
 import { roomStyle } from './reglages-pieces';
 import { TILE_SETTINGS } from './reglages-tuiles';
+import { groundField } from './terrain-rendu';
 
 /**
  * Forme simple d'un volume sans modèle. Les trois dernières sont celles d'une porte (`formes.ts`):
@@ -268,6 +270,10 @@ export function hidingFootprints(
   for (const object of place?.map.objects ?? [])
     add(object.type, object.x, object.y, object.rotation);
   for (const placed of state.placed) add(placed.type, placed.x, placed.y, placed.rotation);
+  // Haies, talus et repères livrés d'un grand lieu: on n'y laisse rien disparaître non plus.
+  const map = place?.map;
+  if (map !== undefined)
+    out.push(...tallFootprints(map, () => groundField(map), HARVEST_LOOK.ground.hideHeight));
   return out;
 }
 

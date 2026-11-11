@@ -17,6 +17,7 @@ import {
   Quaternion,
   Vector3,
 } from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { MapDef } from '../../donnees/schemas/lieu';
 import { KIND, LAYER, SWAP } from '../encre/couches';
 import { SHADOW_ONLY } from '../encre/ombres';
@@ -32,6 +33,7 @@ import {
   variantOf,
 } from './decors-manifeste';
 import type { KeepOut } from './emprises';
+import type { RunCell, RunLayout } from './files';
 import { HARVEST_LOOK, type HarvestLookSettings } from './reglages-recoltes';
 import type { TileSettings } from './reglages-tuiles';
 import type { Relief } from './relief';
@@ -107,6 +109,11 @@ export interface TileKit {
   readonly keepOut?: KeepOut | null;
   /** Faux: les clôtures de la voie sont posées en modèles livrés par le lieu, pas en boîtes. */
   readonly fences?: boolean;
+  /**
+   * Rendu encré: haies, talus et rangs en modules livrés (`files.ts`), fusionnés par sorte et par
+   * tuile; leurs cases n'ont plus de boîte. Absent: les boîtes du décor provisoire.
+   */
+  readonly runs?: RunLayout | null;
 }
 
 /** Végétation semée d'une tuile: ce qui se dessine, et ce qui en porte l'ombre sans se dessiner. */
@@ -461,6 +468,7 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     kit.settings,
     kit.keepOut ?? null,
     kit.fences !== false,
+    kit.runs ?? null,
   );
   if (relief !== null) {
     // Le sol en relief ne porte pas d'ombre: les rails rejoignent les traverses (boîtes
@@ -535,6 +543,19 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     }
   }
   yield;
+
+  // Files de modules (haies, talus, rangs): un maillage par sorte, chaque file d'une seule pièce.
+  const runs = kit.runs ?? null;
+  if (runs !== null && kit.plants !== undefined && kit.plants !== null)
+    for (const [sort, cells] of runs.inTile(kit.map, tile)) {
+      const geometry = runGeometry(cells, kit.plants, relief);
+      if (geometry === null) continue;
+      const mesh = new Mesh(view.tracker.track(geometry), materials.ground);
+      mesh.name = `file-${sort}`;
+      mesh.receiveShadow = true;
+      view.add(mesh);
+      yield;
+    }
 
   if (shapes.pebble !== undefined && shapes.tuft !== undefined) {
     // Semis de petits volumes: ce qui ponctue le sol est un volume, pas un dessin à plat.
@@ -650,6 +671,62 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     }
   }
   return view;
+}
+
+/**
+ * Modules d'une sorte de file dans une tuile, fusionnés en un maillage posé à l'origine du lieu:
+ * le contour encré tire le numéro de pièce de l'origine du maillage, la même pour toutes les
+ * tuiles, et chaque file garde le sien (`RunCell.piece`): aucun trait aux raccords, ni entre deux
+ * modules ni d'une tuile à l'autre. Chaque sommet suit le relief du sol sous lui (hauteur
+ * continue: deux modules voisins se rejoignent exactement); le pied s'enfonce de `bury`.
+ */
+function runGeometry(
+  cells: readonly RunCell[],
+  plants: TilePlants,
+  relief: Relief | null,
+): BufferGeometry | null {
+  const parts: BufferGeometry[] = [];
+  const bury = relief?.settings.mesh.bury ?? 0;
+  for (const cell of cells) {
+    const source = plants.geometryOf(cell.model);
+    if (source === null) continue;
+    const part = source.clone();
+    rotation.setFromAxisAngle(up, (cell.quarter * Math.PI) / 2);
+    matrix.compose(
+      position.set(cell.x + 0.5, 0, cell.y + 0.5),
+      rotation,
+      scale.set(cell.mirror ? -1 : 1, 1, 1),
+    );
+    part.applyMatrix4(matrix);
+    // Un miroir retourne les faces: on rend aux triangles leur sens, sinon l'envers se verrait.
+    const index = part.index;
+    if (cell.mirror && index !== null)
+      for (let i = 0; i + 2 < index.count; i += 3) {
+        const b = index.getX(i + 1);
+        index.setX(i + 1, index.getX(i + 2));
+        index.setX(i + 2, b);
+      }
+    const points = part.getAttribute('position');
+    if (relief !== null)
+      for (let i = 0; i < points.count; i++) {
+        const y = points.getY(i);
+        const ground = relief.heightAt(points.getX(i), points.getZ(i));
+        points.setY(i, y + ground - (y < 0.02 ? bury : 0));
+      }
+    const ink = part.getAttribute('aInk');
+    for (let i = 0; i < ink.count; i++) {
+      // La classe de taille du module reste (hachures), le numéro devient celui de la file.
+      const size = Math.floor(ink.getY(i) / 64);
+      ink.setY(i, size * 64 + cell.piece);
+    }
+    parts.push(part);
+  }
+  if (parts.length === 0) return null;
+  const merged = mergeGeometries(parts);
+  for (const part of parts) part.dispose();
+  merged.computeBoundingBox();
+  merged.computeBoundingSphere();
+  return merged;
 }
 
 /** Ancien décor semé (rendu en aplats, ou modèles absents): un tronc et une boule par arbre. */
