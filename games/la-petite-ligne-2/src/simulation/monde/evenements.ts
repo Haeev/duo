@@ -25,4 +25,12 @@ export const WORLD_EVENTS = [
   /** Un événement du calendrier commence ou finit au lieu courant. */
   v.strictObject({ type: v.literal('calendar_started'), place: IdSchema, event: IdSchema }),
   v.strictObject({ type: v.literal('calendar_ended'), place: IdSchema, event: IdSchema }),
+  /** Un coup de la cloche des heures (`stroke` sur `strokes`): rejoué chez l'invité pour le son. */
+  v.strictObject({
+    type: v.literal('clock_struck'),
+    place: IdSchema,
+    hour: v.pipe(IntSchema, v.minValue(0), v.maxValue(23)),
+    stroke: v.pipe(IntSchema, v.minValue(1), v.maxValue(12)),
+    strokes: v.pipe(IntSchema, v.minValue(1), v.maxValue(12)),
+  }),
 ] as const;

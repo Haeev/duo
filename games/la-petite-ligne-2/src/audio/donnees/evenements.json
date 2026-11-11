@@ -91,6 +91,13 @@
     { "on": "dish_cooked", "sound": "plat-reussi", "audience": "both", "placed": true },
     {
       "on": "deco_changed",
+      "where": { "action": "rotate" },
+      "sound": "meuble-tourner",
+      "audience": "both",
+      "placed": true
+    },
+    {
+      "on": "deco_changed",
       "where": { "action": "drop" },
       "sound": "meuble-poser",
       "audience": "both",
@@ -111,6 +118,56 @@
       "placed": true
     },
     { "on": "deco_changed", "sound": "meuble-soulever", "audience": "both", "placed": true },
+    {
+      "on": "cook_step_done",
+      "where": { "kind": "chop" },
+      "sound": "cuisine-decoupe",
+      "audience": "other",
+      "placed": true
+    },
+    {
+      "on": "cook_step_done",
+      "where": { "kind": "stir" },
+      "sound": "cuisine-mijote",
+      "audience": "other",
+      "placed": true
+    },
+    {
+      "on": "cook_step_done",
+      "where": { "kind": "heat" },
+      "sound": "cuisine-friture",
+      "audience": "other",
+      "placed": true
+    },
+    {
+      "on": "calendar_started",
+      "where": { "event": "train-du-samedi" },
+      "sound": "passage-a-niveau",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "calendar_started",
+      "where": { "event": "depart-du-train-du-samedi" },
+      "sound": "passage-a-niveau",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "calendar_started",
+      "where": { "event": "autorail-de-5h12" },
+      "sound": "passage-a-niveau",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "calendar_started",
+      "where": { "event": "depart-de-l-autorail" },
+      "sound": "passage-a-niveau",
+      "audience": "both",
+      "placed": false
+    },
+    { "on": "clock_struck", "sound": "cloche-marthe-coup", "audience": "both", "placed": false },
     { "on": "door_passed", "sound": "porte", "audience": "both", "placed": true },
     { "on": "shop_opened", "sound": "clochette-boutique", "audience": "both", "placed": true },
     {

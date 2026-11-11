@@ -241,6 +241,25 @@ describe('logement', () => {
     expect(sim.world.places[PLACE]?.placed.some((p) => p.id === id)).toBe(false);
   });
 
+  it('tourner un meuble en main émet rotate, une fois par quart de tour', () => {
+    const sim = restoredSim();
+    act(sim, 0, { type: 'deco_mode', housing: HOUSE, on: true });
+    act(sim, 0, {
+      type: 'deco_take',
+      housing: HOUSE,
+      prop: 'table-essai',
+      x: 30,
+      y: 7.5,
+      rotation: 0,
+    });
+    const turn = (rotation: 0 | 1): string[] =>
+      act(sim, 0, { type: 'deco_move', housing: HOUSE, x: 30, y: 7.5, rotation }).flatMap((e) =>
+        e.type === 'deco_changed' ? [e.action] : [],
+      );
+    expect(turn(1)).toEqual(['rotate']);
+    expect(turn(1)).toEqual([]);
+  });
+
   it('un meuble posé sur une table la suit, la table chargée ne se range pas, le confort monte', () => {
     const sim = restoredSim();
     act(sim, 0, { type: 'deco_mode', housing: HOUSE, on: true });

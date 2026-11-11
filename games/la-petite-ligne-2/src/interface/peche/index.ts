@@ -30,6 +30,8 @@ export interface FishingOverlayOptions {
   readonly keyLabel: (code: string) => string;
   readonly projectToScreen?: ProjectToScreen;
   readonly keyTarget: Pick<Window, 'addEventListener' | 'removeEventListener'>;
+  /** Signal sonore de l'interface (`peche-moulinet` pendant la tirée). */
+  readonly onCue?: (cue: string) => void;
 }
 
 export interface FishingOverlay {
@@ -47,6 +49,8 @@ const R = 92;
 /** Durée de la fête: espèce nouvelle, puis espèce connue (ms). */
 const FEAST_NEW_MS = 4200;
 const FEAST_KNOWN_MS = 1800;
+/** Pendant la tirée, le moulinet fait son bruit à l'appui puis toutes les 0,7 s (durée du son). */
+const REEL_CUE_PERIOD_S = 0.7;
 
 function polar(deg: number, radius: number): string {
   const a = (deg * Math.PI) / 180;
@@ -123,6 +127,7 @@ export function createFishingOverlay(options: FishingOverlayOptions): FishingOve
 
   let game: LocalFishing | null = null;
   let feastLeft = 0;
+  let reelCueIn = 0;
   let zoneDrawn = -1;
   const keys = { left: false, right: false, space: false };
 
@@ -243,6 +248,13 @@ export function createFishingOverlay(options: FishingOverlayOptions): FishingOve
       game.hold({ steer: steer(), reel: keys.space });
       for (const intent of game.update(dt, world)) send(intent);
       const phase = game.phase();
+      if (phase.kind === 'fight' && keys.space) {
+        reelCueIn -= dt;
+        if (reelCueIn <= 0) {
+          options.onCue?.('peche-moulinet');
+          reelCueIn = REEL_CUE_PERIOD_S;
+        }
+      } else reelCueIn = 0;
       if (phase.kind === 'closed') game = null;
       draw(phase);
     },

@@ -197,6 +197,7 @@ function stepDone(sim: SimContext, player: PlayerIndex, grade: number): void {
     step: index,
     grade: bounded,
     early,
+    kind: step.kind,
   });
   if (session.grades.length < def.steps.length) return;
   kitchen.cooks[player] = null;

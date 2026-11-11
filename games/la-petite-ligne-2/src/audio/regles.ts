@@ -52,6 +52,7 @@ export function soundForEvent(
     const own = actor !== null && actor === local;
     // Le premier gabarit qui convient décide, même s'il n'est pas pour ce joueur.
     if (rule.audience === 'own' && !own) return null;
+    if (rule.audience === 'other' && own) return null;
     return { sound: rule.sound, actor, placed: rule.placed && actor !== null, own };
   }
   return null;

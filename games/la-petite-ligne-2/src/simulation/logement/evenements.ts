@@ -23,7 +23,7 @@ export const HOUSING_EVENTS = [
   v.strictObject({
     type: v.literal('deco_changed'),
     player: PlayerIndexSchema,
-    action: v.picklist(['grab', 'take', 'drop', 'cancel', 'store']),
+    action: v.picklist(['grab', 'take', 'drop', 'cancel', 'store', 'rotate']),
     prop: v.nullable(IdSchema),
     item: IdSchema,
   }),
