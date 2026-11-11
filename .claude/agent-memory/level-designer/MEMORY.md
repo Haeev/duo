@@ -185,3 +185,10 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - La grève du gué: rangée 129 terre (pierres plates), eau dès 130; « au bord de l'eau » se prouve par une case d'eau voisine, pas par le sol `galets` (`controler_trouvailles.py`).
 - L'assembleur réordonne `interieurs/epicerie-rdc.json` à chaque passage (déjà le cas avant moi): `git checkout` du fichier après la chaîne si rien d'autre n'y change.
 - Dans `python3 -I -c "..."`, un texte entre accents graves est exécuté par le shell: écrire ces textes avec Edit ou dans un script.
+
+## Poses de la version 9 (Aubrune, vérifié le 2026-11-11)
+
+- L'assembleur conserve les champs ajoutés à la main sur un objet du plan, mais efface un OBJET entier ajouté à la main dans un intérieur (ardoises du chantier dans `maison-rdc.json`): après chaque passe, `git status` sur `interieurs/`, et verser au plan (avec `when`) tout objet d'un autre lot. Un `pourquoi` d'intérieur reste un champ manuel: le retoucher à la main si l'objet bouge.
+- Des modèles retirés du manifeste restent cités par des fiches (`tonneau` barrel, `caisse` crate, `banc-de-ferme`, `tas-de-buches`, `puits`, `abreuvoir-de-pierre`): `controler_plan.py` mesure leur forme provisoire sur l'emprise de la fiche (`taille_de`). Le `modele` d'un objet typé du plan est recopié de sa fiche (`_MODELES`).
+- Le passage de 2 m des intérieurs se juge par combinaison des faits cités par les meubles conditionnés (`gabarit_par_etat`), pas avec tous posés à la fois.
+- Une porte de halte ou de café sur la Grand-Route: la façade est sur la route, rien ne s'y pose; regarder de l'autre côté de la route (herbe rase du café) ou sur le quai.

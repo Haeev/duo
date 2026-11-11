@@ -405,33 +405,33 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 | Bâtiment | Gabarit de base | Largeur x profondeur | Étages | Toit | Porte (façade, position) | Couleurs ou note |
 |---|---|---|---|---|---|---|
 | le quai | `quai` | 27 x 4 m | (modèle) | (modèle) | (aucune) | plateforme de 0,55 m, bordure de pierre côté voie, pas de toit |
-| la halte | `house-town` | 10 x 6 m | 1 | croupe | sud 0.50 | murs pierre_claire, toit lauze, menuiseries rouge_cheminot, volets rouge_cheminot, porte rouge_cheminot |
-| la maison du garde-barrière | `house-town` | 11 x 8 m | 2 | deux-pans | est 0.50 | murs enduit, toit tuile, menuiseries creme, volets sauge, porte sauge |
-| l'épicerie-pension Ferrand | `shop-front` | 8 x 10 m | 2 | croupe | est 0.50 | murs enduit_ocre, toit lauze, volets vert_sombre, porte vert_sombre, menuiseries vert_sombre, enseigne vert_sombre |
-| l'atelier de Basile | `shed` | 10 x 8 m | 1 | deux-pans | est 0.50 | murs bois_brut, toit lauze, menuiseries bois_sombre, porte bois_sombre |
-| la maison de Firmin | `house-town` | 7 x 6 m | 2 | deux-pans | sud 0.50 | murs pierre, toit tuile, volets rouge_cheminot, porte rouge_cheminot |
-| la remise de la draisine | `shed` | 6 x 5 m | (modèle) | (modèle) | ouest 0.50 | porte charretière de 3 m dans l'axe des rails |
-| le fournil d'Achille | `shop-front` | 7 x 6 m | 2 | deux-pans | sud 0.50 | murs enduit, toit tuile, menuiseries miel, porte miel, enseigne bois_sombre |
-| la mercerie-coiffure | `shop-front` | 7 x 7 m | 2 | deux-pans | nord 0.50 | murs enduit_rose, toit tuile, menuiseries creme, volets fleur_rose, porte creme |
-| l'école-mairie | `house-town` | 7 x 6 m | 2 | croupe | sud 0.50 | murs pierre_claire, toit lauze, volets bleu, porte bleu |
-| la maison de Lucie | `house-town` | 6 x 6 m | 2 | (modèle) | nord 0.50 | murs enduit, toit tuile, volets bleu, porte bleu |
-| le café de la Halte | `shop-front` | 7 x 6 m | 2 | deux-pans | sud 0.50 | murs enduit_ocre, toit tuile, menuiseries rouge_cheminot, porte rouge_cheminot, enseigne rouge_cheminot |
-| la forge | `shed` | 6 x 6 m | 1 | deux-pans | sud 0.50 | murs pierre, toit lauze, porte bois_sombre |
-| l'atelier d'Ambroise | `shop-front` | 7 x 6 m | 2 | (modèle) | sud 0.50 | murs pierre_claire, toit tuile, menuiseries bois_sombre, enseigne laiton |
-| la maison d'Honorine | `house-town` | 6 x 6 m | 2 | (modèle) | sud 0.50 | murs enduit_rose, toit tuile, volets sauge, porte sauge |
-| la maison aux volets clos | `house-town` | 6 x 6 m | 2 | (modèle) | sud 0.50 | murs enduit, toit tuile, volets bois_gris, porte bois_gris |
-| la maison du bout | `house-town` | 6 x 6 m | 1 | (modèle) | nord 0.50 | murs pierre, toit lauze, volets rouge_cheminot, porte rouge_cheminot |
+| la halte | `batiments/halte.json` | 10 x 6 m | 1 | croupe | sud 0.50 | murs pierre_claire, toit lauze, menuiseries rouge_cheminot, volets rouge_cheminot, porte rouge_cheminot |
+| la maison du garde-barrière | `batiments/maison.json` | 11 x 8 m | 2 | deux-pans | est 0.50 | murs enduit, toit tuile, menuiseries creme, volets sauge, porte sauge |
+| l'épicerie-pension Ferrand | `batiments/epicerie.json` | 8 x 10 m | 2 | croupe | est 0.50 | murs enduit_ocre, toit lauze, volets vert_sombre, porte vert_sombre, menuiseries vert_sombre, enseigne vert_sombre |
+| l'atelier de Basile | `batiments/scierie.json` | 10 x 8 m | 1 | deux-pans | est 0.50 | murs bois_brut, toit lauze, menuiseries bois_sombre, porte bois_sombre |
+| la maison de Firmin | `batiments/firmin.json` | 7 x 6 m | 2 | deux-pans | sud 0.50 | murs pierre, toit tuile, volets rouge_cheminot, porte rouge_cheminot |
+| la remise de la draisine | `batiments/remise.json` | 6 x 5 m | (modèle) | (modèle) | ouest 0.50 | porte charretière de 3 m dans l'axe des rails |
+| le fournil d'Achille | `batiments/fournil.json` | 7 x 6 m | 2 | deux-pans | sud 0.50 | murs enduit, toit tuile, menuiseries miel, porte miel, enseigne bois_sombre |
+| la mercerie-coiffure | `batiments/mercerie.json` | 7 x 7 m | 2 | deux-pans | nord 0.50 | murs enduit_rose, toit tuile, menuiseries creme, volets fleur_rose, porte creme |
+| l'école-mairie | `batiments/ecole.json` | 7 x 6 m | 2 | croupe | sud 0.50 | murs pierre_claire, toit lauze, volets bleu, porte bleu |
+| la maison de Lucie | `batiments/lucie.json` | 6 x 6 m | 2 | (modèle) | nord 0.50 | murs enduit, toit tuile, volets bleu, porte bleu |
+| le café de la Halte | `batiments/cafe.json` | 7 x 6 m | 2 | deux-pans | sud 0.50 | murs enduit_ocre, toit tuile, menuiseries rouge_cheminot, porte rouge_cheminot, enseigne rouge_cheminot |
+| la forge | `batiments/forge.json` | 6 x 6 m | 1 | deux-pans | sud 0.50 | murs pierre, toit lauze, porte bois_sombre |
+| l'atelier d'Ambroise | `batiments/horloger.json` | 7 x 6 m | 2 | (modèle) | sud 0.50 | murs pierre_claire, toit tuile, menuiseries bois_sombre, enseigne laiton |
+| la maison d'Honorine | `batiments/honorine.json` | 6 x 6 m | 2 | (modèle) | sud 0.50 | murs enduit_rose, toit tuile, volets sauge, porte sauge |
+| la maison aux volets clos | `batiments/hameau-b.json` | 6 x 6 m | 2 | (modèle) | sud 0.50 | murs enduit, toit tuile, volets bois_gris, porte bois_gris |
+| la maison du bout | `batiments/hameau-c.json` | 6 x 6 m | 1 | (modèle) | nord 0.50 | murs pierre, toit lauze, volets rouge_cheminot, porte rouge_cheminot |
 | l'église Saint-Aubin | `eglise` | 21 x 12 m | (modèle) | (modèle) | sud 0.50 | modèle à part: nef de 21 x 12 m, clocher carré de 6 m à l'ouest (22 m de haut), portail au sud |
-| le presbytère | `house-town` | 7 x 7 m | 2 | (modèle) | est 0.50 | murs pierre, toit lauze, volets vert_sombre, porte vert_sombre |
-| la maison de Marthe | `house-town` | 6 x 6 m | 2 | (modèle) | est 0.50 | murs enduit, toit tuile, volets bleu, porte bleu |
-| la maison de cheminot (ouest) | `house-town` | 6 x 6 m | 2 | (modèle) | nord 0.50 | murs pierre_claire, toit tuile, volets rouge_cheminot, porte rouge_cheminot |
-| la maison de cheminot (est) | `house-town` | 6 x 6 m | 2 | (modèle) | nord 0.50 | murs pierre_claire, toit tuile, volets rouge_cheminot, porte rouge_cheminot |
+| le presbytère | `batiments/presbytere.json` | 7 x 7 m | 2 | (modèle) | est 0.50 | murs pierre, toit lauze, volets vert_sombre, porte vert_sombre |
+| la maison de Marthe | `batiments/marthe.json` | 6 x 6 m | 2 | (modèle) | est 0.50 | murs enduit, toit tuile, volets bleu, porte bleu |
+| la maison de cheminot (ouest) | `batiments/cheminot-o.json` | 6 x 6 m | 2 | (modèle) | nord 0.50 | murs pierre_claire, toit tuile, volets rouge_cheminot, porte rouge_cheminot |
+| la maison de cheminot (est) | `batiments/cheminot-e.json` | 6 x 6 m | 2 | (modèle) | nord 0.50 | murs pierre_claire, toit tuile, volets rouge_cheminot, porte rouge_cheminot |
 | le lavoir | `lavoir` | 5 x 4 m | (modèle) | (modèle) | ouest 0.50 | toit en appentis sur quatre poteaux, ouvert à l'ouest, bassin de pierre à l'est |
-| le poste d'aiguillage | `house-town` | 6 x 4 m | 2 | croupe | nord 0.50 | murs pierre, toit lauze, menuiseries rouge_cheminot, porte rouge_cheminot |
-| le moulin de la Vanne | `house-town` | 8 x 8 m | 2 | deux-pans | nord 0.50 | murs pierre, toit tuile, menuiseries bois_sombre, porte bois_sombre |
-| le logis de la ferme Delmas | `house-town` | 9 x 6 m | 2 | deux-pans | sud 0.50 | murs enduit_ocre, toit tuile, volets sauge, porte sauge |
-| la grange | `shed` | 8 x 10 m | 1 | deux-pans | est 0.50 | murs bois_gris, toit tuile, porte bois_brut |
-| la maison forestière | `house-town` | 6 x 6 m | 1 | (modèle) | est 0.50 | murs pierre, toit lauze, volets vert_sombre, porte vert_sombre |
+| le poste d'aiguillage | `batiments/poste.json` | 6 x 4 m | 2 | croupe | nord 0.50 | murs pierre, toit lauze, menuiseries rouge_cheminot, porte rouge_cheminot |
+| le moulin de la Vanne | `batiments/moulin.json` | 8 x 8 m | 2 | deux-pans | nord 0.50 | murs pierre, toit tuile, menuiseries bois_sombre, porte bois_sombre |
+| le logis de la ferme Delmas | `batiments/ferme-logis.json` | 9 x 6 m | 2 | deux-pans | sud 0.50 | murs enduit_ocre, toit tuile, volets sauge, porte sauge |
+| la grange | `batiments/grange.json` | 8 x 10 m | 1 | deux-pans | est 0.50 | murs bois_gris, toit tuile, porte bois_brut |
+| la maison forestière | `batiments/forestiere.json` | 6 x 6 m | 1 | (modèle) | est 0.50 | murs pierre, toit lauze, volets vert_sombre, porte vert_sombre |
 <!-- genere:gabarits:fin -->
 
 ### Mobilier de lieu
@@ -441,7 +441,7 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 |---|---|---|---|---|---|
 | banc-du-quai | banc | `bench-platform` | 200, 100.5 | nord | le banc du réveil: on attend le train face à la voie |
 | banc-quai-ouest | banc | `bench-platform` | 191, 100.5 | nord | second banc du quai, face à la voie |
-| poteau-quai | poteau-de-quai | `poteau-de-quai` | 205.5, 102.5 | sud | là où l'on monte à deux: le point du quai |
+| poteau-quai | poteau-de-quai | `platform-sign` | 205.5, 102.5 | sud | là où l'on monte à deux: le point du quai |
 | caisse-commande | (à créer) | `crate` | 207.5, 101.5 | sud | la caisse de la commande du samedi, au pied du poteau |
 | panneau-gare | (à créer) | `platform-sign` | 196, 99.6 | nord | le nom de la halte se lit depuis le train, donc tourné vers la voie |
 | reverbere-quai-1 | lanterne-de-quai | `platform-lantern` | 188, 102.5 | nord | éclairage du quai, au bout ouest: la potence vers la voie |
@@ -460,52 +460,52 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 | lanterne-halte | lanterne-de-porte | `wall-lantern` | 221.2, 105.03 | sud | à droite de la porte de la halte, côté place: la gare se trouve de loin, même le dernier train parti |
 | lanterne-cafe | lanterne-de-porte | `wall-lantern` | 255.4, 106.03 | sud | entre la porte et la vitrine du café: allumée, elle dit que Colette sert encore |
 | lanterne-epicerie | lanterne-de-porte | `wall-lantern` | 194.03, 117.2 | est | à la porte de l'épicerie-pension, côté place: les pensionnaires rentrent à la nuit |
-| lisse-nord | (à créer) | `level-crossing-gate` | 182.5, 95.4 | sud | la lisse barre la route (bras est-ouest) au nord de la voie, jamais la voie |
-| lisse-sud | (à créer) | `level-crossing-gate` | 182.5, 99.6 | sud | la lisse barre la route au sud de la voie |
+| lisse-nord | (à créer) | `crossing-gate` | 182.5, 95.5 | sud | en travers de la route du Gué au nord de la voie, socle sur l'accotement ouest (à droite de qui descend vers le sud); cachée quand la lisse fleurie est baissée |
+| lisse-sud | (à créer) | `crossing-gate` | 182.5, 99.5 | nord | en travers de la route du Gué au sud de la voie, socle sur l'accotement est (à droite de qui monte vers le nord, côté maison de Firmin); cachée quand la lisse fleurie est baissée |
 | croix-pn-eglise | (à créer) | `crossing-sign` | 256.8, 95 | sud | passage à niveau non gardé: croix de Saint-André au bord de la rue |
 | pompe-de-la-place | pompe | `water-pump` | 208, 113.5 | sud | la pompe de la place, sur l'ancien puits: l'eau de tous et la toilette du matin (acte 1) |
-| banc-place | banc | `bench-park` | 208, 119.4 | nord | face au puits et à la halte: on y voit qui descend du train |
-| ronces-maison-1 | ronces | `buisson` | 167.5, 112.5 | sud | les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à l'acte 1 |
-| ronces-maison-2 | ronces | `buisson` | 176, 119.6 | sud | les ronces du jardin, devant le futur potager |
+| banc-place | banc | `bench-platform` | 208, 119.4 | nord | face au puits et à la halte: on y voit qui descend du train |
+| ronces-maison-1 | ronces | `bramble` | 167.5, 112.5 | sud | les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à l'acte 1 |
+| ronces-maison-2 | ronces | `bramble` | 176, 119.6 | sud | les ronces du jardin, devant le futur potager |
 | table-tonnelle | table-a-manger | `table-farm` | 197.5, 120 | sud | la tonnelle d'Odette: le souper des pensionnaires |
 | chaise-tonnelle-n | chaise | `chair-farm` | 197, 118.9 | sud | autour de la table de la tonnelle |
 | chaise-tonnelle-s | chaise | `chair-farm` | 198, 121.1 | nord | autour de la table de la tonnelle |
-| banc-ponton | banc | `bench-park` | 201.5, 128.2 | sud | au pied du ponton, face à la rivière et au pigeonnier de l'autre rive |
-| banc-berge | banc | `bench-park` | 248, 124.4 | sud | face à la rivière, à l'ombre des saules |
-| panneau-1 | (à créer) | `signpost` | 179.4, 105 | sud | panneau de carrefour: passage à niveau, Grand-Route, chemin du Moulin, le Gué |
-| panneau-2 | (à créer) | `signpost` | 256.4, 111.5 | sud | panneau de carrefour: rue de l'Église, venelle des Jardins |
-| panneau-3 | (à créer) | `signpost` | 185.6, 85 | sud | panneau de carrefour: chemin forestier, chemin de la Lisière |
-| panneau-4 | (à créer) | `signpost` | 185.6, 123.6 | sud | panneau de carrefour: chemin de la Berge, le Gué |
-| panneau-5 | (à créer) | `signpost` | 317, 111.6 | sud | panneau de carrefour: bout de la Grand-Route, chemin des Jardins, l'arrêt du car |
-| panneau-6 | (à créer) | `signpost` | 150, 105.4 | sud | panneau de carrefour: chemin du Moulin, portail du moulin |
-| boite-lucie | (à créer) | `mailbox` | 248.4, 110.6 | nord | la boîte aux lettres du bourg, à la grille de Lucie, tournée vers la rue |
-| boite-maison | (à créer) | `mailbox` | 179.6, 113.4 | est | la boîte de la maison du garde, à côté de la porte, tournée vers la route: les lettres des habitants |
+| banc-ponton | banc | `bench-platform` | 201.5, 128.2 | sud | au pied du ponton, face à la rivière et au pigeonnier de l'autre rive |
+| banc-berge | banc | `bench-platform` | 248, 124.4 | sud | face à la rivière, à l'ombre des saules |
+| panneau-1 | (à créer) | `fingerpost` | 179.4, 105 | sud | panneau de carrefour: passage à niveau, Grand-Route, chemin du Moulin, le Gué |
+| panneau-2 | (à créer) | `fingerpost` | 256.4, 111.5 | sud | panneau de carrefour: rue de l'Église, venelle des Jardins |
+| panneau-3 | (à créer) | `fingerpost` | 185.6, 85 | sud | panneau de carrefour: chemin forestier, chemin de la Lisière |
+| panneau-4 | (à créer) | `fingerpost` | 185.6, 123.6 | sud | panneau de carrefour: chemin de la Berge, le Gué |
+| panneau-5 | (à créer) | `fingerpost` | 317, 111.6 | sud | panneau de carrefour: bout de la Grand-Route, chemin des Jardins, l'arrêt du car |
+| panneau-6 | (à créer) | `fingerpost` | 150, 105.4 | sud | panneau de carrefour: chemin du Moulin, portail du moulin |
+| boite-lucie | (à créer) | `letter-box` | 248.4, 110.6 | nord | la boîte aux lettres du bourg, à la grille de Lucie, tournée vers la rue |
+| boite-maison | (à créer) | `letter-box` | 179.6, 113.4 | est | la boîte de la maison du garde, à côté de la porte, tournée vers la route: les lettres des habitants |
 | pompe-jardin | pompe | `water-pump` | 179.5, 121.5 | sud | la pompe du jardin: l'eau de l'arrosoir à deux pas du potager |
-| bois-maison | tas-de-bois | `log-pile` | 167.4, 116.5 | sud | bois de chauffage contre le pignon ouest, à l'abri du vent de pluie |
-| bois-atelier | tas-de-bois | `log-pile` | 171, 93 | sud | les grumes refendues de Basile, au sud de l'atelier |
+| bois-maison | tas-de-bois | `woodpile` | 167.4, 116.5 | sud | bois de chauffage contre le pignon ouest, à l'abri du vent de pluie |
+| bois-atelier | tas-de-bois | `woodpile` | 171, 93 | sud | les grumes refendues de Basile, au sud de l'atelier |
 | haches-basile | etal-de-haches | `ratelier` | 176.5, 90.5 | est | sous l'auvent est, dos au mur de l'atelier, à côté de la porte: Basile prête ses outils (acte 1) |
-| potager | terre-cultivable | `terre` | 174, 122.5 | sud | le potager de 6 x 4 cases au bout de l'allée du jardin (24 cases) |
-| banc-cretes | banc | `bench-park` | 304, 47.6 | sud | le banc des Crêtes: le bourg entier en contrebas |
-| banc-etang | banc | `bench-park` | 225.5, 39.5 | est | face à l'étang, au coin de pêche |
-| tronc-clairiere | banc | `stump` | 183, 52.4 | nord | un tronc couché sert de banc face au Vieux Chêne |
-| banc-belvedere | banc | `bench-park` | 345, 27.6 | ouest | le belvédère regarde le bourg et le clocher, à l'ouest |
+| potager | terre-cultivable | `garden-bed` | 174, 122.5 | sud | le potager de 6 x 4 cases au bout de l'allée du jardin (24 cases) |
+| banc-cretes | banc | `bench-platform` | 304, 47.6 | sud | le banc des Crêtes: le bourg entier en contrebas |
+| banc-etang | banc | `bench-platform` | 225.5, 39.5 | est | face à l'étang, au coin de pêche |
+| tronc-clairiere | banc | `bench-platform` | 183, 52.4 | nord | un tronc couché sert de banc face au Vieux Chêne |
+| banc-belvedere | banc | `bench-platform` | 345, 27.6 | ouest | le belvédère regarde le bourg et le clocher, à l'ouest |
 | abreuvoir | pompe | `water-pump` | 201, 185.6 | sud | la pompe et l'abreuvoir des bêtes, au bout de la cour |
 | tonneaux-ferme | tonneau | `barrel` | 196.5, 154.5 | sud | tonneaux de cidre contre le logis |
 | caisses-epicerie | caisse | `crate` | 194.5, 113.5 | sud | cageots de légumes devant la vitrine d'Odette |
-| tonneau-cafe | (à créer) | `barrel` | 251.6, 106.6 | sud | le tonneau qui sert de table à la terrasse du café |
-| caillou-greve-1 | caillou | `caillou` | 185, 129.4 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
-| caillou-greve-2 | caillou | `caillou` | 186.6, 129.4 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
-| caillou-greve-3 | caillou | `caillou` | 188.2, 129.4 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
-| caillou-greve-4 | caillou | `caillou` | 189.8, 129.4 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
-| caillou-greve-5 | caillou | `caillou` | 191.4, 129.4 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
-| caillou-greve-6 | caillou | `caillou` | 184, 129.6 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
-| caillou-ile-1 | caillou | `caillou` | 39, 146.4 | sud | pierres plates de la grève de l'Île, au pied de la vanne (i4) |
-| caillou-ile-2 | caillou | `caillou` | 41, 146.4 | sud | pierres plates de la grève de l'Île, au pied de la vanne (i4) |
-| caillou-ile-3 | caillou | `caillou` | 43, 146.4 | sud | pierres plates de la grève de l'Île, au pied de la vanne (i4) |
-| caillou-ile-4 | caillou | `caillou` | 45, 146.4 | sud | pierres plates de la grève de l'Île, au pied de la vanne (i4) |
-| ronces-tranchee-1 | ronces | `buisson` | 144.5, 95.5 | sud | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
-| ronces-tranchee-2 | ronces | `buisson` | 148.5, 95.5 | sud | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
-| ronces-tranchee-3 | ronces | `buisson` | 146.5, 99.5 | sud | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
+| tonneau-cafe | tonneau | `barrel` | 256.5, 111.5 | sud | le tonneau qui sert de table à la terrasse du café, en face de la porte, de l'autre côté de la Grand-Route (herbe rase, côté soleil, au bout du jeu de quilles): il ne barre plus la route |
+| caillou-greve-1 | caillou | `stone` | 185, 129.4 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
+| caillou-greve-2 | caillou | `stone` | 186.6, 129.4 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
+| caillou-greve-3 | caillou | `stone` | 188.2, 129.4 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
+| caillou-greve-4 | caillou | `stone` | 189.8, 129.4 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
+| caillou-greve-5 | caillou | `stone` | 191.4, 129.4 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
+| caillou-greve-6 | caillou | `stone` | 184, 129.6 | sud | pierres plates de la grève, au pied de la berge et à 10 m du gué: la hache forgée (3 pierres) et le gué (6 pierres) |
+| caillou-ile-1 | caillou | `stone` | 39, 146.4 | sud | pierres plates de la grève de l'Île, au pied de la vanne (i4) |
+| caillou-ile-2 | caillou | `stone` | 41, 146.4 | sud | pierres plates de la grève de l'Île, au pied de la vanne (i4) |
+| caillou-ile-3 | caillou | `stone` | 43, 146.4 | sud | pierres plates de la grève de l'Île, au pied de la vanne (i4) |
+| caillou-ile-4 | caillou | `stone` | 45, 146.4 | sud | pierres plates de la grève de l'Île, au pied de la vanne (i4) |
+| ronces-tranchee-1 | ronces | `bramble` | 144.5, 95.5 | sud | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
+| ronces-tranchee-2 | ronces | `bramble` | 148.5, 95.5 | sud | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
+| ronces-tranchee-3 | ronces | `bramble` | 146.5, 99.5 | sud | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
 | poulailler-jardin | poulailler | `poulailler` | 161.5, 120 | sud | le poulailler du jardin (3 x 2 m) en haut de son parc, à 5,5 m du pignon ouest de la maison: sa rampe descend au sud dans le parc, qui ne touche pas le chemin |
 | wagon-oublie | (à créer) | `wagon-old` | 69, 93.5 | sud | le wagon oublié sur la voie de garage, porte côté ligne: la cabane de Jeanne (41 bâtons à la craie) |
 | coquelicots-verger | coquelicots | `poppies` | 305.5, 124.5 | sud | dans l'herbe haute du verger, qu'on ne fauche qu'en juillet: la seule touffe du bourg (la mercerie les rachète) |
@@ -635,6 +635,8 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 | berge-plumes-etang | plumes-de-heron | `wild-herbs` | 234.5, 47.5 | sud | la vase à l'est de la bonde, eau basse: le héron de l'étang y guette à l'aube |
 | cote-girolles-1 | girolles | `wild-herbs` | 180.5, 26.5 | sud | sous-bois humide à l'est du chemin forestier, au carrefour du haut: les girolles de l'été et de l'automne, le matin |
 | cote-girolles-2 | girolles | `wild-herbs` | 174.5, 29.5 | sud | sous-bois de l'autre côté du chemin, en contrebas: second rond de girolles |
+| estrade-fanfare | estrade-de-fanfare | `bandstand` | 175.5, 102 | est | la fanfare de la halte joue pour les trains: au bout du quai, au coin du passage à niveau et de la Grand-Route, face au quai; le quai (5 m, le train à quai) n'a pas la place de 4 x 3 m, la place a ses fêtes |
+| panneau-commande | panneau-d-affichage | `chalk-board` | 207.5, 102.5 | sud | la commande de la semaine, à la craie, sur la troisième rangée du quai (hors du bord): Rosalie l'écrit à 3 m de son poste, on la lit en montant de la Grand-Route par le passage; face au sud, vers qui arrive |
 <!-- genere:mobilier:fin -->
 
 ### Végétation par zones
@@ -737,16 +739,16 @@ Pièces: salle des pas perdus (5 x 5); guichet (1 x 5); bureau de Firmin (3 x 3)
 **la maison du garde, rez-de-chaussée** (`interieurs/maison-rdc.json`, 10 x 7 m, 70 m², niveau 0): au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de l'étage part de la cuisine, celui de la cave de la chambre.
 
 ```text
-. . S . A # T T H P
+. A S . A # T T H P
 . . . B . # C . . P
 . . . . . . T T * P
-E . . . . . . . L C
-. . . . . E . . L L
-. . . . . . . * * S
-. . . . . # R P P C
+E A . . . . . . L C
+. . . . A E . . L L
+. . . . . A . * * S
+. . A . . # R A P C
 ```
 
-Pièces: salle commune et cuisine (5 x 7); chambre (5 x 4); troisième pièce (5 x 3). Meubles: maison-cuisiniere (cuisiniere), maison-plan (plan-de-travail), maison-table (table-a-manger), maison-chaise-1 (chaise), maison-chaise-2 (chaise), lit-de-la-maison (lit-double), maison-armoire (armoire), maison-rechaud (rechaud), maison-rdc-patere (patere), maison-rdc-horloge (horloge-murale), maison-rdc-portrait (cadre-ovale), maison-rdc-panier (panier-a-linge), maison-rdc-seau (seau), maison-rdc-tapis-de-sol (tapis-long), maison-rdc-balai (balai), maison-rdc-seau-gravats (seau), maison-rdc-lampe (lampe-a-petrole, sur maison-table), maison-rdc-pain (corbeille-de-pain, sur maison-table), maison-rdc-journal (journal, sur maison-table), maison-rdc-pots (pots-de-gres, sur maison-plan). Points: maison-lit-g (lit), maison-lit-d (lit), maison-cuisine (poste).
+Pièces: salle commune et cuisine (5 x 7); chambre (5 x 4); troisième pièce (5 x 3). Meubles: maison-cuisiniere (cuisiniere), maison-plan (plan-de-travail), maison-table (table-a-manger), maison-chaise-1 (chaise), maison-chaise-2 (chaise), lit-de-la-maison (lit-double), maison-armoire (armoire), maison-rechaud (rechaud), maison-rdc-patere (patere), maison-rdc-horloge (horloge-murale), maison-rdc-portrait (cadre-ovale), maison-rdc-panier (panier-a-linge), maison-rdc-seau (seau), maison-rdc-tapis-de-sol (tapis-long), maison-rdc-balai (balai), maison-rdc-seau-gravats (seau), maison-rdc-lampe (lampe-a-petrole, sur maison-table), maison-rdc-pain (corbeille-de-pain, sur maison-table), maison-rdc-journal (journal, sur maison-table), maison-rdc-pots (pots-de-gres, sur maison-plan), maison-chantier-salle (ardoise-de-chantier), maison-chantier-cuisine (ardoise-de-chantier), maison-chantier-chambre (ardoise-de-chantier), maison-chantier-troisieme-piece (ardoise-de-chantier), maison-chantier-etage (ardoise-de-chantier), maison-chantier-cave (ardoise-de-chantier). Points: maison-lit-g (lit), maison-lit-d (lit), maison-cuisine (poste).
 
 **la maison du garde, étage** (`interieurs/maison-etage.json`, 10 x 7 m, 70 m², niveau 1): sous le toit, ouvert à l'acte 2 (chambre d'amis, atelier).
 
@@ -823,12 +825,12 @@ Pièces: boutique (6 x 3); fournil (6 x 2). Meubles: fournil-four (four), fourni
 E E . P . P
 . C C . . C
 . . * . . .
-P T T T # .
-S T * . # *
+P T T T # *
+S T * . # M
 B . . . . A
 ```
 
-Pièces: boutique (6 x 3); salon de coiffure (4 x 3); cabine (2 x 3). Meubles: mercerie-comptoir (comptoir-mercerie), mercerie-fauteuil (chaise), mercerie-armoire (armoire), mercerie-rubans (etagere-murale), mercerie-boutons (etagere-murale), mercerie-patere (patere), mercerie-affiche (cadre-portrait), mercerie-panier (panier-a-linge), mercerie-balai (balai), mercerie-tapis-de-sol (tapis-rond), mercerie-tabouret (tabouret-de-ferme), mercerie-seau (seau), mercerie-boites-boutons (boites-a-provisions, sur mercerie-comptoir), mercerie-bouquet (bouquet, sur mercerie-comptoir), mercerie-patrons (pile-de-livres, sur mercerie-comptoir). Points: solange-comptoir (comptoir, Solange), jeanne-fauteuil (poste, Jeanne), mercerie-cabine (poste).
+Pièces: boutique (6 x 3); salon de coiffure (4 x 3); cabine (2 x 3). Meubles: mercerie-comptoir (comptoir-mercerie), mercerie-fauteuil (chaise), mercerie-armoire (armoire), mercerie-miroir (miroir), mercerie-rubans (etagere-murale), mercerie-boutons (etagere-murale), mercerie-patere (patere), mercerie-affiche (cadre-portrait), mercerie-panier (panier-a-linge), mercerie-balai (balai), mercerie-tapis-de-sol (tapis-rond), mercerie-tabouret (tabouret-de-ferme), mercerie-seau (seau), mercerie-boites-boutons (boites-a-provisions, sur mercerie-comptoir), mercerie-bouquet (bouquet, sur mercerie-comptoir), mercerie-patrons (pile-de-livres, sur mercerie-comptoir). Points: solange-comptoir (comptoir, Solange), jeanne-fauteuil (poste, Jeanne), mercerie-cabine (poste).
 
 **la forge** (`interieurs/forge.json`, 5 x 5 m, 25 m², niveau 0): foyer au nord sous la hotte; l'enclume est dehors, sous l'auvent.
 
@@ -1305,7 +1307,7 @@ Mesure: cadre de chaque capture (lacet 0: largeur donnée, profondeur 0,97 fois 
 | orée (104; 90) | 22 | 4 x 4 | buissons, herbes hautes et pierres moussues du sous-bois (la forêt gagne par l'orée), bûches d'une ancienne coupe; herbes et buissons de la friche du garage |
 | rue du bourg (204; 124) | 1 | 4 x 4 | les cageots du plan devant la vitrine d'Odette, enfin posés |
 
-Rien n'est posé sur un chemin, une route, un seuil, un nœud ni contre un point; rien de récoltable. Le tonneau de la terrasse du café garde son attente: posé, il barrerait la Grand-Route. La rue du bourg tient la mesure, mais la critique du directeur artistique porte sur le cadrage (aucune façade): c'est la vue qui est à recadrer.
+Rien n'est posé sur un chemin, une route, un seuil, un nœud ni contre un point; rien de récoltable. Le tonneau de la terrasse du café a trouvé sa place en version 9, de l'autre côté de la Grand-Route (section 20). La rue du bourg tient la mesure, mais la critique du directeur artistique porte sur le cadrage (aucune façade): c'est la vue qui est à recadrer.
 
 ### Le comptoir du café reste d'une case
 
@@ -1326,7 +1328,7 @@ Le modèle `comptoir-cafe` mesure 0,92 x 0,63 m: une fiche de deux cases laisser
 
 ## 18. Le décor des fêtes et des veillées (version 7, 2026-11-11)
 
-Les quatre fêtes et la veillée du quai (`../ecriture-fetes.md`) se voient maintenant le jour où elles ont lieu. 63 objets de carte, tous posés par le plan (`construire_plan.py`, section « version 7 »), chacun avec sa condition `when`, que l'assembleur écrit dans `carte.json` (le plan l'emporte sur une retouche à la main; les `when` ajoutés à la main dans les intérieurs restent conservés).
+Les quatre fêtes et la veillée du quai (`../ecriture-fetes.md`) se voient maintenant le jour où elles ont lieu. 62 objets de carte (63 avant que l'estrade devienne permanente, section 20), tous posés par le plan (`construire_plan.py`, section « version 7 »), chacun avec sa condition `when`, que l'assembleur écrit dans `carte.json` (le plan l'emporte sur une retouche à la main; les `when` ajoutés à la main dans les intérieurs restent conservés).
 
 ### Quand le décor paraît
 
@@ -1369,7 +1371,7 @@ La place (x 194 à 213, y 110 à 122), concours de la soupe
 - **Barrières fleuries.** Les deux lisses barrent la route du Gué en travers (bras est-ouest), une de chaque côté de la voie, jamais sur la voie: c'est ce que dit la scène (« la route du Gué est fermée, pour la plus belle raison de l'année »). On passe à pied par l'accotement, une case d'herbe libre à chaque bout (contrôlé). Firmin se tient contre la lisse sud, c'est son poste; Jeanne, Léon et Solange à 2 m au sud. La banderole est tendue au-dessus de la route, entre le carrefour et la lisse sud, face au sud: on la lit en venant du bourg. Le tonneau du café est sur l'herbe au coin du passage, à 5 m du carrefour où se tient Colette, hors de la route.
 - **Nuit des lumignons.** Le jour, trois rangs de sept sur le parvis, à l'est du portail (deux cases libres devant la porte), au pied de la façade et près de Marthe, qui coule la cire. La nuit, un lumignon par habitant à un ou deux mètres de son poste de nuit, à l'endroit que l'écriture lui donne (`fete-lumignon-<habitant>`): Firmin et Jeanne aux deux coins de la route au bord de la voie, Odette sous la tonnelle, Basile à l'établi, Achille sous la fenêtre du fournil, Solange au seuil de la mercerie (hors des deux cases devant la porte), Mado au pied de l'enclume (rien ne se pose sur l'enclume), Barnabé devant la forge, Ambroise sur le quai côté bourg, Honorine deux à son seuil, Marthe au pied du clocher (à l'ouest du portail: le clocher est à l'ouest de la nef), Lucie à la boîte aux lettres, Colette sur la terrasse du café, Armand contre le lavoir, Paulin et Margot au gué, Léon en haut de la grève, Berthe au bout du ponton, Martial au cimetière, Rosalie sur le quai face à sa locomotive. Le lumignon n'est pas solide: il ne barre rien, même posé sur une route.
 - **Concours de la soupe.** Les deux marmites se font face de part et d'autre de la rue du Bourg, au nord de la place, à 2 et 3 m de la rue: la soupe des mères côté épicerie (Odette et Colette se tiennent devant, `pl-o`), la panade du moulin à l'est de la pompe, que l'on atteint toujours par l'ouest et le sud. Chacun goûte une marmite différente: elles sont à 11 m l'une de l'autre, on se décrit ce qu'on a goûté. La grande table et ses deux bancs au sud-est, à côté du banc où Honorine préside (sa place et le devant du banc restent libres). L'ardoise du palmarès au coin nord-est, face au sud, lisible depuis le carrefour.
-- **Veillée du premier train.** Le quai fait 5 m et le train du samedi reste à quai jusqu'à 22 h: les deux rangées du bord restent vides, la rue qui longe le quai au sud aussi. La table de la tourte va sur la troisième rangée, entre les deux bancs du quai, son long côté vers la voie (« la place du voyageur »): on passe au nord sur 3 m. L'estrade (4 x 3 m) n'a pas sa place sur le quai: elle est sur l'herbe à l'ouest de la route du Gué, face au quai, à 1 m du bord de la voie, et son ombre de caméra ne tombe que sur l'herbe et la voie. Le tonneau au pied du bout ouest, près de Jeanne, Solange, Lucie et Armand. La banderole au-dessus du passage qui monte de la Grand-Route au quai, face au sud.
+- **Veillée du premier train.** Le quai fait 5 m et le train du samedi reste à quai jusqu'à 22 h: les deux rangées du bord restent vides, la rue qui longe le quai au sud aussi. La table de la tourte va sur la troisième rangée, entre les deux bancs du quai, son long côté vers la voie (« la place du voyageur »): on passe au nord sur 3 m. L'estrade (4 x 3 m) n'a pas sa place sur le quai: elle est sur l'herbe à l'ouest de la route du Gué, face au quai, à 1 m du bord de la voie, et son ombre de caméra ne tombe que sur l'herbe et la voie. Depuis la version 9, c'est l'estrade permanente de la fanfare (`estrade-fanfare`, section 20), à la même place: la veillée n'en pose plus de seconde. Le tonneau au pied du bout ouest, près de Jeanne, Solange, Lucie et Armand. La banderole au-dessus du passage qui monte de la Grand-Route au quai, face au sud.
 - **Veillées du quai.** Le brasero de Mado au bout est, sur la troisième rangée, à 1,5 m du poste `quai-e` (Mado, Barnabé, Basile, Berthe), à côté de la lanterne; deux bancs de ferme sur l'herbe au sud de la rue, face au feu et à la voie. Trois guirlandes sur l'herbe au sud du quai, du banc ouest au passage vers la Grand-Route (poteau de chaque guirlande à l'ouest, poteau de bout à l'est, à l'ouest du passage qu'il laisse libre): le quai est éclairé sans que rien n'y soit posé.
 
 ### Lumières
@@ -1395,8 +1397,8 @@ Coût mesuré: relire la présence des 63 objets (plus les 3 de la maison) prend
 
 ### Ce qui manque encore
 
-- Une lisse fleurie levée (et une lisse ordinaire, baissée ou levée, avec son type): aujourd'hui, hors de la fête, le passage à niveau n'a pas de lisse dessinée.
-- Le tonneau de la terrasse du café n'a toujours pas de place sans barrer la Grand-Route: le lumignon de Colette est posé sur la terrasse, pas sur le tonneau.
+- Une lisse fleurie levée (et une lisse ordinaire, baissée ou levée, avec son type): aujourd'hui, hors de la fête, le passage à niveau n'a pas de lisse dessinée. Positions préparées pour la lisse ordinaire: section 20.
+- Le tonneau de la terrasse du café: posé en version 9 sur l'herbe rase en face du café (section 20); le lumignon de Colette reste au seuil du café.
 - La lumière qui dérive au ponton (Berthe), la table de cire du parvis, la cloche du quai, le tableau des horaires et sa devise, les treillis et les pétales des barrières: pas de modèle.
 
 <!-- genere:fetes:debut -->
@@ -1464,7 +1466,6 @@ Coût mesuré: relire la présence des 63 objets (plus les 3 de la maison) prend
 | fete-hiver-table | table-de-banquet | hiver | 195.5, 102.5 | sud | toute la fête |  | la table de la tourte sur la dernière rangée du quai, entre les deux bancs, son long côté vers la voie (« côté voie, c'est la place du voyageur »): on passe au nord (3 m) et par la rue du quai au sud |
 | fete-hiver-banderole | banderole | hiver | 204, 104.5 | sud | toute la fête |  | au-dessus du passage qui monte de la Grand-Route au quai, face au sud: on la lit en arrivant |
 | fete-hiver-tonneau | tonneau-en-perce | hiver | 186.5, 104.5 | sud | toute la fête |  | le tonneau en perce sur l'herbe au pied du bout ouest du quai, près de Jeanne, Solange, Lucie et Armand (quai-o) |
-| fete-hiver-estrade | estrade-de-fanfare | hiver | 175.5, 102 | est | toute la fête |  | l'estrade sur l'herbe à l'ouest de la route du Gué, face à l'est (vers le quai): le quai, 5 m de profondeur et le train à quai, n'a pas la place de 4 x 3 m; à 1 m du bord de la voie |
 <!-- genere:fetes:fin -->
 
 ## 19. Coquillages et rivière (version 8, 2026-11-11)
@@ -1606,3 +1607,57 @@ Vignettes d'objets (artiste 2D, à la plume, grille 96, PNG 96 et 48 px; inscrit
 ### Collections (décision au manager)
 
 Rien n'entre au carnet: le cahier (4.8) ne prévoit pas de collection de coquillages, et la famille « Fossiles et trésors » est comptée à 12 (`tests/collections-aubrune.test.ts`). La perle de rivière et la plume de martin-pêcheur feraient de belles entrées « trésor » rares; c'est une modification du contrat (compte du cahier) à décider avec le client.
+
+## 20. Ce que les lots du 2026-11-11 laissaient à poser (version 9)
+
+Tout passe par `construire_plan.py` (section « version 9 »), l'outil, l'assembleur et la copie du plan dans le jeu; `controler_plan.py`: 0 erreur.
+
+### L'estrade de la fanfare, permanente (`estrade-fanfare`, 175,5; 102, face à l'est)
+
+- **Où un bourg la mettrait.** Le kiosque d'un bourg va d'ordinaire sur sa place. Mais la fanfare d'Aubrune est « la fanfare de la halte » (suites secondaires, section 6): elle naît pour accueillir les trains, son concert se joue au quai et le chef dirige « face au train ». Sa place est donc à la gare, pas sur la place, qui garde ses fêtes (concours de la soupe: deux marmites, la grande table et ses bancs; l'est de la place reste libre).
+- **Pourquoi pas sur le quai (proposition du développeur, à l'ouest du banc 191; 100,5).** Le quai a 4 rangées utiles (99 à 102), dont les deux du bord restent vides: le train du samedi y ouvre ses portes. Une estrade de 4 x 3 m à l'ouest du banc couvrirait la rangée 100, le poste `quai-o` (187; 101,5) et la lanterne ouest du quai (188; 102,5). Refusée.
+- **Où.** Sur l'herbe à l'ouest de la route du Gué, au bout du quai: la place que la Veillée du premier train donnait déjà à son estrade. Elle devient permanente et la veillée ne pose plus la sienne (une seule estrade, aucun doublon). Face à l'est: les marches regardent la route, le carrefour de la Grand-Route et le quai où le train s'arrête; derrière elle, l'herbe, rien à cacher. À 1 m du bord de la voie (rangée 99 libre).
+- **Qui l'entend (habitants à moins de 9 m).** La Grand-Route passe à 2 à 6 m (tous ceux qui vont du bourg au gué ou à la maison des joueurs), le carrefour `gr0` à 7 m, le pied de la lisse sud `pn-s` à 5,5 m, Firmin à sa barrière (`firmin-barriere`) à 7,6 m. Le bout ouest du quai (`quai-o`, 10 m) est juste au-delà: on y joue sur le banc du quai (brique « jouer ici » du banc).
+- **Fêtes.** Barrières fleuries: la lisse sud garde son accotement libre à l'ouest (179; 99), le tonneau en perce (177,5; 104,5) est hors de l'estrade. Le contrôle des fêtes passe avec l'estrade posée à toute heure.
+
+### Le panneau de la commande du samedi (`panneau-commande`, 207,5; 102,5, face au sud)
+
+- **Proposition corrigée.** (218,5; 104,5) tombe dans l'emprise de la halte (x 215 à 224, y 99 à 104), et sa porte donne au sud sur la Grand-Route, pas sur la voie: contre la façade, le panneau serait sur la route.
+- **Où.** Sur la troisième rangée du quai (hors du bord), entre le poteau où l'on monte (205,5; 102,5) et la lanterne est: Rosalie, qui reçoit la commande, se tient à `quai` (204; 102,5), à 3 m. Face au sud: on le lit en montant de la Grand-Route par le passage (x 202 à 205), puis le long de la rue du quai. Il ne gêne ni le brasero des veillées (211,5) ni la table de la tourte (195,5).
+- **Fiche.** Aucun meuble « panneau d'affichage » n'existait: fiche `panneau-d-affichage` créée sur le modèle de l'ardoise (`chalk-board`), solide, non posable, sans brique (la commande se lit au carnet et se livre à Rosalie). Modèle à faire: `notice-board`, un panneau d'affichage de la Compagnie (cadre de bois sous un petit auvent, sur deux poteaux, une feuille épinglée et une ligne à la craie), 1 x 1 m, environ 1,8 m de haut.
+
+### Le miroir de la cabine de la mercerie (`mercerie-miroir`, intérieur 5,5; 4,5, face au nord)
+
+La cabine est la colonne est du salon (x 5, rangées 3 et 4), fermée à l'ouest par la cloison et ouverte sur la boutique au nord; l'armoire en ferme le fond. La psyché (brique « se changer », comme celle de la maison) va au fond de la cabine, face au nord: on y entre depuis la boutique et on se voit en face. Le point `mercerie-cabine`, qui tombait sur sa case (5; 4,5, au bord de la cloison), passe devant elle (5,5; 3,5): le chargeur refuse un point sur une case pleine. Aucune fiche d'habitant ni de quête ne cite ce point. Règle d'accès tenue.
+
+### Les lisses ordinaires du passage à niveau (préparées, non posées)
+
+Le meuble `lisse-de-passage-a-niveau` n'est pas sur la branche à l'heure de ce lot: `lisse-nord` et `lisse-sud` restent « à créer » (modèle `crossing-gate`), à leurs places préparées.
+
+- **Quels passages.** Seul le passage gardé (`pn_garde`, route du Gué, x 180 à 184) a des lisses: Firmin les manœuvre depuis la maison du garde. Le passage de l'Église est non gardé (croix de Saint-André, déjà prévue) et celui des Hameaux est un accès de service fermé par la grille de la Compagnie: sans garde pour les baisser, des lisses n'y auraient pas de raison d'être.
+- **Où et dans quel sens.** En travers de la route (bras est-ouest), jamais de la voie, sur la rangée d'herbe de chaque côté (95 au nord, 99 au sud), aux places des lisses fleuries. Socle du côté droit de la chaussée pour qui arrive: lisse sud (182,5; 99,5), socle sur l'accotement est (185; 99), pour qui monte vers le nord, côté maison de Firmin; lisse nord (182,5; 95,5), socle sur l'accotement ouest (179; 95), pour qui descend vers le sud. Si le modèle a son socle à l'ouest en rotation 0 (comme la guirlande et son poteau), lisse nord en rotation 0, lisse sud en rotation 2; si sa fiche fait 6 x 1 (socle compris, sur l'accotement), décaler le centre de 0,5 m vers le socle. Une demi-lisse (moitié droite de la chaussée) prend la même règle.
+- **Avec la fête.** Les lisses fleuries sont les mêmes lisses garnies: chaque lisse ordinaire porte `when` = non (fête des barrières commencée et `aubrune.barrieres.lisses` = `baissees`), pour ne jamais se dessiner sous la lisse fleurie. Firmin (`firmin-barriere`, 184,5; 100,5) reste contre le socle de la lisse sud.
+- **À la livraison.** Donner le type aux deux objets dans la section « version 9 » de `construire_plan.py`, ajouter la condition, ajouter `lisse-de-passage-a-niveau` à `BARRENT` de `controler_plan.py` (ce qui barre par nature, contourné par l'accotement), relancer la chaîne.
+
+### Le tonneau du café (`tonneau-cafe`, 256,5; 111,5)
+
+La porte du café donne directement sur la Grand-Route: devant la façade, le tonneau barrait la route. Le plan disait déjà du café « terrasse et jeu de quilles au sud, côté soleil »: la bande d'herbe rase en face (x 249 à 257, y 111 et 112), de l'autre côté de la route. Le tonneau-table y va, au bout est de la bande, à 2 m de l'axe de la porte et à côté de la venelle: on pose son verre en attendant son tour aux quilles. Les deux autres poses signalées par le décor des fêtes: la lisse ordinaire (ci-dessus, en attente de son meuble) et la lumière qui dérive, la table de cire, la cloche, le tableau des horaires, les treillis et les pétales (aucun modèle: rien à poser).
+
+### Ménage des modèles retirés le 2026-11-11
+
+| Ancien modèle | Ce qu'il désignait | Devenu |
+|---|---|---|
+| `house-town`, `shop-front`, `shed` | base des gabarits de 25 bâtiments | la fiche du bâtiment (`batiments/<id>.json`), dont sort aujourd'hui le modèle encré |
+| `bench-park` | six bancs publics (place, ponton, berge, Crêtes, étang, belvédère) | le meuble `banc` (`bench-platform`, celui que le rendu dessinait déjà) |
+| `chair-bedroom` | le fauteuil de coiffure de la mercerie | le meuble `chaise` (`chair-farm`) |
+| `log-pile` | tas de bois du jardin et de l'atelier; bûches du décor de la ferme | le meuble `tas-de-bois` (`woodpile`); les bûches gardent `tas-de-buches`, dont la fiche pointe encore vers `log-pile` (ci-dessous) |
+| `signpost` | six poteaux indicateurs de carrefour | à faire: `fingerpost` (poteau de bois, deux à quatre flèches peintes) |
+| `mailbox` | la boîte aux lettres du bourg (grille de Lucie) et celle de la maison | à faire: `letter-box` (boîte de tôle sur pied ou au mur) |
+| `level-crossing-gate` | les lisses du passage à niveau | à faire: `crossing-gate` (lot en cours de l'artiste) |
+| `stool`, `street-lamp`, `lamp-floor`, `table-round`, `rug-oval`, `shelf` | rien | absents du plan |
+
+Tout objet typé du plan prend désormais le modèle de sa fiche (celui que le rendu dessine). Restent des fiches de meubles qui pointent vers des modèles retirés (le rendu les dessine en forme provisoire): `tonneau` (`barrel`), `caisse` (`crate`), `banc-de-ferme` (`bench-farm`), `tas-de-buches` (`log-pile`), `puits` (`well`), `abreuvoir-de-pierre` (`sink-stone`): modèles à refaire par l'artiste, fiches non touchées ici. `controler_plan.py` mesure leur forme provisoire sur l'emprise de leur fiche (il échouait sur la caisse qui porte une lampe).
+
+### Les ardoises du chantier de la maison, versées au plan
+
+Les six ardoises de chantier (`maison-chantier-*`) avaient été ajoutées à la main dans `interieurs/maison-rdc.json`: l'assembleur efface tout objet absent du plan, la première passe de la chaîne les a donc effacées. Elles entrent dans le plan avec leur condition (leurs raisons, écrites dans le fichier, sont conservées). Celle de la salle était au milieu de la pièce (7,5; 3,5): avant que la salle soit faite, elle coupait le passage de 2 m de la porte au lit et aux deux escaliers. Elle passe contre la cloison ouest, au sud de l'escalier de l'étage (5,5; 5,5), face à l'est: lue depuis toute la salle, sans rien barrer. `controler_plan.py` juge maintenant ce passage dans chaque combinaison des faits que citent les meubles conditionnés d'un intérieur (l'ardoise de la cuisine et le plan de travail qui la remplace ne sont jamais posés ensemble); banc d'épreuve: 36 casses vues sur 36.

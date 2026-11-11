@@ -740,6 +740,14 @@
       "pourquoi": "cageots de légumes devant la vitrine d'Odette"
     },
     {
+      "id": "tonneau-cafe",
+      "type": "tonneau",
+      "x": 256.5,
+      "y": 111.5,
+      "rotation": 0,
+      "pourquoi": "le tonneau qui sert de table à la terrasse du café, en face de la porte, de l'autre côté de la Grand-Route (herbe rase, côté soleil, au bout du jeu de quilles): il ne barre plus la route"
+    },
+    {
       "id": "caillou-greve-1",
       "type": "caillou",
       "x": 185,
@@ -2501,15 +2509,6 @@
       "pourquoi": "le tonneau en perce sur l'herbe au pied du bout ouest du quai, près de Jeanne, Solange, Lucie et Armand (quai-o)"
     },
     {
-      "id": "fete-hiver-estrade",
-      "type": "estrade-de-fanfare",
-      "x": 175.5,
-      "y": 102,
-      "rotation": 1,
-      "when": [{ "type": "event_is", "events": ["veillee-du-premier-train"], "when": "begun" }],
-      "pourquoi": "l'estrade sur l'herbe à l'ouest de la route du Gué, face à l'est (vers le quai): le quai, 5 m de profondeur et le train à quai, n'a pas la place de 4 x 3 m; à 1 m du bord de la voie"
-    },
-    {
       "id": "berge-coquilles-gue-1",
       "type": "coquilles-de-greve",
       "x": 187.5,
@@ -2660,6 +2659,22 @@
       "y": 29.5,
       "rotation": 0,
       "pourquoi": "sous-bois de l'autre côté du chemin, en contrebas: second rond de girolles"
+    },
+    {
+      "id": "estrade-fanfare",
+      "type": "estrade-de-fanfare",
+      "x": 175.5,
+      "y": 102,
+      "rotation": 1,
+      "pourquoi": "la fanfare de la halte joue pour les trains: au bout du quai, au coin du passage à niveau et de la Grand-Route, face au quai; le quai (5 m, le train à quai) n'a pas la place de 4 x 3 m, la place a ses fêtes"
+    },
+    {
+      "id": "panneau-commande",
+      "type": "panneau-d-affichage",
+      "x": 207.5,
+      "y": 102.5,
+      "rotation": 0,
+      "pourquoi": "la commande de la semaine, à la craie, sur la troisième rangée du quai (hors du bord): Rosalie l'écrit à 3 m de son poste, on la lit en montant de la Grand-Route par le passage; face au sud, vers qui arrive"
     },
     {
       "id": "vieux-chene",
@@ -3600,7 +3615,7 @@
       "mercerie-porte": { "x": 80.5, "y": 210.5 },
       "solange-comptoir": { "x": 79, "y": 212.4 },
       "jeanne-fauteuil": { "x": 79.5, "y": 214.5 },
-      "mercerie-cabine": { "x": 82, "y": 214.5 },
+      "mercerie-cabine": { "x": 82.5, "y": 213.5 },
       "porte-forge": { "x": 266.5, "y": 106.5 },
       "forge-porte": { "x": 88.5, "y": 214.5 },
       "mado-foyer": { "x": 88.5, "y": 211.6 },

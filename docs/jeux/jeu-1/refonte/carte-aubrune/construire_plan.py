@@ -552,57 +552,64 @@ SOLS_SUPPL = [  # rectangles de sol particuliers (x, y, l, h), posés après les
 # depuis la gauche vue de dehors (maison.py). Couleurs: noms du nuancier [couleurs] de gabarits.toml.
 GABARITS = {
     'quai_b': dict(base='quai', note="plateforme de 0,55 m, bordure de pierre côté voie, pas de toit"),
-    'halte': dict(base='house-town', etages=1, hauteur_etage=3.4, toit='croupe', pente=30, fenetres=dict(sud=2, nord=3),
+    'halte': dict(base='fiche', etages=1, hauteur_etage=3.4, toit='croupe', pente=30, fenetres=dict(sud=2, nord=3),
                   couleurs=dict(murs='pierre_claire', toit='lauze', menuiseries='rouge_cheminot', volets='rouge_cheminot', porte='rouge_cheminot'),
                   note="bâtiment voyageurs de la Compagnie: un seul niveau haut, auvent côté quai, pendule sur le pignon est"),
-    'maison': dict(base='house-town', etages=2, toit='deux-pans', pente=40, fenetres=dict(sud=3, nord=2, est=2, ouest=1),
+    'maison': dict(base='fiche', etages=2, toit='deux-pans', pente=40, fenetres=dict(sud=3, nord=2, est=2, ouest=1),
                    couleurs=dict(murs='enduit', toit='tuile', menuiseries='creme', volets='sauge', porte='sauge'),
                    note="maison finie; au début, ruine: moitié ouest sans toit, murs arasés à 1 m, moitié est couverte d'une bâche"),
-    'epicerie': dict(base='shop-front', etages=2, toit='croupe', pente=35, devanture=dict(facade='est', largeur=4.2, position=0.5),
+    'epicerie': dict(base='fiche', etages=2, toit='croupe', pente=35, devanture=dict(facade='est', largeur=4.2, position=0.5),
                      fenetres=dict(est=2, ouest=2, nord=2, sud=2),
                      couleurs=dict(murs='enduit_ocre', toit='lauze', volets='vert_sombre', porte='vert_sombre', menuiseries='vert_sombre', enseigne='vert_sombre')),
-    'scierie': dict(base='shed', etages=1, hauteur_etage=3.6, toit='deux-pans', pente=30, fenetres=dict(sud=2, nord=1),
+    'scierie': dict(base='fiche', etages=1, hauteur_etage=3.6, toit='deux-pans', pente=30, fenetres=dict(sud=2, nord=1),
                     couleurs=dict(murs='bois_brut', toit='lauze', menuiseries='bois_sombre', porte='bois_sombre'),
                     note="grande porte et auvent de 3 m à l'est sur l'établi"),
-    'firmin': dict(base='house-town', etages=2, toit='deux-pans', pente=40, couleurs=dict(murs='pierre', toit='tuile', volets='rouge_cheminot', porte='rouge_cheminot')),
-    'remise': dict(base='shed', note="porte charretière de 3 m dans l'axe des rails"),
-    'fournil': dict(base='shop-front', etages=2, toit='deux-pans', pente=40, devanture=dict(facade='sud', largeur=3.2, position=0.4),
+    'firmin': dict(base='fiche', etages=2, toit='deux-pans', pente=40, couleurs=dict(murs='pierre', toit='tuile', volets='rouge_cheminot', porte='rouge_cheminot')),
+    'remise': dict(base='fiche', note="porte charretière de 3 m dans l'axe des rails"),
+    'fournil': dict(base='fiche', etages=2, toit='deux-pans', pente=40, devanture=dict(facade='sud', largeur=3.2, position=0.4),
                     couleurs=dict(murs='enduit', toit='tuile', menuiseries='miel', porte='miel', enseigne='bois_sombre'),
                     note="cheminée du four sur le pignon est, côté ru"),
-    'mercerie': dict(base='shop-front', etages=2, toit='deux-pans', pente=40, devanture=dict(facade='nord', largeur=3.6, position=0.5),
+    'mercerie': dict(base='fiche', etages=2, toit='deux-pans', pente=40, devanture=dict(facade='nord', largeur=3.6, position=0.5),
                      couleurs=dict(murs='enduit_rose', toit='tuile', menuiseries='creme', volets='fleur_rose', porte='creme')),
-    'ecole': dict(base='house-town', etages=2, toit='croupe', pente=35, couleurs=dict(murs='pierre_claire', toit='lauze', volets='bleu', porte='bleu'),
+    'ecole': dict(base='fiche', etages=2, toit='croupe', pente=35, couleurs=dict(murs='pierre_claire', toit='lauze', volets='bleu', porte='bleu'),
                   note="horloge et drapeau au-dessus de la porte: la mairie"),
-    'lucie': dict(base='house-town', etages=2, couleurs=dict(murs='enduit', toit='tuile', volets='bleu', porte='bleu')),
-    'cafe': dict(base='shop-front', etages=2, toit='deux-pans', pente=40, devanture=dict(facade='sud', largeur=4.0, position=0.5),
+    'lucie': dict(base='fiche', etages=2, couleurs=dict(murs='enduit', toit='tuile', volets='bleu', porte='bleu')),
+    'cafe': dict(base='fiche', etages=2, toit='deux-pans', pente=40, devanture=dict(facade='sud', largeur=4.0, position=0.5),
                  couleurs=dict(murs='enduit_ocre', toit='tuile', menuiseries='rouge_cheminot', porte='rouge_cheminot', enseigne='rouge_cheminot')),
-    'forge': dict(base='shed', etages=1, hauteur_etage=3.4, toit='deux-pans', pente=35, couleurs=dict(murs='pierre', toit='lauze', porte='bois_sombre'),
+    'forge': dict(base='fiche', etages=1, hauteur_etage=3.4, toit='deux-pans', pente=35, couleurs=dict(murs='pierre', toit='lauze', porte='bois_sombre'),
                   note="grande baie ouverte au sud, cheminée de forge au nord"),
-    'horloger': dict(base='shop-front', etages=2, devanture=dict(facade='sud', largeur=3.0, position=0.5), couleurs=dict(murs='pierre_claire', toit='tuile', menuiseries='bois_sombre', enseigne='laiton')),
-    'honorine': dict(base='house-town', etages=2, couleurs=dict(murs='enduit_rose', toit='tuile', volets='sauge', porte='sauge')),
-    'hameau_b': dict(base='house-town', etages=2, couleurs=dict(murs='enduit', toit='tuile', volets='bois_gris', porte='bois_gris'), note="volets clos"),
-    'hameau_c': dict(base='house-town', etages=1, couleurs=dict(murs='pierre', toit='lauze', volets='rouge_cheminot', porte='rouge_cheminot')),
+    'horloger': dict(base='fiche', etages=2, devanture=dict(facade='sud', largeur=3.0, position=0.5), couleurs=dict(murs='pierre_claire', toit='tuile', menuiseries='bois_sombre', enseigne='laiton')),
+    'honorine': dict(base='fiche', etages=2, couleurs=dict(murs='enduit_rose', toit='tuile', volets='sauge', porte='sauge')),
+    'hameau_b': dict(base='fiche', etages=2, couleurs=dict(murs='enduit', toit='tuile', volets='bois_gris', porte='bois_gris'), note="volets clos"),
+    'hameau_c': dict(base='fiche', etages=1, couleurs=dict(murs='pierre', toit='lauze', volets='rouge_cheminot', porte='rouge_cheminot')),
     'eglise': dict(base='eglise', note="modèle à part: nef de 21 x 12 m, clocher carré de 6 m à l'ouest (22 m de haut), portail au sud"),
-    'presbytere': dict(base='house-town', etages=2, couleurs=dict(murs='pierre', toit='lauze', volets='vert_sombre', porte='vert_sombre')),
-    'marthe': dict(base='house-town', etages=2, couleurs=dict(murs='enduit', toit='tuile', volets='bleu', porte='bleu')),
-    'cheminot_o': dict(base='house-town', etages=2, couleurs=dict(murs='pierre_claire', toit='tuile', volets='rouge_cheminot', porte='rouge_cheminot'), note="logement type de la Compagnie, jumeau du voisin"),
-    'cheminot_e': dict(base='house-town', etages=2, couleurs=dict(murs='pierre_claire', toit='tuile', volets='rouge_cheminot', porte='rouge_cheminot'), note="logement type de la Compagnie, jumeau du voisin"),
+    'presbytere': dict(base='fiche', etages=2, couleurs=dict(murs='pierre', toit='lauze', volets='vert_sombre', porte='vert_sombre')),
+    'marthe': dict(base='fiche', etages=2, couleurs=dict(murs='enduit', toit='tuile', volets='bleu', porte='bleu')),
+    'cheminot_o': dict(base='fiche', etages=2, couleurs=dict(murs='pierre_claire', toit='tuile', volets='rouge_cheminot', porte='rouge_cheminot'), note="logement type de la Compagnie, jumeau du voisin"),
+    'cheminot_e': dict(base='fiche', etages=2, couleurs=dict(murs='pierre_claire', toit='tuile', volets='rouge_cheminot', porte='rouge_cheminot'), note="logement type de la Compagnie, jumeau du voisin"),
     'lavoir': dict(base='lavoir', note="toit en appentis sur quatre poteaux, ouvert à l'ouest, bassin de pierre à l'est"),
-    'poste': dict(base='house-town', etages=2, hauteur_etage=2.8, toit='croupe', pente=30, fenetres=dict(sud=2, nord=3, est=2, ouest=2),
+    'poste': dict(base='fiche', etages=2, hauteur_etage=2.8, toit='croupe', pente=30, fenetres=dict(sud=2, nord=3, est=2, ouest=2),
                   couleurs=dict(murs='pierre', toit='lauze', menuiseries='rouge_cheminot', porte='rouge_cheminot'),
                   note="cabine vitrée à l'étage, escalier extérieur au nord"),
-    'moulin': dict(base='house-town', etages=2, toit='deux-pans', pente=45, couleurs=dict(murs='pierre', toit='tuile', menuiseries='bois_sombre', porte='bois_sombre'),
+    'moulin': dict(base='fiche', etages=2, toit='deux-pans', pente=45, couleurs=dict(murs='pierre', toit='tuile', menuiseries='bois_sombre', porte='bois_sombre'),
                    note="roue de 5 m sur le pignon sud, dans le bief"),
-    'ferme_logis': dict(base='house-town', etages=2, toit='deux-pans', pente=40, couleurs=dict(murs='enduit_ocre', toit='tuile', volets='sauge', porte='sauge')),
-    'grange': dict(base='shed', etages=1, hauteur_etage=5.0, toit='deux-pans', pente=40, couleurs=dict(murs='bois_gris', toit='tuile', porte='bois_brut'),
+    'ferme_logis': dict(base='fiche', etages=2, toit='deux-pans', pente=40, couleurs=dict(murs='enduit_ocre', toit='tuile', volets='sauge', porte='sauge')),
+    'grange': dict(base='fiche', etages=1, hauteur_etage=5.0, toit='deux-pans', pente=40, couleurs=dict(murs='bois_gris', toit='tuile', porte='bois_brut'),
                    note="porte charretière de 3,5 m"),
-    'forestiere': dict(base='house-town', etages=1, couleurs=dict(murs='pierre', toit='lauze', volets='vert_sombre', porte='vert_sombre')),
+    'forestiere': dict(base='fiche', etages=1, couleurs=dict(murs='pierre', toit='lauze', volets='vert_sombre', porte='vert_sombre')),
 }
 
 
 def gabarit(bb):
     """Entrée de gabarit complète (largeur, profondeur, portes) tirée de l'emprise et de la porte du plan."""
     g = dict(GABARITS[bb['id']])
+    # Version 9: les anciens gabarits arrondis sont retirés du jeu; le modèle encré du bâtiment sort de sa fiche
+    # (`donnees/lieux/aubrune/batiments/<id>.json`, chaîne `assets-src/decors/batiments-aubrune`).
+    if g.get('base') == 'fiche':
+        fiche = 'batiments/%s.json' % bb['id'].replace('_', '-')
+        assert os.path.exists(os.path.join(ICI, '..', '..', '..', '..', '..', 'games', 'la-petite-ligne-2', 'donnees', 'lieux',
+                                           'aubrune', fiche)), fiche
+        g['base'] = fiche
     x, y, l, h = bb['rect']
     g.update(largeur=l, profondeur=h)
     if bb['porte']:
@@ -653,34 +660,34 @@ mob('reverbere-parvis', 'reverbere', 'street-lantern', 257.5, 81, 0, "sur le par
 mob('lanterne-halte', 'lanterne-de-porte', 'wall-lantern', 221.2, 105.03, 0, "à droite de la porte de la halte, côté place: la gare se trouve de loin, même le dernier train parti")
 mob('lanterne-cafe', 'lanterne-de-porte', 'wall-lantern', 255.4, 106.03, 0, "entre la porte et la vitrine du café: allumée, elle dit que Colette sert encore", acte=2)
 mob('lanterne-epicerie', 'lanterne-de-porte', 'wall-lantern', 194.03, 117.2, 1, "à la porte de l'épicerie-pension, côté place: les pensionnaires rentrent à la nuit")
-mob('lisse-nord', None, 'level-crossing-gate', 182.5, 95.4, 0, "la lisse barre la route (bras est-ouest) au nord de la voie, jamais la voie")
-mob('lisse-sud', None, 'level-crossing-gate', 182.5, 99.6, 0, "la lisse barre la route au sud de la voie")
+mob('lisse-nord', None, 'crossing-gate',182.5, 95.4, 0, "la lisse barre la route (bras est-ouest) au nord de la voie, jamais la voie")
+mob('lisse-sud', None, 'crossing-gate',182.5, 99.6, 0, "la lisse barre la route au sud de la voie")
 mob('croix-pn-eglise', None, 'crossing-sign', 256.8, 95, 0, "passage à niveau non gardé: croix de Saint-André au bord de la rue")
 mob('pompe-de-la-place', 'pompe', 'water-pump', 208, 113.5, 0, "la pompe de la place, sur l'ancien puits: l'eau de tous et la toilette du matin (acte 1)")
-mob('banc-place', 'banc', 'bench-park', 208, 119.4, 2, "face au puits et à la halte: on y voit qui descend du train", regarde=[208, 113.5])
+mob('banc-place', 'banc', 'bench-platform', 208, 119.4, 2, "face au puits et à la halte: on y voit qui descend du train", regarde=[208, 113.5])
 mob('ronces-maison-1', 'ronces', 'buisson', 167.5, 112.5, 0, "les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à l'acte 1")
 mob('ronces-maison-2', 'ronces', 'buisson', 176, 119.6, 0, "les ronces du jardin, devant le futur potager")
 mob('table-tonnelle', 'table-a-manger', 'table-farm', 197.5, 120, 0, "la tonnelle d'Odette: le souper des pensionnaires")
 mob('chaise-tonnelle-n', 'chaise', 'chair-farm', 197, 118.9, 0, "autour de la table de la tonnelle", regarde=[197, 120])
 mob('chaise-tonnelle-s', 'chaise', 'chair-farm', 198, 121.1, 2, "autour de la table de la tonnelle", regarde=[198, 120])
-mob('banc-ponton', 'banc', 'bench-park', 201.5, 128.2, 0, "au pied du ponton, face à la rivière et au pigeonnier de l'autre rive", regarde=[201.5, 134])
-mob('banc-berge', 'banc', 'bench-park', 248, 124.4, 0, "face à la rivière, à l'ombre des saules", regarde=[248, 134])
+mob('banc-ponton', 'banc', 'bench-platform', 201.5, 128.2, 0, "au pied du ponton, face à la rivière et au pigeonnier de l'autre rive", regarde=[201.5, 134])
+mob('banc-berge', 'banc', 'bench-platform', 248, 124.4, 0, "face à la rivière, à l'ombre des saules", regarde=[248, 134])
 for _i, (_x, _y) in enumerate(((179.4, 105), (256.4, 111.5), (185.6, 85), (185.6, 123.6), (317, 111.6), (150, 105.4))):
-    mob('panneau-%d' % (_i + 1), None, 'signpost', _x, _y, 0,
+    mob('panneau-%d' % (_i + 1), None, 'fingerpost', _x, _y, 0,
         "panneau de carrefour: " + ("passage à niveau, Grand-Route, chemin du Moulin, le Gué", "rue de l'Église, venelle des Jardins",
                                     "chemin forestier, chemin de la Lisière", "chemin de la Berge, le Gué", "bout de la Grand-Route, chemin des Jardins, l'arrêt du car",
                                     "chemin du Moulin, portail du moulin")[_i])
-mob('boite-lucie', None, 'mailbox', 248.4, 110.6, 2, "la boîte aux lettres du bourg, à la grille de Lucie, tournée vers la rue")
-mob('boite-maison', None, 'mailbox', 179.6, 113.4, 1, "la boîte de la maison du garde, à côté de la porte, tournée vers la route: les lettres des habitants")
+mob('boite-lucie', None, 'letter-box',248.4, 110.6, 2, "la boîte aux lettres du bourg, à la grille de Lucie, tournée vers la rue")
+mob('boite-maison', None, 'letter-box',179.6, 113.4, 1, "la boîte de la maison du garde, à côté de la porte, tournée vers la route: les lettres des habitants")
 mob('pompe-jardin', 'pompe', 'water-pump', 179.5, 121.5, 0, "la pompe du jardin: l'eau de l'arrosoir à deux pas du potager")
 mob('bois-maison', 'tas-de-bois', 'log-pile', 167.4, 116.5, 0, "bois de chauffage contre le pignon ouest, à l'abri du vent de pluie")
 mob('bois-atelier', 'tas-de-bois', 'log-pile', 171, 93, 0, "les grumes refendues de Basile, au sud de l'atelier")
 mob('haches-basile', 'etal-de-haches', 'ratelier', 177.2, 90.6, 1, "sous l'auvent est: Basile prête ses outils (acte 1)")
 mob('potager', 'terre-cultivable', 'terre', 174, 122.5, 0, "le potager de 6 x 4 cases au bout de l'allée du jardin (24 cases)")
-mob('banc-cretes', 'banc', 'bench-park', 304, 47.6, 0, "le banc des Crêtes: le bourg entier en contrebas", regarde=[260, 108])
-mob('banc-etang', 'banc', 'bench-park', 225.5, 39.5, 1, "face à l'étang, au coin de pêche", regarde=[236, 40], acte=3)
+mob('banc-cretes', 'banc', 'bench-platform', 304, 47.6, 0, "le banc des Crêtes: le bourg entier en contrebas", regarde=[260, 108])
+mob('banc-etang', 'banc', 'bench-platform', 225.5, 39.5, 1, "face à l'étang, au coin de pêche", regarde=[236, 40], acte=3)
 mob('tronc-clairiere', 'banc', 'stump', 183, 52.4, 2, "un tronc couché sert de banc face au Vieux Chêne", regarde=[188, 47], acte=3)
-mob('banc-belvedere', 'banc', 'bench-park', 345, 27.6, 3, "le belvédère regarde le bourg et le clocher, à l'ouest", regarde=[252, 73], acte=3)
+mob('banc-belvedere', 'banc', 'bench-platform', 345, 27.6, 3, "le belvédère regarde le bourg et le clocher, à l'ouest", regarde=[252, 73], acte=3)
 mob('abreuvoir', 'pompe', 'water-pump', 201, 185.6, 0, "la pompe et l'abreuvoir des bêtes, au bout de la cour", acte=3)
 mob('tonneaux-ferme', None, 'barrel', 196.5, 154.4, 0, "tonneaux de cidre contre le logis", acte=3)
 mob('caisses-epicerie', None, 'crate', 194.7, 113.4, 0, "cageots de légumes devant la vitrine d'Odette")
@@ -854,9 +861,11 @@ interieur('fournil', 'fournil', "le fournil d'Achille", 6, 5,
           porte=(3.5, 4.5, 2), note="le four contre le pignon est, côté ru; la boutique sur la rue")
 interieur('mercerie', 'mercerie', 'la mercerie-coiffure', 6, 6,
           [('boutique', [0, 0, 6, 3]), ('salon de coiffure', [0, 3, 4, 3]), ('cabine', [4, 3, 2, 3])], [[4, 3, 1, 2]],
-          [('mercerie-comptoir', 'comptoir-mercerie', 'comptoir', 2, 1.5, 0), ('mercerie-fauteuil', 'chaise', 'chair-bedroom', 1.5, 4.5, 2),
-           ('mercerie-armoire', 'armoire', 'wardrobe', 5.5, 5.5, 0)],
-          [('solange-comptoir', 2, 2.4, 'comptoir', 'Solange'), ('jeanne-fauteuil', 2.5, 4.5, 'poste', 'Jeanne'), ('mercerie-cabine', 5, 4.5, 'poste', None)],
+          [('mercerie-comptoir', 'comptoir-mercerie', 'comptoir', 2, 1.5, 0), ('mercerie-fauteuil', 'chaise', 'chair-farm', 1.5, 4.5, 2),
+           ('mercerie-armoire', 'armoire', 'wardrobe', 5.5, 5.5, 0),
+           # Version 9: la psyché au fond de la cabine, face au nord: on entre par la boutique et on se voit en face.
+           ('mercerie-miroir', 'miroir', 'miroir', 5.5, 4.5, 2)],
+          [('solange-comptoir', 2, 2.4, 'comptoir', 'Solange'), ('jeanne-fauteuil', 2.5, 4.5, 'poste', 'Jeanne'), ('mercerie-cabine', 5.5, 3.5, 'poste', None)],
           porte=(3.5, 0.5, 0), note="porte au nord sur la rue; la cabine sert à essayer les tenues")
 interieur('forge', 'forge', 'la forge', 5, 5,
           [('forge', [0, 0, 5, 5])], [],
@@ -1545,7 +1554,8 @@ for _m in M_:
         _m.update(type='tonneau', x=196.5, y=154.5)
     elif _m['id'] == 'caisses-epicerie':
         _m.update(type='caisse', x=194.5, y=113.5)
-    # Le tonneau de la terrasse du café (251,6; 106,6) reste sans type: posé, il barrerait la Grand-Route.
+    # Le tonneau de la terrasse du café (251,6; 106,6) reste sans type: posé, il barrerait la Grand-Route (posé
+    # ailleurs en version 9).
 # Vues du dehors (captures `ensemble-*`, critère du directeur artistique: aucune zone vide de plus de 4 x 4 m à
 # l'écran). Rien sur un chemin, une route, un seuil, un nœud ni contre un point; rien de récoltable.
 DECOR_6 = [
@@ -1755,15 +1765,14 @@ fete('fete-quai-banc-1', 'banc-de-ferme', 212, 104.5, 2, _VEIL, 'quai',
      "un banc sur l'herbe au sud de la rue du quai, face au brasero et à la voie")
 fete('fete-quai-banc-2', 'banc-de-ferme', 209, 104.5, 2, _VEIL, 'quai',
      "un second banc à côté, face au quai: les vieux s'assoient, les autres restent debout autour du feu")
-# Veillée du premier train seulement: la table de la tourte, la banderole, le tonneau et l'estrade.
+# Veillée du premier train seulement: la table de la tourte, la banderole et le tonneau (l'estrade est permanente).
 fete('fete-hiver-table', 'table-de-banquet', 195.5, 102.5, 0, _quand(HIVER), 'hiver',
      "la table de la tourte sur la dernière rangée du quai, entre les deux bancs, son long côté vers la voie (« côté voie, c'est la place du voyageur »): on passe au nord (3 m) et par la rue du quai au sud")
 fete('fete-hiver-banderole', 'banderole', 204, 104.5, 0, _quand(HIVER), 'hiver',
      "au-dessus du passage qui monte de la Grand-Route au quai, face au sud: on la lit en arrivant")
 fete('fete-hiver-tonneau', 'tonneau-en-perce', 186.5, 104.5, 0, _quand(HIVER), 'hiver',
      "le tonneau en perce sur l'herbe au pied du bout ouest du quai, près de Jeanne, Solange, Lucie et Armand (quai-o)")
-fete('fete-hiver-estrade', 'estrade-de-fanfare', 175.5, 102, 1, _quand(HIVER), 'hiver',
-     "l'estrade sur l'herbe à l'ouest de la route du Gué, face à l'est (vers le quai): le quai, 5 m de profondeur et le train à quai, n'a pas la place de 4 x 3 m; à 1 m du bord de la voie")
+# L'estrade de la veillée est devenue permanente en version 9 (`estrade-fanfare`, même place): plus de doublon.
 
 
 # ================================================================ version 8: coquillages et rivière (cahier 4.7, 2026-11-11)
@@ -1828,6 +1837,59 @@ for _r in RESSOURCES:
         _r.update(heures='toutes', pourquoi=_r['pourquoi'] + "; coquilles, galets et bois flotté (version 8): plus après la pluie")
     elif _r['id'] == 'champignons':
         _r.update(saisons=['été', 'automne'], pourquoi="girolles du sous-bois humide, le matin (plus quand il pleut), posées en version 8")
+
+# ================================================================ version 9: ce que les lots du 2026-11-11 laissaient à poser
+# Raisons détaillées dans plan.md, section 20.
+# 1. L'estrade de la fanfare de la halte, permanente, là où la Veillée du premier train posait la sienne: sur l'herbe
+#    à l'ouest de la route du Gué, face à l'est (le quai, le train à quai, le carrefour de la Grand-Route).
+mob('estrade-fanfare', 'estrade-de-fanfare', _MODELES['estrade-de-fanfare'], 175.5, 102, 1,
+    "la fanfare de la halte joue pour les trains: au bout du quai, au coin du passage à niveau et de la Grand-Route, "
+    "face au quai; le quai (5 m, le train à quai) n'a pas la place de 4 x 3 m, la place a ses fêtes")
+# 2. Le panneau de la commande du samedi, sur le quai, à côté du poteau où l'on monte et à 3 m de Rosalie.
+mob('panneau-commande', 'panneau-d-affichage', _MODELES['panneau-d-affichage'], 207.5, 102.5, 0,
+    "la commande de la semaine, à la craie, sur la troisième rangée du quai (hors du bord): Rosalie l'écrit à 3 m de "
+    "son poste, on la lit en montant de la Grand-Route par le passage; face au sud, vers qui arrive")
+for _m in M_:
+    # 3. Le tonneau du café: sur la terrasse d'herbe rase au sud de la Grand-Route, où sont aussi les quilles.
+    if _m['id'] == 'tonneau-cafe':
+        _m.update(type='tonneau', x=256.5, y=111.5,
+                  pourquoi="le tonneau qui sert de table à la terrasse du café, en face de la porte, de l'autre côté de "
+                           "la Grand-Route (herbe rase, côté soleil, au bout du jeu de quilles): il ne barre plus la route")
+    # 4. Les lisses ordinaires attendent leur meuble (`lisse-de-passage-a-niveau`): positions préparées, non posées.
+    elif _m['id'] == 'lisse-nord':
+        _m.update(x=182.5, y=95.5,
+                  pourquoi="en travers de la route du Gué au nord de la voie, socle sur l'accotement ouest (à droite de qui "
+                           "descend vers le sud); cachée quand la lisse fleurie est baissée")
+    elif _m['id'] == 'lisse-sud':
+        _m.update(x=182.5, y=99.5, rotation=2,
+                  pourquoi="en travers de la route du Gué au sud de la voie, socle sur l'accotement est (à droite de qui "
+                           "monte vers le nord, côté maison de Firmin); cachée quand la lisse fleurie est baissée")
+# 6. Les ardoises du chantier de la maison (lot du chantier, 2026-11-11), ajoutées à la main dans l'intérieur: l'assembleur
+#    efface tout objet absent du plan, elles entrent donc dans le plan avec leur condition. L'ardoise de la salle quitte
+#    le milieu de la pièce (elle y coupait le passage de 2 m de la porte au lit et aux escaliers) pour la cloison ouest.
+_FAIT = 'aubrune.maison-du-garde.'
+_fait = lambda k: dict(type='remembered', key=_FAIT + k)
+_sans = lambda k: dict(type='not', condition=_fait(k))
+for _s, _x, _y, _r, _q in (
+        ('salle', 5.5, 5.5, 1, [_sans('salle')]),
+        ('cuisine', 7.5, 6.5, 2, [_fait('salle'), _sans('cuisine')]),
+        ('chambre', 1.5, 0.5, 0, [_fait('salle'), _sans('chambre')]),
+        ('troisieme-piece', 2.5, 6.5, 2, [_fait('chambre'), _sans('troisieme-piece')]),
+        ('etage', 4.5, 4.5, 3, [_fait('troisieme-piece'), _sans('etage')]),
+        ('cave', 1.5, 3.5, 1, [_fait('salle'), _sans('cave')])):
+    next(_it for _it in INT if _it['id'] == 'maison-rdc')['meubles'].append(dict(
+        id='maison-chantier-' + _s, type='ardoise-de-chantier', modele=_MODELES['ardoise-de-chantier'], x=_x, y=_y,
+        rotation=_r, when=_q, pourquoi="ardoise du chantier: " + _s))
+# 5. Ménage des modèles retirés le 2026-11-11 (`assets-src/decors/README.md`): un objet typé prend le modèle de sa fiche
+#    (celui que le rendu dessine); un objet à créer garde le nom du modèle encré à faire (`fingerpost`, `letter-box`,
+#    `crossing-gate`...).
+for _m in M_:
+    if _m['type']:
+        _m['modele'] = _MODELES[_m['type']]
+for _it in INT:
+    for _m in _it['meubles']:
+        if _m.get('type') in _MODELES:
+            _m['modele'] = _MODELES[_m['type']]
 
 
 # ================================================================ calculs

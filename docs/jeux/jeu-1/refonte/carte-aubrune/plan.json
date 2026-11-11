@@ -934,7 +934,7 @@
       "interieur": "salle des pas perdus, guichet, consigne (coffre commun), bureau de Firmin: 54 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/halte.json",
         "etages": 1,
         "hauteur_etage": 3.4,
         "toit": "croupe",
@@ -967,7 +967,7 @@
       "interieur": "salle, cuisine, chambre, troisième pièce, étage, cave sous la chambre: 85 m² au sol",
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/maison.json",
         "etages": 2,
         "toit": "deux-pans",
         "pente": 40,
@@ -999,7 +999,7 @@
       "interieur": "boutique, cuisine, chambre de la pension: 70 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "shop-front",
+        "base": "batiments/epicerie.json",
         "etages": 2,
         "toit": "croupe",
         "pente": 35,
@@ -1032,7 +1032,7 @@
       "interieur": "atelier et établi sous auvent: 60 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "shed",
+        "base": "batiments/scierie.json",
         "etages": 1,
         "hauteur_etage": 3.6,
         "toit": "deux-pans",
@@ -1064,7 +1064,7 @@
       "interieur": null,
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/firmin.json",
         "etages": 2,
         "toit": "deux-pans",
         "pente": 40,
@@ -1093,7 +1093,7 @@
       "interieur": null,
       "sur_rail": "remise",
       "gabarit": {
-        "base": "shed",
+        "base": "batiments/remise.json",
         "note": "porte charretière de 3 m dans l'axe des rails",
         "largeur": 6,
         "profondeur": 5,
@@ -1114,7 +1114,7 @@
       "interieur": "boutique et fournil: 36 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "shop-front",
+        "base": "batiments/fournil.json",
         "etages": 2,
         "toit": "deux-pans",
         "pente": 40,
@@ -1146,7 +1146,7 @@
       "interieur": "boutique, fauteuil de coiffure, cabine: 42 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "shop-front",
+        "base": "batiments/mercerie.json",
         "etages": 2,
         "toit": "deux-pans",
         "pente": 40,
@@ -1177,7 +1177,7 @@
       "interieur": "classe, archives de la mairie: 36 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/ecole.json",
         "etages": 2,
         "toit": "croupe",
         "pente": 35,
@@ -1202,7 +1202,7 @@
       "interieur": null,
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/lucie.json",
         "etages": 2,
         "couleurs": { "murs": "enduit", "toit": "tuile", "volets": "bleu", "porte": "bleu" },
         "largeur": 6,
@@ -1224,7 +1224,7 @@
       "interieur": "salle, comptoir, cuisine: 36 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "shop-front",
+        "base": "batiments/cafe.json",
         "etages": 2,
         "toit": "deux-pans",
         "pente": 40,
@@ -1255,7 +1255,7 @@
       "interieur": "forge et appentis: 32 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "shed",
+        "base": "batiments/forge.json",
         "etages": 1,
         "hauteur_etage": 3.4,
         "toit": "deux-pans",
@@ -1281,7 +1281,7 @@
       "interieur": "atelier aux horloges: 36 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "shop-front",
+        "base": "batiments/horloger.json",
         "etages": 2,
         "devanture": { "facade": "sud", "largeur": 3.0, "position": 0.5 },
         "couleurs": {
@@ -1309,7 +1309,7 @@
       "interieur": null,
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/honorine.json",
         "etages": 2,
         "couleurs": { "murs": "enduit_rose", "toit": "tuile", "volets": "sauge", "porte": "sauge" },
         "largeur": 6,
@@ -1331,7 +1331,7 @@
       "interieur": null,
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/hameau-b.json",
         "etages": 2,
         "couleurs": {
           "murs": "enduit",
@@ -1359,7 +1359,7 @@
       "interieur": null,
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/hameau-c.json",
         "etages": 1,
         "couleurs": {
           "murs": "pierre",
@@ -1407,7 +1407,7 @@
       "interieur": null,
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/presbytere.json",
         "etages": 2,
         "couleurs": {
           "murs": "pierre",
@@ -1434,7 +1434,7 @@
       "interieur": "une salle: lit, table: 25 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/marthe.json",
         "etages": 2,
         "couleurs": { "murs": "enduit", "toit": "tuile", "volets": "bleu", "porte": "bleu" },
         "largeur": 6,
@@ -1456,7 +1456,7 @@
       "interieur": null,
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/cheminot-o.json",
         "etages": 2,
         "couleurs": {
           "murs": "pierre_claire",
@@ -1484,7 +1484,7 @@
       "interieur": null,
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/cheminot-e.json",
         "etages": 2,
         "couleurs": {
           "murs": "pierre_claire",
@@ -1533,7 +1533,7 @@
       "interieur": "cabine des leviers à l’étage: 24 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/poste.json",
         "etages": 2,
         "hauteur_etage": 2.8,
         "toit": "croupe",
@@ -1565,7 +1565,7 @@
       "interieur": "salle des meules et étage: 64 m² par niveau",
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/moulin.json",
         "etages": 2,
         "toit": "deux-pans",
         "pente": 45,
@@ -1595,7 +1595,7 @@
       "interieur": "salle commune: 54 m²",
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/ferme-logis.json",
         "etages": 2,
         "toit": "deux-pans",
         "pente": 40,
@@ -1619,7 +1619,7 @@
       "interieur": null,
       "sur_rail": null,
       "gabarit": {
-        "base": "shed",
+        "base": "batiments/grange.json",
         "etages": 1,
         "hauteur_etage": 5.0,
         "toit": "deux-pans",
@@ -1645,7 +1645,7 @@
       "interieur": null,
       "sur_rail": null,
       "gabarit": {
-        "base": "house-town",
+        "base": "batiments/forestiere.json",
         "etages": 1,
         "couleurs": {
           "murs": "pierre",
@@ -3082,7 +3082,7 @@
     {
       "id": "poteau-quai",
       "type": "poteau-de-quai",
-      "modele": "poteau-de-quai",
+      "modele": "platform-sign",
       "x": 205.5,
       "y": 102.5,
       "rotation": 0,
@@ -3291,22 +3291,22 @@
     {
       "id": "lisse-nord",
       "type": null,
-      "modele": "level-crossing-gate",
+      "modele": "crossing-gate",
       "x": 182.5,
-      "y": 95.4,
+      "y": 95.5,
       "rotation": 0,
-      "pourquoi": "la lisse barre la route (bras est-ouest) au nord de la voie, jamais la voie",
+      "pourquoi": "en travers de la route du Gué au nord de la voie, socle sur l'accotement ouest (à droite de qui descend vers le sud); cachée quand la lisse fleurie est baissée",
       "regarde": null,
       "acte": 1
     },
     {
       "id": "lisse-sud",
       "type": null,
-      "modele": "level-crossing-gate",
+      "modele": "crossing-gate",
       "x": 182.5,
-      "y": 99.6,
-      "rotation": 0,
-      "pourquoi": "la lisse barre la route au sud de la voie",
+      "y": 99.5,
+      "rotation": 2,
+      "pourquoi": "en travers de la route du Gué au sud de la voie, socle sur l'accotement est (à droite de qui monte vers le nord, côté maison de Firmin); cachée quand la lisse fleurie est baissée",
       "regarde": null,
       "acte": 1
     },
@@ -3335,7 +3335,7 @@
     {
       "id": "banc-place",
       "type": "banc",
-      "modele": "bench-park",
+      "modele": "bench-platform",
       "x": 208,
       "y": 119.4,
       "rotation": 2,
@@ -3346,7 +3346,7 @@
     {
       "id": "ronces-maison-1",
       "type": "ronces",
-      "modele": "buisson",
+      "modele": "bramble",
       "x": 167.5,
       "y": 112.5,
       "rotation": 0,
@@ -3357,7 +3357,7 @@
     {
       "id": "ronces-maison-2",
       "type": "ronces",
-      "modele": "buisson",
+      "modele": "bramble",
       "x": 176,
       "y": 119.6,
       "rotation": 0,
@@ -3401,7 +3401,7 @@
     {
       "id": "banc-ponton",
       "type": "banc",
-      "modele": "bench-park",
+      "modele": "bench-platform",
       "x": 201.5,
       "y": 128.2,
       "rotation": 0,
@@ -3412,7 +3412,7 @@
     {
       "id": "banc-berge",
       "type": "banc",
-      "modele": "bench-park",
+      "modele": "bench-platform",
       "x": 248,
       "y": 124.4,
       "rotation": 0,
@@ -3423,7 +3423,7 @@
     {
       "id": "panneau-1",
       "type": null,
-      "modele": "signpost",
+      "modele": "fingerpost",
       "x": 179.4,
       "y": 105,
       "rotation": 0,
@@ -3434,7 +3434,7 @@
     {
       "id": "panneau-2",
       "type": null,
-      "modele": "signpost",
+      "modele": "fingerpost",
       "x": 256.4,
       "y": 111.5,
       "rotation": 0,
@@ -3445,7 +3445,7 @@
     {
       "id": "panneau-3",
       "type": null,
-      "modele": "signpost",
+      "modele": "fingerpost",
       "x": 185.6,
       "y": 85,
       "rotation": 0,
@@ -3456,7 +3456,7 @@
     {
       "id": "panneau-4",
       "type": null,
-      "modele": "signpost",
+      "modele": "fingerpost",
       "x": 185.6,
       "y": 123.6,
       "rotation": 0,
@@ -3467,7 +3467,7 @@
     {
       "id": "panneau-5",
       "type": null,
-      "modele": "signpost",
+      "modele": "fingerpost",
       "x": 317,
       "y": 111.6,
       "rotation": 0,
@@ -3478,7 +3478,7 @@
     {
       "id": "panneau-6",
       "type": null,
-      "modele": "signpost",
+      "modele": "fingerpost",
       "x": 150,
       "y": 105.4,
       "rotation": 0,
@@ -3489,7 +3489,7 @@
     {
       "id": "boite-lucie",
       "type": null,
-      "modele": "mailbox",
+      "modele": "letter-box",
       "x": 248.4,
       "y": 110.6,
       "rotation": 2,
@@ -3500,7 +3500,7 @@
     {
       "id": "boite-maison",
       "type": null,
-      "modele": "mailbox",
+      "modele": "letter-box",
       "x": 179.6,
       "y": 113.4,
       "rotation": 1,
@@ -3522,7 +3522,7 @@
     {
       "id": "bois-maison",
       "type": "tas-de-bois",
-      "modele": "log-pile",
+      "modele": "woodpile",
       "x": 167.4,
       "y": 116.5,
       "rotation": 0,
@@ -3533,7 +3533,7 @@
     {
       "id": "bois-atelier",
       "type": "tas-de-bois",
-      "modele": "log-pile",
+      "modele": "woodpile",
       "x": 171,
       "y": 93,
       "rotation": 0,
@@ -3555,7 +3555,7 @@
     {
       "id": "potager",
       "type": "terre-cultivable",
-      "modele": "terre",
+      "modele": "garden-bed",
       "x": 174,
       "y": 122.5,
       "rotation": 0,
@@ -3566,7 +3566,7 @@
     {
       "id": "banc-cretes",
       "type": "banc",
-      "modele": "bench-park",
+      "modele": "bench-platform",
       "x": 304,
       "y": 47.6,
       "rotation": 0,
@@ -3577,7 +3577,7 @@
     {
       "id": "banc-etang",
       "type": "banc",
-      "modele": "bench-park",
+      "modele": "bench-platform",
       "x": 225.5,
       "y": 39.5,
       "rotation": 1,
@@ -3588,7 +3588,7 @@
     {
       "id": "tronc-clairiere",
       "type": "banc",
-      "modele": "stump",
+      "modele": "bench-platform",
       "x": 183,
       "y": 52.4,
       "rotation": 2,
@@ -3599,7 +3599,7 @@
     {
       "id": "banc-belvedere",
       "type": "banc",
-      "modele": "bench-park",
+      "modele": "bench-platform",
       "x": 345,
       "y": 27.6,
       "rotation": 3,
@@ -3642,19 +3642,19 @@
     },
     {
       "id": "tonneau-cafe",
-      "type": null,
+      "type": "tonneau",
       "modele": "barrel",
-      "x": 251.6,
-      "y": 106.6,
+      "x": 256.5,
+      "y": 111.5,
       "rotation": 0,
-      "pourquoi": "le tonneau qui sert de table à la terrasse du café",
+      "pourquoi": "le tonneau qui sert de table à la terrasse du café, en face de la porte, de l'autre côté de la Grand-Route (herbe rase, côté soleil, au bout du jeu de quilles): il ne barre plus la route",
       "regarde": null,
       "acte": 2
     },
     {
       "id": "caillou-greve-1",
       "type": "caillou",
-      "modele": "caillou",
+      "modele": "stone",
       "x": 185,
       "y": 129.4,
       "rotation": 0,
@@ -3665,7 +3665,7 @@
     {
       "id": "caillou-greve-2",
       "type": "caillou",
-      "modele": "caillou",
+      "modele": "stone",
       "x": 186.6,
       "y": 129.4,
       "rotation": 0,
@@ -3676,7 +3676,7 @@
     {
       "id": "caillou-greve-3",
       "type": "caillou",
-      "modele": "caillou",
+      "modele": "stone",
       "x": 188.2,
       "y": 129.4,
       "rotation": 0,
@@ -3687,7 +3687,7 @@
     {
       "id": "caillou-greve-4",
       "type": "caillou",
-      "modele": "caillou",
+      "modele": "stone",
       "x": 189.8,
       "y": 129.4,
       "rotation": 0,
@@ -3698,7 +3698,7 @@
     {
       "id": "caillou-greve-5",
       "type": "caillou",
-      "modele": "caillou",
+      "modele": "stone",
       "x": 191.4,
       "y": 129.4,
       "rotation": 0,
@@ -3709,7 +3709,7 @@
     {
       "id": "caillou-greve-6",
       "type": "caillou",
-      "modele": "caillou",
+      "modele": "stone",
       "x": 184,
       "y": 129.6,
       "rotation": 0,
@@ -3720,7 +3720,7 @@
     {
       "id": "caillou-ile-1",
       "type": "caillou",
-      "modele": "caillou",
+      "modele": "stone",
       "x": 39,
       "y": 146.4,
       "rotation": 0,
@@ -3731,7 +3731,7 @@
     {
       "id": "caillou-ile-2",
       "type": "caillou",
-      "modele": "caillou",
+      "modele": "stone",
       "x": 41,
       "y": 146.4,
       "rotation": 0,
@@ -3742,7 +3742,7 @@
     {
       "id": "caillou-ile-3",
       "type": "caillou",
-      "modele": "caillou",
+      "modele": "stone",
       "x": 43,
       "y": 146.4,
       "rotation": 0,
@@ -3753,7 +3753,7 @@
     {
       "id": "caillou-ile-4",
       "type": "caillou",
-      "modele": "caillou",
+      "modele": "stone",
       "x": 45,
       "y": 146.4,
       "rotation": 0,
@@ -3764,7 +3764,7 @@
     {
       "id": "ronces-tranchee-1",
       "type": "ronces",
-      "modele": "buisson",
+      "modele": "bramble",
       "x": 144.5,
       "y": 95.5,
       "rotation": 0,
@@ -3775,7 +3775,7 @@
     {
       "id": "ronces-tranchee-2",
       "type": "ronces",
-      "modele": "buisson",
+      "modele": "bramble",
       "x": 148.5,
       "y": 95.5,
       "rotation": 0,
@@ -3786,7 +3786,7 @@
     {
       "id": "ronces-tranchee-3",
       "type": "ronces",
-      "modele": "buisson",
+      "modele": "bramble",
       "x": 146.5,
       "y": 99.5,
       "rotation": 0,
@@ -6143,19 +6143,6 @@
       "fete": "hiver"
     },
     {
-      "id": "fete-hiver-estrade",
-      "type": "estrade-de-fanfare",
-      "modele": "bandstand",
-      "x": 175.5,
-      "y": 102,
-      "rotation": 1,
-      "pourquoi": "l'estrade sur l'herbe à l'ouest de la route du Gué, face à l'est (vers le quai): le quai, 5 m de profondeur et le train à quai, n'a pas la place de 4 x 3 m; à 1 m du bord de la voie",
-      "regarde": null,
-      "acte": 1,
-      "when": [{ "type": "event_is", "events": ["veillee-du-premier-train"], "when": "begun" }],
-      "fete": "hiver"
-    },
-    {
       "id": "berge-coquilles-gue-1",
       "type": "coquilles-de-greve",
       "modele": "stone-b",
@@ -6363,6 +6350,28 @@
       "pourquoi": "sous-bois de l'autre côté du chemin, en contrebas: second rond de girolles",
       "regarde": null,
       "acte": 3
+    },
+    {
+      "id": "estrade-fanfare",
+      "type": "estrade-de-fanfare",
+      "modele": "bandstand",
+      "x": 175.5,
+      "y": 102,
+      "rotation": 1,
+      "pourquoi": "la fanfare de la halte joue pour les trains: au bout du quai, au coin du passage à niveau et de la Grand-Route, face au quai; le quai (5 m, le train à quai) n'a pas la place de 4 x 3 m, la place a ses fêtes",
+      "regarde": null,
+      "acte": 1
+    },
+    {
+      "id": "panneau-commande",
+      "type": "panneau-d-affichage",
+      "modele": "chalk-board",
+      "x": 207.5,
+      "y": 102.5,
+      "rotation": 0,
+      "pourquoi": "la commande de la semaine, à la craie, sur la troisième rangée du quai (hors du bord): Rosalie l'écrit à 3 m de son poste, on la lit en montant de la Grand-Route par le passage; face au sud, vers qui arrive",
+      "regarde": null,
+      "acte": 1
     }
   ],
   "vegetation": [
@@ -7212,7 +7221,7 @@
         {
           "id": "maison-cuisiniere",
           "type": "cuisiniere",
-          "modele": "stove",
+          "modele": "cuisiniere",
           "x": 9.5,
           "y": 6.5,
           "rotation": 2
@@ -7384,6 +7393,104 @@
           "rotation": 3,
           "on": "maison-plan",
           "pourquoi": "la saumure et le cidre, au bout du plan de travail près de la cuisinière"
+        },
+        {
+          "id": "maison-chantier-salle",
+          "type": "ardoise-de-chantier",
+          "modele": "chalk-board",
+          "x": 5.5,
+          "y": 5.5,
+          "rotation": 1,
+          "when": [
+            {
+              "type": "not",
+              "condition": { "type": "remembered", "key": "aubrune.maison-du-garde.salle" }
+            }
+          ],
+          "pourquoi": "ardoise du chantier: salle"
+        },
+        {
+          "id": "maison-chantier-cuisine",
+          "type": "ardoise-de-chantier",
+          "modele": "chalk-board",
+          "x": 7.5,
+          "y": 6.5,
+          "rotation": 2,
+          "when": [
+            { "type": "remembered", "key": "aubrune.maison-du-garde.salle" },
+            {
+              "type": "not",
+              "condition": { "type": "remembered", "key": "aubrune.maison-du-garde.cuisine" }
+            }
+          ],
+          "pourquoi": "ardoise du chantier: cuisine"
+        },
+        {
+          "id": "maison-chantier-chambre",
+          "type": "ardoise-de-chantier",
+          "modele": "chalk-board",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "when": [
+            { "type": "remembered", "key": "aubrune.maison-du-garde.salle" },
+            {
+              "type": "not",
+              "condition": { "type": "remembered", "key": "aubrune.maison-du-garde.chambre" }
+            }
+          ],
+          "pourquoi": "ardoise du chantier: chambre"
+        },
+        {
+          "id": "maison-chantier-troisieme-piece",
+          "type": "ardoise-de-chantier",
+          "modele": "chalk-board",
+          "x": 2.5,
+          "y": 6.5,
+          "rotation": 2,
+          "when": [
+            { "type": "remembered", "key": "aubrune.maison-du-garde.chambre" },
+            {
+              "type": "not",
+              "condition": {
+                "type": "remembered",
+                "key": "aubrune.maison-du-garde.troisieme-piece"
+              }
+            }
+          ],
+          "pourquoi": "ardoise du chantier: troisieme-piece"
+        },
+        {
+          "id": "maison-chantier-etage",
+          "type": "ardoise-de-chantier",
+          "modele": "chalk-board",
+          "x": 4.5,
+          "y": 4.5,
+          "rotation": 3,
+          "when": [
+            { "type": "remembered", "key": "aubrune.maison-du-garde.troisieme-piece" },
+            {
+              "type": "not",
+              "condition": { "type": "remembered", "key": "aubrune.maison-du-garde.etage" }
+            }
+          ],
+          "pourquoi": "ardoise du chantier: etage"
+        },
+        {
+          "id": "maison-chantier-cave",
+          "type": "ardoise-de-chantier",
+          "modele": "chalk-board",
+          "x": 1.5,
+          "y": 3.5,
+          "rotation": 1,
+          "when": [
+            { "type": "remembered", "key": "aubrune.maison-du-garde.salle" },
+            {
+              "type": "not",
+              "condition": { "type": "remembered", "key": "aubrune.maison-du-garde.cave" }
+            }
+          ],
+          "pourquoi": "ardoise du chantier: cave"
         }
       ],
       "points": [
@@ -7506,7 +7613,7 @@
         {
           "id": "epicerie-comptoir",
           "type": "comptoir-epicerie",
-          "modele": "comptoir",
+          "modele": "comptoir-epicerie",
           "x": 2.5,
           "y": 3,
           "rotation": 1
@@ -7514,7 +7621,7 @@
         {
           "id": "epicerie-cuisiniere",
           "type": "cuisiniere",
-          "modele": "stove",
+          "modele": "cuisiniere",
           "x": 0.5,
           "y": 8.5,
           "rotation": 2
@@ -7943,7 +8050,7 @@
         {
           "id": "fournil-comptoir",
           "type": "comptoir-fournil",
-          "modele": "comptoir",
+          "modele": "comptoir-fournil",
           "x": 5,
           "y": 2.5,
           "rotation": 0
@@ -8094,7 +8201,7 @@
         {
           "id": "mercerie-comptoir",
           "type": "comptoir-mercerie",
-          "modele": "comptoir",
+          "modele": "comptoir-mercerie",
           "x": 2,
           "y": 1.5,
           "rotation": 0
@@ -8102,7 +8209,7 @@
         {
           "id": "mercerie-fauteuil",
           "type": "chaise",
-          "modele": "chair-bedroom",
+          "modele": "chair-farm",
           "x": 1.5,
           "y": 4.5,
           "rotation": 2
@@ -8114,6 +8221,14 @@
           "x": 5.5,
           "y": 5.5,
           "rotation": 0
+        },
+        {
+          "id": "mercerie-miroir",
+          "type": "miroir",
+          "modele": "miroir",
+          "x": 5.5,
+          "y": 4.5,
+          "rotation": 2
         },
         {
           "id": "mercerie-rubans",
@@ -8230,7 +8345,7 @@
       "points": [
         { "id": "solange-comptoir", "x": 2, "y": 2.4, "role": "comptoir", "qui": "Solange" },
         { "id": "jeanne-fauteuil", "x": 2.5, "y": 4.5, "role": "poste", "qui": "Jeanne" },
-        { "id": "mercerie-cabine", "x": 5, "y": 4.5, "role": "poste", "qui": null }
+        { "id": "mercerie-cabine", "x": 5.5, "y": 3.5, "role": "poste", "qui": null }
       ],
       "porte": [3.5, 0.5, 0],
       "escaliers": [],
@@ -8258,7 +8373,7 @@
         {
           "id": "forge-haches",
           "type": "ratelier-de-la-forge",
-          "modele": "ratelier",
+          "modele": "ratelier-forge",
           "x": 4.5,
           "y": 2.5,
           "rotation": 3
@@ -8412,7 +8527,7 @@
         {
           "id": "basile-bois",
           "type": "tas-de-bois",
-          "modele": "log-pile",
+          "modele": "woodpile",
           "x": 0.5,
           "y": 6.5,
           "rotation": 0
@@ -8558,7 +8673,7 @@
         {
           "id": "cafe-cuisiniere",
           "type": "cuisiniere",
-          "modele": "stove",
+          "modele": "cuisiniere",
           "x": 0.5,
           "y": 0.5,
           "rotation": 0
@@ -8574,7 +8689,7 @@
         {
           "id": "cafe-comptoir",
           "type": "comptoir-cafe",
-          "modele": "comptoir",
+          "modele": "comptoir-cafe",
           "x": 4.5,
           "y": 1.5,
           "rotation": 0
@@ -9456,7 +9571,7 @@
         {
           "id": "logis-cuisiniere",
           "type": "cuisiniere",
-          "modele": "stove",
+          "modele": "cuisiniere",
           "x": 0.5,
           "y": 0.5,
           "rotation": 0
