@@ -15,8 +15,22 @@ export interface PavingProfile {
   /** Longueur moyenne d'une dalle (m) et part dont elle varie d'une dalle à l'autre (0 à 0,4). */
   readonly length: number;
   readonly jitter: number;
-  /** Rangs par mètre (1 à 4): la largeur d'une dalle est 1 / `rows`. */
+  /**
+   * Rangs par case de 1 m (1 à 8), répartis à parts égales entre les bordures de la case: la
+   * largeur d'une dalle est 1 / `rows` (un peu moins dans une case bordée).
+   */
   readonly rows: number;
+  /**
+   * Taille nominale d'une dalle pour son trait (m, diagonale): elle choisit le rang du joint
+   * dessiné à l'encre (`sizeClass`). Sous 0,4 le joint n'est tracé qu'au zoom serré; de 0,4 à 1
+   * il est fin et à demi-teinte à la vue de jeu (pavés lisibles sans gribouillis).
+   */
+  readonly stroke: number;
+  /**
+   * Couche de traits du dessus: `face` (éclats, fissures et taches d'une grande pierre) ou
+   * `tile` (quelques piqûres, sans tache: une tache à cheval sur dix pavés ferait un rond sale).
+   */
+  readonly layer: 'face' | 'tile';
   /** Joint: largeur et profondeur (m). */
   readonly joint: number;
   readonly depth: number;
@@ -175,46 +189,54 @@ export const RELIEF_SETTINGS = {
       spread: 0.5,
     },
     route: {
-      pourquoi: 'la route: grandes dalles usées, bordée de pierres qui retiennent la terre',
+      pourquoi:
+        'la Grand-Route dans le bourg: pavés de grès de 28 x 20 cm (un passant en couvre plusieurs de haut), bordée de pierres qui retiennent la terre',
       level: 0,
       edge: 'rigide',
       paving: {
-        length: 1.15,
-        jitter: 0.3,
-        rows: 2,
+        length: 0.28,
+        jitter: 0.25,
+        rows: 5,
+        stroke: 0.45,
+        layer: 'tile',
         joint: 0.02,
-        depth: 0.022,
+        depth: 0.02,
         uneven: 0.006,
-        tone: 0.06,
-        chamfer: 0.012,
+        tone: 0.08,
+        chamfer: 0.008,
       },
       kerb: { width: 0.15, length: 0.5, height: 0.03 },
     },
     rue: {
-      pourquoi: 'la rue du bourg: dalles plus petites que celles de la route, même bordure',
+      pourquoi:
+        'la rue du bourg: petits pavés de 25 x 15 cm environ, plus serrés que ceux de la route, même bordure',
       level: 0,
       edge: 'rigide',
       paving: {
-        length: 0.8,
-        jitter: 0.3,
-        rows: 2,
-        joint: 0.02,
-        depth: 0.022,
-        uneven: 0.007,
-        tone: 0.07,
-        chamfer: 0.012,
+        length: 0.25,
+        jitter: 0.25,
+        rows: 6,
+        stroke: 0.45,
+        layer: 'tile',
+        joint: 0.018,
+        depth: 0.02,
+        uneven: 0.006,
+        tone: 0.09,
+        chamfer: 0.008,
       },
       kerb: { width: 0.14, length: 0.5, height: 0.025 },
     },
     quai: {
       pourquoi:
-        'le quai: une marche au-dessus de la rue et de la voie, nez de quai en pierre claire',
+        'le quai: une marche au-dessus de la rue et de la voie, dalles de 60 cm, nez de quai en pierre claire',
       level: 0.12,
       edge: 'rigide',
       paving: {
-        length: 1,
-        jitter: 0.22,
+        length: 0.6,
+        jitter: 0.2,
         rows: 2,
+        stroke: 0.8,
+        layer: 'face',
         joint: 0.018,
         depth: 0.02,
         uneven: 0.004,
@@ -289,6 +311,12 @@ export const RELIEF_SETTINGS = {
     jointShade: 0.6,
     /** Flanc d'une dalle ou d'une bordure, en part de sa teinte. */
     sideShade: 0.8,
+    /**
+     * Une dalle dont le petit côté est sous cette taille (m) n'a que son dessus: ses flancs de
+     * 2 cm feraient moins d'un point et demi à l'écran, le fond sombre du joint suffit à la
+     * détacher. Huit triangles de moins par pavé.
+     */
+    flankFrom: 0.35,
   },
 
   /**

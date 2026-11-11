@@ -10,6 +10,7 @@
 import * as v from 'valibot';
 import ambiancesJson from './ambiances.json';
 import { hex, type Rgb } from './couches';
+import { INK_SETTINGS } from './reglages';
 
 export const AMBIANCE_KEYS = ['aube', 'midi', 'apres-midi', 'crepuscule', 'nuit'] as const;
 export type AmbianceKey = (typeof AMBIANCE_KEYS)[number];
@@ -338,6 +339,19 @@ export interface AmbianceQuery {
   readonly room?: boolean;
 }
 
+/**
+ * Part allumée des fenêtres du dehors pour une force de lampes d'ambiance: nulle tant que la
+ * dernière lampe n'est pas pleinement allumée (`INK_SETTINGS.lamps`), pleine `windowRamp` plus
+ * loin. Une rue n'a donc jamais ses fenêtres allumées sous un réverbère éteint.
+ */
+export function windowShare(
+  lamps: number,
+  settings: typeof INK_SETTINGS.lamps = INK_SETTINGS.lamps,
+): number {
+  const allLit = settings.from + settings.spread + settings.ramp;
+  return Math.min(1, Math.max(0, (lamps - allLit) / settings.windowRamp));
+}
+
 /** L'ambiance d'un instant: fiche du lieu, heure, dedans ou dehors, météo. */
 export function ambianceAt(book: AmbianceBook, query: AmbianceQuery): Ambiance {
   const sheet =
@@ -355,6 +369,10 @@ export function ambianceAt(book: AmbianceBook, query: AmbianceQuery): Ambiance {
       if (floor !== undefined) outside[name] = Math.max(outside[name], floor);
     }
   }
+  // Dehors, les fenêtres s'allument après les lampes (réglage commun d'allumage).
+  const share = windowShare(outside.lamps);
+  outside.windowAmount *= share;
+  outside.spill *= share;
   if (query.indoor <= 0) return outside;
   const keys = query.room === true ? sheet.piece : sheet.dedans;
   const inside = blendAmbiances(keys[span.from], keys[span.to], span.t);

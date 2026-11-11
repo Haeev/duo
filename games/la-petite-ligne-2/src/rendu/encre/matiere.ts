@@ -35,7 +35,7 @@ import {
 import type { Ambiance } from './ambiances';
 import { EDGE_SETTINGS } from '../lieu/reglages-lisieres';
 import { RELIEF_SETTINGS } from '../lieu/reglages-relief';
-import { hex, LAYER, type Rgb, SLEEK_PART, TILE_METRES } from './couches';
+import { hex, KEEP_INK, LAYER, type Rgb, SLEEK_PART, TILE_METRES } from './couches';
 import { INK_SETTINGS } from './reglages';
 
 /**
@@ -426,6 +426,47 @@ float windowSpill(vec3 wp, vec3 N, vec2 tremble) {
   return lit;
 }
 
+// Part de hachures courtes permise sur ce point (le sol et les dalles), et taille d'un point
+// d'écran au sol (m): posées par main(), hors de toute branche (dérivées).
+float gTicks = 0.0;
+float gTickPx = 0.01;
+
+float tickHash(vec2 c, float salt) {
+  return fract(sin(dot(c, vec2(12.9898, 78.233)) + salt) * 43758.5453);
+}
+
+// Hachures courtes du sol à l'ombre: dans une case sur deux d'une grille ancrée au monde, une
+// touffe de deux ou trois traits parallèles de 25 à 40 cm, tournés à peu près comme les
+// hachures de l'encre. Trait d'un point et demi à l'écran quelle que soit la vue.
+float groundTicks(vec2 p) {
+  const float cellSize = ${INK_SETTINGS.ground.ticks.cell.toFixed(3)};
+  const float gap = ${INK_SETTINGS.ground.ticks.gap.toFixed(3)};
+  const float len = ${INK_SETTINGS.ground.ticks.length.toFixed(3)};
+  float px = gTickPx;
+  vec2 cell = floor(p / cellSize);
+  float h1 = tickHash(cell, 0.0);
+  float h2 = tickHash(cell, 1.7);
+  float h3 = tickHash(cell, 3.1);
+  float present = step(h1, ${INK_SETTINGS.ground.ticks.share.toFixed(3)});
+  vec2 centre = (cell + 0.3 + vec2(h2, h3) * 0.4) * cellSize;
+  float a = 1.15 + (h2 - 0.5) * 0.45;
+  vec2 u = vec2(cos(a), sin(a));
+  vec2 d = p - centre;
+  float along = dot(d, u);
+  float count = 2.0 + step(0.5, h3);
+  float across = dot(d, vec2(-u.y, u.x)) + (count - 1.0) * gap * 0.5;
+  float k = clamp(floor(across / gap + 0.5), 0.0, count - 1.0);
+  float off = across - k * gap;
+  // Chaque trait a sa longueur et son décalage le long de la touffe.
+  float hk = tickHash(cell + k * 7.31, 5.3);
+  float reach = len * (0.6 + 0.4 * hk) * 0.5;
+  float shift = (hk - 0.5) * len * 0.3;
+  float w = px * 0.9;
+  float line = 1.0 - smoothstep(w * 0.5, w * 1.5, abs(off));
+  float ends = 1.0 - smoothstep(reach - px * 1.5, reach, abs(along - shift));
+  return present * line * ends;
+}
+
 // foot: hauteur au-dessus du pied de l'objet (grande valeur: pas de pied, le sol par exemple).
 // inkGain: part des hachures et des noirs gardée (0 sur les personnages et les petits objets).
 // lift: part de l'ombre relevée vers le ton clair (les personnages restent lisibles à l'ombre).
@@ -453,7 +494,10 @@ vec3 inkLight(vec3 base, vec3 wp, vec3 flatN, vec3 N, float foot, float inkGain,
     if (radius > 0.0) {
       vec3 d = uLampPos[i].xyz - wp;
       vec3 dn = normalize(d);
-      float reach = length(d) / radius + (nz.g - 0.5) * 0.12 + (fine.g - 0.5) * 0.05;
+      // Portée comptée à plat, sur le cercle que la sphère de la lampe découpe à cette hauteur:
+      // le cœur de la flaque couvre le pied de la lampe, pas seulement le dessus de sa cage.
+      float disc = sqrt(max(radius * radius - d.y * d.y, 1e-4));
+      float reach = length(d.xz) / disc + (nz.g - 0.5) * 0.12 + (fine.g - 0.5) * 0.05;
       float lampFacing = smoothstep(0.0, 0.08, dot(N, dn));
       float ring = (1.0 - smoothstep(0.97, 1.0, reach)) * 0.45 + (1.0 - smoothstep(0.56, 0.59, reach)) * 0.55;
       float visible = abs(float(i) - uLampCaster) < 0.5 ? casterSeen : 1.0;
@@ -479,6 +523,12 @@ vec3 inkLight(vec3 base, vec3 wp, vec3 flatN, vec3 N, float foot, float inkGain,
   float ownHatch = mix(hatch.g, max(hatch.r, hatch.g), deep);
   float dark = max(own * ownHatch * uHatch.x, thrown * hatch.g * uHatch.y) * uDetail.y;
   float black = own * step(1.0 - uHatch.z * 0.6, nz.b * 0.75 + fine.b * 0.25 + deep * 0.12);
+  // Sol à l'ombre: quelques touffes de hachures courtes (jamais dedans, où l'ombre portée n'a
+  // pas de hachures: uHatch.y nul).
+  if (gTicks > 0.0 && sun < 0.99) {
+    float tick = groundTicks(wp.xz) * gTicks * (1.0 - sun) * smoothstep(0.0, 0.15, uHatch.y);
+    dark = max(dark, tick * ${INK_SETTINGS.ground.ticks.strength.toFixed(2)} * uDetail.y);
+  }
   dark = max(dark, black) * (1.0 - glow) * inkGain;
 
   // Pied de l'objet: un liseré d'encre pleine au ras du sol, puis des hachures qui s'éclaircissent.
@@ -748,12 +798,16 @@ void main() {
     color = figure(vColor, N, N, 1.0 - step(0.5, uOwn.y));
   #else
     float kind = vMeta.z;
-    float layer = vMeta.x;
+    float keepInk = step(${String(KEEP_INK - 0.5)}, vMeta.x);
+    float layer = vMeta.x - keepInk * ${String(KEEP_INK)}.0;
     vec3 base = vColor;
     vec3 an = abs(N);
     vec2 tuv = an.y > 0.7 ? vLocal.xz : (an.x > an.z ? vLocal.zy : vLocal.xy);
     if (vSwap > 0.5) tuv = tuv.yx;
-    float inkGain = step(floor(vMeta.y / 64.0), 1.5) * step(floor(vMeta.w / 64.0), 1.5);
+    float inkGain = max(step(floor(vMeta.y / 64.0), 1.5) * step(floor(vMeta.w / 64.0), 1.5), keepInk);
+    gTickPx = length(fwidth(vWorld.xz));
+    // Hachures courtes à l'ombre: le sol, et le dessus des dalles et pavés qui gardent l'encre.
+    gTicks = max(step(4.5, kind) * step(kind, 5.5), keepInk * step(0.7, an.y));
     float border = 0.0;
     // Liseré d'eau claire au pied d'une berge: ni hachure ni trait dessus.
     float foam = 0.0;

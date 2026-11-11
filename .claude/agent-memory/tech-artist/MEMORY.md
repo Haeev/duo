@@ -238,4 +238,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Copie isolée: un `python3 - <<EOF` long ou un `mkdir && cat > ... &&` est refusé; écrire le script avec l'outil d'écriture puis `python3 fichier.py` depuis le dossier du jeu. Deux bancs en rendu logiciel et `pnpm test` en même temps: un test à délai (20 s) échoue par manque de processeur, le relancer seul.
 
 - Banc `tests/rendu-encre/ensemble.spec.ts` dans un arbre neuf: « le faux hôte s'est arrêté (code 1) » veut dire que `packages/sdk-dev/dist` manque (`pnpm --filter @duo/sdk-dev build`, 1 s). Sa préparation rejoue toute la suite vitest: un test rouge la bloque.
+## Revue d'Aubrune, corrections 4, 8, 9, 14 (2026-11-11)
+
+- `inkGain` du nuanceur coupe hachures et noirs sur tout morceau de classe 2 ou 3: un pavé dont on veut le joint fin (classe 3) perd son ombre encrée. Ajouter `KEEP_INK` (16) à la couche pour garder l'encre.
+- Pavés de 25 cm: dessus seul (2 triangles) quand le petit côté est sous `mesh.flankFrom`; le fond sombre du joint suffit. +2 % de triangles seulement sur le quai et la rue.
+- Pavés en appareil régulier vus au lacet 0: ils lisent comme un mur de briques; rapport longueur/largeur vers 1,4 au plus.
+- Flaques des lampes: la portée était une distance 3D depuis la lampe; à 2,8 m de haut et 5,4 m de rayon, l'anneau intérieur ne touchait jamais le sol (flaque pâle à 0,45). Compter à plat sur le disque `sqrt(r² - dy²)`.
+- Hachures courtes procédurales: d'abord trop petites (2 cm d'écart: des points); à la vue de jeu, traits de 25 à 40 cm, écart 7 cm. Pour vérifier une forme, la peindre en rouge vif un instant.
+- Le vignettage de l'après-midi assombrit le coin bas droit: ne pas le prendre pour une ombre portée.
+- Modèles livrés peints en vert (caisse du wagon): la règle de teinte en fait du feuillage (bord dentelé, frémissement); `INK_SETTINGS.models.glass` les en exclut par famille.
+- Page de démonstration: les compteurs montent sur plusieurs secondes (familles chargées une par image); attendre trois relevés égaux avant de comparer.
+
 - Sauvegarde `aubrune-apres-scene` du banc: les habitants absents à 7 h (Colette...) le restent après `setMinutes`; un commerce peut donc paraître fermé le soir en capture. Pour prouver les fenêtres, cadrer la halte et le fournil (227, 109.5, lacet 0).

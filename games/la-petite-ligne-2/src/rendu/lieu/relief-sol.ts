@@ -6,15 +6,15 @@
  * étapes (`yield`): le moteur étale le travail sur plusieurs images.
  */
 import { type BufferGeometry, Color } from 'three';
-import { inkCode, KIND, LAYER } from '../encre/couches';
+import { inkCode, KEEP_INK, KIND, LAYER } from '../encre/couches';
 import { GeometryBuilder } from './geometrie';
 import { type Relief, SIDES, type SideIndex, sidePoint, type Slab } from './relief';
 import { hash01 } from './terrain-rendu';
 
 /** Pièce du dallage, la même dans toutes les tuiles (grande: son bord prend le trait fort). */
 const PAVING_PIECE = inkCode(0, 99);
-/** Taille nominale d'une dalle pour son trait (m): joints au trait fin, hachures gardées à l'ombre. */
-const SLAB_DIAGONAL = 1.2;
+/** Taille nominale d'une pierre de bordure pour son trait (m): joints au trait fin. */
+const KERB_DIAGONAL = 1.2;
 /** Rangées de cases, puis pierres, construites entre deux pauses. */
 const ROWS_PER_STEP = 2;
 const STONES_PER_STEP = 250;
@@ -289,18 +289,24 @@ function risers(builder: GeometryBuilder, relief: Relief, cx: number, cy: number
   }
 }
 
+/** Ce qui distingue une sorte de pierre: son trait, ses flancs. */
+interface StoneLook {
+  readonly chamfer: number;
+  readonly sideShade: number;
+  /** Taille nominale pour le rang du trait (m). */
+  readonly stroke: number;
+  /** Petit côté sous lequel la pierre n'a que son dessus (m). */
+  readonly flankFrom: number;
+}
+
 /** Une dalle ou une pierre: dessus (inégal) et quatre flancs en léger fruit, un seul morceau. */
-function stone(
-  builder: GeometryBuilder,
-  item: Slab,
-  color: Color,
-  chamfer: number,
-  sideShade: number,
-): void {
+function stone(builder: GeometryBuilder, item: Slab, color: Color, look: StoneLook): void {
   const { x0, z0, x1, z1, bottom } = item;
   const [nw, sw, se, ne] = item.tops;
-  const c = Math.min(chamfer, (x1 - x0) / 4, (z1 - z0) / 4);
-  builder.part(SLAB_DIAGONAL);
+  const flanks = Math.min(x1 - x0, z1 - z0) >= look.flankFrom;
+  const c = flanks ? Math.min(look.chamfer, (x1 - x0) / 4, (z1 - z0) / 4) : 0;
+  const sideShade = look.sideShade;
+  builder.part(look.stroke);
   tint.copy(color).multiplyScalar(item.tone);
   side.copy(tint).multiplyScalar(sideShade);
   // Normale du dessus d'après ses coins: une dalle penchée prend un autre ton que sa voisine.
@@ -324,6 +330,7 @@ function stone(
     [tx * tk, ty * tk, tz * tk],
     [tint],
   );
+  if (!flanks) return;
   const rise = Math.max(0.001, (nw + sw + se + ne) / 4 - bottom);
   const k = 1 / Math.hypot(rise, c);
   const flat = rise * k;
@@ -396,7 +403,6 @@ function* paving(builder: GeometryBuilder, relief: Relief, rect: Rect): Generato
         [tint],
       );
     }
-  builder.setInk(LAYER.face);
   const cellOf = (item: Slab): [number, number] => [
     Math.floor(Math.max(rect.x0, (item.x0 + item.x1) / 2)),
     Math.floor((item.z0 + item.z1) / 2),
@@ -405,18 +411,31 @@ function* paving(builder: GeometryBuilder, relief: Relief, rect: Rect): Generato
   let laid = 0;
   for (const slab of relief.slabs(rect)) {
     const [cx, cy] = cellOf(slab);
-    const profile = relief.profileAt(cx, cy);
+    const paving = relief.profileAt(cx, cy)?.paving;
     color.set(relief.lookAt(cx, cy)?.color ?? '#ffffff');
-    stone(builder, slab, color, profile?.paving?.chamfer ?? 0, mesh.sideShade);
+    builder.setInk(LAYER[paving?.layer ?? 'face'] + KEEP_INK);
+    stone(builder, slab, color, {
+      chamfer: paving?.chamfer ?? 0,
+      sideShade: mesh.sideShade,
+      stroke: paving?.stroke ?? KERB_DIAGONAL,
+      flankFrom: mesh.flankFrom,
+    });
     if (++laid % STONES_PER_STEP === 0) yield;
   }
   yield;
+  builder.setInk(LAYER.face);
+  const kerbLook: StoneLook = {
+    chamfer: 0.012,
+    sideShade: mesh.sideShade,
+    stroke: KERB_DIAGONAL,
+    flankFrom: 0,
+  };
   for (const kerb of relief.kerbStones(rect)) {
     const [cx, cy] = cellOf(kerb);
     const own = relief.profileAt(cx, cy)?.kerb;
     if (own?.color !== undefined) color.set(own.color);
     else color.set(relief.lookAt(cx, cy)?.color ?? '#ffffff').multiplyScalar(1.08);
-    stone(builder, kerb, color, 0.012, mesh.sideShade);
+    stone(builder, kerb, color, kerbLook);
     if (++laid % STONES_PER_STEP === 0) yield;
   }
   builder.part(null);

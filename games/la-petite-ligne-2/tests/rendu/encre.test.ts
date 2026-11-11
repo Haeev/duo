@@ -22,15 +22,28 @@ import {
   ambianceSpan,
   gameAmbiances,
   resolveAmbiances,
+  windowShare,
 } from '../../src/rendu/encre/ambiances';
 import { detailShare, rankWeights } from '../../src/rendu/encre/contour';
-import { connectedParts, inkifyModel, inkTag, layerRuleOf } from '../../src/rendu/encre/conversion';
+import {
+  connectedParts,
+  glassFamily,
+  inkifyModel,
+  inkTag,
+  layerRuleOf,
+} from '../../src/rendu/encre/conversion';
 import { inkCode, KIND, LAYER, sizeClass } from '../../src/rendu/encre/couches';
 import { placeLights } from '../../src/rendu/encre/lumieres';
-import { createInkUniforms, InkMaterial, isInkMaterial } from '../../src/rendu/encre/matiere';
+import {
+  createInkUniforms,
+  InkMaterial,
+  isInkMaterial,
+  lampPower,
+} from '../../src/rendu/encre/matiere';
 import { LAMP_LAYER, StageSort, SUN_LAYER } from '../../src/rendu/encre/ombres';
 import { INK_SETTINGS } from '../../src/rendu/encre/reglages';
 import { floorMapBytes, groundMapBytes } from '../../src/rendu/encre/sol';
+import { closedViewWidth, floorExtent } from '../../src/rendu/cadrage';
 import { CameraRig } from '../../src/rendu/camera';
 import type { SceneVolume } from '../../src/rendu/lieu/description';
 import { GeometryBuilder } from '../../src/rendu/lieu/geometrie';
@@ -112,6 +125,25 @@ describe('ambiances en données', () => {
     expect(() => resolveAmbiances(raw)).toThrow(/boucle/);
   });
 
+  it('dehors, aucune fenêtre ne s’allume avant que toutes les lampes le soient', () => {
+    const s = INK_SETTINGS.lamps;
+    const allLit = s.from + s.spread + s.ramp;
+    expect(windowShare(allLit)).toBe(0);
+    expect(windowShare(allLit + s.windowRamp)).toBeCloseTo(1, 9);
+    let lit = 0;
+    for (let m = 0; m < 1440; m += 2) {
+      const a = ambianceAt(book, { sheet: null, minutes: m, indoor: 0, weather: null });
+      if (a.windowAmount <= 0 && a.spill <= 0) continue;
+      lit += 1;
+      // La dernière lampe (rang 1) est pleinement allumée dès qu'une fenêtre luit.
+      expect(lampPower(a.lamps, { phase: 1 }), `minute ${String(m)}`).toBeGreaterThan(0.999);
+    }
+    expect(lit).toBeGreaterThan(200);
+    // Dedans, les vitres gardent leur jour (la lumière du ciel par la fenêtre).
+    const noon = ambianceAt(book, { sheet: null, minutes: 720, indoor: 1, weather: null });
+    expect(noon.windowAmount).toBeGreaterThan(0);
+  });
+
   it('dedans: pas d’ombre du soleil; météo: brume plus épaisse, couleurs plus sourdes', () => {
     const inside = ambianceAt(book, { sheet: null, minutes: 720, indoor: 1, weather: null });
     expect(inside.sunShadow).toBe(0);
@@ -165,6 +197,24 @@ describe('conversion automatique des modèles', () => {
     expect(layerRuleOf(...linear('#5f8a4a'))?.layer).toBe('leaf');
     expect(layerRuleOf(...linear('#6e5440'))?.layer).toBe('grain');
     expect(layerRuleOf(...linear('#a59b8c'))?.layer).toBe('face');
+  });
+
+  it('vitres d’un modèle à vitres: le morceau bleu devient une vitre, le reste non', () => {
+    const material = new InkMaterial(createInkUniforms());
+    const body = painted(new BoxGeometry(1, 2, 0.1), '#2f5a48');
+    const pane = painted(new BoxGeometry(0.8, 0.8, 0.02).translate(0, 0.3, 0.2), '#1c2638');
+    const make = (): Mesh => new Mesh(mergeGeometries([body.clone(), pane.clone()]));
+    const glazed = make();
+    inkifyModel(new Group().add(glazed), material, { glass: true });
+    const ink = glazed.geometry.getAttribute('aInk');
+    expect(ink.getZ(0)).toBe(KIND.none);
+    expect(ink.getZ(ink.count - 1)).toBe(KIND.window);
+    // Hors des familles à vitres, le même modèle ne change pas.
+    const plain = make();
+    inkifyModel(new Group().add(plain), material);
+    expect(plain.geometry.getAttribute('aInk').getZ(ink.count - 1)).toBe(KIND.none);
+    expect(glassFamily('paroi-voiture')).toBe(true);
+    expect(glassFamily('reverbere')).toBe(false);
   });
 
   it('codes: numéro de 1 à 62 et classe de taille sur deux bits', () => {
@@ -267,6 +317,24 @@ describe('caméra du style encré', () => {
     rig.set(45, 10);
     expect(deg()).toBeGreaterThan(35);
     expect(deg()).toBeLessThan(50);
+  });
+
+  it('le wagon (petit lieu clos) se cadre pour remplir 60 % de la largeur', () => {
+    const wagon = {
+      nature: 'vide',
+      areas: [
+        { x: 2, y: 3, w: 7, h: 3, nature: 'plancher' },
+        { x: 2, y: 4, w: 5, h: 1, nature: 'tapis-de-couloir' },
+      ],
+    };
+    const extent = floorExtent(wagon, 11, 9);
+    expect(extent).toEqual({ w: 7, h: 3 });
+    const s = INK_SETTINGS.camera;
+    const width = closedViewWidth(extent ?? { w: 0, h: 0 }, Math.PI / 4, s.closedShare, 6, 18);
+    // À 45 degrés le wagon couvre (7 + 3) / racine de 2 mètres d'écran.
+    expect((7 + 3) / Math.SQRT2 / width).toBeCloseTo(s.closedShare, 5);
+    expect(floorExtent({ nature: 'vide' }, 11, 9)).toBeNull();
+    expect(closedViewWidth({ w: 60, h: 40 }, 0, 0.6, 6, 18)).toBe(18);
   });
 });
 

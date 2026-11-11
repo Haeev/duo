@@ -41,6 +41,11 @@ export const INK_SETTINGS = {
     pitchNearDeg: 35,
     /** Largeur à partir de laquelle la plongée est entière (m). */
     pitchFullWidth: 18,
+    /**
+     * Petit lieu clos (ambiance `indoor` de son `lieu.json`, sol déclaré): à l'arrivée, la vue
+     * se cadre pour que son plancher occupe cette part de la largeur de l'écran (`cadrage.ts`).
+     */
+    closedShare: 0.6,
   },
 
   /** Passe de contour: demi-épaisseur du trait en points d'écran à 768 points de haut. */
@@ -94,12 +99,16 @@ export const INK_SETTINGS = {
   lights: { reach: 26, lampRadius: 5.2, lampHeightShare: 0.86, windowReach: 3.4 },
 
   /**
-   * Allumage des lampes du dehors selon la force des lampes de l'ambiance (0 le jour, 1 la nuit):
-   * rien sous `from`; chaque lampe a son rang (tiré de son identifiant) et s'allume entre
-   * `from + rang x spread` et `ramp` plus loin. À la tombée du jour elles s'allument l'une après
-   * l'autre, à l'aube elles s'éteignent de même.
+   * Allumage du dehors, un seul réglage pour les lampes et les fenêtres, selon la force des
+   * lampes de l'ambiance (0 le jour, 1 la nuit). Lampes: rien sous `from`; chaque lampe a son
+   * rang (tiré de son identifiant) et s'allume entre `from + rang x spread` et `ramp` plus loin.
+   * À la tombée du jour elles s'allument l'une après l'autre, à l'aube elles s'éteignent de même.
+   * Fenêtres: leur lueur (et la lumière qu'elles posent dehors) ne commence que quand la
+   * dernière lampe est pleinement allumée, et monte sur `windowRamp` (revue du 2026-11-11: une
+   * rue aux fenêtres allumées sous un réverbère éteint). Avec l'ambiance livrée: lampes de 17 h 50
+   * à 18 h 35, fenêtres de 18 h 35 à 18 h 55; le matin, fenêtres éteintes avant les lampes.
    */
-  lamps: { from: 0.3, spread: 0.3, ramp: 0.15 },
+  lamps: { from: 0.3, spread: 0.2, ramp: 0.1, windowRamp: 0.1 },
 
   /**
    * Bâtiments éclairés de l'intérieur (`lieu/eclairage.ts`): d'après les heures des commerces, les
@@ -172,6 +181,13 @@ export const INK_SETTINGS = {
      * l'opposé). À 2,5, une pente de 5 % suffit à changer de ton: un talus de chemin se lit.
      */
     slopeTone: 2.5,
+    /**
+     * Hachures courtes du sol à l'ombre (revue du 2026-11-11: « le sol reste en aplats »): une
+     * touffe de deux ou trois traits dans `share` des cases d'une grille de `cell` m ancrée au
+     * monde; longueur d'un trait et écart entre deux (m), force de l'encre (0 à 1). Calcul dans
+     * le nuanceur, sans texture ni passe. Rien dedans, ni sur un sol au soleil.
+     */
+    ticks: { cell: 1.1, share: 0.45, length: 0.42, gap: 0.075, strength: 0.85 },
   },
 
   /**
@@ -208,6 +224,25 @@ export const INK_SETTINGS = {
     weld: 0.001,
     /** Au-delà de ce nombre de morceaux, les plus petits partagent un numéro (63 au plus). */
     maxParts: 62,
+    /**
+     * Vitres des modèles livrés: dans les familles listées, un morceau bleu (verre sombre ou son
+     * reflet peint) devient une vitre qui suit l'heure (ciel pâle le jour, reflets des lampes
+     * la nuit). Le wagon n'avait que des vitres de nuit, même au matin (revue du 2026-11-11).
+     */
+    glass: {
+      families: ['paroi-voiture', 'porte-voiture'] as readonly string[],
+      rule: {
+        hue: [195, 250],
+        minSaturation: 0.2,
+        maxLightness: 0.75,
+        layer: 'plain',
+      } as LayerRule,
+      /**
+       * Dans ces familles, un morceau vert n'est pas du feuillage (la caisse verte du wagon
+       * frémissait au vent et dentelait son ombre): il prend cette règle, un panneau de bois peint.
+       */
+      body: { hue: [0, 360], minSaturation: 0, maxLightness: 1, layer: 'grain' } as LayerRule,
+    },
   },
 
   /**

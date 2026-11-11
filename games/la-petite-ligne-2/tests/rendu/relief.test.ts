@@ -146,7 +146,9 @@ describe('dallage et maillage', () => {
     expect(west.length + east.length).toBe(both.length);
     const rows = new Map<number, { x0: number; x1: number }[]>();
     for (const slab of both) {
-      expect(slab.x1 - slab.x0).toBeGreaterThan(0.15);
+      // Le plus petit morceau: un tiers de pavé de rue (25 cm), joint déduit.
+      expect(slab.x1 - slab.x0).toBeGreaterThan(0.05);
+      expect(slab.z1 - slab.z0).toBeGreaterThan(0.08);
       const row = rows.get(slab.z0) ?? [];
       row.push(slab);
       rows.set(slab.z0, row);

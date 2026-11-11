@@ -25,11 +25,13 @@ Revenir à l'ancien rendu: `?rendu=aplats` dans l'adresse du jeu, ou `RenderOpti
 4. Note l'intention dans `pourquoi`.
 5. `pnpm exec vitest run tests/rendu/encre.test.ts` contrôle le fichier (un exemplaire factice y est ajouté par le test).
 
-Un lieu clos (wagon) donne en plus la teinte de ses lampes et du dehors dans son `lieu.json` (`ambience`).
+Un lieu clos (wagon) donne en plus la teinte de ses lampes et du dehors dans son `lieu.json` (`ambience`); à l'arrivée, la vue se cadre sur son plancher (`INK_SETTINGS.camera.closedShare`, `cadrage.ts`).
+
+L'heure d'allumage du dehors est un seul réglage (`INK_SETTINGS.lamps`): les lampes s'allument l'une après l'autre, puis les fenêtres, jamais avant la dernière lampe (`windowShare` de `ambiances.ts`).
 
 ## Ajouter un objet ou une lampe (aucun code)
 
-- Un modèle livré dans `assets/commun/decors/` passe seul au matériau encré: ses morceaux d'un seul tenant deviennent des morceaux de contour, leur couche de traits vient de leur teinte (`INK_SETTINGS.models.rules`).
+- Un modèle livré dans `assets/commun/decors/` passe seul au matériau encré: ses morceaux d'un seul tenant deviennent des morceaux de contour, leur couche de traits vient de leur teinte (`INK_SETTINGS.models.rules`). Une famille à vitres (`INK_SETTINGS.models.glass`: paroi et porte de voiture) fait de ses morceaux bleus des vitres qui suivent l'heure, et n'a pas de feuillage.
 - Une famille de modèles qui éclaire s'inscrit dans `INK_SETTINGS.lampFamilies` (hauteur du foyer, rayon de la flaque, ombre ou non).
 
 ## Outil de mesure (dans le jeu)

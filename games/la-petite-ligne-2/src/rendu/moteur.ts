@@ -92,6 +92,7 @@ import { Daylight, nightShare } from './lumiere';
 import { DEFAULT_GRAPHICS_OPTIONS, type GraphicsOptions } from './options';
 import { QualityGovernor, sizeSettingsOf, type RenderProfile } from './options-graphiques';
 import { type DisplaySurface, renderPixelSize, usefulResolutionSteps } from './qualite';
+import { closedViewWidth, floorExtent } from './cadrage';
 import { RENDER_SETTINGS } from './reglages';
 import { TRIP_SETTINGS } from './voyage/reglages';
 import { TripScene } from './voyage/scene';
@@ -267,6 +268,8 @@ class Engine implements GameRenderer {
   /** Rendu encré (ADR 0023), `null` dans l'ancien rendu en aplats. */
   private readonly ink: InkKit | null;
   private lights: InkLights | null = null;
+  /** La vue a été cadrée sur un petit lieu clos (`frameClosedPlace`). */
+  private framed = false;
   /** Bâtiments éclairés de l'intérieur: recalculés quand la minute du jeu change. */
   private litBuildings: ReadonlyMap<string, BuildingLight> = new Map();
   private litMinute = Number.NaN;
@@ -764,6 +767,30 @@ class Engine implements GameRenderer {
     );
     this.characters.reset();
     this.rig.detach();
+    this.frameClosedPlace(place.def.ambience?.indoor === true ? place.map : null);
+  }
+
+  /**
+   * Rendu encré: un petit lieu clos à sol déclaré (le wagon) se cadre à l'arrivée pour remplir
+   * `INK_SETTINGS.camera.closedShare` de l'écran; en le quittant, la vue reprend sa largeur de
+   * jeu. Le joueur garde le zoom libre ensuite.
+   */
+  private frameClosedPlace(map: PlaceContent['map'] | null): void {
+    if (this.ink === null) return;
+    const s = this.cameraSettings;
+    const yawDeg = (this.rig.yawAngle() * 180) / Math.PI;
+    const extent = map?.floor === undefined ? null : floorExtent(map.floor, map.width, map.height);
+    if (extent !== null) {
+      const share = INK_SETTINGS.camera.closedShare;
+      this.rig.set(
+        yawDeg,
+        closedViewWidth(extent, this.rig.yawAngle(), share, s.minWidth, s.defaultWidth),
+      );
+      this.framed = true;
+    } else if (this.framed) {
+      this.rig.set(yawDeg, s.defaultWidth);
+      this.framed = false;
+    }
   }
 
   private poseCamera(pose: CameraPose): void {

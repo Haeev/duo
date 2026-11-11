@@ -19,7 +19,7 @@ import {
   Vector4,
 } from 'three';
 import type { Aimable } from '../cible';
-import { inkifyModel, inkTag } from '../encre/conversion';
+import { glassFamily, inkifyModel, inkTag } from '../encre/conversion';
 import { KIND, LAYER } from '../encre/couches';
 import { INK_INNER, type InkInner } from '../encre/matiere';
 import { createFloorMap } from '../encre/sol';
@@ -55,6 +55,11 @@ const at = new Vector3();
 const size = new Vector3();
 const up = new Vector3(0, 1, 0);
 const white = new Color('#ffffff');
+
+/** Le modèle a-t-il des vitres à reconnaître (famille de `INK_SETTINGS.models.glass`) ? */
+function glassOf(model: string | null): { glass: boolean } {
+  return { glass: glassFamily(model === null ? undefined : DECOR_MANIFEST.models[model]?.family) };
+}
 
 /** Volumes d'un même modèle posés en un seul maillage instancié (cases et plants du potager). */
 interface Batch {
@@ -172,7 +177,7 @@ export class PlaceScene {
     let object: Object3D;
     if (gone) object = new Group();
     else if (model !== null) {
-      object = this.inked === null ? model : inkifyModel(model, this.inked);
+      object = this.inked === null ? model : inkifyModel(model, this.inked, glassOf(volume.model));
     } else if (volume.standIn === 'bundle') {
       this.bundle ??= this.tracker.track(bundleGeometry());
       if (this.inked !== null) inkTag(this.bundle, { layer: LAYER.plain });
@@ -276,7 +281,7 @@ export class PlaceScene {
     const first = volumes[0];
     const sample = first === undefined ? null : (this.models?.instantiate(model, first.id) ?? null);
     if (sample === null || !isMesh(sample)) return null;
-    if (this.inked !== null) inkifyModel(sample, this.inked);
+    if (this.inked !== null) inkifyModel(sample, this.inked, glassOf(model));
     const mesh = new InstancedMesh(sample.geometry, sample.material, volumes.length);
     mesh.name = `lot-${model}`;
     volumes.forEach((volume, i) => {

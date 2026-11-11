@@ -27,6 +27,8 @@ interface BoxLook {
   readonly kind?: number;
   /** Teinte des faces du dessus (tranche d'un mur coupé). */
   readonly top?: Color;
+  /** Liseré du dessus le long de ses deux grandes arêtes: largeur (m) et teinte. */
+  readonly rim?: { readonly width: number; readonly color: Color };
   /** Axe du fil du bois ou des rangs de la couche de traits. */
   readonly grain?: Axis;
   /** Garde le morceau en cours: aucun trait entre cette boîte et la précédente. */
@@ -102,18 +104,47 @@ class Carver {
         ? kind + SWAP
         : kind;
     const top = look.top ?? color;
-    this.quad(
-      [
-        [x0, y1, z0],
-        [x0, y1, z1],
-        [x1, y1, z1],
-        [x1, y1, z0],
-      ],
-      [0, 1, 0],
-      top,
-      layer,
-      swap('x', 'z'),
-    );
+    const rim = look.rim;
+    const alongX = x1 - x0 >= z1 - z0;
+    const across = alongX ? z1 - z0 : x1 - x0;
+    if (rim !== undefined && rim.width * 3 < across) {
+      // Dessus en trois bandes le long du grand côté: liseré, aplat, liseré.
+      const w = rim.width;
+      const bands: readonly (readonly [number, number, Color])[] = [
+        [0, w, rim.color],
+        [w, across - w, top],
+        [across - w, across, rim.color],
+      ];
+      for (const [a, b, tint] of bands) {
+        const c: [number, number, number, number] = alongX
+          ? [x0, z0 + a, x1, z0 + b]
+          : [x0 + a, z0, x0 + b, z1];
+        this.quad(
+          [
+            [c[0], y1, c[1]],
+            [c[0], y1, c[3]],
+            [c[2], y1, c[3]],
+            [c[2], y1, c[1]],
+          ],
+          [0, 1, 0],
+          tint,
+          layer,
+          swap('x', 'z'),
+        );
+      }
+    } else
+      this.quad(
+        [
+          [x0, y1, z0],
+          [x0, y1, z1],
+          [x1, y1, z1],
+          [x1, y1, z0],
+        ],
+        [0, 1, 0],
+        top,
+        layer,
+        swap('x', 'z'),
+      );
     this.quad(
       [
         [x0, y1, z1],
@@ -196,6 +227,47 @@ class Carver {
 
 const layerOf = (name: LayerName): number => LAYER[name];
 
+/** Une teinte d'écran (`#rrggbb`) assombrie de `points` de clarté L* (CIELAB, D65), même teinte. */
+export function darkenLightness(color: string, points: number): string {
+  const value = Number.parseInt(color.slice(1), 16);
+  const lin = [16, 8, 0].map((shift) => {
+    const c = ((value >> shift) & 255) / 255;
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  const [r = 0, g = 0, b = 0] = lin;
+  const f = (t: number): number =>
+    t > 216 / 24389 ? Math.cbrt(t) : (t * 24389) / 27 / 116 + 16 / 116;
+  const fx = f((0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047);
+  const fy = f(0.2126 * r + 0.7152 * g + 0.0722 * b);
+  const fz = f((0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883);
+  const lightness = Math.max(0, 116 * fy - 16 - points);
+  const a = 500 * (fx - fy);
+  const bb = 200 * (fy - fz);
+  const ny = (lightness + 16) / 116;
+  const inv = (t: number): number =>
+    t ** 3 > 216 / 24389 ? t ** 3 : ((116 * t - 16) * 27) / 24389;
+  const x = inv(ny + a / 500) * 0.95047;
+  const y = inv(ny);
+  const z = inv(ny - bb / 200) * 1.08883;
+  const out = [
+    3.2406 * x - 1.5372 * y - 0.4986 * z,
+    -0.9689 * x + 1.8758 * y + 0.0415 * z,
+    0.0557 * x - 0.204 * y + 1.057 * z,
+  ].map((c) => {
+    const s = c <= 0.0031308 ? c * 12.92 : 1.055 * Math.max(c, 0) ** (1 / 2.4) - 0.055;
+    return Math.round(Math.min(1, Math.max(0, s)) * 255);
+  });
+  return `#${out.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** Dessus d'un mur coupé de ce style: teinte et liseré (`RoomStyle.cap`). */
+function capLook(style: RoomPlan['style']): { top: Color; rim: { width: number; color: Color } } {
+  return {
+    top: new Color(darkenLightness(style.wall.color, style.cap.darken)),
+    rim: { width: style.cap.rim, color: new Color(style.cap.rimColor) },
+  };
+}
+
 /** Pas des lames d'un plancher (m): celui des planches de la couche de traits `wood` (16 par carreau). */
 const PLANK_PITCH = TILE_METRES / 16;
 
@@ -264,13 +336,14 @@ function stubWall(plan: RoomPlan, wall: RoomWallPlan, index: number): BufferGeom
   const [from, to] = wallReach(plan, wall);
   c.piece(Math.hypot(to - from, st.cut + st.footing.drop, t));
   const stone = new Color(st.footing.color);
-  const cap = new Color(st.capColor);
+  const cap = capLook(st);
   const doors = wall.openings.filter((o) => o.kind === 'door');
   let first = true;
   for (const [u0, u1, y0, y1] of solids(from, to, st.cut, doors)) {
     wallBox(c, plan, wall.side, u0, u1, y0 - st.footing.drop, y1, 0, t, stone, {
       layer: layerOf(st.footing.layer),
-      top: cap,
+      top: cap.top,
+      rim: cap.rim,
       joined: !first,
     });
     first = false;
@@ -399,13 +472,15 @@ function fullWall(
   const h = st.height;
   c.piece(Math.hypot(to - from, h, t));
   const plaster = new Color(st.wall.color);
-  const cap = new Color(st.capColor);
+  const cap = capLook(st);
   const stone = new Color(st.footing.color);
   const pans = solids(from, to, h, wall.openings);
   pans.forEach(([u0, u1, y0, y1], i) => {
+    const cut = y1 >= h - 1e-3;
     wallBox(c, plan, side, u0, u1, y0, y1, 0, t, plaster, {
       layer: layerOf(st.wall.layer),
-      top: y1 >= h - 1e-3 ? cap : plaster,
+      top: cut ? cap.top : plaster,
+      ...(cut ? { rim: cap.rim } : {}),
       joined: i > 0,
     });
   });
@@ -422,7 +497,7 @@ function fullWall(
     [from - 0.012, from],
     [to, to + 0.012],
   ] as const)
-    wallBox(c, plan, side, a, b, st.cut, h, 0, t, cap, { joined: true });
+    wallBox(c, plan, side, a, b, st.cut, h, 0, t, cap.top, { joined: true });
 
   // Le dedans du mur ne s'habille que sur le nu intérieur (`u` de 0 à la longueur).
   const inner = solids(0, wall.length, h, wall.openings).filter(([, , y0]) => y0 === 0);
@@ -638,15 +713,16 @@ function floorGeometry(plan: RoomPlan, settings: RoomSettings): BufferGeometry {
   }
   // Cloisons: des murs de refend coupés à la même hauteur que les murs du devant.
   const plaster = new Color(st.wall.color);
-  const cap = new Color(st.capColor);
+  const cap = capLook(st);
   const plinth = new Color(st.plinth.color);
   plan.partitions.forEach((p) => {
     c.piece(Math.hypot(p.x1 - p.x0, p.z1 - p.z0, st.cut));
-    // Un mur mince montre sa tranche à l'encre; un massif (estrade, pile, souche) son dessus.
+    // Un mur mince montre sa coupe; un massif (estrade, pile, souche) un dessus plus clair.
     const thin = Math.min(p.x1 - p.x0, p.z1 - p.z0) <= settings.partitionThickness + 0.05;
     c.box(p.x0, 0, p.z0, p.x1, st.cut, p.z1, plaster, {
       layer: layerOf(st.wall.layer),
-      top: thin ? cap : cap.clone().lerp(plaster, 0.3),
+      top: thin ? cap.top : cap.top.clone().lerp(plaster, 0.5),
+      rim: cap.rim,
     });
     const o = st.plinth.out;
     c.box(p.x0 - o, 0, p.z0 - o, p.x1 + o, st.plinth.height, p.z1 + o, plinth, {
