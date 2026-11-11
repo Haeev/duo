@@ -572,3 +572,7 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 ## 11 novembre, 8 h 55: fond des intérieurs
 
 - Le client: « garde le fond sombre pour les intérieurs ». La proposition de la revue visuelle (montrer le sol du dehors autour de la pièce) est écartée.
+
+## 11 novembre, 9 h 50: bâtiment devant la caméra
+
+- Sur le montage avant et après de la découpe autour des joueurs, le client: « fondu fantome : meilleur ». Il préfère le fondu d'origine (le bâtiment entier devient translucide). La découpe en ellipse est annulée (fusion 9831234 annulée); ne pas la reproposer.
