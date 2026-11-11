@@ -28,7 +28,14 @@ import {
   resolveAmbiances,
   windowShare,
 } from '../../src/rendu/encre/ambiances';
-import { detailShare, rankWeights } from '../../src/rendu/encre/contour';
+import {
+  AUX_PACKING,
+  backgroundAux,
+  depthWindow,
+  detailShare,
+  maskSetup,
+  rankWeights,
+} from '../../src/rendu/encre/contour';
 import {
   connectedParts,
   glassFamily,
@@ -304,6 +311,65 @@ describe('hiérarchie du trait', () => {
     for (let i = 1; i < 5; i++) expect(game[i] ?? 0).toBeLessThanOrEqual(game[i - 1] ?? 0);
     expect(detailShare(20, INK_SETTINGS.detail.painted)).toBe(0);
     expect(detailShare(200, INK_SETTINGS.detail.painted)).toBe(1);
+  });
+});
+
+describe('image du contour et masque du trait', () => {
+  it('range morceau, normale, pièce et profondeur dans deux entiers que 32 bits à virgule portent sans arrondi', () => {
+    const top = 255 * AUX_PACKING.high + 255 * 256 + 255;
+    expect(top).toBeLessThan(2 ** 24);
+    expect(Math.fround(top)).toBe(top);
+    expect(255 * AUX_PACKING.high + AUX_PACKING.depthSteps).toBe(2 ** 24 - 1);
+  });
+
+  it("le fond vide garde ce que l'effacement de la cible y laissait: teinte lue comme code, pièce 255, au plus loin", () => {
+    const aux = backgroundAux([0.2, 0.4, 0.6]);
+    expect(Math.floor((aux[0] ?? 0) / AUX_PACKING.high)).toBe(153);
+    expect((aux[0] ?? 0) % AUX_PACKING.high).toBe(51 * 256 + 102);
+    expect(Math.floor((aux[1] ?? 0) / AUX_PACKING.high)).toBe(AUX_PACKING.backgroundPiece);
+    expect((aux[1] ?? 0) % AUX_PACKING.high).toBe(AUX_PACKING.depthSteps);
+    // Fond sans bleu: morceau 0, donc la normale commune des points sans morceau.
+    expect(backgroundAux([0.2, 0.4, 0])[0]).toBe(AUX_PACKING.flatNormal);
+  });
+
+  it('la portée du masque couvre la plus longue prise du trait à toutes les définitions du jeu', () => {
+    const s = INK_SETTINGS.outline;
+    for (const height of [540, 768, 900, 1080])
+      for (const zoom of s.zoomRange) {
+        const radius = (s.radius * zoom * height) / s.referenceHeight;
+        // Vue de jeu la plus large (28 m, soit 16 m de haut) comme la plus serrée.
+        const window = depthWindow(
+          120,
+          RENDER_SETTINGS.camera.near,
+          RENDER_SETTINGS.camera.far,
+          16,
+        );
+        const setup = maskSetup(radius, window.span);
+        const farthest = radius * s.widthRange[1] + (radius * s.wobble) / 2 + 0.5;
+        expect(setup.reach * 4).toBeGreaterThanOrEqual(Math.floor(farthest));
+        // Le seuil reste au-dessus de l'arrondi de la profondeur: le masque sert.
+        expect(setup.plane).toBeGreaterThan(s.mask.minSteps);
+        expect(setup.steep).toBeGreaterThan(0);
+      }
+  });
+
+  it('la fenêtre de profondeur entoure le point visé et reste dans la caméra', () => {
+    const { near, far } = RENDER_SETTINGS.camera;
+    const window = depthWindow(120, near, far, 10);
+    expect(window.span).toBe(INK_SETTINGS.outline.depthSpan + 20);
+    // Le point visé est au milieu: sa profondeur ramenée à la fenêtre vaut un demi.
+    const focus = (120 - near) / (far - near);
+    expect((focus - window.from) * window.scale).toBeCloseTo(0.5, 6);
+    // Caméra plus courte que la fenêtre: toute son étendue, sans rien décaler.
+    expect(depthWindow(5, 0.1, 30, 4)).toEqual({ from: 0, scale: 1, span: 29.9 });
+    // Point visé près du plan proche: la fenêtre part du plan proche.
+    expect(depthWindow(3, near, far, 10).from).toBe(0);
+  });
+
+  it("le masque se retire quand un pas de profondeur est trop grossier (vue d'ensemble)", () => {
+    expect(maskSetup(2, 2000).plane).toBe(-1);
+    // Trait très épais (aperçu agrandi): même repli, tout est cherché comme avant.
+    expect(maskSetup(12, 160).plane).toBe(-1);
   });
 });
 

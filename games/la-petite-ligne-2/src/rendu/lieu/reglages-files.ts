@@ -99,20 +99,32 @@ export interface TrackBedSort {
   /**
    * Talus du profil (sommets à plus de `from` m de l'axe): il monte de rien à sa pleine hauteur
    * sur `ramp` m depuis le bout de la sorte, sans bout de talus coupé à l'endroit où elle commence.
+   * Un talus est de la terre du coteau, pas un ouvrage: il prend la nature et la teinte du sol
+   * qu'il recouvre, sa hauteur ondule de `swell` (part) le long de la voie, et son revers (au-delà
+   * de la crête, à `crest` m de l'axe dans le modèle) s'étale de `spread` fois sa largeur, plus
+   * ou moins selon l'endroit (ondulation de `wave` m): son pied se perd dans le pré au lieu de
+   * tirer un trait droit.
    */
-  readonly talus?: { readonly from: number; readonly ramp: number };
+  readonly talus?: {
+    readonly from: number;
+    readonly ramp: number;
+    readonly crest: number;
+    readonly swell: number;
+    readonly spread: readonly [number, number];
+    readonly wave: number;
+  };
 }
 
 /** Lits de voie: sortes (la première qui convient l'emporte) et pose sur le sol. */
 export const TRACK_BED = {
   pourquoi:
-    'le ballast qui porte les traverses, les fossés qui le drainent; en tranchée à l’approche du tunnel, la voie entre dans le coteau',
+    'le ballast qui porte les traverses, les fossés secs qui le drainent; en tranchée à l’approche du tunnel, la voie entre dans le coteau',
   sorts: [
     {
       pourquoi: 'les derniers mètres avant le tunnel: la voie est entaillée dans le coteau',
       model: 'rail-cutting',
       nearTunnel: 26,
-      talus: { from: 3.15, ramp: 10 },
+      talus: { from: 3.15, ramp: 10, crest: 5.5, swell: 0.16, spread: [1.3, 2.5], wave: 19 },
     },
     {
       pourquoi: 'partout ailleurs: la voie au ras du pré, entre deux fossés',
@@ -137,6 +149,12 @@ export const TRACK_BED = {
     'sous-bois',
     'hors-jeu',
   ] as readonly string[],
+  /**
+   * Fossés. Un fossé de voie draine le ballast: il est sec, tapissé d'herbe rase et de terre, sauf
+   * là où le plan met de l'eau sous lui (nature en eau de la carte). Les modèles livrés le peignent
+   * en eau: hors de l'eau du plan, il prend cette teinte.
+   */
+  ditch: { dry: '#7a7648' },
   /** Longueur d'un module (m): ceux d'un tronçon sont étirés pour en couvrir la longueur exacte. */
   step: 1,
   /** Lit levé au-dessus du sol en relief (m): ses fossés ne se battent pas avec lui. */

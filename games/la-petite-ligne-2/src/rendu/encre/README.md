@@ -2,18 +2,18 @@
 
 Le style « bande dessinée encrée » du jeu. `index.ts` (`InkKit`) est ce que le moteur branche; rien ici ne lit les options graphiques (un seul niveau de rendu).
 
-| Fichier                                  | Rôle                                                                                      |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `reglages.ts`                            | tout ce qui se règle: style par défaut, caméra, trait, ombres, sol, conversion, budgets   |
-| `ambiances.json`, `ambiances.ts`         | ambiances en données (heures, dedans, météo), schéma et interpolation                     |
-| `couches.ts`, `textures.ts`              | couches de traits (dessinées au démarrage), natures de face, codes de pièce et de morceau |
-| `matiere.ts`                             | matériau partagé (`InkMaterial`), lumière encrée, contact, aplat, profondeur              |
-| `contour.ts`                             | cible à deux sorties et passe de contour hiérarchisée, teinte, vignette, mise à l'échelle |
-| `echelle.ts`                             | résolution interne adaptative (paliers, hystérésis), logique pure                         |
-| `mesure.ts`, `panneau-mesure.ts`         | outil de mesure: journal des images, relevé en texte, panneau, chronomètres               |
-| `ombres.ts`                              | cartes d'ombre du soleil et de la lampe, mise en route étalée des programmes              |
-| `conversion.ts`                          | pose `aInk` sur une géométrie ou un modèle livré, sans rien nommer                        |
-| `sol.ts`, `lumieres.ts`, `particules.ts` | carte du sol d'un lieu et ses limites adoucies, lampes et fenêtres, particules de l'air   |
+| Fichier                                  | Rôle                                                                                                                       |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `reglages.ts`                            | tout ce qui se règle: style par défaut, caméra, trait, ombres, sol, conversion, budgets                                    |
+| `ambiances.json`, `ambiances.ts`         | ambiances en données (heures, dedans, météo), schéma et interpolation                                                      |
+| `couches.ts`, `textures.ts`              | couches de traits (dessinées au démarrage), natures de face, codes de pièce et de morceau                                  |
+| `matiere.ts`                             | matériau partagé (`InkMaterial`), lumière encrée, contact, aplat, profondeur                                               |
+| `contour.ts`                             | cible à deux sorties, image du contour, masque du trait, passe de contour hiérarchisée, teinte, vignette, mise à l'échelle |
+| `echelle.ts`                             | résolution interne adaptative (paliers, hystérésis), logique pure                                                          |
+| `mesure.ts`, `panneau-mesure.ts`         | outil de mesure: journal des images, relevé en texte, panneau, chronomètres                                                |
+| `ombres.ts`                              | cartes d'ombre du soleil et de la lampe, mise en route étalée des programmes                                               |
+| `conversion.ts`                          | pose `aInk` sur une géométrie ou un modèle livré, sans rien nommer                                                         |
+| `sol.ts`, `lumieres.ts`, `particules.ts` | carte du sol d'un lieu et ses limites adoucies, lampes et fenêtres, particules de l'air                                    |
 
 Revenir à l'ancien rendu: `?rendu=aplats` dans l'adresse du jeu, ou `RenderOptions.style`.
 
@@ -44,9 +44,16 @@ L'heure d'allumage du dehors est un seul réglage (`INK_SETTINGS.lamps`): les la
 - « Remettre à zéro » relance la mesure; « Échelle » passe d'adaptative à chaque palier figé (100, 85, 75, 70 %) pour mesurer chacun.
 - Aucune donnée personnelle: ni nom, ni chemin, ni adresse, ni contenu de la partie (seulement l'heure du jeu et l'ambiance).
 
+## Coût par point (ADR 0023, point 18)
+
+- Image du contour (`AUX_PACKING` de `contour.ts`): morceau, normale, pièce et profondeur d'un point tiennent dans deux nombres à virgule de 32 bits (cible `RG32F`). Tout nuanceur qui dessine dans la cible l'écrit par `packAux` (`AUX_GLSL`), ou écrit `vec4(0.0)` en mélange pour garder ce qui est dessous. La profondeur y est comptée dans une fenêtre autour du point visé (`depthWindow`, `outline.depthSpan`): un pas vaut un millimètre et demi. Extensions requises: `EXT_color_buffer_float`, `EXT_float_blend`, `OES_texture_float_linear` (`inkSupported`; sans elles le moteur revient aux aplats).
+- Masque du trait: deux petites passes au quart de la définition disent, par carré de quatre points de côté, si quelque chose change à portée de prise (`maskSetup`). Hors du masque, le contour lit la couleur et le masque, rien d'autre. Le masque est prudent: l'image est la même qu'en cherchant partout (réglages et raisons dans `outline.mask`). Il se retire seul quand la profondeur est trop grossière (vue d'ensemble) ou le trait très épais.
+- Scène: les deux dernières lectures d'une ombre (soleil, lampe) ne se font que près d'un bord d'ombre; les hachures ne se lisent que là où elles se voient; la carte du sol une fois au lieu de trois loin d'une limite de sol; le bruit des plages d'herbe sur l'herbe seulement.
+- Ce qui reste à payer: partout où un trait est possible (pavés, lames d'un plancher, feuillages), le contour fait ses huit prises. Mesurer avant de retirer quoi que ce soit: une sonde hors dépôt compte les lectures exécutées en chaque point (voir le carnet du technical artist).
+
 ## Résolution interne adaptative
 
-Sur un processeur graphique intégré (`resolution.integrated`: nom contenant « Intel »), l'échelle adaptative part d'au plus 1366 x 768 points internes, et ses paliers s'appliquent à ce départ. Le canevas est opaque, sans profondeur ni pochoir (`inkContext`). La scène et le contour se calculent à une échelle interne (`INK_SETTINGS.resolution`: paliers 100, 85, 75, 70 %), puis l'image finie est mise à l'échelle du canevas (bicubique bornée, cinq lectures). Elle descend d'un palier quand la moyenne des images dépasse 30 images par seconde de budget, remonte quand le palier du dessus tiendrait avec de la marge, et une remontée ratée double l'attente de la suivante. Figer: `mode: 'fixed'` et `fixedScale`, ou `?echelle=1` (de 0,5 à 1, ou `auto`). En rendu logiciel (tests, banc) elle reste à 100 %.
+Sur un processeur graphique intégré (`resolution.integrated`: nom contenant « Intel »), l'échelle adaptative part d'au plus 1600 x 900 points internes, et ses paliers s'appliquent à ce départ (elle sait descendre, mais à 30 images par seconde calées sur l'écran elle ne remonte pas: d'où un départ sûr). Le canevas est opaque, sans profondeur ni pochoir (`inkContext`). La scène et le contour se calculent à une échelle interne (`INK_SETTINGS.resolution`: paliers 100, 85, 75, 70 %), puis l'image finie est mise à l'échelle du canevas (bicubique bornée, cinq lectures). Elle descend d'un palier quand la moyenne des images dépasse 30 images par seconde de budget, remonte quand le palier du dessus tiendrait avec de la marge, et une remontée ratée double l'attente de la suivante. Figer: `mode: 'fixed'` et `fixedScale`, ou `?echelle=1` (de 0,5 à 1, ou `auto`). En rendu logiciel (tests, banc) elle reste à 100 %.
 
 Ce n'est pas un second niveau de rendu: mêmes passes, mêmes effets. Les seuils de détail, les rangs du trait, le pas des hachures des personnages et la taille des particules se comptent en points du canevas, pas de la cible interne: l'image garde la même composition à tous les paliers, seule sa finesse varie.
 
