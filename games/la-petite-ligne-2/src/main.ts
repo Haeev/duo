@@ -18,6 +18,7 @@ import { createCharacterPreview } from './rendu/personnages/apercu';
 import { createGameObjectViewer } from './rendu/objets/index';
 import { createSession } from './session';
 import { createGameAudio } from './audio/index';
+import { createSurfaceLookup } from './audio/sol';
 import { createGameMusic } from './audio/musique/index';
 import { DEFAULT_UI_SETTINGS } from './interface/carnet/lectures';
 import { memorySettings } from './interface/carnet/options';
@@ -66,6 +67,7 @@ const sound = createGameAudio({
   view: session.view,
   random: duo.random('son'),
   cameraYaw: () => renderer?.cameraYaw() ?? 0,
+  surfaceAt: createSurfaceLookup(session.view, (x, y) => renderer?.surfaceAt(x, y) ?? null),
   warn: (message, data) => {
     duo.log.warn(message, data);
   },

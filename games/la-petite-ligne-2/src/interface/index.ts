@@ -440,6 +440,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'villager_left':
       case 'villager_reacted':
       case 'calendar_ended':
+      case 'clock_struck':
       case 'calendar_started':
       case 'collection_completed':
       case 'collection_found':
@@ -475,7 +476,10 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   const keyTarget = options.keyTarget ?? window;
   const kitchen = createKitchen(layer, view, send, keyLabel, keyTarget, {
     onCue: (cue) => {
-      if (cue.type === 'mark') options.onCue?.('choix');
+      if (cue.type === 'mark')
+        options.onCue?.(
+          cue.kind === 'season' || cue.kind === 'plate' ? 'choix' : `cuisine-${cue.kind}`,
+        );
       else if (cue.type === 'dish') options.onCue?.('poser');
     },
   });
@@ -531,6 +535,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       send,
       keyLabel,
       keyTarget,
+      onCue: (cue: string) => options.onCue?.(cue),
     },
     ...(options.projectToScreen === undefined ? {} : { projectToScreen: options.projectToScreen }),
   });

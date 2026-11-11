@@ -423,8 +423,17 @@ function decoIntent(sim: SimContext, player: PlayerIndex, ctx: Ctx, intent: Inte
       if (at.x === held.x && at.y === held.y && at.rotation === held.rotation) return;
       held.x = at.x;
       held.y = at.y;
+      const turned = at.rotation !== held.rotation;
       held.rotation = at.rotation;
       sim.touch('place');
+      if (turned)
+        sim.emit({
+          type: 'deco_changed',
+          player,
+          action: 'rotate',
+          prop: held.prop,
+          item: held.type,
+        });
       return;
     }
     case 'deco_drop': {

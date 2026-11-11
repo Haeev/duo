@@ -52,8 +52,11 @@ export const EventRuleSchema = v.strictObject({
   sound: IdSchema,
   /** Champ de l'événement qui désigne le joueur acteur (`player` par défaut; `to`, `who`). */
   actor: v.exactOptional(v.picklist(['player', 'from', 'to', 'who']), 'player'),
-  /** `own`: seul l'acteur l'entend (retour privé); `both`: les deux, l'autre un peu plus bas. */
-  audience: v.picklist(['own', 'both']),
+  /**
+   * `own`: seul l'acteur l'entend (retour privé); `both`: les deux, l'autre un peu plus bas;
+   * `other`: seulement l'autre joueur (l'acteur a déjà eu son signal immédiat de l'interface).
+   */
+  audience: v.picklist(['own', 'both', 'other']),
   /** Joué à la position de l'acteur (écoute placée) ou sans position. */
   placed: v.boolean(),
 });

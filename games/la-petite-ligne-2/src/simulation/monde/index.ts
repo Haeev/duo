@@ -8,6 +8,7 @@ import type { GameSystem, SimContext } from '../noyau/systemes';
 import { remember } from '../regles/memoire';
 import { noteMemories } from '../regles/souvenirs';
 import { activeEvents, announcedFor } from './agenda';
+import { stepBell } from './cloche';
 import { morningWeather, weatherAt } from './meteo';
 
 /**
@@ -82,6 +83,7 @@ function step(sim: SimContext): void {
   }
   memo.active = now;
   noteMemories(sim);
+  stepBell(sim);
 }
 
 export const worldTimeSystem: GameSystem = { id: 'monde', step };

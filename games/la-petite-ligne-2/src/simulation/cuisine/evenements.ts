@@ -2,6 +2,7 @@
 import * as v from 'valibot';
 import { IdSchema, IntSchema, PlayerIndexSchema } from '../../donnees/schemas/communs';
 import { STATIONS } from '../../donnees/schemas/briques';
+import { COOK_STEP_KINDS } from '../../donnees/schemas/recette';
 
 const Part = v.picklist([0, 1]);
 const Grade = v.pipe(IntSchema, v.minValue(1), v.maxValue(3));
@@ -33,6 +34,8 @@ export const COOK_EVENTS = [
     grade: Grade,
     /** Faite avant l'étape qu'elle attend (repas à deux): un cran de moins. */
     early: v.boolean(),
+    /** Nature du geste (pour le son chez l'autre joueur); facultative. */
+    kind: v.exactOptional(v.picklist(COOK_STEP_KINDS)),
   }),
   /** Une part d'un repas à deux est prête: on attend l'autre. */
   v.strictObject({
