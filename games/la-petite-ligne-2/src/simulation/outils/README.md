@@ -6,7 +6,7 @@ La touche d'action fait la bonne chose selon l'outil en main et la cible. Chaque
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `outils.ts`     | l'objet tenu, niveau, points et cases par coup, durée d'un coup (`toolSpeed` des besoins), `strike` (usure par `wearTool`, faim, saleté par `soil`) |
 | `ressources.ts` | brique `harvest`: coups cumulés, butin, repousse en jours; `resourceReady`, `resourceProgress` pour le rendu                                        |
-| `butin.ts`      | tables de butin: heure, météo, saison, `rareLuck`, `extraCatch`                                                                                     |
+| `butin.ts`      | tables de butin: heure, météo, saison, pluie de la veille (`rainedYesterday`, `rainedOn` de `monde/meteo.ts`), `rareLuck`, `extraCatch`             |
 | `forge.ts`      | amélioration et réparation payée: `upgradeOf`, `repairCostOf`, intentions `tool_upgrade` et `tool_repair_paid`                                      |
 | `saison.ts`     | saison du jour, plages d'heures, pluie                                                                                                              |
 | `briques.ts`    | les deux briques pour le registre (`briques/registre.ts`)                                                                                           |

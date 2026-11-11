@@ -90,7 +90,7 @@ Cinq ajouts de données, sans ligne de moteur (gabarits commentés: `_gabarits/l
 Exemple: les trouvailles de berge d'Aubrune (`coquilles-de-greve`, `plumes-de-heron`...; `docs/jeux/jeu-1/refonte/carte-aubrune/plan.md`, section 19).
 
 1. `pnpm nouveau objet <objet>`: nom, famille (`material`, `treasure` pour un trésor), pile (coquillage, plume: 10).
-2. `pnpm nouveau ressource <sorte-de-rive>`: `kind: "pick"`, verbe « Ramasser », `respawnDays`, et le butin: une ligne par condition (`hours` pour l'aube, `weathers` pour la pluie, `seasons`), `rare: true` et un petit poids pour la surprise.
+2. `pnpm nouveau ressource <sorte-de-rive>`: `kind: "pick"`, verbe « Ramasser », `respawnDays`, et le butin: une ligne par condition (`hours` pour l'aube, `rainedYesterday` pour « après la pluie »: `true` si la veille a plu au moins une heure de jour, `false` après un jour sec; `weathers` pour le temps du moment, `seasons`), `rare: true` et un petit poids pour la surprise.
 3. `pnpm nouveau meuble <sorte-de-rive>` (même identifiant): `solid: false`, brique `{ "brick": "harvest", "resource": "<sorte-de-rive>" }`, un modèle existant en attendant le sien.
 4. Une ligne `buys` chez le commerçant du métier (`lieux/<lieu>/commerces/`), au prix de l'économie.
 5. Un point de plus: une ligne dans `TROUVAILLES` de `construire_plan.py` (case au bord de l'eau, raison d'être), puis la chaîne du plan et `controler_trouvailles.py` (0 erreur).

@@ -12,6 +12,7 @@ import { startTalk } from '../src/simulation/dialogues/conversation';
 import type { Sim } from '../src/simulation/noyau/pas';
 import { evaluateAll } from '../src/simulation/regles/conditions';
 import { remember } from '../src/simulation/regles/memoire';
+import { RULES } from '../src/simulation/regles/reglages';
 import { giveItem } from '../src/simulation/sac/actions';
 import { act, contentWith, contextOf, wait } from './aides-l3';
 import { visit } from './aides-visite';
@@ -332,6 +333,46 @@ describe("vie quotidienne des habitants d'Aubrune", () => {
         for (const item of list ?? []) expect(item in items, `${v}: ${item}`).toBe(true);
       }
     }
+  });
+
+  it('confidences aux seuils du cahier (4.9): la première à 2 cœurs, la seconde à 4', () => {
+    const per = RULES.bonds.perHeart;
+    for (const v of villagers) {
+      const thresholds = dialoguesOf(v)
+        .filter((d) => d.id.includes('-secret-'))
+        .map((d) => Math.min(...typed(d.when, 'bond_at_least').map((c) => Number(c.points))))
+        .sort((a, b) => a - b);
+      expect(thresholds, `confidences de ${v}`).toEqual([2 * per, 4 * per]);
+    }
+  });
+
+  it('Armand offre ses clarinettes au duo après sa seconde confidence, une seule fois', () => {
+    const sim = freshSim();
+    for (const key of ['acte1.fini', 'acte2.train', 'acte2.fini', 'decor.cafe-ouvert'])
+      remember(contextOf(sim), `aubrune.${key}`, true, 'duo');
+    for (const p of [0, 1] as const) {
+      sim.world.progress.bonds[bondKey('armand', p)] = 4 * RULES.bonds.perHeart;
+      remember(contextOf(sim), `dialogues.aubrune.armand-secret-squelette.j${String(p)}`, true, p);
+      sim.world.players[p].needs.hygiene = 100;
+    }
+    sim.world.minutes = 780;
+    wait(sim, 1);
+    const clarinets = (p: PlayerIndex): number => {
+      const me = sim.world.players[p];
+      return [...me.toolbar, ...(me.bag?.slots ?? [])].reduce(
+        (n, stack) => n + (stack?.item === 'clarinette' ? stack.count : 0),
+        0,
+      );
+    };
+    const heard: [string[], string[]] = [[], []];
+    for (const p of [0, 1] as const)
+      for (let i = 0; i < 8 && !heard[p].some((n) => n.startsWith('armand-quotidien')); i++)
+        heard[p].push(...talk(sim, p, 'armand'));
+    expect(heard[0]).toContain('armand-secret-redactions#etui-1');
+    expect(heard[1]).toContain('armand-secret-redactions#n4');
+    expect(heard[1]).not.toContain('armand-secret-redactions#etui-1');
+    expect([clarinets(0), clarinets(1)]).toEqual([1, 1]);
+    expect(content.items.clarinette?.instrument?.tier).toBe(1);
   });
 
   it("aucun dialogue du quotidien ne passe devant une étape d'histoire", () => {

@@ -2,13 +2,15 @@
  * Le poste d'un joueur à l'instrument: tout ce que sa machine sait et fait pendant un air, sans
  * écran ni carte son (pur, testé dans Node avec un réseau lent). Il lit les événements de l'hôte,
  * juge les frappes du joueur (`local.ts`), fait entendre l'autre (`partenaire.ts`), et rend un
- * modèle à dessiner. L'écran (`interface/musique/`) et le son (`audio/musique/scene.ts`) ne font
+ * modèle à dessiner. Celui qui ne joue pas entend l'autre jouer quand il est à portée (même
+ * chemin que la voix de l'autre dans un duo), plus bas à mesure qu'il s'éloigne. L'écran (`interface/musique/`) et le son (`audio/musique/scene.ts`) ne font
  * que le servir.
  */
 import type { Content } from '../../donnees/charger';
 import type { AirNote, AirScore } from '../../donnees/schemas/air';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../../etat/monde';
+import { assistFactor } from '../aide';
 import { modifiersOf } from '../besoins/jauges';
 import type { Intent } from '../noyau/entrees';
 import type { GameEvent } from '../noyau/evenements';
@@ -17,7 +19,7 @@ import { windowScaleOf, windowsOf } from './jugement';
 import { heldInstrument, leadMs, notesOf, songbook, type SongbookLine } from './lecture';
 import { createPerformance, type Hit, type Performance } from './local';
 import { createPartnerVoice, type PartnerVoice } from './partenaire';
-import { MUSIC, type AssistLevel, type Rating, type Verdict } from './reglages';
+import { MUSIC, type Rating, type Verdict } from './reglages';
 
 /** Ce que le poste demande au son de la machine. */
 export interface StageSound {
@@ -47,6 +49,11 @@ export interface StageSound {
   }): number;
   /** Une note déjà partie se met à sonner faux. */
   sour(id: number): void;
+  /**
+   * Niveau de tout l'air (accompagnement et notes), de 0 à 1: 1 pour qui joue, selon la distance
+   * pour qui écoute. Appelé au lancement, puis à chaque image pour qui écoute.
+   */
+  level(gain: number): void;
   /** Fin ou abandon: l'accompagnement s'efface, la musique du lieu revient. */
   stop(): void;
 }
@@ -58,8 +65,6 @@ export interface DeskOptions {
   send(intent: Intent): void;
   /** Heure de session commune aux deux machines (`net.sessionTimeMs`). */
   sessionNow(): number;
-  /** Cran de l'aide de ce joueur, lu à l'ouverture du cahier. */
-  assist(): AssistLevel;
   readonly sound: StageSound;
 }
 
@@ -124,8 +129,21 @@ export interface Desk {
   isOpen(): boolean;
 }
 
+/** La voix de l'autre telle que cette machine la fait entendre (duo, ou écoute à distance). */
+interface Heard {
+  readonly voice: VoiceId;
+  readonly notes: readonly AirNote[];
+  readonly verdicts: (Verdict | null)[];
+  readonly plan: PartnerVoice;
+  readonly timbre: string;
+  /** Notes de l'autre déjà parties, par rang, pour les faire sonner faux après coup. */
+  readonly sounding: Map<number, number>;
+}
+
 type State =
   | { kind: 'closed' }
+  /** L'autre joue sans nous: on l'entend d'où l'on est, sans écran. */
+  | { kind: 'listen'; target: string; startAtMs: number; performer: PlayerIndex; heard: Heard }
   | { kind: 'book'; target: string; selected: number; partner: boolean }
   | { kind: 'wait'; target: string }
   | {
@@ -136,15 +154,7 @@ type State =
       lead: number;
       startAtMs: number;
       mine: { voice: VoiceId; game: Performance; timbre: string };
-      partner: {
-        voice: VoiceId;
-        notes: readonly AirNote[];
-        verdicts: (Verdict | null)[];
-        plan: PartnerVoice;
-        timbre: string;
-        /** Notes de l'autre déjà parties, par rang, pour les faire sonner faux après coup. */
-        sounding: Map<number, number>;
-      } | null;
+      partner: Heard | null;
       last: { verdict: Verdict; lane: number; atMs: number } | null;
     }
   | {
@@ -155,6 +165,14 @@ type State =
 
 const RESULT_MS = 9000;
 const FALLBACK_TIMBRE = 'cornet';
+
+/** Niveau d'un air entendu à `distance` mètres de qui le joue (`MUSIC.listen`), de 0 à 1. */
+export function listenGain(distance: number): number {
+  const { nearM, farM } = MUSIC.listen;
+  if (distance <= nearM) return 1;
+  if (distance >= farM) return 0;
+  return (farM - distance) / (farM - nearM);
+}
 
 function voiceName(content: Content, air: string, voice: VoiceId): string {
   const voices = content.airs[air]?.voices;
@@ -169,8 +187,73 @@ export function createDesk(options: DeskOptions): Desk {
   let known: readonly string[] = [];
 
   function close(): void {
-    if (state.kind === 'play') sound.stop();
+    if (state.kind === 'play' || state.kind === 'listen') sound.stop();
     state = { kind: 'closed' };
+  }
+
+  function heardOf(score: AirScore, voice: VoiceId, player: PlayerIndex): Heard {
+    const notes = notesOf(score, voice);
+    return {
+      voice,
+      notes,
+      verdicts: notes.map(() => null),
+      plan: createPartnerVoice(notes),
+      timbre: timbreOf(player),
+      sounding: new Map(),
+    };
+  }
+
+  /** Les notes de l'autre à programmer d'ici l'avance de programmation. */
+  function schedule(heard: Heard, now: number): void {
+    for (const command of heard.plan.plan(now)) {
+      const written = heard.notes[command.index];
+      if (written === undefined || command.type !== 'play') continue;
+      heard.sounding.set(
+        command.index,
+        sound.note({
+          who: 'partner',
+          timbre: heard.timbre,
+          midi: written[2],
+          atMs: command.atMs,
+          ms: written[3],
+          sour: false,
+        }),
+      );
+    }
+  }
+
+  /** Un verdict de l'autre validé par l'hôte: sa voix se corrige (couac, silence, reprise). */
+  function correct(heard: Heard, index: number, verdict: Verdict): void {
+    heard.verdicts[index] = verdict;
+    const written = heard.notes[index];
+    for (const command of heard.plan.result(index, verdict, clock())) {
+      if (written === undefined) continue;
+      if (command.type === 'sour') {
+        const id = heard.sounding.get(command.index);
+        if (id !== undefined) sound.sour(id);
+      } else
+        heard.sounding.set(
+          command.index,
+          sound.note({
+            who: 'partner',
+            timbre: heard.timbre,
+            midi: written[2],
+            atMs: command.type === 'play' && !command.late ? command.atMs : null,
+            ms: written[3],
+            sour: command.type === 'couac',
+          }),
+        );
+    }
+  }
+
+  /** Niveau de l'air pour qui écoute: selon sa distance à qui joue. */
+  function listenLevel(performer: PlayerIndex): number {
+    const world = options.world();
+    const me = options.local();
+    if (world === null || me === null) return 0;
+    const a = world.players[me].body;
+    const b = world.players[performer].body;
+    return listenGain(Math.hypot(a.x - b.x, a.y - b.y));
   }
 
   function timbreOf(player: PlayerIndex): string {
@@ -186,7 +269,7 @@ export function createDesk(options: DeskOptions): Desk {
   }
 
   function clock(): number {
-    if (state.kind !== 'play') return 0;
+    if (state.kind !== 'play' && state.kind !== 'listen') return 0;
     return sound.airNow() ?? options.sessionNow() - state.startAtMs;
   }
 
@@ -202,7 +285,7 @@ export function createDesk(options: DeskOptions): Desk {
       case 'music_opened':
         if (event.player === me) {
           known = event.airs;
-          options.send({ type: 'music_assist', level: options.assist() });
+          if (state.kind === 'listen') sound.stop();
           state =
             event.leader === me
               ? { kind: 'book', target: event.target, selected: 0, partner: false }
@@ -212,14 +295,29 @@ export function createDesk(options: DeskOptions): Desk {
       case 'music_started': {
         const voice = event.voices[me];
         const score = content.airs[event.air]?.score;
-        if (voice === null || score === undefined) break;
+        if (score === undefined) break;
+        const mate: PlayerIndex = me === 0 ? 1 : 0;
+        const mateVoice = event.voices[mate];
+        const lead = leadMs(score);
+        if (voice === null) {
+          // L'autre joue sans nous: on l'entend d'où l'on est (rien à l'écran).
+          if (mateVoice === null || (state.kind !== 'closed' && state.kind !== 'result')) break;
+          state = {
+            kind: 'listen',
+            target: event.target,
+            startAtMs: event.startAtMs,
+            performer: mate,
+            heard: heardOf(score, mateVoice, mate),
+          };
+          sound.start({ air: event.air, score, startAtMs: event.startAtMs, leadMs: lead });
+          sound.level(listenLevel(mate));
+          break;
+        }
         if (state.kind !== 'book' && state.kind !== 'wait') break;
         const world = options.world();
         const needs = world === null ? 1 : modifiersOf(content, world, me).minigame;
-        const mate: PlayerIndex = me === 0 ? 1 : 0;
-        const mateVoice = event.voices[mate];
-        const mateNotes = mateVoice === null ? null : notesOf(score, mateVoice);
-        const lead = leadMs(score);
+        // Aide réglable du joueur (`simulation/aide/`): l'hôte la fige au même instant.
+        const assist = world === null ? 1 : assistFactor(world, me);
         state = {
           kind: 'play',
           target: event.target,
@@ -229,54 +327,29 @@ export function createDesk(options: DeskOptions): Desk {
           startAtMs: event.startAtMs,
           mine: {
             voice,
-            game: createPerformance(
-              notesOf(score, voice),
-              windowsOf(windowScaleOf(options.assist(), needs)),
-            ),
+            game: createPerformance(notesOf(score, voice), windowsOf(windowScaleOf(assist, needs))),
             timbre: timbreOf(me),
           },
-          partner:
-            mateVoice === null || mateNotes === null
-              ? null
-              : {
-                  voice: mateVoice,
-                  notes: mateNotes,
-                  verdicts: mateNotes.map(() => null),
-                  plan: createPartnerVoice(mateNotes),
-                  timbre: timbreOf(mate),
-                  sounding: new Map(),
-                },
+          partner: mateVoice === null ? null : heardOf(score, mateVoice, mate),
           last: null,
         };
         sound.start({ air: event.air, score, startAtMs: event.startAtMs, leadMs: lead });
+        sound.level(1);
         break;
       }
       case 'music_note': {
-        if (state.kind !== 'play' || event.player === me || state.partner === null) break;
-        const partner = state.partner;
-        partner.verdicts[event.index] = event.verdict;
-        const written = partner.notes[event.index];
-        for (const command of partner.plan.result(event.index, event.verdict, clock())) {
-          if (written === undefined) continue;
-          if (command.type === 'sour') {
-            const id = partner.sounding.get(command.index);
-            if (id !== undefined) sound.sour(id);
-          } else
-            partner.sounding.set(
-              command.index,
-              sound.note({
-                who: 'partner',
-                timbre: partner.timbre,
-                midi: written[2],
-                atMs: command.type === 'play' && !command.late ? command.atMs : null,
-                ms: written[3],
-                sour: command.type === 'couac',
-              }),
-            );
-        }
+        if (event.player === me) break;
+        if (state.kind === 'play' && state.partner !== null)
+          correct(state.partner, event.index, event.verdict);
+        else if (state.kind === 'listen' && event.player === state.performer)
+          correct(state.heard, event.index, event.verdict);
         break;
       }
       case 'music_finished': {
+        if (state.kind === 'listen' && state.target === event.target) {
+          close();
+          break;
+        }
         if (state.kind !== 'play' || state.target !== event.target) break;
         const mine = event.results[me];
         sound.stop();
@@ -302,7 +375,8 @@ export function createDesk(options: DeskOptions): Desk {
         break;
       }
       case 'music_closed':
-        if (event.player === me) close();
+        if (event.player === me || (state.kind === 'listen' && event.player === state.performer))
+          close();
         else if (state.kind === 'book' && state.target === event.target) state.partner = false;
         break;
       case 'refused':
@@ -321,26 +395,15 @@ export function createDesk(options: DeskOptions): Desk {
         if (state.age > RESULT_MS) state = { kind: 'closed' };
         return;
       }
+      if (state.kind === 'listen') {
+        sound.level(listenLevel(state.performer));
+        schedule(state.heard, clock());
+        return;
+      }
       if (state.kind !== 'play') return;
       const now = clock();
       for (const hit of state.mine.game.advance(now)) sendHit(hit);
-      const partner = state.partner;
-      if (partner === null) return;
-      for (const command of partner.plan.plan(now)) {
-        const written = partner.notes[command.index];
-        if (written === undefined || command.type !== 'play') continue;
-        partner.sounding.set(
-          command.index,
-          sound.note({
-            who: 'partner',
-            timbre: partner.timbre,
-            midi: written[2],
-            atMs: command.atMs,
-            ms: written[3],
-            sour: false,
-          }),
-        );
-      }
+      if (state.partner !== null) schedule(state.partner, now);
     },
     move(delta) {
       if (state.kind !== 'book') return;
@@ -363,7 +426,7 @@ export function createDesk(options: DeskOptions): Desk {
       });
     },
     leave() {
-      if (state.kind === 'closed') return;
+      if (state.kind === 'closed' || state.kind === 'listen') return;
       if (state.kind !== 'result') options.send({ type: 'music_leave' });
       close();
     },
@@ -389,6 +452,7 @@ export function createDesk(options: DeskOptions): Desk {
     view() {
       switch (state.kind) {
         case 'closed':
+        case 'listen':
           return { kind: 'closed' };
         case 'book':
           return {
@@ -426,6 +490,6 @@ export function createDesk(options: DeskOptions): Desk {
           return state.view;
       }
     },
-    isOpen: () => state.kind !== 'closed',
+    isOpen: () => state.kind !== 'closed' && state.kind !== 'listen',
   };
 }

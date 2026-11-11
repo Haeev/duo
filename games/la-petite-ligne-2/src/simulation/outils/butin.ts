@@ -6,14 +6,25 @@ import type { LootEntry, ResourceDef } from '../../donnees/schemas/recolte';
 import type { ReadonlyWorld } from '../../etat/monde';
 import type { Content } from '../../donnees/charger';
 import type { SimContext } from '../noyau/systemes';
+import { rainedOn } from '../monde/meteo';
+import { HARVEST_TUNING } from './reglages';
 import { allows, inHours, seasonOf } from './saison';
 
-/** L'entrée peut-elle tomber maintenant (heure, météo, saison) ? */
+/** L'entrée peut-elle tomber maintenant (heure, météo, saison, pluie de la veille) ? */
 export function lootAvailable(content: Content, world: ReadonlyWorld, entry: LootEntry): boolean {
   return (
     inHours(entry.hours, world.minutes) &&
     allows(entry.weathers, world.common.weather) &&
-    allows(entry.seasons, seasonOf(content.settings.clock, world.common.day))
+    allows(entry.seasons, seasonOf(content.settings.clock, world.common.day)) &&
+    (entry.rainedYesterday === undefined ||
+      entry.rainedYesterday ===
+        rainedOn(
+          content,
+          world.seed,
+          world.common.place,
+          world.common.day - 1,
+          HARVEST_TUNING.rainedYesterdayMinutes,
+        ))
   );
 }
 

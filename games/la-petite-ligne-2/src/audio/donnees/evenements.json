@@ -323,6 +323,7 @@
       "sound": "draisine-avertissement",
       "audience": "both",
       "placed": false
-    }
+    },
+    { "on": "vehicle_bell", "sound": "clochette-boutique", "audience": "both", "placed": false }
   ]
 }

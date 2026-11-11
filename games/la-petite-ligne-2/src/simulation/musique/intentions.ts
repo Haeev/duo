@@ -8,11 +8,6 @@ import { LANES } from '../../donnees/schemas/air';
 
 export const MUSIC_INTENTS = [
   /**
-   * Cran de l'aide de ce joueur (0, 1, 2), dit à l'hôte seul à l'ouverture du cahier: il élargit
-   * ses fenêtres. Aucun événement ne le répète: l'autre joueur ne le voit jamais.
-   */
-  v.strictObject({ type: v.literal('music_assist'), level: v.picklist([0, 1, 2]) }),
-  /**
    * Lancer l'air choisi (celui qui a ouvert le cahier). `startAtMs`: instant du premier temps sur
    * l'heure de session commune (`net.sessionTimeMs`), pour que les deux machines partent ensemble;
    * l'hôte, lui, compte en pas de simulation à partir de la réception.

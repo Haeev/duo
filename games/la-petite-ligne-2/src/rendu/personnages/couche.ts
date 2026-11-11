@@ -30,7 +30,7 @@ import {
 } from 'three';
 import { DECOR_MANIFEST } from '../lieu/decors-manifeste';
 import { clampAlongSeat, type Leg, LegPose, solveLeg } from './assise';
-import type { Look } from '../../donnees/schemas/personnage';
+import type { Look, Slot } from '../../donnees/schemas/personnage';
 import type { DeepReadonly } from '../../etat/monde';
 import type { Body, PlayerState } from '../../etat/joueur';
 import type { GameEvent } from '../../simulation/noyau/evenements';
@@ -65,6 +65,7 @@ import {
   lookKey,
   resolveLook,
   silhouetteLook,
+  withoutSlots,
 } from './apparence';
 import {
   type AssembledGeometry,
@@ -114,6 +115,8 @@ interface Figure extends Aimable {
   readonly face: Face;
   readonly fadable: Fadable;
   lookRef: unknown;
+  /** Emplacements ôtés pour la posture (`lie.removes` couché, aucun sinon). */
+  strip: readonly Slot[];
   placed: boolean;
   x: number;
   y: number;
@@ -139,6 +142,8 @@ const size = new Vector2();
 const cameraPoint = new Vector3();
 const blobPoint = new Vector3();
 const lying: LyingPose = { x: 0, y: 0, facing: 0, height: 0 };
+/** Aucun emplacement ôté (même référence partout: la comparaison de `ensure` est une identité). */
+const NONE: readonly Slot[] = [];
 
 /** Pastille dégradée de l'ombre de contact (texture calculée, sans canevas). */
 function contactTexture(opacity: number): DataTexture {
@@ -433,6 +438,7 @@ export class AssembledCharacters implements CharacterLayer {
       face: new Face(hashString(id)),
       fadable,
       lookRef: null,
+      strip: NONE,
       placed: false,
       x: 0,
       y: 0,
@@ -476,23 +482,28 @@ export class AssembledCharacters implements CharacterLayer {
     library: CharacterLibrary,
     /** Teinte unique d'une silhouette (apparence pas encore révélée), `null`: les vraies couleurs. */
     shade: string | null = null,
+    /** Emplacements ôtés pour la posture du moment (coiffe au lit). */
+    strip: readonly Slot[] = NONE,
   ): Figure {
-    if (current !== null && current.lookRef === lookRef) return current;
-    const look = lookOf();
+    if (current !== null && current.lookRef === lookRef && current.strip === strip) return current;
+    const look = withoutSlots(lookOf(), strip);
     const key = shadedKey(
       lookKey(resolveLook(look, library.catalogue, library.morphologies)),
       shade,
     );
     if (current !== null && current.key === key && current.chosenHeight === look.height) {
       current.lookRef = lookRef;
+      current.strip = strip;
       return current;
     }
     const next = this.create(id, look, library, shade);
     next.lookRef = lookRef;
+    next.strip = strip;
     if (current !== null) {
       next.x = current.x;
       next.y = current.y;
       next.facing = current.facing;
+      next.ground = current.ground;
       next.placed = current.placed;
       this.remove(current);
     }
@@ -824,22 +835,28 @@ export class AssembledCharacters implements CharacterLayer {
       const player = frame.world.players[index];
       // Avant la photo (fait « apparence révélée » absent): une silhouette, la même pour les deux.
       const revealed = lookRevealed(frame.world, index);
-      const figure = revealed
-        ? this.ensure(
-            this.players[index],
-            `player-${String(index)}`,
-            player.look ?? `default-${player.gender ?? ''}`,
-            () => this.playerLook(index, player, library),
-            library,
-          )
-        : this.ensure(
-            this.players[index],
-            `player-${String(index)}`,
-            SILHOUETTE,
-            () => this.hiddenLook(library),
-            library,
-            this.settings.silhouette.color,
-          );
+      const dress = (strip: readonly Slot[]): Figure =>
+        revealed
+          ? this.ensure(
+              this.players[index],
+              `player-${String(index)}`,
+              player.look ?? `default-${player.gender ?? ''}`,
+              () => this.playerLook(index, player, library),
+              library,
+              null,
+              strip,
+            )
+          : this.ensure(
+              this.players[index],
+              `player-${String(index)}`,
+              SILHOUETTE,
+              () => this.hiddenLook(library),
+              library,
+              this.settings.silhouette.color,
+              strip,
+            );
+      // Posture de l'image passée d'abord (la taille ne dépend pas des pièces), corrigée ci-dessous.
+      let figure = dress(this.players[index]?.strip ?? NONE);
       this.players[index] = figure;
       const seat = this.seatOf(frame, index);
       let held: string | null = null;
@@ -860,6 +877,9 @@ export class AssembledCharacters implements CharacterLayer {
         this.settings.lie.fallback,
         lying,
       );
+      // Coiffe ôtée au coucher, remise au lever.
+      figure = dress(lies === null ? NONE : this.settings.lie.removes);
+      this.players[index] = figure;
       figure.face.hold(lies === null ? held : this.settings.lie.expression);
       const ride = frame.riders?.[index] ?? null;
       if (lies !== null) this.lie(figure, lies, frame.dt);
@@ -875,7 +895,8 @@ export class AssembledCharacters implements CharacterLayer {
       const state = frame.place.villagers[id];
       if (state === undefined) continue;
       const { ref, look } = this.villagerLook(placeId, id, library);
-      const figure = this.ensure(this.villagers.get(id) ?? null, id, ref, look, library);
+      const previous = this.villagers.get(id) ?? null;
+      let figure = this.ensure(previous, id, ref, look, library, null, previous?.strip ?? NONE);
       this.villagers.set(id, figure);
       // La vie de l'habitant (planning): absent, assis sur une vraie place, ou en plein geste.
       const life = villagerView({ content: this.view.content, world: frame.world }, id);
@@ -907,6 +928,11 @@ export class AssembledCharacters implements CharacterLayer {
               lying,
             )
           : null;
+      const strip = lies === null ? NONE : this.settings.lie.removes;
+      if (strip !== figure.strip) {
+        figure = this.ensure(figure, id, ref, look, library, null, strip);
+        this.villagers.set(id, figure);
+      }
       figure.face.hold(lies === null ? null : this.settings.lie.expression);
       if (lies !== null) {
         this.lie(figure, lies, frame.dt);

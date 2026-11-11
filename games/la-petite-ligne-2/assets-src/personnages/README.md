@@ -40,7 +40,7 @@ Douze pièces à gagner (étiquette `a-gagner`), toutes faites par le script, au
 | `accessory-neckerchief` | Foulard | récompense |
 | `accessory-apron` | Tablier | récompense |
 
-Brique qui manque pour la vente: un commerce ne vend que des objets (`sells[].item`). Il faudrait une ligne de vente de pièce (`{ "piece": "<id>", "price": 2800 }` dans `sells`, ou un objet de famille `clothing` avec un champ `piece`, comme `bag`) dont l'achat appelle `givePiece` (`src/simulation/regles/recompenses.ts`). D'ici là, les six pièces `mercerie` restent à gagner; leur `prix` est dans `gabarits.toml` (non exporté). Les pièces à gagner peuvent être portées par les habitants (tirage de `composeLook`), jamais par le look de départ d'un joueur.
+Vente: une ligne `pieces` du commerce (`{ "piece": "<id>", "price": 2800 }`, schéma `src/donnees/schemas/commerce.ts`) met en vente une pièce `a-gagner`; l'achat l'ajoute à la garde-robe de l'acheteur seul. Le `prix` de référence des pièces `mercerie` est dans `gabarits.toml` (non exporté). Les pièces à gagner peuvent être portées par les habitants (tirage de `composeLook`), jamais par le look de départ d'un joueur.
 
 Le gilet `accessory-vest` a été refait le 2026-11-11 (même id, trois zones au lieu d'une: les apparences qui le portent restent valides, les zones nouvelles prennent leur couleur par défaut).
 

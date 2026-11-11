@@ -61,6 +61,11 @@ export const LootEntrySchema = v.strictObject({
   hours: v.nullable(v.strictObject({ from: MinuteOfDay, to: MinuteOfDay })),
   weathers: v.array(v.picklist(CATCH_WEATHERS)),
   seasons: v.array(v.picklist(SEASONS)),
+  /**
+   * Pluie de la veille dans le lieu (au moins une heure de `wateringWeathers` pendant le jour):
+   * `true` seulement après la pluie, `false` seulement après un jour sec, absent: les deux.
+   */
+  rainedYesterday: v.exactOptional(v.boolean()),
 });
 export type LootEntry = v.InferOutput<typeof LootEntrySchema>;
 
@@ -161,6 +166,10 @@ export function validateHarvestContent(content: Content): string[] {
     for (const entry of resource.loot) {
       item(path, entry.item);
       if (entry.max < entry.min) problems.push(`${path}, ${entry.item}: « max » sous « min »`);
+      if (entry.rainedYesterday === true && content.time.file.wateringWeathers.length === 0)
+        problems.push(
+          `${path}, ${entry.item}: « rainedYesterday » sans météo de pluie (« wateringWeathers » de temps.json vide)`,
+        );
     }
     if (resource.tool === null && resource.minTier > 0)
       problems.push(`${path}: « minTier » sans outil`);

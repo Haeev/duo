@@ -6,7 +6,7 @@ Auteur: game-designer, 2026-11-11. Suite de `ecriture-suites-secondaires.md`. So
 
 - 21 habitants écrits (les 20 du cahier et Martial Roques, qui arrive après la Veillée): 504 dialogues, 1 237 répliques dans `donnees/lieux/aubrune/dialogues/`.
 - Chacun a au moins 12 souvenirs (277 en tout, dont 217 nouveaux), 4 au moins sur ce qu'a fait l'autre joueur, un secret confié par amitié, des goûts, et des répliques selon l'heure, le lieu de son planning, la pluie et la brume.
-- Sept secrets nouveaux, en deux paliers (1 cœur, puis 2 cœurs): Anatole, Barnabé, Berthe, Léon, Margot, Paulin, Rosalie. Martial a le sien.
+- Sept secrets nouveaux, en deux paliers (2 cœurs, puis 4 cœurs, cahier 4.9): Anatole, Barnabé, Berthe, Léon, Margot, Paulin, Rosalie. Martial a le sien.
 - Depuis le 2026-11-11, les 21 habitants ont deux paliers: les douze qui n'en avaient qu'un ont leur seconde confidence, à 4 cœurs (section 10).
 - Deux trains réguliers font revenir les habitants de passage: celui du samedi (Rosalie) et l'autorail de 5 h 12 (le Contrôleur). Sans eux, leurs répliques ne s'entendraient jamais.
 
@@ -217,7 +217,7 @@ Chaque joueur a sa relation: l'un peut l'entendre des jours avant l'autre, et la
 
 **Un seul cadeau**, celui qui est juste: Odette donne la recette de la tourte du quai, « la recette de maman », le repas à deux postes qui manquait (audit B.11; `economie-aubrune.md`, section 2, « La tourte du quai »). Les autres confidences ne donnent rien: le plan du nichoir (`commun/plans/nichoir.json`, source `quest`, donné par personne) irait à Basile, mais l'objet ne se pose pas et ne plaît à personne; à brancher le jour où le nichoir sert à quelque chose.
 
-**Seuils.** Les douze secondes confidences suivent le cahier (4 cœurs). Les premières restent à 1 cœur, et les secondes des neuf autres habitants à 2 cœurs: l'écart cahier contre données (audit D.6) reste à trancher pour ces 30 fichiers, une valeur par fichier.
+**Seuils.** Toutes les confidences suivent le cahier (4.9): les premières à 2 cœurs (`bond_at_least` 200), les secondes à 4 cœurs (400), une valeur par fichier `*-secret-*.json` (écart de l'audit D.6 corrigé le 2026-11-11).
 
 **Ajouts au monde, à faire valider par le client** (le manager transmet): le sentiment tu d'Achille et de Colette (recommandation: garder, c'est la paire que deux joueurs se raconteront); l'aiguilleur de Marthe; le bras de signal de Mado; les nichoirs de Basile; Jeanne qui porte la brioche à la barrière.
 

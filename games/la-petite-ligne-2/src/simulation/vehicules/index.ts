@@ -22,6 +22,7 @@ import type { GameSystem, SimContext } from '../noyau/systemes';
 import { evaluateAll } from '../regles/conditions';
 import { applyEffects } from '../regles/effets';
 import { restVehicle } from './etat';
+import { walkerAhead } from './passants';
 import { ridersAboard, riddenBy, seatOf } from './places';
 import { strokeLever, type Stroke } from './pompe';
 import { SIM_HZ } from '../noyau/constantes';
@@ -46,6 +47,10 @@ interface Runtime {
   readonly ready: [boolean, boolean];
   /** Véhicules en marche: le départ ne s'annonce qu'une fois, quand il roule vraiment. */
   readonly rolling: Set<string>;
+  /** Véhicules qui cèdent la voie à un passant: la vitesse à reprendre quand elle sera libre. */
+  readonly held: Map<string, number>;
+  /** Véhicules arrêtés devant un passant: ils repartent avec un coup de timbre. */
+  readonly waiting: Set<string>;
 }
 
 const runtimes = new WeakMap<object, Runtime>();
@@ -53,7 +58,13 @@ const runtimes = new WeakMap<object, Runtime>();
 function runtimeOf(world: object): Runtime {
   let runtime = runtimes.get(world);
   if (runtime === undefined) {
-    runtime = { braking: [false, false], ready: [false, false], rolling: new Set() };
+    runtime = {
+      braking: [false, false],
+      ready: [false, false],
+      rolling: new Set(),
+      held: new Map(),
+      waiting: new Set(),
+    };
     runtimes.set(world, runtime);
   }
   return runtime;
@@ -166,7 +177,10 @@ function halt(
   end: boolean,
 ): void {
   state.speed = 0;
-  runtimeOf(sim.world).rolling.delete(def.id);
+  const runtime = runtimeOf(sim.world);
+  runtime.rolling.delete(def.id);
+  runtime.held.delete(def.id);
+  runtime.waiting.delete(def.id);
   state.stop = stopAt(line, def, state.s);
   // En bout de voie, le seul chemin est le retour: le sens s'inverse de lui-même.
   if (end) state.dir = state.dir === 1 ? -1 : 1;
@@ -227,20 +241,64 @@ function advance(
     state.stop = null;
     sim.emit({ type: 'vehicle_started', vehicle: def.id });
   }
-  if (state.speed > 0) {
-    const { roll, drag, brake: brakeForce, endBrake } = def.speed;
+
+  // Un passant sur la voie (habitant, joueur à pied): il lui cède, freine en douceur pour
+  // s'arrêter à `yield.gap` de lui, et repart quand la voie est libre. Jamais de choc.
+  const { endBrake } = def.speed;
+  const yielding = RAIL_VEHICLES.yield;
+  const placeState = sim.world.places[sim.world.common.place];
+  const free =
+    placeState === undefined
+      ? Infinity
+      : walkerAhead(sim.world, placeState, def, line, state, sim.content.settings.movement.radius);
+  const cap = Math.sqrt(2 * endBrake * Math.max(0, free - yielding.gap));
+  let held = runtime.held.get(def.id);
+  if (held !== undefined && (brake || ridersAboard(state) === 0)) {
+    // Frein serré ou plus personne à bord: il ne reprendra rien de lui-même.
+    runtime.held.delete(def.id);
+    held = undefined;
+    if (state.speed <= rest) halt(sim, def, line, state, false);
+  } else if (cap < state.speed || held !== undefined) {
+    held = Math.max(held ?? 0, state.speed);
+    runtime.held.set(def.id, held);
+  }
+
+  if (state.speed > 0 || held !== undefined) {
+    const { roll, drag, brake: brakeForce } = def.speed;
     let speed = state.speed - (roll + drag * state.speed + (brake ? brakeForce : 0)) * sim.dt;
+    if (held !== undefined) {
+      const waiting = runtime.waiting.has(def.id);
+      if (!waiting || free > yielding.gap + yielding.resume) {
+        if (waiting) {
+          // Voie libre: un petit coup de timbre, et il reprend sa vitesse.
+          runtime.waiting.delete(def.id);
+          sim.emit({ type: 'vehicle_bell', vehicle: def.id });
+        }
+        speed = Math.max(speed, Math.min(held, state.speed + yielding.accel * sim.dt));
+      }
+      speed = Math.min(speed, cap);
+    }
     limitsOf(sim, place, def, state.s, limits);
     const room = Math.max(0, roomAhead(state, limits));
     // Il freine de lui-même pour s'arrêter à la butée, jamais contre elle.
     speed = Math.min(speed, Math.sqrt(2 * endBrake * room));
     const end = room <= RAIL_VEHICLES.atEnd;
-    if (speed <= rest || end) halt(sim, def, line, state, end);
-    else {
+    if (end || (speed <= rest && held === undefined)) {
+      halt(sim, def, line, state, end);
+      sim.touch('place');
+    } else if (speed <= rest) {
+      // Arrêté devant le passant: il attend, sans être « arrêté » (ni arrêt, ni effets).
+      runtime.waiting.add(def.id);
+      if (state.speed !== 0) {
+        state.speed = 0;
+        sim.touch('place');
+      }
+    } else {
       state.speed = speed;
       state.s = Math.max(limits.min, Math.min(limits.max, state.s + state.dir * speed * sim.dt));
+      if (held !== undefined && speed >= held) runtime.held.delete(def.id);
+      sim.touch('place');
     }
-    sim.touch('place');
   }
 
   // Rythme perdu: l'indicateur retombe.

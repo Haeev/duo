@@ -13,6 +13,7 @@
 import type { AirScore } from '../../donnees/schemas/air';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { WorldState } from '../../etat/monde';
+import { assistFactor } from '../aide';
 import { modifiersOf } from '../besoins/jauges';
 import { isFound } from '../collections/registre';
 import { addBond } from '../dialogues/amitie';
@@ -35,10 +36,11 @@ import {
   notesOf,
   voicesFor,
 } from './lecture';
-import { MUSIC, type AssistLevel, type Rating, type Verdict } from './reglages';
+import { MUSIC, type Rating, type Verdict } from './reglages';
 
 interface Member {
-  assist: AssistLevel;
+  /** Aide du joueur (`assistFactor`), figée au lancement de l'air: sa machine juge avec la même. */
+  assist: number;
   voice: VoiceId;
   readonly verdicts: (Verdict | null)[];
 }
@@ -138,7 +140,7 @@ export function sitIn(
     };
     stage.recitals.push(recital);
   }
-  recital.members[player] = { assist: 0, voice: 'solo', verdicts: [] };
+  recital.members[player] = { assist: 1, voice: 'solo', verdicts: [] };
   sim.emit({
     type: 'music_opened',
     player,
@@ -205,6 +207,7 @@ function go(
     const voice = voices[p];
     if (member === null || voice === null) continue;
     member.voice = voice;
+    member.assist = assistFactor(sim.world, p);
     member.verdicts.length = 0;
   }
   const startTick = sim.world.tick + Math.round(leadMs(score) / 1000 / SIM_DT);
@@ -338,10 +341,7 @@ function finish(sim: SimContext, recital: Recital): void {
 }
 
 function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
-  if (intent.type === 'music_assist') {
-    const member = recitalWith(sim.world, player)?.members[player] ?? null;
-    if (member !== null) member.assist = intent.level;
-  } else if (intent.type === 'music_go') go(sim, player, intent);
+  if (intent.type === 'music_go') go(sim, player, intent);
   else if (intent.type === 'music_note') note(sim, player, intent);
   else if (intent.type === 'music_leave') leave(sim, player);
 }

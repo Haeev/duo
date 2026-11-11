@@ -3,6 +3,7 @@
  * Les pièces, les morphologies et les clips viennent du catalogue (lot L5), jamais d'ici.
  */
 import { decorSeats } from '../lieu/decors-manifeste';
+import type { Slot } from '../../donnees/schemas/personnage';
 import { RENDER_SETTINGS } from '../reglages';
 
 export const CHARACTER_SETTINGS = {
@@ -92,9 +93,11 @@ export const CHARACTER_SETTINGS = {
    * Couché (brique `sleep`): le personnage debout basculé sur le dos. `back`: épaisseur du dos
    * sous l'axe des pieds (m), `headBelowTop`: du sommet du crâne au milieu de la tête (m), au
    * gabarit adulte. Mesures du couchage: fiche du meuble (`lie`), sinon le dessus de la forme
-   * provisoire. Yeux fermés pendant le sommeil.
+   * provisoire. Yeux fermés pendant le sommeil. `removes`: emplacements ôtés au coucher et remis
+   * au lever (une coiffe traverserait l'oreiller: bord du chapeau de paille 16,7 cm sous le couchage).
    */
   lie: {
+    removes: ['hat'] as readonly Slot[],
     back: 0.12,
     headBelowTop: 0.12,
     expression: 'blink',

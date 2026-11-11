@@ -27,7 +27,7 @@ export interface StageAudioOptions {
   readonly sessionNow: () => number;
   /** Horloge locale des événements du clavier (`performance.now`); les tests donnent la leur. */
   readonly perfNow?: () => number;
-  /** La musique du lieu se tait pendant l'air (`MusicDirector.hush`). */
+  /** La musique du lieu se tait pendant l'air, dès qu'on l'entend assez (`MusicDirector.hush`). */
   readonly hush?: (on: boolean) => void;
   readonly warn?: (message: string, data?: unknown) => void;
   /** Charge un fichier (tests et rendu hors ligne); par défaut `fetch` puis décodage. */
@@ -57,6 +57,15 @@ export function createStageAudio(options: StageAudioOptions): StageAudio {
   const master = ctx.createGain();
   master.connect(options.output);
   let disposed = false;
+  /** Niveau de l'air (1 pour qui joue, selon la distance pour qui écoute) et musique du lieu tue. */
+  let level = 1;
+  let hushed = false;
+
+  function hush(on: boolean): void {
+    if (hushed === on) return;
+    hushed = on;
+    options.hush?.(on);
+  }
 
   // --- Horloge ---------------------------------------------------------------------------------
   /** Instant du contexte que le joueur entend à l'instant `perfMs` de l'horloge locale. */
@@ -172,7 +181,7 @@ export function createStageAudio(options: StageAudioOptions): StageAudio {
     setTimeoutSafe(() => {
       current.bus.disconnect();
     }, fadeSeconds * 2000);
-    options.hush?.(false);
+    hush(false);
   }
 
   /** Débranche plus tard; sans minuteur (rendu hors ligne), le nœud reste branché, muet. */
@@ -187,7 +196,6 @@ export function createStageAudio(options: StageAudioOptions): StageAudio {
     start(spec) {
       if (disposed) return;
       stopPlaying(0.05);
-      options.hush?.(true);
       const perfStart = perfNow() + (spec.startAtMs - options.sessionNow());
       const startCtx = heardAt(perfStart);
       const bus = ctx.createGain();
@@ -301,6 +309,16 @@ export function createStageAudio(options: StageAudioOptions): StageAudio {
         panner.disconnect();
       };
       return id;
+    },
+    level(gain) {
+      if (disposed) return;
+      const next = Math.max(0, Math.min(1, gain));
+      // Relevé à chaque image pour qui écoute: on ne touche au gain que s'il a bougé.
+      if (Math.abs(next - level) >= 0.01 || (next === 0) !== (level === 0)) {
+        level = next;
+        master.gain.setTargetAtTime(level, ctx.currentTime, 0.05);
+      }
+      hush(playing !== null && level > MUSIC.listen.hushAbove);
     },
     sour(id) {
       const voice = voices.get(id);

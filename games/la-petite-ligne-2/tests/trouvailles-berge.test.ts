@@ -61,9 +61,12 @@ describe('trouvailles de berge d’Aubrune', () => {
     expect(aimOf(sim, 0)).toMatchObject({ id: 'berge-coquilles-gue-1', refusal: null });
   });
 
-  it('sous la pluie, la grève en donne deux ou trois', () => {
+  it('après un jour de pluie, la grève en donne deux ou trois', () => {
     const sim = start('rain');
     expect(sim.world.common.weather).toBe('rain');
+    // Le lendemain d'un jour de pluie (`rainedYesterday`): le premier jour n'a pas de veille.
+    sim.world.common.day += 1;
+    run(sim, 1 / 30);
     put(sim, 0, 190.5, 128.4, SOUTH);
     run(sim, 0.1);
     expect(aimOf(sim, 0)?.id).toBe('berge-coquilles-gue-2');
