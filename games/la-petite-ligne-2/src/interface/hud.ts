@@ -56,6 +56,8 @@ export interface HudFrame {
   readonly yaw: number;
   /** Réglage « besoins toujours visibles » (carnet, onglet Réglages). */
   readonly needsAlways?: boolean;
+  /** Réglage « barre d'outils toujours visible »: elle ne se replie plus (CA-17). */
+  readonly toolbarAlways?: boolean;
   /** Repère de l'étape suivie (`glanceTarget`), montré par le coup d'œil; absent: rien. */
   readonly questTarget?: { readonly x: number; readonly y: number; readonly label: string } | null;
 }
@@ -187,6 +189,7 @@ export function createHud(
   return {
     frame(f) {
       const { now, world, local, prompt: model, menu, yaw, needsAlways = false } = f;
+      const toolbarAlways = f.toolbarAlways ?? false;
       const c = clockModel(world, local);
       setText(time, c.time);
       const dayLabel = day.lastElementChild;
@@ -249,7 +252,7 @@ export function createHud(
         drawToolbar(world, local);
         toolbarDrawn = signature;
       }
-      show(toolbar, fold.visible(now, glancing) && !menu);
+      show(toolbar, fold.visible(now, glancing || toolbarAlways) && !menu);
 
       // Bulle: au-dessus de l'objet si le rendu sait projeter, sinon au-dessus de la barre.
       const refusing = now < refusalUntil;

@@ -32,6 +32,12 @@ export const PairFightSchema = v.strictObject({
   tired: v.nullable(TickSchema),
   /** Plongeons d'épuisette ratés. */
   misses: v.pipe(IntSchema, v.minValue(0), v.maxValue(99)),
+  /**
+   * Aides de la canne et de l'épuisette (cran de chaque joueur, `simulation/aide`), figées à la
+   * touche: les deux machines lisent les mêmes phases. Absentes: 1 (combats d'avant).
+   */
+  rodAid: v.exactOptional(v.pipe(FiniteSchema, v.minValue(1), v.maxValue(2))),
+  netAid: v.exactOptional(v.pipe(FiniteSchema, v.minValue(1), v.maxValue(2))),
 });
 export type PairFight = v.InferOutput<typeof PairFightSchema>;
 

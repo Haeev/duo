@@ -42,7 +42,7 @@ export const SHOP_TEXTS = {
   piecePrice: '{objet}, pièce de tenue, {prix}',
   pieceMine: '{objet}, pièce de tenue, déjà à toi',
   mineShort: 'À toi',
-  mine: 'Déjà à toi : change de tenue au miroir ou dans le carnet (Tenues).',
+  mine: 'Change de tenue au miroir ou dans le carnet (Tenues).',
   slot: 'Emplacement : {slot}',
   bought: 'Merci !',
   sold: 'Marché conclu.',

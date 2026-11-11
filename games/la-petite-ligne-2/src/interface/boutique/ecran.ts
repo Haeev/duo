@@ -429,7 +429,10 @@ export function createShopScreen(
         : null,
       el('div', { class: 'shop-foot' }, [
         el('span', {}, [keyChip('KeyQ'), keyChip('KeyE'), SHOP_TEXTS.keysTabs]),
-        el('span', {}, [keyChip('KeyA'), keyChip('KeyD'), SHOP_TEXTS.keysQty]),
+        // Une pièce de tenue se prend une fois: pas de quantité à régler.
+        m.detail?.tile.kind === 'piece'
+          ? null
+          : el('span', {}, [keyChip('KeyA'), keyChip('KeyD'), SHOP_TEXTS.keysQty]),
         m.detail?.chest === 'optional'
           ? el('span', {}, [keyChip('KeyV'), SHOP_TEXTS.keysChest])
           : null,
@@ -462,9 +465,6 @@ export function createShopScreen(
               },
               [icon('tenue'), slotName],
             ),
-            d.tile.state === 'owned'
-              ? el('span', { class: 'pastille pastille--full', text: SHOP_TEXTS.mineShort })
-              : null,
           ])
         : el('div', { class: 'shop-row' }, [
             d.hunger === null
@@ -585,12 +585,15 @@ export function createShopScreen(
       chestRow?.addEventListener('click', () => {
         setUi({ chest: !(ui?.chest ?? false) });
       });
-      const action = el(
-        'button',
-        { class: `shop-btn${d.quantity === 0 ? ' shop-btn--off' : ''}` },
-        [keyChip('Enter'), m.tab === 'buy' ? SHOP_TEXTS.buy : SHOP_TEXTS.sell],
-      );
-      action.addEventListener('click', confirm);
+      // Pièce déjà à soi: une mention, pas de bouton (il n'y a rien à acheter).
+      const mine = piece && d.tile.state === 'owned';
+      const action = mine
+        ? el('p', { class: 'shop-mine' }, [icon('tenue'), SHOP_TEXTS.mineShort])
+        : el('button', { class: `shop-btn${d.quantity === 0 ? ' shop-btn--off' : ''}` }, [
+            keyChip('Enter'),
+            m.tab === 'buy' ? SHOP_TEXTS.buy : SHOP_TEXTS.sell,
+          ]);
+      if (!mine) action.addEventListener('click', confirm);
       // Ce qui empêche l'achat ou la vente se dit en image et en mots, jamais par la seule couleur.
       const purse = world.players[me].money + d.chestPart;
       const why =
@@ -615,7 +618,7 @@ export function createShopScreen(
         pastilles,
         knownRow ?? '',
         refused || piece ? '' : stepper,
-        refused ? '' : total,
+        refused || mine ? '' : total,
         chestRow ?? '',
         action,
       );

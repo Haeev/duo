@@ -20,6 +20,10 @@ import { pairPhase, pairWarning } from '../../../simulation/peche/a-deux';
 import { aimOf } from '../../../simulation/briques/visee';
 import { createInterface } from '../../index';
 
+// Thème sombre validé par le client, posé comme dans `main.ts`; `?interface=ancien`: l'habillage clair.
+if (new URLSearchParams(location.search).get('interface') !== 'ancien')
+  document.documentElement.dataset.lplStyle = 'encre';
+
 const files: Record<string, unknown> = { ...DATA_FILES };
 // La partie commence à la gare d'essai, au bord de son étang.
 const settings = DATA_FILES['commun/reglages.json'] as { start: Record<string, unknown> };

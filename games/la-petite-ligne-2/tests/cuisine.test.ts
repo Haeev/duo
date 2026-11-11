@@ -330,8 +330,8 @@ describe('cuisine', () => {
         expect(seconds).toBeGreaterThanOrEqual(15);
         expect(seconds).toBeLessThanOrEqual(40);
       }
-    expect(windowScaleOf(1, 0, false)).toBe(1);
-    expect(windowScaleOf(1.15, 2, true)).toBeCloseTo(2.5, 6);
+    expect(windowScaleOf(1, 1, false)).toBe(1);
+    expect(windowScaleOf(1.15, 1.5, true)).toBeCloseTo(2.5, 6);
     const narrow = createMinigame({ steps: [{ kind: 'heat', count: 1 }], seed: 3, windowScale: 1 });
     const wide = createMinigame({ steps: [{ kind: 'heat', count: 1 }], seed: 3, windowScale: 2 });
     const width = (g: typeof narrow): number => {

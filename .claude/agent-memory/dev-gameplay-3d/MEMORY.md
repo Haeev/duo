@@ -789,3 +789,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Cadeau d'un habitant en fin de suite: dialogue `once: "player"`, priorité 58, `when` sur `aubrune.<suite>.fini`, nœud `effects` avec `give_piece` (comme `achille-canne-fine`): aucune quête à toucher.
 - Vignettes 3D hors éditeur: la fabrique `characterPreview` sur un canevas détaché, `thumbnail(look, 'piece')`, puis `dispose` aussitôt; démonstration de la boutique: `#mercerie` (départ réglé sur Aubrune par `settings.start`, `editorAtStart: false`, boutique ouverte par un faux `shop_opened`: le comptoir tenu donne d'abord la parole à Solange).
 - `src/interface/cuisine/index.ts` avait un `switch` incomplet (`clock_struck`) laissé par un autre lot: lint seul, `tsc` ne le voit pas.
+
+## Aide par joueur, vibration, thème sombre des écrans (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Aide des mini-jeux: `assistFactor(world, player)` (`simulation/aide`), cran dans `players[i].assist` (facultatif: ni migration ni sauvegarde cassée), envoyé par `set_assist` tant que l'état de l'hôte diffère. Un mini-jeu rejoué par l'hôte fige le facteur à son départ (`line.help`, `pair.rodAid`/`netAid`).
+- Réglages de la machine gardés par `localStorage` (`interface/carnet/memoire.ts`), comme le son et le rappel de course.
+- Vibration d'écran sans toucher au moteur: `requestCameraShake()` de `rendu/camera.ts` (compteur de module lu par chaque `CameraRig.update`, décalage dans `pose()`); `main.ts` décide (`interface/secousse.ts`).
+- Thème sombre: les jetons d'`encre.css` ne vivent que sous `.lpl-ui`; un écran à couleurs en dur (cuisine, déco) demande ses propres règles `[data-lpl-style='encre']`. Les CSS des écrans passent avant `encre.css`: à spécificité égale, `encre.css` gagne (doubler la classe).
+- Pages de démonstration: le jeu part maintenant du wagon; celles qui montrent la gare d'essai (atelier, basse-cour, déco) règlent `commun/reglages.json` `start.place` sur `essai-gare`. Démos en deux moitiés: largeurs en `cqw` (`container-type: size`), pas en `vw`.
+- `prettier --write` sur un dossier reformate aussi les README des autres membres: viser les fichiers touchés.

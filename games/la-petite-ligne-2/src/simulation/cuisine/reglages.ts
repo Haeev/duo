@@ -30,8 +30,6 @@ export interface CookingSettings {
   readonly perfectFrom: number;
   /** Plafond de l'élargissement des fenêtres (bonus, aide et cuisine tranquille réunis). */
   readonly maxWindowScale: number;
-  /** Aide réglable (cahier 2.4): élargissement selon le cran. */
-  readonly assist: readonly [number, number, number];
   /** Cuisine tranquille (interface.md 5.6): fenêtres doublées. */
   readonly calm: number;
   /** Attente avant le premier geste d'une étape (s): le temps de lire la frise. */
@@ -53,7 +51,6 @@ export const COOKING: CookingSettings = {
   goodFrom: 1.8,
   perfectFrom: 2.6,
   maxWindowScale: 2.5,
-  assist: [1, 1.25, 1.5],
   calm: 2,
   leadIn: 1,
   steps: {

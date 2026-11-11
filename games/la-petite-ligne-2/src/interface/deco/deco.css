@@ -136,3 +136,27 @@
   margin-left: 0.5rem;
   font-size: 0.8125rem;
 }
+
+/*
+ * Thème sombre (`encre/encre.css`): les boutons de la barre et l'étiquette du plan avaient un fond
+ * crème en dur sous un texte devenu clair. Mêmes jetons que le reste de l'interface.
+ */
+[data-lpl-style='encre'] .lpl-deco__bar {
+  background: var(--paper);
+  color: var(--ink);
+  border-top: 0.125rem solid var(--line);
+}
+[data-lpl-style='encre'] .lpl-deco__bar button {
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.125rem solid var(--accent);
+}
+[data-lpl-style='encre'] .lpl-deco__badge {
+  background: var(--paper);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+[data-lpl-style='encre'] .lpl-deco__badge[data-ok='non'] {
+  border-color: var(--stamp);
+  color: var(--stamp);
+}

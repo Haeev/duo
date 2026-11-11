@@ -115,8 +115,17 @@ export const CARNET_TEXTS = {
     volume: 'Volume',
     graphics: 'Qualité graphique',
     needs: 'Besoins toujours visibles',
+    toolbar: 'Barre d’outils toujours visible',
     scale: 'Taille de l’interface',
     motion: 'Mouvement réduit',
+    shake: 'Vibration d’écran',
+    assist: 'Aide aux mini-jeux',
+    assists: { normal: 'Normal', nudge: 'Coup de pouce', big: 'Grand coup de pouce' },
+    assistNotes: {
+      normal: 'la pêche, la cuisine et le filet tels quels.',
+      nudge: 'un quart de marge en plus à la pêche, à la cuisine et au filet.',
+      big: 'moitié plus de marge à la pêche, à la cuisine et au filet.',
+    },
     on: 'Oui',
     off: 'Non',
     presets: {
@@ -130,5 +139,7 @@ export const CARNET_TEXTS = {
     keys: 'régler',
     rowKeys: 'choisir',
     machineOnly: 'Ces réglages ne concernent que ta machine.',
+    assistOnly: 'L’aide ne vaut que pour toi: l’autre joueur ne la voit pas et garde la sienne.',
+    shakeMuted: 'Coupée tant que le mouvement réduit est actif.',
   },
 } as const;

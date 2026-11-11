@@ -35,6 +35,7 @@ import { removeItem } from '../sac/inventaire';
 import type { DeepReadonly } from '../../etat/monde';
 import { judgeNet, missNet, stepPair, type Lane } from './a-deux';
 import { baitFactor, uniqueOf } from './uniques';
+import { assistFactor } from '../aide/index';
 
 type FishingIntent = Extract<Intent, { type: `fish_${string}` }>;
 
@@ -300,13 +301,17 @@ function land(
 /** La touche d'une pêche à deux: l'hôte la ferre lui-même au plongeon du bouchon. */
 function hookPair(sim: SimContext, player: PlayerIndex, line: FishingLine): void {
   line.hooked = true;
+  const netter: PlayerIndex = player === 0 ? 1 : 0;
   line.pair = {
-    netter: player === 0 ? 1 : 0,
+    netter,
     since: sim.world.tick,
     held: 0,
     down: false,
     tired: null,
     misses: 0,
+    // Chacun son aide: la canne tient moins longtemps, l'épuisette voit la remontée plus longtemps.
+    rodAid: assistFactor(sim.world, player),
+    netAid: assistFactor(sim.world, netter),
   };
   eatBait(sim, player, line);
   sim.touch('place');

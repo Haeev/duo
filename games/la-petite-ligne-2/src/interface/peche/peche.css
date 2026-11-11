@@ -3,6 +3,15 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  /*
+   * Panneaux de la pêche, à droite au-dessus de la barre d'objets (6,5 rem du bas, comme la
+   * consigne): même en fenêtre de 683 px de large, la barre centrée ne passe jamais dessous.
+   * Largeur prise sur l'écran de pêche lui-même (`cqw`): juste aussi dans une moitié d'écran.
+   */
+  container-type: size;
+  --peche-large: min(19rem, max(14rem, 40cqw));
+  --peche-bas: 6.5rem;
+  --peche-ecart: 2rem;
 }
 .lpl-peche[data-phase='closed'] > *,
 .lpl-peche[data-phase='end'] .lpl-peche__jeu {
@@ -11,8 +20,8 @@
 .lpl-peche__jeu {
   position: absolute;
   right: 3%;
-  bottom: 6%;
-  width: min(19rem, 40vw);
+  bottom: var(--peche-bas);
+  width: var(--peche-large);
   overflow: visible;
   filter: drop-shadow(0.1875rem 0.25rem 0 rgb(42 37 34 / 0.32));
   animation: lpl-peche-entree var(--d-slow) var(--ease-bounce) both;
@@ -297,13 +306,13 @@
 }
 .lpl-peche__appat {
   right: 3%;
-  bottom: calc(6% + min(19rem, 40vw) * 0.66);
+  bottom: calc(var(--peche-bas) + var(--peche-large) * 0.66 + 1rem);
 }
 .lpl-peche__consigne {
   /* À gauche du médaillon et au-dessus de la barre d'objets: rien ne se chevauche, même étroit. */
   left: 3%;
   bottom: 6.5rem;
-  max-width: min(30rem, calc(94% - min(19rem, 40vw) - 1rem));
+  max-width: min(30rem, calc(94% - var(--peche-large) - var(--peche-ecart)));
 }
 .lpl-peche__appat,
 .lpl-peche__consigne,
@@ -329,8 +338,8 @@
 .lpl-peche__eaux {
   position: absolute;
   right: 3%;
-  bottom: 9%;
-  width: min(19rem, 40vw);
+  bottom: var(--peche-bas);
+  width: var(--peche-large);
   overflow: visible;
 }
 .lpl-peche__eaux {
@@ -394,6 +403,97 @@
   stroke: var(--wood);
   stroke-width: 5;
   stroke-linecap: round;
+}
+
+/*
+ * Thème sombre (validé le 2026-11-10, `encre/encre.css`): chaque panneau de la pêche (médaillon,
+ * ressenti de la canne, eau de l'épuisette) devient un panneau brun presque noir à liseré bouton
+ * d'or, texte clair et chaud; ce qui était blanc sur l'eau (bouchon, ronds, bulles, filet) reste
+ * clair. Jetons du thème seulement.
+ */
+[data-lpl-style='encre'] .lpl-peche {
+  --peche-piste: #4a3f37;
+}
+[data-lpl-style='encre'] :is(.lpl-peche__jeu, .lpl-peche__ressenti, .lpl-peche__eaux) {
+  box-sizing: border-box;
+  padding: 0.5rem 0.625rem 0.375rem;
+  background: var(--paper);
+  border: 0.1875rem solid var(--accent);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-3);
+  filter: none;
+}
+[data-lpl-style='encre'] :is(.lpl-peche__arc, .lpl-peche__ressenti-arc) {
+  stroke: var(--peche-piste);
+}
+[data-lpl-style='encre'] .lpl-peche__rail {
+  stroke: var(--ink-muted);
+}
+[data-lpl-style='encre'] .lpl-peche__repere span {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 0.125rem var(--dark-shadow);
+}
+[data-lpl-style='encre']
+  :is(.lpl-peche__bouchon-bas, .lpl-peche__oeil, .lpl-peche__moulinet circle) {
+  fill: var(--ink);
+}
+[data-lpl-style='encre'] :is(.lpl-peche__bouchon-haut, .lpl-peche__bouchon-bas) {
+  stroke: var(--dark-shadow);
+}
+[data-lpl-style='encre'] .lpl-peche__moulinet path {
+  stroke: var(--paper-sunken);
+}
+[data-lpl-style='encre'] .lpl-peche__eau,
+[data-lpl-style='encre'] .lpl-peche__piste {
+  stroke: #6fa3bf;
+}
+[data-lpl-style='encre'] :is(.lpl-peche__rond, .lpl-peche__bulles circle) {
+  stroke: var(--ink);
+}
+[data-lpl-style='encre'] .lpl-peche__epuisette path {
+  stroke: var(--ink);
+}
+[data-lpl-style='encre'] .lpl-peche__epuisette line {
+  stroke: var(--line);
+}
+[data-lpl-style='encre'] .lpl-peche__eaux-fond {
+  stroke: var(--paper-sunken);
+}
+[data-lpl-style='encre'] .lpl-peche__berge {
+  fill: var(--wood);
+  stroke: var(--line);
+}
+[data-lpl-style='encre'] .lpl-peche__forces-fond {
+  fill: var(--paper-sunken);
+  stroke: var(--line);
+}
+[data-lpl-style='encre'] .lpl-peche__forces-titre {
+  fill: var(--ink-muted);
+}
+[data-lpl-style='encre'] .lpl-peche__touches rect {
+  fill: var(--paper-raised);
+  stroke: var(--ink);
+}
+[data-lpl-style='encre'] .lpl-peche__touches .lpl-peche--appui rect {
+  fill: var(--accent);
+}
+[data-lpl-style='encre'] .lpl-peche__touches .lpl-peche--appui text {
+  fill: var(--on-accent);
+}
+[data-lpl-style='encre'] :is(.lpl-peche__appat, .lpl-peche__consigne) {
+  background: var(--paper);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-2);
+}
+[data-lpl-style='encre'] .lpl-peche__fete {
+  background: var(--paper);
+  border-color: var(--accent);
+}
+[data-lpl-style='encre'] .lpl-peche__titre {
+  color: var(--accent);
+}
+[data-lpl-style='encre'] .lpl-peche__etoiles {
+  -webkit-text-stroke: 0.04rem var(--dark-shadow);
 }
 
 [data-motion='reduced'] .lpl-peche * {

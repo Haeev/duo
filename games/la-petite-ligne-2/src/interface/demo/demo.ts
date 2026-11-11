@@ -26,6 +26,10 @@ import { histoireFiles, setupHistoire } from './histoire';
 import planAubrune from '../../../donnees/lieux/aubrune/plan.json';
 import { loadPortraits } from '../portrait';
 
+// Thème sombre validé par le client, posé comme dans `main.ts`; `?interface=ancien`: l'habillage clair.
+if (new URLSearchParams(location.search).get('interface') !== 'ancien')
+  document.documentElement.dataset.lplStyle = 'encre';
+
 // Portraits dessinés: lot à part, attendu avant toute interface (comme `main.ts`).
 await loadPortraits();
 

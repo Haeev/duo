@@ -21,6 +21,8 @@
       .vue {
         position: relative;
         overflow: hidden;
+        /* La couche d'interface se pose en `position: fixed`: chaque vue en devient le cadre. */
+        transform: translateZ(0);
       }
       .vue > p {
         position: absolute;

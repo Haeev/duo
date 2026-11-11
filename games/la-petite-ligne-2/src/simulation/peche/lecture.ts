@@ -2,6 +2,7 @@
  * Lectures pures de la pêche, les mêmes chez l'hôte et chez l'invité: canne en main, coin devant
  * le pêcheur, ombres du moment, et ce que le rendu et le carnet affichent.
  */
+import { assistFactor } from '../aide/index';
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { FishingSpot, ShadowSize } from '../../donnees/schemas/peche';
@@ -28,13 +29,17 @@ export function heldRod(
   return { slot: state.selected, stack };
 }
 
-/** Aide du pêcheur: état de la canne et bonus des besoins (`minigame`). 0: pas de canne. */
+/**
+ * Aide du pêcheur: état de la canne, bonus des besoins (`minigame`) et cran d'aide du joueur
+ * (`simulation/aide`). Elle élargit la fenêtre du ferrage et le secteur vert. 0: pas de canne.
+ */
 export function helpOf(content: Content, world: ReadonlyWorld, player: PlayerIndex): number {
   const rod = heldRod(content, world, player);
   if (rod === null) return 0;
   const condition = toolCondition(content, { ...rod.stack });
   const rodFactor = FISHING.rod[condition ?? 'base'];
-  return Math.max(0.2, Math.min(4, rodFactor * modifiersOf(content, world, player).minigame));
+  const mods = modifiersOf(content, world, player).minigame;
+  return Math.max(0.2, Math.min(4, rodFactor * mods * assistFactor(world, player)));
 }
 
 export function placeSpots(content: Content, world: ReadonlyWorld): readonly FishingSpot[] {

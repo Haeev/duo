@@ -76,14 +76,17 @@ export interface MinigameOptions {
   readonly settings?: CookingSettings;
 }
 
-/** Élargissement total, borné: `minigame` des besoins, cran d'aide (0 à 2), cuisine tranquille. */
+/**
+ * Élargissement total, borné: `minigame` des besoins, aide du joueur (`assistFactor` de
+ * `simulation/aide`: 1, 1,25 ou 1,5), cuisine tranquille.
+ */
 export function windowScaleOf(
   needs: number,
-  assist: 0 | 1 | 2,
+  assist: number,
   calm: boolean,
   settings: CookingSettings = COOKING,
 ): number {
-  const scale = needs * settings.assist[assist] * (calm ? settings.calm : 1);
+  const scale = needs * assist * (calm ? settings.calm : 1);
   return Math.max(0.5, Math.min(settings.maxWindowScale, scale));
 }
 

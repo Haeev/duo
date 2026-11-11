@@ -27,6 +27,8 @@ export interface PairPhase {
   /** Secondes écoulées dans la phase, et sa durée. */
   into: number;
   length: number;
+  /** Les bulles paraissent quand la remontée arrive dans moins de `warn` s (aide de l'épuisette). */
+  warn: number;
 }
 
 const P = FISHING.pair;
@@ -37,16 +39,19 @@ function lane(value: number): Lane {
 
 /**
  * Phase du poisson `t` s après la touche (`tiredTick` nul) ou après sa fatigue. `out` évite une
- * allocation à chaque image.
+ * allocation à chaque image. `netAid`: aide de l'épuisette (`simulation/aide`), qui allonge la
+ * remontée (le temps de plonger) et l'avance des bulles.
  */
 export function pairPhaseAt(
   seed: number,
   tiredTick: number | null,
   t: number,
-  out: PairPhase = { kind: 'pull', side: 0, into: 0, length: 1 },
+  out: PairPhase = { kind: 'pull', side: 0, into: 0, length: 1, warn: P.warn },
+  netAid = 1,
 ): PairPhase {
   const tired = tiredTick !== null;
   const random = createRandom(deriveSeed(seed, tired ? `remontee-${String(tiredTick)}` : 'a-deux'));
+  const rise = P.rise * netAid;
   let start = 0;
   // Borne: au plus la durée du combat, en phases de la plus courte durée permise.
   for (let i = 0; i < 400; i++) {
@@ -54,7 +59,8 @@ export function pairPhaseAt(
     const first = tired
       ? random.float(P.dive.min, P.dive.max)
       : random.float(P.pull.min, P.pull.max);
-    const second = tired ? P.rise : random.float(P.rest.min, P.rest.max);
+    const second = tired ? rise : random.float(P.rest.min, P.rest.max);
+    out.warn = Math.min(first, P.warn * netAid);
     if (t < start + first) {
       out.kind = tired ? 'dive' : 'pull';
       out.side = side;
@@ -73,6 +79,7 @@ export function pairPhaseAt(
     start += second;
   }
   out.kind = tired ? 'dive' : 'rest';
+  out.warn = P.warn;
   out.side = 0;
   out.into = 0;
   out.length = 1;
@@ -87,17 +94,25 @@ export function pairPhase(
   out?: PairPhase,
 ): PairPhase {
   const from = (pair.tired ?? pair.since) * SIM_DT;
-  return pairPhaseAt(line.seed, pair.tired, Math.max(0, seconds - from), out);
+  return pairPhaseAt(line.seed, pair.tired, Math.max(0, seconds - from), out, pair.netAid ?? 1);
+}
+
+/**
+ * Secondes à tenir la canne pour la fatiguer: l'aide de la canne (`rodAid`) les raccourcit, comme
+ * elle adoucit la pénalité d'un appui à contretemps.
+ */
+export function pairHoldSeconds(pair: DeepReadonly<PairFight>): number {
+  return P.holdSeconds / (pair.rodAid ?? 1);
 }
 
 /** Part des forces perdues (0: fraîche, 1: fatiguée). */
 export function pairFatigue(pair: DeepReadonly<PairFight>): number {
-  return pair.tired !== null ? 1 : Math.min(1, pair.held / P.holdSeconds);
+  return pair.tired !== null ? 1 : Math.min(1, pair.held / pairHoldSeconds(pair));
 }
 
 /** Les bulles: la remontée arrive dans moins de `warn` s. */
 export function pairWarning(phase: Readonly<PairPhase>): boolean {
-  return phase.kind === 'dive' && phase.length - phase.into <= P.warn;
+  return phase.kind === 'dive' && phase.length - phase.into <= phase.warn;
 }
 
 export type NetVerdict = 'landed' | 'deep' | 'side' | 'slack';
@@ -128,10 +143,11 @@ export function stepPair(
   if (pair.tired === null && pair.down) {
     const phase = pairPhase(line, pair, tick * SIM_DT);
     const before = pair.held;
+    const aid = pair.rodAid ?? 1;
     if (phase.kind === 'pull') pair.held = Math.min(120, pair.held + SIM_DT);
-    else pair.held = Math.max(0, pair.held - P.restPenalty * SIM_DT);
+    else pair.held = Math.max(0, pair.held - (P.restPenalty / aid) * SIM_DT);
     changed = pair.held !== before;
-    if (pair.held >= P.holdSeconds) {
+    if (pair.held >= pairHoldSeconds(pair)) {
       pair.tired = tick;
       changed = true;
     }
@@ -142,7 +158,7 @@ export function stepPair(
 /** Après un plongeon raté: elle replonge, un peu reposée. */
 export function missNet(pair: PairFight): void {
   pair.misses = Math.min(99, pair.misses + 1);
-  pair.held = Math.min(pair.held, P.holdSeconds) * P.missKeep;
+  pair.held = Math.min(pair.held, pairHoldSeconds(pair)) * P.missKeep;
   pair.tired = null;
 }
 
