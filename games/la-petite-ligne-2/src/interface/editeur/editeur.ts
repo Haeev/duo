@@ -8,6 +8,7 @@
 import type { Gender, Look } from '../../donnees/schemas/personnage';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../../etat/monde';
+import { lookRevealed } from '../../simulation/regles/apparence';
 import { wardrobeOf } from '../../simulation/regles/recompenses';
 import type { Intent } from '../../simulation/noyau/entrees';
 import { el, setText, show, toggle } from '../dom';
@@ -585,7 +586,7 @@ export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): Cha
       preview?.frame(dt);
       const other: PlayerIndex = me === 0 ? 1 : 0;
       const o = world.players[other];
-      const ready = o.look !== null;
+      const ready = lookRevealed(world, other);
       setText(otherChip, `${o.name} : ${ready ? T.other.ready : T.other.waiting}`);
       toggle(otherChip, 'is-ready', ready);
       show(otherChip, mode === 'create');

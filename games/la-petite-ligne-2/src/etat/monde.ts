@@ -10,7 +10,7 @@ import { PlaceStateSchema } from './lieu';
 import { ProgressSchema } from './progression';
 
 /** Version du format de sauvegarde. Jusqu'à l'Alpha, un changement peut remettre la partie à zéro (ADR 0017). */
-export const DATA_SCHEMA = 1;
+export const DATA_SCHEMA = 2;
 
 export const WorldSchema = v.strictObject({
   schema: v.literal(DATA_SCHEMA),

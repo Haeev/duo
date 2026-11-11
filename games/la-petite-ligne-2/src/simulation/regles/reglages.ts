@@ -53,6 +53,13 @@ export interface RulesSettings {
     /** Effets qui font d'une option un échange. */
     readonly exchangeEffects: readonly Effect['type'][];
   };
+  readonly look: {
+    /**
+     * Préfixe du fait « apparence révélée » d'un joueur (`<préfixe>.j0`, `<préfixe>.j1`): absent,
+     * le personnage n'a pas encore de visage et se montre en silhouette (`apparence.ts`).
+     */
+    readonly revealedPrefix: string;
+  };
 }
 
 export const RULES: RulesSettings = {
@@ -73,4 +80,5 @@ export const RULES: RulesSettings = {
     failHygiene: ['blocked', 'low'],
     exchangeEffects: ['give_item', 'take_item', 'give_money', 'take_money', 'give_bag', 'remember'],
   },
+  look: { revealedPrefix: 'joueurs.apparence' },
 };

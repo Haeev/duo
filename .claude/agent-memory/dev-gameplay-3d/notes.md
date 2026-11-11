@@ -84,3 +84,14 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - L'icosaèdre de Three.js n'a pas de sommet au pôle: seules 2 faces sur 20 sont sous y = -0,5; retirer « le dessous » d'un caillou ne rapporte rien.
 - Natures d'Aubrune absentes de `GROUND_LOOKS` (sous-bois, prairie, potager, place...): elles prennent l'herbe par défaut; les arbres semés ne poussent que sur `hors-jeu` et `pre`.
 - Heredoc Python refusé dès qu'il est long ou suivi d'une autre commande: scripts de retouche par Write dans le scratchpad (paires ancien/nouveau avec `assert count == 1`), lancés par `python3 script.py .`.
+
+## La Petite Ligne 2: photo du prologue et parcours à deux (vérifié le 2026-11-11)
+
+- Parcours Playwright dans un arbre neuf: `pnpm --filter @duo/sdk-dev build` d'abord, sinon « le faux hôte s'est arrêté (code 1) » (pages de la coque absentes). Le `globalSetup` relance toute la suite Vitest (35 s) à chaque lancement: un test rapide cassé empêche tout parcours. Le faux hôte sert `dist` en direct: ne pas relancer `vite build` pendant qu'un parcours tourne.
+- Captures en 1366 x 768 dans un parcours: `page.setViewportSize`, attendre 6 s (rendu logiciel), capturer, puis revenir à la petite taille pour marcher (`windowSize`).
+- Apparence: `look === null` veut dire « jamais composé », pas « caché ». Caché ou révélé se lit par `lookRevealed` (fait `joueurs.apparence.j<n>`); `createWorld` révèle d'office si le lieu de départ n'a aucun `reveal_look` (lieux d'essai, démonstrations, bancs).
+- Une silhouette d'une seule teinte: repeindre l'attribut `color` des géométries assemblées (corps, tête, ensemble), même matériau donc aucun programme de plus; la clé de géométrie partagée doit porter la teinte.
+- Quêtes: la condition `talked` avec `node` n'est vue que si la réplique reste affichée plus d'un pas (dans un test: `wait` entre deux `talk_next`).
+- Trace d'essai: `JSON.stringify` d'un tableau où l'on a poussé `player.talk` montre l'état final partout (même objet muté); copier le champ lu.
+- Ajouter un effet aux données: schéma (`regles.ts`), `effets.ts`, `donnees/valider.ts` et `quetes/valider.ts` (deux `switch` exhaustifs).
+

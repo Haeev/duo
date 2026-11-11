@@ -65,6 +65,19 @@ Cinq ajouts de données, sans ligne de moteur (gabarits commentés: `_gabarits/l
 | Note de placement `pourquoi` | Texte facultatif sur le lieu (`lieu.json`), chaque meuble, chaque objet au sol et chaque intérieur: pourquoi il est là, dans ce sens, à cette taille. Le moteur l'ignore. `pnpm pourquoi [lieu]` liste ce qui n'en a pas, sans rien bloquer.                                       |
 | Sol d'un petit lieu          | Dans `carte.json` d'un lieu sans `terrain`, `floor`: `{ "nature": "vide", "areas": [{ "x", "y", "w", "h", "nature": "plancher" }] }`, peints dans l'ordre. Natures: `plancher`, `tapis-de-couloir`, `vide` (rien n'est dessiné), `herbe`... Exemple: `lieux/train-de-nuit`.        |
 
+## Une réplique qui ouvre un écran, et l'apparence révélée (la photo)
+
+Avant la photo du prologue, un joueur n'a pas de visage: son personnage est une silhouette sombre (monde, portraits, onglet Tenues fermé, miroir refusé). Gabarit commenté: `_gabarits/dialogue.jsonc`; exemple: `lieux/train-de-nuit/dialogues/controleur-papiers.json`.
+
+1. Sur une réplique (`"kind": "line"`), ajoute `"opens": "character-editor"`: une fois la réplique lue, l'éditeur s'ouvre chez le joueur qui parle, chez lui seul.
+2. Quand il le ferme (validation), le dialogue passe à `next`: rien d'autre à écrire.
+3. Fais suivre un nœud `{ "kind": "effects", "effects": [{ "type": "reveal_look" }], "next": "..." }`: le personnage paraît, chez les deux joueurs.
+4. `reveal_look` va aussi dans `onDone` d'une étape de quête; `"to": "duo"` révèle les deux (filet de la fin du prologue, `quetes/terminus.json`).
+5. Le fait retenu est `joueurs.apparence.j0` (ou `j1`): une condition `remembered` peut le lire.
+6. Une partie neuve commence cachée si le lieu de départ porte un `reveal_look` (dialogue ou quête); sinon (lieux d'essai) les joueurs arrivent avec leur visage. Valider l'éditeur révèle aussi.
+7. Un écran de plus: son nom dans `DIALOGUE_SCREEN_IDS` (`src/donnees/schemas/dialogue.ts`) et son ouverture dans la table de `src/interface/index.ts` (`createDialogueScreens`).
+8. Test court: `tests/photo-prologue.test.ts` (dialogue factice ajouté par les seules données); parcours à deux: `tests/e2e/photo.spec.ts`.
+
 ## Briques (ce qu'un meuble sait faire)
 
 `sit` s'asseoir, `sleep` dormir, `store` ranger, `gather` ramasser ou cueillir, `relieve` soulager un besoin, `shop` vendre et acheter, `cook` cuisiner ou fabriquer, `open` ouvrir, `repair` réparer, `harvest` point de récolte d'une ressource (`ressources/`), `field` terre cultivable (parcelles du potager, nombre selon les améliorations). Paramètres: `_gabarits/meuble.jsonc`. Une chaise est un meuble avec `sit`; un coffre, un meuble avec `store`; un banc-coffre, les deux.

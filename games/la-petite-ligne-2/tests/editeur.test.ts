@@ -19,6 +19,7 @@ import {
 import { EDITOR_SETTINGS } from '../src/interface/editeur/reglages';
 import { WorldSchema } from '../src/etat/monde';
 import { aimOf } from '../src/simulation/briques/visee';
+import { lookRevealedKey } from '../src/simulation/regles/apparence';
 import { dataFiles, gameContent, newSim } from './aides';
 import { contentWith, NORTH, put, send } from './aides-noyau';
 
@@ -153,14 +154,22 @@ describe('éditeur de personnage: simulation', () => {
     expect(v.is(WorldSchema, sim.world)).toBe(true);
   });
 
-  it('brique mirror: l’appui rouvre l’éditeur chez ce joueur seulement', () => {
+  it('brique mirror: refusée sans visage (avant la photo), puis l’appui rouvre l’éditeur chez ce joueur seulement', () => {
     const furnished = contentWith(
       [{ id: 'miroir-essai', bricks: [{ brick: 'mirror' }] }],
       [{ id: 'miroir', type: 'miroir-essai', x: 30.5, y: 25.5 }],
     );
     const sim = newSim(furnished);
     put(sim, 0, 30.5, 26.6, NORTH);
-    expect(aimOf(sim, 0)).toMatchObject({ id: 'miroir', action: 'mirror' });
+    // À la gare d'essai, personne ne fait de photo: on arrive avec son visage. On le retire.
+    expect(sim.world.progress.memory[lookRevealedKey(0)]?.v).toBe(true);
+    Reflect.deleteProperty(sim.world.progress.memory, lookRevealedKey(0));
+    expect(aimOf(sim, 0)).toMatchObject({ id: 'miroir', refusal: 'no-face-yet' });
+    expect(send(sim, 0, { type: 'act' })).toContainEqual(
+      expect.objectContaining({ type: 'refused', player: 0, reason: 'no-face-yet' }),
+    );
+    sim.world.progress.memory[lookRevealedKey(0)] = { v: true, by: 0, day: 1 };
+    expect(aimOf(sim, 0)).toMatchObject({ id: 'miroir', action: 'mirror', refusal: null });
     expect(send(sim, 0, { type: 'act' })).toContainEqual({
       type: 'mirror_opened',
       player: 0,

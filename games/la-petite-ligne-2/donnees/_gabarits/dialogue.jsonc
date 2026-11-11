@@ -27,6 +27,9 @@
   "nodes": {
     // Réplique: 150 caractères au plus (trois lignes du bandeau). "speaker": un habitant ou "player".
     // "emote": surprise, question, joy, anger, sad, idea, ou null. "next": nœud suivant, null = fin.
+    // "opens" (facultatif): un écran ouvert chez celui qui lit, une fois la réplique lue; le fermer
+    //   passe au nœud suivant. Écrans: "character-editor" (l'éditeur de personnage). Exemple:
+    //   donnees/lieux/train-de-nuit/dialogues/controleur-papiers.json (nœud "photo").
     "bonjour": {
       "kind": "line",
       "speaker": "cheffe-de-gare",
@@ -36,6 +39,8 @@
     },
     // Choix: 2 à 3 options, dont une au moins sans condition. Effets possibles:
     //   give_item, take_item, give_money, change_need, give_bag, remember,
+    //   { "type": "reveal_look" }   (le personnage de qui parle sort de l'ombre: jusque-là, une
+    //       silhouette sans traits ni tenue; "to": "duo" pour les deux)
     //   { "type": "take_money", "amount": 250 }   (paiement en centimes: 2,50 €)
     //   { "type": "change_bond", "villager": "cheffe-de-gare", "points": 20 }   (négatif: perte)
     // give_item, take_item, give_money et take_money prennent "to": "duo" pour s'appliquer à

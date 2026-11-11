@@ -12,6 +12,7 @@ import { postureOf } from '../briques/postures';
 import { SIM_DT } from './constantes';
 import { freePlayer } from './deblocage';
 import { movePlayers, stopPlayer } from './deplacement';
+import { revealLook } from '../regles/apparence';
 import { lockedPieceOf } from '../regles/recompenses';
 import type { Intent, StepInput } from './entrees';
 import type { GameEvent } from './evenements';
@@ -62,6 +63,9 @@ function coreIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void 
     actor.name = intent.name;
     actor.look = intent.look;
     if (intent.gender !== undefined) actor.gender = intent.gender;
+    // Un personnage composé a un visage: il se montre, même si le dialogue qui a ouvert l'éditeur
+    // s'est fermé entre-temps (l'effet `reveal_look` des données n'aurait alors jamais joué).
+    revealLook(sim, player);
     sim.touch('players');
   } else if (intent.type === 'unstick') {
     // Debout et libre de ses gestes seulement: une place assise se quitte en marchant.

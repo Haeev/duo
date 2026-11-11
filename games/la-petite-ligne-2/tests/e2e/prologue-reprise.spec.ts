@@ -1,6 +1,7 @@
 // P19b et P20, compagnons du parcours P19 (`prologue.spec.ts`).
-// P19b: une vraie partie neuve SANS la sonde de recette (comme chez un joueur): l'éditeur de
-// personnage s'ouvre-t-il au démarrage, et que voit-on avec la première scène derrière ?
+// P19b: une vraie partie neuve SANS la sonde de recette (comme chez un joueur): on entre droit
+// dans le wagon de nuit, sans éditeur de personnage (il vient à la photo du Contrôleur, P19), et
+// la première scène se lit sur des silhouettes.
 // P20 (CA-34): quitter au milieu du prologue puis reprendre rend l'état de la dernière sauvegarde,
 // sans objet ni euro dupliqué, chacun là où il était (D11). Les joueurs y marchent au clavier:
 // aucune téléportation.
@@ -36,7 +37,9 @@ const newContext = (journal: Journal): UiContext => ({
   current: new Map(),
 });
 
-test('P19b partie neuve sans sonde: l’éditeur de personnage au démarrage', async ({ browser }) => {
+test('P19b partie neuve sans sonde: pas d’éditeur au démarrage, le wagon tout de suite', async ({
+  browser,
+}) => {
   test.setTimeout(240_000);
   const journal = new Journal('p19b-releves.txt');
   const duo = await startDuo(browser, 'p19b', { save: null, probe: false });
@@ -51,23 +54,30 @@ test('P19b partie neuve sans sonde: l’éditeur de personnage au démarrage', a
   );
   journal.log(`P19b textes coupés: ${JSON.stringify([...sh.broken, ...sg.broken])}`);
   await Promise.all([host.shot('p19b-1-demarrage-hote'), guest.shot('p19b-1-demarrage-invite')]);
-  expect(sh.editor, 'l’éditeur s’ouvre au démarrage chez l’hôte').toBe(true);
-  expect(sg.editor, 'l’éditeur s’ouvre au démarrage chez l’invité').toBe(true);
-  // Chacun compose sa photo: genre puis « Valider »; l'autre voit que son partenaire compose.
+  expect(sh.editor, 'pas d’éditeur au démarrage chez l’hôte').toBe(false);
+  expect(sg.editor, 'pas d’éditeur au démarrage chez l’invité').toBe(false);
+  expect(sh.scene, 'la première scène se lit chez l’hôte').not.toBeNull();
+  expect(sg.scene, 'la première scène se lit chez l’invité').not.toBeNull();
+  // Les deux lisent la scène du compartiment: toujours pas d'éditeur, et le jeu rend la main.
   const ctx = newContext(journal);
-  for (let i = 0; i < 8 && ((await snapshot(host)).editor || (await snapshot(guest)).editor); i++)
+  for (let i = 0; i < 60; i++) {
+    const [h, g] = [await snapshot(host), await snapshot(guest)];
+    expect(h.editor || g.editor, 'aucun éditeur pendant la scène').toBe(false);
+    if (h.scene === null && g.scene === null) break;
     await Promise.all([playUi(host, ctx), playUi(guest, ctx)]);
-  await host.page.waitForTimeout(2500);
+  }
+  await host.page.waitForTimeout(1500);
   const [ah, ag] = [await snapshot(host), await snapshot(guest)];
   journal.log(
-    `P19b après l'éditeur: éditeur fermé chez l'hôte ${String(!ah.editor)}, chez l'invité ${String(!ag.editor)}; scène hôte ${ah.scene?.text ?? 'aucune'}`,
+    `P19b après la scène: éditeur chez l'hôte ${String(ah.editor)}, chez l'invité ${String(ag.editor)}; scène hôte ${ah.scene?.text ?? 'aucune'}, invité ${ag.scene?.text ?? 'aucune'}`,
   );
   await Promise.all([
-    host.shot('p19b-2-apres-editeur-hote'),
-    guest.shot('p19b-2-apres-editeur-invite'),
+    host.shot('p19b-2-apres-scene-hote'),
+    guest.shot('p19b-2-apres-scene-invite'),
   ]);
   expect(ah.editor).toBe(false);
   expect(ag.editor).toBe(false);
+  expect(ah.scene, 'la scène du compartiment est finie chez l’hôte').toBeNull();
   await duo.close();
 });
 
@@ -189,6 +199,21 @@ test('P20 quitter et reprendre au milieu du prologue (CA-34)', async ({ browser 
   ]);
   expect(after.common.place).toBe(PLACE);
   expect(quest(after)).toEqual(quest(before));
+  // La photo était faite avant de quitter: chacun retrouve son personnage, pas une silhouette,
+  // chez l'hôte comme chez l'invité.
+  const faces = (w: ProbeWorld): unknown =>
+    w.players.map((p, i) => ({
+      revealed: w.progress?.memory?.[`joueurs.apparence.j${String(i)}`]?.v === true,
+      look: p.look ?? null,
+    }));
+  journal.log(`P20 visages avant ${JSON.stringify(faces(before))}`);
+  expect(
+    before.players.map((_, i) => before.progress?.memory?.[`joueurs.apparence.j${String(i)}`]?.v),
+    'les deux ont fait leur photo avant de quitter',
+  ).toEqual([true, true]);
+  expect(faces(after), 'personnages retrouvés à la reprise (hôte)').toEqual(faces(before));
+  const guestAfter = await second.guest.world();
+  expect(guestAfter === null ? null : faces(guestAfter), 'et chez l’invité').toEqual(faces(before));
   expect(after.players.map((p) => p.money)).toEqual(before.players.map((p) => p.money));
   for (const i of [0, 1]) {
     expect(items(after, i), `barre du joueur ${String(i)}: aucun objet dupliqué ni perdu`).toBe(

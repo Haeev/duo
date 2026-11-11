@@ -13,7 +13,7 @@ import type { Intent } from '../../simulation/noyau/entrees';
 import type { BabbleInfo } from '../dialogue';
 import { el, setText, show, toggle } from '../dom';
 import { paginate, Typewriter } from '../modeles';
-import { portraitMarkup } from '../portrait';
+import { portraitMarkup, silhouettePortraitMarkup } from '../portrait';
 import { TEXTS, fill } from '../textes';
 import { sceneScreenModel, type SceneLineModel, type SceneScreenModel } from './modele';
 import { HISTOIRE_SETTINGS } from './reglages';
@@ -53,10 +53,14 @@ function speakerName(line: SceneLineModel): string {
   return line.speaker.name;
 }
 
-/** Identifiant du portrait: l'habitant, ou le portrait d'essai des joueurs. */
+/** Portrait en silhouette des joueurs pas encore révélés (le même pour les deux). */
+const HIDDEN_PORTRAIT = 'ombre';
+
+/** Identifiant du portrait: l'habitant, le portrait d'essai des joueurs, ou leur silhouette. */
 function portraitId(line: SceneLineModel): string | null {
   if (line.speaker.kind === 'villager') return line.speaker.id;
-  if (line.speaker.kind === 'player') return `joueur-${String(line.speaker.player)}`;
+  if (line.speaker.kind === 'player')
+    return line.speaker.hidden ? HIDDEN_PORTRAIT : `joueur-${String(line.speaker.player)}`;
   return null;
 }
 
@@ -149,7 +153,12 @@ export function createSceneLine(options: SceneLineOptions): SceneLine {
     const nextBust = `${id ?? '-'}:${line.mood}`;
     if (nextBust !== bustKey) {
       bustKey = nextBust;
-      bust.innerHTML = id === null ? '' : portraitMarkup(id, line.mood);
+      bust.innerHTML =
+        id === null
+          ? ''
+          : id === HIDDEN_PORTRAIT
+            ? silhouettePortraitMarkup()
+            : portraitMarkup(id, line.mood);
     }
     band.dataset.speaker = line.speaker.kind;
     band.dataset.audience = line.audience;

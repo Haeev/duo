@@ -6,6 +6,7 @@
  */
 import {
   type AnimationAction,
+  type BufferGeometry,
   AnimationMixer,
   BackSide,
   type Camera,
@@ -57,7 +58,14 @@ import {
   targetWeights,
   standingPosture,
 } from './animation';
-import { composeLook, defaultPlayerLook, hashString, lookKey, resolveLook } from './apparence';
+import {
+  composeLook,
+  defaultPlayerLook,
+  hashString,
+  lookKey,
+  resolveLook,
+  silhouetteLook,
+} from './apparence';
 import {
   type AssembledGeometry,
   assemble,
@@ -67,6 +75,7 @@ import {
 } from './assemblage';
 import { CHARACTER_SETTINGS, type CharacterSettings } from './reglages';
 import { villagerView } from '../../simulation/habitants/lecture';
+import { lookRevealed } from '../../simulation/regles/apparence';
 
 interface Shared {
   readonly geometry: AssembledGeometry;
@@ -179,6 +188,21 @@ interface Seat {
 }
 
 const legTarget = new Vector3();
+const shadeColor = new Color();
+/** Référence de look d'une silhouette (et clé de son look composé). */
+const SILHOUETTE = 'silhouette';
+
+/** Clé de géométrie partagée: une silhouette ne partage pas la géométrie du même look en couleurs. */
+function shadedKey(key: string, shade: string | null): string {
+  return shade === null ? key : `${key}|ombre:${shade}`;
+}
+
+/** Peint tous les sommets d'une même teinte: plus de peau, de traits ni de couleur de tenue. */
+function paintFlat(geometry: BufferGeometry, tint: Color): void {
+  const colors = geometry.getAttribute('color');
+  for (let i = 0; i < colors.count; i += 1) colors.setXYZ(i, tint.r, tint.g, tint.b);
+  colors.needsUpdate = true;
+}
 
 export class AssembledCharacters implements CharacterLayer {
   private readonly material: MeshStandardMaterial;
@@ -295,12 +319,19 @@ export class AssembledCharacters implements CharacterLayer {
   private acquire(
     look: Look,
     library: CharacterLibrary,
+    shade: string | null,
   ): { key: string; shared: Shared; shape: string } {
     const resolved = resolveLook(look, library.catalogue, library.morphologies);
-    const key = lookKey(resolved);
+    const key = shadedKey(lookKey(resolved), shade);
     let shared = this.geometries.get(key);
     if (shared === undefined) {
-      shared = { geometry: assemble(resolved, library), users: 0 };
+      const geometry = assemble(resolved, library);
+      if (shade !== null) {
+        shadeColor.set(shade);
+        for (const part of [geometry.body, geometry.head, geometry.whole])
+          if (part !== null) paintFlat(part, shadeColor);
+      }
+      shared = { geometry, users: 0 };
       this.assemblies += 1;
       this.geometries.set(key, shared);
     }
@@ -319,8 +350,8 @@ export class AssembledCharacters implements CharacterLayer {
     this.geometries.delete(key);
   }
 
-  private create(id: string, look: Look, library: CharacterLibrary): Figure {
-    const { key, shared, shape } = this.acquire(look, library);
+  private create(id: string, look: Look, library: CharacterLibrary, shade: string | null): Figure {
+    const { key, shared, shape } = this.acquire(look, library, shade);
     const { root, skeletonOf } = createRig(library, shape, look.height);
     const parent = skeletonOf.parent ?? root;
     // Encre: chaque personnage a ses deux matériaux (même programme), donc son numéro de pièce.
@@ -440,15 +471,20 @@ export class AssembledCharacters implements CharacterLayer {
     lookRef: unknown,
     lookOf: () => Look,
     library: CharacterLibrary,
+    /** Teinte unique d'une silhouette (apparence pas encore révélée), `null`: les vraies couleurs. */
+    shade: string | null = null,
   ): Figure {
     if (current !== null && current.lookRef === lookRef) return current;
     const look = lookOf();
-    const key = lookKey(resolveLook(look, library.catalogue, library.morphologies));
+    const key = shadedKey(
+      lookKey(resolveLook(look, library.catalogue, library.morphologies)),
+      shade,
+    );
     if (current !== null && current.key === key && current.chosenHeight === look.height) {
       current.lookRef = lookRef;
       return current;
     }
-    const next = this.create(id, look, library);
+    const next = this.create(id, look, library, shade);
     next.lookRef = lookRef;
     if (current !== null) {
       next.x = current.x;
@@ -478,6 +514,20 @@ export class AssembledCharacters implements CharacterLayer {
         this.settings,
       );
       this.composed.set(key, look);
+    }
+    return look;
+  }
+
+  /** La silhouette commune des joueurs pas encore révélés (composée une fois). */
+  private hiddenLook(library: CharacterLibrary): Look {
+    let look = this.composed.get(SILHOUETTE);
+    if (look === undefined) {
+      look = silhouetteLook(
+        this.view.content.settings.start.shapes,
+        library.catalogue,
+        this.settings,
+      );
+      this.composed.set(SILHOUETTE, look);
     }
     return look;
   }
@@ -747,13 +797,24 @@ export class AssembledCharacters implements CharacterLayer {
     if (library === null) return;
     for (const index of [0, 1] as const) {
       const player = frame.world.players[index];
-      const figure = this.ensure(
-        this.players[index],
-        `player-${String(index)}`,
-        player.look ?? `default-${player.gender ?? ''}`,
-        () => this.playerLook(index, player, library),
-        library,
-      );
+      // Avant la photo (fait « apparence révélée » absent): une silhouette, la même pour les deux.
+      const revealed = lookRevealed(frame.world, index);
+      const figure = revealed
+        ? this.ensure(
+            this.players[index],
+            `player-${String(index)}`,
+            player.look ?? `default-${player.gender ?? ''}`,
+            () => this.playerLook(index, player, library),
+            library,
+          )
+        : this.ensure(
+            this.players[index],
+            `player-${String(index)}`,
+            SILHOUETTE,
+            () => this.hiddenLook(library),
+            library,
+            this.settings.silhouette.color,
+          );
       this.players[index] = figure;
       const seat = this.seatOf(frame, index);
       let held: string | null = null;

@@ -1,7 +1,7 @@
 // Le pas de simulation du socle: vide de règles, mais déterministe, horodaté et conforme au schéma d'état.
 import * as v from 'valibot';
 import { describe, expect, it } from 'vitest';
-import { WorldSchema } from '../src/etat/monde';
+import { DATA_SCHEMA, WorldSchema } from '../src/etat/monde';
 import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { SIM_HZ } from '../src/simulation/noyau/constantes';
 import { idleInput, IntentSchema } from '../src/simulation/noyau/entrees';
@@ -144,13 +144,17 @@ describe('sauvegarde', () => {
     const data = JSON.parse(JSON.stringify(newSim(content).world)) as Record<string, unknown>;
     expect(restoreWorld(content, { dataSchema: 15, data }, MEMBERS)).toMatchObject({
       ok: false,
-      reason: 'format 15, plus récent que 1',
+      reason: `format 15, plus récent que ${String(DATA_SCHEMA)}`,
     });
     expect(
-      restoreWorld(content, { dataSchema: 1, data: { ...data, minutes: 'midi' } }, MEMBERS),
+      restoreWorld(
+        content,
+        { dataSchema: DATA_SCHEMA, data: { ...data, minutes: 'midi' } },
+        MEMBERS,
+      ),
     ).toMatchObject({ ok: false, reason: expect.stringMatching(/^minutes/) as unknown });
     expect(
-      restoreWorld(content, { dataSchema: 1, data }, [
+      restoreWorld(content, { dataSchema: DATA_SCHEMA, data }, [
         { id: 'autre', name: 'Zoé' },
         { id: 'encore', name: 'Léo' },
       ]),

@@ -494,6 +494,13 @@
   margin-bottom: 0.75rem;
 }
 
+/* Jeton au-dessus d'une silhouette (apparence pas encore révélée): qui est qui. */
+.lpl-ui .ombre-jeton {
+  position: absolute;
+  transform: translate(-50%, -50%) scale(0.75);
+  pointer-events: none;
+}
+
 /* Jeton */
 .lpl-ui .token {
   display: inline-block;

@@ -201,5 +201,11 @@ export const EffectSchema = v.variant('type', [
    * (`decision` et ses options: champ `decision` d'une étape de quête; lire par `decision_is`).
    */
   v.strictObject({ type: v.literal('choose'), decision: IdSchema, option: IdSchema }),
+  /**
+   * Révèle l'apparence de celui qui agit (ou de chacun avec `to: 'duo'`): jusque-là son personnage
+   * se montre en silhouette, sans traits ni tenue (`simulation/regles/apparence.ts`). Déjà révélée:
+   * sans effet.
+   */
+  v.strictObject({ type: v.literal('reveal_look'), to: v.exactOptional(EffectTargetSchema) }),
 ]);
 export type Effect = v.InferOutput<typeof EffectSchema>;

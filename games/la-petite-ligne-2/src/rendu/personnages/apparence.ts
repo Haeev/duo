@@ -197,6 +197,23 @@ export function composeLook(
   return { shape, skin, pieces };
 }
 
+/**
+ * Look de la silhouette d'un joueur pas encore révélé: le même pour les deux joueurs, sans
+ * cheveux ni coiffe (`settings.silhouette`). Le rendu le peint d'une seule teinte sombre.
+ */
+export function silhouetteLook(
+  startShapes: Readonly<Record<Gender, string>>,
+  catalogue: Catalogue,
+  settings: CharacterSettings = CHARACTER_SETTINGS,
+): Look {
+  const pieces: Look['pieces'] = [];
+  for (const slot of settings.silhouette.slots) {
+    const piece = catalogue.pieces.find((p) => p.slot === slot);
+    if (piece !== undefined) pieces.push({ slot: piece.slot, id: piece.id, colors: [] });
+  }
+  return { shape: startShapes[settings.silhouette.gender], skin: 0, pieces };
+}
+
 /** Look par défaut d'un joueur sans personnage créé: sa silhouette, sa couleur de profil. */
 export function defaultPlayerLook(
   index: 0 | 1,

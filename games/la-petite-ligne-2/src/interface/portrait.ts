@@ -31,6 +31,20 @@ export function hasDrawnPortrait(id: string): boolean {
   return DRAWN_BY_ID.has(PLAYER_IDS.test(id) ? 'joueur' : id);
 }
 
+/**
+ * Portrait d'un joueur dont l'apparence n'est pas encore révélée (avant la photo du prologue): un
+ * buste d'une seule teinte sombre, sans traits, le même pour les deux joueurs.
+ */
+export function silhouettePortraitMarkup(): string {
+  const fill = `fill="${SHADOW}" stroke="${SHADOW}" stroke-width="5" stroke-linejoin="bevel"`;
+  return `<svg class="lpl-por lpl-por--ombre" viewBox="0 0 190 230" aria-hidden="true">
+  <path d="M12 232l16-54 46-22h44l44 20 18 56z" ${fill}/>
+  <path d="M80 128h32l2 32-18 14-18-14z" ${fill}/>
+  <path d="M50 72l16-28 32-9 30 10 13 30-4 38-21 27-24 4-28-10-14-27z" ${fill}/>
+</svg>`;
+}
+
+const SHADOW = '#2b2a36';
 const SKINS = ['#f1c9a5', '#e0ac85', '#c68863', '#9a6646', '#6f4630'] as const;
 const INK = '#2a2522';
 
