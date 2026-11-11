@@ -11,6 +11,7 @@ import { loadContent } from '../../src/donnees/charger';
 import { contentWith, contextOf, wait } from '../aides-l3';
 import { createSim } from '../../src/simulation/noyau/pas';
 import type { WorldState } from '../../src/etat/monde';
+import { markLookRevealed } from '../../src/simulation/regles/apparence';
 import { remember } from '../../src/simulation/regles/memoire';
 import { equipBag } from '../../src/simulation/sac/actions';
 import { addItem } from '../../src/simulation/sac/inventaire';
@@ -33,6 +34,9 @@ function aubruneContent(): ReturnType<typeof contentWith> {
 
 function write(name: string, label: string, world: WorldState): void {
   mkdirSync(FIXTURES, { recursive: true });
+  // Toutes ces parties se passent après la photo du prologue: les deux personnages ont un visage
+  // (sans ce fait, ils resteraient en silhouette; le vrai départ se joue sans sauvegarde, P19).
+  for (const player of [0, 1] as const) markLookRevealed(world, player);
   const save = {
     slot: 1,
     label,

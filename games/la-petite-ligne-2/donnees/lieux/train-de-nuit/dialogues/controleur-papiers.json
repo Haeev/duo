@@ -19,6 +19,16 @@
       "speaker": "controleur",
       "text": "Ta photo d'identité est floue. Ou absente. On la refait. Regarde l'objectif, et ne bouge plus.",
       "emote": null,
+      "opens": "character-editor",
+      "next": "revele"
+    },
+    "revele": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "reveal_look"
+        }
+      ],
       "next": "clic"
     },
     "clic": {

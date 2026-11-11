@@ -129,6 +129,7 @@ export function checkEffect(content: Content, e: Effect, at: string, problems: s
     case 'give_money':
     case 'take_money':
     case 'change_need':
+    case 'reveal_look':
       return;
   }
 }

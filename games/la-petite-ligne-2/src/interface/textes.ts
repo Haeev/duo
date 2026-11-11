@@ -95,6 +95,7 @@ export const TEXTS = {
     'needs-spade': 'Il faut une bêche',
     'needs-tilling': 'Bêche d’abord',
     'nest-empty': 'Nid vide',
+    'no-face-yet': 'Tu n’as pas encore de visage',
     'no-feed': 'Pas de grain',
     'no-line': 'Pas de train par là',
     'no-more-plots': 'Plus de parcelle',

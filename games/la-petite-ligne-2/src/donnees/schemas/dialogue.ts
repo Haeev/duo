@@ -10,6 +10,13 @@ export const EMOTES = ['surprise', 'question', 'joy', 'anger', 'sad', 'idea'] as
 
 const Next = v.nullable(IdSchema);
 
+/**
+ * Écrans de l'interface qu'une réplique peut ouvrir (`opens`). Un écran de plus: son nom ici, et
+ * son ouverture dans `src/interface/ecrans-dialogue.ts`.
+ */
+export const DIALOGUE_SCREEN_IDS = ['character-editor'] as const;
+export type DialogueScreenId = (typeof DIALOGUE_SCREEN_IDS)[number];
+
 export const DialogueNodeSchema = v.variant('kind', [
   /** Une réplique; `speaker`: identifiant de l'habitant, ou `player`. */
   v.strictObject({
@@ -18,6 +25,11 @@ export const DialogueNodeSchema = v.variant('kind', [
     text: TextSchema,
     emote: v.nullable(v.picklist(EMOTES)),
     next: Next,
+    /**
+     * Écran ouvert chez le joueur qui lit, une fois la réplique lue (la touche qui passerait à la
+     * suite l'ouvre); le fermer fait avancer le dialogue. Absent: réplique ordinaire.
+     */
+    opens: v.exactOptional(v.picklist(DIALOGUE_SCREEN_IDS)),
   }),
   v.strictObject({
     kind: v.literal('choice'),

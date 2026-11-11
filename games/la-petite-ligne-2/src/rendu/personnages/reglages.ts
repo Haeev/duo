@@ -141,6 +141,18 @@ export const CHARACTER_SETTINGS = {
    */
   defaultGenders: ['f', 'm'] as const,
   composed: { dress: 0.3, hat: 0.2, accessory: 0.2 },
+
+  /**
+   * Silhouette d'un joueur dont l'apparence n'est pas encore révélée (avant la photo du prologue):
+   * la même pour les deux, une tête nue et le volume d'une tenue (première pièce du catalogue de
+   * chaque emplacement de `slots`), le tout d'une seule teinte sombre: ni traits, ni couleur de
+   * tenue, ni coiffure. `gender`: la morphologie de départ prêtée aux deux.
+   */
+  silhouette: {
+    gender: 'f',
+    slots: ['head', 'top', 'bottom', 'shoes'],
+    color: '#2b2a36',
+  },
 } as const;
 
 export type CharacterSettings = typeof CHARACTER_SETTINGS;

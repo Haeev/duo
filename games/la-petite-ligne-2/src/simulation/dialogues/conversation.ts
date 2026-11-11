@@ -6,7 +6,7 @@
  */
 import type { PlaceContent } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
-import type { DialogueDef, DialogueNode } from '../../donnees/schemas/dialogue';
+import type { DialogueDef, DialogueNode, DialogueScreenId } from '../../donnees/schemas/dialogue';
 import type { Effect } from '../../donnees/schemas/regles';
 import type { ReadonlyWorld } from '../../etat/monde';
 import type { Content } from '../../donnees/charger';
@@ -33,10 +33,30 @@ function ruleContext(sim: SimContext, player: PlayerIndex): RuleContext {
   return { world: sim.world, content: sim.content, actor: player };
 }
 
-/** Clé du « déjà joué » d'un dialogue `once`. */
+/**
+ * Clé du « déjà joué » d'un dialogue `once`. Le fait vaut `true` quand le dialogue est allé au
+ * bout; tant qu'il est entamé, il vaut le nœud affiché: un dialogue fermé avant sa fin (touche
+ * Retour, partie quittée puis reprise) se reprend là où il s'était arrêté, sans rejouer ses
+ * effets déjà appliqués. Sans cela, une étape de quête qui attend sa fin restait bloquée.
+ */
 export function onceKey(place: string, dialogue: DialogueDef, player: PlayerIndex): string {
   const base = `dialogues.${place}.${dialogue.id}`;
   return dialogue.once === 'player' ? `${base}.j${String(player)}` : base;
+}
+
+function onceAuthor(dialogue: DialogueDef, player: PlayerIndex): PlayerIndex | 'duo' {
+  return dialogue.once === 'duo' ? 'duo' : player;
+}
+
+/** Nœud où reprendre un dialogue `once` entamé, `null`: jamais ouvert (ou nœud disparu des données). */
+function resumeNode(
+  world: ReadonlyWorld,
+  place: string,
+  dialogue: DialogueDef,
+  player: PlayerIndex,
+): string | null {
+  const at = recall(world, onceKey(place, dialogue, player))?.v;
+  return typeof at === 'string' && Object.hasOwn(dialogue.nodes, at) ? at : null;
 }
 
 /** Le dialogue à jouer: le plus prioritaire dont les conditions sont vraies et qui n'est pas épuisé. */
@@ -51,11 +71,14 @@ export function pickDialogue(
   let best: DialogueDef | null = null;
   for (const dialogue of place.dialogues) {
     if (dialogue.villager !== villager) continue;
-    if (
-      dialogue.once !== null &&
-      recall(sim.world, onceKey(place.def.id, dialogue, player)) !== null
-    )
-      continue;
+    if (dialogue.once !== null) {
+      const played = recall(sim.world, onceKey(place.def.id, dialogue, player));
+      // Allé au bout: épuisé. Entamé: il se reprend, sauf si l'autre le lit en ce moment (`duo`).
+      const other: PlayerIndex = player === 0 ? 1 : 0;
+      const busy = sim.world.players[other].talk?.dialogue === dialogue.id;
+      if (played !== null && (typeof played.v !== 'string' || (dialogue.once === 'duo' && busy)))
+        continue;
+    }
     if (!evaluateAll(ctx, dialogue.when)) continue;
     if (best === null || dialogue.priority > best.priority) best = dialogue;
   }
@@ -191,6 +214,13 @@ function enter(
         const talk = sim.world.players[player].talk;
         if (talk === null) return;
         talk.node = id;
+        if (dialogue.once !== null)
+          remember(
+            sim,
+            onceKey(sim.world.common.place, dialogue, player),
+            id,
+            onceAuthor(dialogue, player),
+          );
         sim.touch('players');
         sim.emit({
           type: 'talk_page',
@@ -203,6 +233,14 @@ function enter(
       }
     }
   }
+  // Allé au bout (ou arrêté par une faute de données): un dialogue `once` ne se rejouera plus.
+  if (dialogue.once !== null)
+    remember(
+      sim,
+      onceKey(sim.world.common.place, dialogue, player),
+      true,
+      onceAuthor(dialogue, player),
+    );
   // Fin naturelle (et non faute de données): le commerçant propose encore sa boutique.
   if (id === null && offerShop(sim, player, dialogue)) return;
   endTalk(sim, player);
@@ -219,22 +257,22 @@ export function startTalk(sim: SimContext, player: PlayerIndex, villager: string
     sim.emit({ type: 'refused', player, reason: 'nothing-to-say', target: villager });
     return false;
   }
+  // Un dialogue `once` entamé puis fermé reprend au nœud où il s'était arrêté.
+  const from =
+    dialogue.once === null
+      ? dialogue.start
+      : (resumeNode(sim.world, place.def.id, dialogue, player) ?? dialogue.start);
   if (dialogue.once !== null)
-    remember(
-      sim,
-      onceKey(place.def.id, dialogue, player),
-      true,
-      dialogue.once === 'duo' ? 'duo' : player,
-    );
+    remember(sim, onceKey(place.def.id, dialogue, player), from, onceAuthor(dialogue, player));
   else if (hasNews(dialogue)) remember(sim, heardKey(place.def.id, dialogue, player), true, player);
-  state.talk = { villager, dialogue: dialogue.id, node: dialogue.start };
+  state.talk = { villager, dialogue: dialogue.id, node: from };
   villagerState.met[player] = true;
   villagerState.talkingWith = player;
   sim.touch('players');
   sim.touch('place');
   greet(sim, player, villager);
   sim.emit({ type: 'talk_started', player, villager, dialogue: dialogue.id });
-  enter(sim, player, dialogue, dialogue.start);
+  enter(sim, player, dialogue, from);
   return true;
 }
 
@@ -304,6 +342,8 @@ export interface TalkView {
     fails: 'hygiene' | null;
     blocked: ExchangeRefusal | null;
   }[];
+  /** Écran que cette réplique ouvre une fois lue (`opens` du nœud), `null`: aucun. */
+  readonly opens: DialogueScreenId | null;
 }
 
 /** La page qui propose la boutique: deux options, textes du commerce, rien d'échangé. */
@@ -326,6 +366,7 @@ function shopOfferView(
       { id: open, text: agreeFor(world, player, shop.talk.open), fails: null, blocked: null },
       { id: leave, text: agreeFor(world, player, shop.talk.leave), fails: null, blocked: null },
     ],
+    opens: null,
   };
 }
 
@@ -349,6 +390,7 @@ export function talkView(
       text: agreeFor(world, player, node.text),
       emote: node.emote,
       options: [],
+      opens: node.opens ?? null,
     };
   if (node.kind !== 'choice') return null;
   const ctx: RuleContext = { world, content, actor: player };
@@ -367,5 +409,6 @@ export function talkView(
     text: null,
     emote: null,
     options,
+    opens: null,
   };
 }

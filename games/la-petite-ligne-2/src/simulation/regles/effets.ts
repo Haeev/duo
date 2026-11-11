@@ -13,6 +13,7 @@ import { changeBond } from '../dialogues/amitie';
 import { effectTargets } from '../dialogues/echanges';
 import { earn, pay } from '../sac/argent';
 import { removeItem } from '../sac/inventaire';
+import { revealLook } from './apparence';
 import { remember } from './memoire';
 import { giveEntry, givePiece, givePlan, giveRecipe } from './recompenses';
 import { choose } from '../quetes/decisions';
@@ -65,6 +66,9 @@ export function applyEffect(sim: SimContext, actor: PlayerIndex, effect: Effect)
       return;
     case 'choose':
       choose(sim, actor, effect.decision, effect.option);
+      return;
+    case 'reveal_look':
+      for (const p of effectTargets(actor, effect.to)) revealLook(sim, p);
       return;
   }
 }

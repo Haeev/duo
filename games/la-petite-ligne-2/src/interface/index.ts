@@ -19,6 +19,7 @@ import { createKitchen } from './cuisine/index';
 import { createCoopScreen } from './basse-cour/ecran';
 import { createDecoMode, decoHousingFor } from './deco/deco';
 import { createDialogue, type BabbleInfo } from './dialogue';
+import { createDialogueScreens } from './ecrans-dialogue';
 import type { UiSettings } from './carnet/lectures';
 import { createCharacterEditor, type EditorPreviewFactory } from './editeur/editeur';
 import { EDITOR_SETTINGS } from './editeur/reglages';
@@ -38,6 +39,7 @@ import { fill, refusalText, TEXTS } from './textes';
 import { passageSays } from '../simulation/lieux/index';
 import { hydrateThumbnails, type ObjectViewer } from '../rendu/objets/index';
 import { glanceTarget } from '../simulation/quetes/lecture';
+import { lookRevealed } from '../simulation/regles/apparence';
 
 import './interface.css';
 import './carnet/carnet.css';
@@ -72,7 +74,11 @@ export interface InterfaceOptions {
   readonly characterPreview?: EditorPreviewFactory;
   /** Couleurs des profils (hôte, invité): pièces de départ proches de sa couleur. */
   readonly playerColors?: readonly [string, string];
-  /** Ouvre l'éditeur au début tant que le joueur n'a pas d'apparence (prologue). Défaut: oui. */
+  /**
+   * Au début de la séance, ouvre l'éditeur chez un joueur dont l'apparence est révélée mais jamais
+   * composée (remplaçant d'une partie reprise). Avant la révélation, rien ne s'ouvre: l'éditeur
+   * vient d'une réplique de dialogue (`opens`). Défaut: oui.
+   */
   readonly editorAtStart?: boolean;
   /** Écoute du clavier (`window` par défaut). */
   readonly keyTarget?: Pick<Window, 'addEventListener' | 'removeEventListener'>;
@@ -150,10 +156,33 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     view.content,
     typeof localStorage === 'undefined' ? null : localStorage,
   );
+  // Répliques qui ouvrent un écran (`opens` des données): la table des écrans ouvrables.
+  const dialogueScreens = createDialogueScreens(
+    {
+      'character-editor': {
+        open: () => {
+          const world = view.world();
+          const me = view.localIndex();
+          if (world === null || me === null) return false;
+          editor.open('create', world, me);
+          return true;
+        },
+        isOpen: () => editor.isOpen(),
+      },
+    },
+    () => {
+      const world = view.world();
+      const me = view.localIndex();
+      return world === null || me === null ? null : talkView(view.content, world, me);
+    },
+    send,
+  );
   const dialogue = createDialogue(
     layer,
     view.content,
-    send,
+    (intent) => {
+      dialogueScreens.send(intent);
+    },
     keyLabel,
     reduced,
     options.onBabble ?? (() => undefined),
@@ -178,7 +207,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     openEditor: () => {
       const world = view.world();
       const me = view.localIndex();
-      if (world === null || me === null) return;
+      // Pas de tenue à changer tant que le personnage n'a pas de visage (silhouette).
+      if (world === null || me === null || !lookRevealed(world, me)) return;
       notebook.close();
       editor.open('mirror', world, me);
     },
@@ -350,7 +380,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       }
       case 'mirror_opened': {
         const world = view.world();
-        if (event.player === me && world !== null) editor.open('mirror', world, me);
+        if (event.player === me && world !== null && lookRevealed(world, me))
+          editor.open('mirror', world, me);
         break;
       }
       // Les autres événements ne touchent pas l'interface: les changements de palier
@@ -561,11 +592,13 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       const me = local();
       layer.hidden = world === null || me === null;
       if (world === null || me === null) return;
-      if (!editorShown && world.players[me].look === null) {
+      if (!editorShown) {
         editorShown = true;
-        editor.open('create', world, me);
+        if (lookRevealed(world, me) && world.players[me].look === null)
+          editor.open('create', world, me);
       }
       editor.frame(dt, world, me);
+      dialogueScreens.frame();
       fishing.frame(dtMs / 1000);
       dialogue.sync(talkView(view.content, world, me), now);
       dialogue.frame(dtMs);

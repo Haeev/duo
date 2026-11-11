@@ -5,6 +5,7 @@
 import type { Content } from '../donnees/charger';
 import type { PlayerIndex } from '../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../etat/monde';
+import { lookRevealed } from '../simulation/regles/apparence';
 import { el, icon, setAttr, setText, show, toggle } from './dom';
 import {
   clockModel,
@@ -35,6 +36,8 @@ const WEATHER_ICONS = {
 /** Hauteurs (m) où s'accrochent la bulle d'action et le jeton de l'autre joueur. */
 const PROMPT_HEIGHT = 1.1;
 const TOKEN_HEIGHT = 2.2;
+/** Hauteur (m) du jeton posé au-dessus d'une silhouette (apparence pas encore révélée). */
+const SHADOW_TOKEN_HEIGHT = 2.05;
 
 export type ProjectToScreen = (
   x: number,
@@ -131,8 +134,17 @@ export function createHud(
   const timer = el('div', { class: 'glance-timer', 'aria-hidden': 'true' }, [el('i')]);
   const glanceLayer = el('div', { class: 'glance' }, [otherToken, quest, timer]);
   glanceLayer.hidden = true;
+  // Avant la photo, les deux silhouettes sont les mêmes: chacune porte le jeton de son joueur
+  // (rond: moi, losange: l'autre), seul repère de qui est qui.
+  const shadowTokens = [
+    el('div', { class: 'ombre-jeton', 'aria-hidden': 'true' }, [el('span', { class: 'token' })]),
+    el('div', { class: 'ombre-jeton', 'aria-hidden': 'true' }, [
+      el('span', { class: 'token token--other' }),
+    ]),
+  ] as const;
+  for (const token of shadowTokens) token.hidden = true;
 
-  root.append(clock, needs, toolbar, prompt, notice, glanceLayer);
+  root.append(...shadowTokens, clock, needs, toolbar, prompt, notice, glanceLayer);
 
   const watcher = new NeedsWatcher();
   const fold = new ToolbarFold();
@@ -202,6 +214,18 @@ export function createHud(
 
       const glancing = glance.active(now);
       const me = world.players[local];
+      shadowTokens.forEach((token, i) => {
+        const player: PlayerIndex = i === 0 ? local : local === 0 ? 1 : 0;
+        const body = world.players[player].body;
+        const at =
+          menu || lookRevealed(world, player)
+            ? null
+            : (project?.(body.x, body.y, SHADOW_TOKEN_HEIGHT) ?? null);
+        show(token, at !== null);
+        if (at === null) return;
+        token.style.left = `${String(Math.round(at.x))}px`;
+        token.style.top = `${String(Math.round(at.y))}px`;
+      });
       const list = watcher.update(now, me.needs, me.tiers, glancing || menu || needsAlways);
       list.forEach((n, i) => {
         const node = medallions[i];
@@ -316,6 +340,7 @@ export function createHud(
       purse.classList.add('purse--bump');
     },
     dispose() {
+      for (const token of shadowTokens) token.remove();
       clock.remove();
       needs.remove();
       toolbar.remove();

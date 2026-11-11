@@ -7,6 +7,7 @@ import { initialBrickStates } from '../../etat/briques';
 import type { PlayerState } from '../../etat/joueur';
 import type { PlaceState } from '../../etat/lieu';
 import { DATA_SCHEMA, type WorldState } from '../../etat/monde';
+import { markLookRevealed, placeReveals } from '../regles/apparence';
 import { layMapGround } from '../sac/sol';
 import { arrivalFrame } from '../voyage/arrivee';
 
@@ -121,5 +122,8 @@ export function createWorld(
     places: { [start.place]: createPlaceState(content, place) },
   };
   placeAtArrival(content, world);
+  // Sans visage au départ seulement là où une photo attend les joueurs (`reveal_look` dans les
+  // données du lieu de départ); ailleurs, ils arrivent avec leur visage.
+  if (!placeReveals(place)) for (const player of [0, 1] as const) markLookRevealed(world, player);
   return world;
 }

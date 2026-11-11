@@ -8,6 +8,7 @@ import type { BeatDef, GestureDef } from '../../donnees/schemas/scene';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { chapterEndView } from '../../simulation/quetes/lecture';
 import { STORY } from '../../simulation/quetes/reglages';
+import { lookRevealed } from '../../simulation/regles/apparence';
 import { sceneView } from '../../simulation/scenes/lecture';
 import { HISTOIRE_SETTINGS } from './reglages';
 
@@ -221,6 +222,8 @@ export type SceneSpeakerModel =
       readonly name: string;
       /** C'est le personnage de ce joueur. */
       readonly me: boolean;
+      /** Son apparence n'est pas encore révélée: portrait en silhouette. */
+      readonly hidden: boolean;
     }
   | { readonly kind: 'narrator' };
 
@@ -307,6 +310,7 @@ export function sceneScreenModel(
         player: beat.speakerPlayer,
         name: world.players[beat.speakerPlayer].name,
         me: beat.speakerPlayer === me,
+        hidden: !lookRevealed(world, beat.speakerPlayer),
       };
     else
       speaker = { kind: 'villager', id: beat.speaker, name: villagerName(content, beat.speaker) };

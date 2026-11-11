@@ -89,6 +89,7 @@ describe('répliques des scènes', () => {
       player: 0,
       name: 'Ada',
       me: true,
+      hidden: false,
     });
     expect(sceneScreenModel(sim.world, sim.content, 1)?.line?.speaker).toMatchObject({
       kind: 'player',

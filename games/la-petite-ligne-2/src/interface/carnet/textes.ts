@@ -102,6 +102,7 @@ export const CARNET_TEXTS = {
     title: 'Tenues',
     open: 'Changer de tenue',
     hint: 'Choisis tes vêtements, ta coiffure et tes couleurs.',
+    hidden: 'Tu n’as pas encore de visage: ta photo d’identité reste à faire.',
     slot: 'Éditeur de personnage',
     keys: 'ouvrir',
   },

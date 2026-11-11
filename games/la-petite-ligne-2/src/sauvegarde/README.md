@@ -30,6 +30,7 @@ L'hôte relit, remet d'aplomb (`settleForResume`: gestes, dialogues et cible oub
 ## Format et migrations
 
 - `DATA_SCHEMA` (`src/etat/monde.ts`) est la version courante. La monter oblige à: ajouter `MIGRATIONS[n]` (de `n` à `n + 1`, pure), ranger `tests/donnees/sauvegarde-v<n+1>.json`, et le test `sauvegarde.test.ts` vérifie les deux. Une référence n'est jamais régénérée.
+- Version 2 (2026-11-11): l'apparence d'un joueur se révèle à la photo du prologue (fait `joueurs.apparence.j<n>`). `MIGRATIONS[1]` retient ce fait pour les deux joueurs d'une partie de la version 1 (elle avait commencé par l'éditeur: les personnages restent visibles). Test: `tests/photo-prologue.test.ts`.
 - Pendant la refonte, `STAGE_FLOOR` est la plus ancienne version reprise. Plus ancienne: refus poli avec message, partie neuve, écriture qui continue (ADR 0017). À l'Alpha: `STAGE_FLOOR = 1`, migrations seules.
 - Sauvegarde d'un format plus récent ou abîmée: même refus, message différent. Rien ne plante.
 

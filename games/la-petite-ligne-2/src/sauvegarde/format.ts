@@ -9,6 +9,7 @@
  */
 import * as v from 'valibot';
 import { DATA_SCHEMA, WorldSchema, type WorldState } from '../etat/monde';
+import { lookRevealedKey } from '../simulation/regles/apparence';
 
 /** Plus ancien format encore repris, dans l'étape en cours de la refonte. */
 export const STAGE_FLOOR = 1;
@@ -17,8 +18,33 @@ export const STAGE_FLOOR = 1;
 export type Migration = (data: unknown) => unknown;
 export type MigrationTable = Readonly<Record<number, Migration>>;
 
-/** `MIGRATIONS[n]`: de la version `n` à `n + 1`. Vide tant que le format n'a jamais changé. */
-export const MIGRATIONS: MigrationTable = {};
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Version 1 vers 2: l'apparence se révèle désormais à la photo du prologue (fait
+ * `joueurs.apparence.j<n>`). Une partie de la version 1 a commencé par l'éditeur de personnage:
+ * ses deux personnages ont déjà été vus, ils restent révélés.
+ */
+function revealBothLooks(data: unknown): unknown {
+  if (!isRecord(data) || !isRecord(data.common) || !isRecord(data.progress))
+    throw new Error('état sans tranche commune ou progression');
+  const memory = data.progress.memory;
+  if (!isRecord(memory)) throw new Error('mémoire des faits absente');
+  const day = data.common.day;
+  const revealed: Record<string, unknown> = {};
+  for (const player of [0, 1] as const)
+    revealed[lookRevealedKey(player)] = { v: true, by: player, day };
+  return {
+    ...data,
+    schema: 2,
+    progress: { ...data.progress, memory: { ...memory, ...revealed } },
+  };
+}
+
+/** `MIGRATIONS[n]`: de la version `n` à `n + 1`. */
+export const MIGRATIONS: MigrationTable = { 1: revealBothLooks };
 
 export type ReadFailure = 'older-stage' | 'newer' | 'damaged';
 export type ReadResult =

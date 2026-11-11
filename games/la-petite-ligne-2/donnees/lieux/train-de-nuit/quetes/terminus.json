@@ -127,6 +127,10 @@
               "by": "duo"
             },
             {
+              "type": "reveal_look",
+              "to": "duo"
+            },
+            {
               "type": "travel_to",
               "place": "aubrune",
               "arrival": {

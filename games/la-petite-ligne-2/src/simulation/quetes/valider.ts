@@ -237,6 +237,7 @@ function checkEffects(env: Env, effects: readonly StepEffect[], at: string): voi
       case 'give_entry':
       case 'give_piece':
       case 'choose':
+      case 'reveal_look':
         env.base.effect(env.content, e, at, problems);
     }
   }

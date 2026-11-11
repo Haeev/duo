@@ -6,6 +6,7 @@
 - `effets.ts`: `applyEffect`, `applyEffects`; chaque effet passe par le système qui possède ce qu'il touche.
 - `memoire.ts`: faits retenus (`remember`, `recall`, compteurs `bump`), garde de taille `maxFacts`.
 - `reglages.ts`: réglages du lot L3 que les fichiers de données n'ont pas encore (à migrer dans `reglages.json`).
+- `apparence.ts`: apparence révélée ou non (`lookRevealed`, fait `joueurs.apparence.j<n>`), retenue par l'effet `reveal_look` (`to: "duo"` pour les deux) ou par la validation de l'éditeur (`set_look`). Une partie neuve ne commence cachée que si le lieu de départ sait révéler (`placeReveals`). Avant: silhouette dans le monde et les portraits, miroir refusé (`no-face-yet`), onglet Tenues fermé. Test: `tests/photo-prologue.test.ts`.
 - `recompenses.ts`: récompenses qui ne sont pas des objets (recette, plan, entrée de collection, pièce de tenue), garde-robe gagnée (`isPieceOwned`, `wardrobeOf`).
 
 ## Donner une récompense (recette)

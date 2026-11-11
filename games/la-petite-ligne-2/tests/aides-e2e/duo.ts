@@ -39,6 +39,8 @@ export interface ProbeWorld {
   };
   readonly players: readonly ProbePlayer[];
   readonly progress?: {
+    /** Faits retenus (dont `joueurs.apparence.j<n>`: l'apparence de ce joueur est révélée). */
+    readonly memory?: Readonly<Record<string, { readonly v: unknown } | undefined>>;
     readonly quests: Readonly<
       Record<
         string,
@@ -73,6 +75,8 @@ export interface ProbeWorld {
 export interface ProbePlayer {
   readonly member: string;
   readonly name: string;
+  /** Apparence composée dans l'éditeur, `null` tant qu'il n'a rien validé. */
+  readonly look?: unknown;
   readonly money: number;
   readonly body: { readonly x: number; readonly y: number; readonly facing: number };
   readonly needs: Readonly<Record<Need, number>>;
