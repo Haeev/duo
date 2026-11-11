@@ -19,6 +19,7 @@ import type { ReadonlyWorld } from '../../etat/monde';
 import type { GraphicsOptions } from '../../rendu/options';
 import type { QuestLineDef } from '../../donnees/schemas/quete';
 import { RULES } from '../../simulation/regles/reglages';
+import { stowedWasher } from '../../simulation/logement/etat';
 import { fill } from '../textes';
 import { UI_TUNING } from '../reglages';
 import { CARNET_TEXTS } from './textes';
@@ -279,6 +280,7 @@ export function worldSources(content: Content, extras: WorldSourcesExtras = {}):
       const glance = glanceTarget(world, content, local);
       // Hygiène trop basse: une étape sur dialogue attend (cahier 4.4), le carnet le dit.
       const dirty = RULES.dialogue.failHygiene.includes(world.players[local].tiers.hygiene);
+      const washer = dirty ? stowedWasher(content, world) : null;
       return journal(world, content, local).map((entry) => {
         const place = content.places[entry.place];
         const def = place?.quests[entry.quest];
@@ -308,9 +310,13 @@ export function worldSources(content: Content, extras: WorldSourcesExtras = {}):
           })),
           finished: entry.done,
           step: waitsForWash(dirty, entry, def)
-            ? fill(CARNET_TEXTS.quests.washFirst, {
-                etape: entry.steps.map((st) => st.objective).join(' ; '),
-              })
+            ? fill(
+                washer === null ? CARNET_TEXTS.quests.washFirst : CARNET_TEXTS.quests.washStowed,
+                {
+                  etape: entry.steps.map((st) => st.objective).join(' ; '),
+                  meuble: washer?.toLocaleLowerCase('fr') ?? '',
+                },
+              )
             : entry.steps.map((st) => st.objective).join(' ; '),
           together: entry.steps.some((st) => st.together),
           target,

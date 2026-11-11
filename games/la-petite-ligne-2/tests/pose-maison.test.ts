@@ -63,6 +63,13 @@ describe('pose dans la maison du garde', () => {
 
   it('un meuble solide se pose dans la salle: les autres morceaux et les meubles à venir ne comptent pas', () => {
     const sim = aubrune();
+    // Le baquet de départ prend la dernière place libre de la salle (4 x 5 m): rangé, il la rend.
+    const state = sim.world.places.aubrune;
+    if (state === undefined) throw new Error('lieu');
+    expect(refusalOf(sim, { type: 'tabouret-miel', x: 21.5, y: 213.5, rotation: 0 })).toBe(
+      'overlap',
+    );
+    state.placed = state.placed.filter((p) => p.type !== 'baquet');
     // Au milieu de la salle, loin des portes: rien ne s'y oppose.
     expect(refusalOf(sim, { type: 'tabouret-miel', x: 21.5, y: 213.5, rotation: 0 })).toBeNull();
     // À la place de la future cuisinière (absente tant que la cuisine n'est pas faite): la pièce

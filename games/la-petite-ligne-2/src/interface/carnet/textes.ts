@@ -16,6 +16,8 @@ export const CARNET_TEXTS = {
     togetherHint: 'Il faut être deux pour cette étape.',
     /** Hygiène trop basse: l'étape sur dialogue attend une toilette (cahier 4.4). `{etape}`: la ligne. */
     washFirst: 'Un brin de toilette d’abord. Ensuite : {etape}',
+    /** Même cas, mais le meuble pour se laver est rangé (mode déco). `{meuble}`: son nom, en minuscules. */
+    washStowed: 'Pose le {meuble} dans la maison et fais ta toilette. Ensuite : {etape}',
     page: 'Page {n} sur {max}',
     chapter: 'Chapitre {n} sur {max}, {etat}',
     chapterState: { done: 'fait', current: 'en cours', todo: 'à venir' },

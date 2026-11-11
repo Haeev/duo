@@ -39,6 +39,11 @@ export const HousingStateSchema = v.strictObject({
   rooms: v.record(IdSchema, RoomProgressSchema),
   /** Meubles possédés et rangés (hors sac), par type. */
   stock: v.record(IdSchema, v.pipe(CountSchema, v.minValue(1))),
+  /**
+   * Meubles de départ déjà remis (`stock` et `furnished` de la fiche), par type: le rattrapage ne
+   * remet que l'écart, une seule fois. Absent: logement créé avant ce relevé (0.22.0 et avant).
+   */
+  granted: v.exactOptional(v.record(IdSchema, CountSchema)),
   held: v.tuple([v.nullable(HoldSchema), v.nullable(HoldSchema)]),
   decorating: v.tuple([v.boolean(), v.boolean()]),
   /** Pièce où chaque joueur travaille, `null`: aucune. */

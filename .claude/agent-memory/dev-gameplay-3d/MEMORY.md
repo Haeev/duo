@@ -880,3 +880,9 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `tests/aides-visite.ts` (`visitObject`) cherche une place à `reach.action` du centre de l'objet: un buisson 1 x 1 coincé entre un mur et le potager ne se vise que depuis le bord de l'emprise plus la portée; `tests/aides-geste.ts` (`faceObject`) cherche jusqu'à une demi-case plus loin.
 - La chaîne du plan d'Aubrune est rejouable: `construire_plan.py`, `prettier --ignore-path= --write` sur le `plan.json` des docs (le dossier `docs/` est ignoré par prettier), `plan-vers-lieu.ts`, `assembler_lieu.py`. Seul écart parasite au 2026-11-11: l'ordre d'un objet de `interieurs/epicerie-rdc.json`, à remettre par `git checkout` du fichier.
 - Les heredocs Python qui modifient un fichier du dépôt passent tant qu'ils sont courts; un long heredoc ou un `cat >>` avec `$(...)` est refusé: préférer Edit.
+
+## Meubles de départ des logements (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Un meuble fixe de la carte qui doit devenir un meuble des joueurs: `furnished` de la fiche du logement (posé à la création par `ensureHousings`, comme une pose déco), pas `map.objects`. `granted` (facultatif dans `HousingState`, aucune migration) relève ce qui a été remis: le rattrapage met l'écart dans `stock` une seule fois.
+- Un meuble à brique `relieve` sur `hygiene` demande la fonction `wash` à sa pièce (`functionsOf`): sans `wash` dans `unlocks`, la pose déco répond `wrong-room`. Le validateur des logements contrôle aussi `furnished`.
+- Le test de couverture de `reseau-etat-partage.test.ts` descend jusqu'aux champs du logement (`places.*.housing.*.<champ>`): tout champ ajouté à `HousingState` se remplit dans `fillEverything`.

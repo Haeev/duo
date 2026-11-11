@@ -21,6 +21,8 @@ export const TEXTS = {
     hunger: 'Faim',
     sleep: 'Sommeil',
     hygiene: 'Hygiène',
+    /** Aide de la jauge d'hygiène quand le meuble pour se laver est rangé. `{meuble}`: son nom, en minuscules. */
+    washStowed: 'Pose le {meuble} dans la maison pour te laver',
     state: {
       blocked: 'à zéro',
       low: 'basse',

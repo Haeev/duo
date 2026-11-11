@@ -1,5 +1,6 @@
 /** Contrôles des logements entre fichiers: objets, meubles et pièces référencés existent, pièces disjointes. */
 import type { Content, PlaceContent } from '../../donnees/charger';
+import { boxOf, functionsOf } from './pose';
 
 function overlap(
   a: { x: number; y: number; w: number; h: number },
@@ -41,6 +42,27 @@ export function validateHousings(content: Content): string[] {
         const prop = content.props[type];
         if (prop === undefined) problems.push(`${at}: meuble inconnu « ${type} »`);
         else if (!prop.placeable) problems.push(`${at}: meuble « ${type} » non posable`);
+      }
+      for (const piece of def.furnished ?? []) {
+        const where = `${at}, meuble posé « ${piece.prop} » en (${String(piece.x)}, ${String(piece.y)})`;
+        const prop = content.props[piece.prop];
+        if (prop === undefined) {
+          problems.push(`${where}: meuble inconnu`);
+          continue;
+        }
+        if (!prop.placeable) problems.push(`${where}: meuble non posable`);
+        // Même règle de pièce que le mode déco: dans une pièce qui permet ce que le meuble demande.
+        const box = boxOf(prop, piece);
+        const room = def.rooms.find(
+          (r) =>
+            box.x0 >= r.area.x &&
+            box.y0 >= r.area.y &&
+            box.x1 <= r.area.x + r.area.w &&
+            box.y1 <= r.area.y + r.area.h,
+        );
+        if (room === undefined) problems.push(`${where}: hors des pièces du logement`);
+        else if (functionsOf(prop).some((f) => !room.unlocks.includes(f)))
+          problems.push(`${where}: la pièce « ${room.id} » ne permet pas ce meuble (\`unlocks\`)`);
       }
     }
     problems.push(...siteProblems(content, place));

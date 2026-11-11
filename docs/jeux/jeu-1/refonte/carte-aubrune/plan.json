@@ -7352,15 +7352,6 @@
           "pourquoi": "l'eau tirée à la pompe du jardin, posée à côté de la cuisinière"
         },
         {
-          "id": "maison-rdc-baquet",
-          "type": "baquet",
-          "modele": "tub",
-          "x": 7.5,
-          "y": 4,
-          "rotation": 3,
-          "pourquoi": "le baquet de la toilette, entre le pied du lit et le refend: au chaud près des feux et du seau de la pompe, hors de la vue de la porte"
-        },
-        {
           "id": "maison-rdc-tapis-de-sol",
           "type": "tapis-long",
           "modele": "rug-runner",

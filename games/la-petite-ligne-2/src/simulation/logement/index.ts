@@ -45,7 +45,8 @@ function contextOf(sim: SimContext, housing: string): Ctx | null {
   const pstate = sim.world.places[id];
   const def = place?.housings[housing];
   if (place === undefined || pstate === undefined || def === undefined) return null;
-  if (ensureHousings(place, pstate, sim.world.common.day)) sim.touch('place');
+  if (ensureHousings(sim.content, sim.world.players, place, pstate, sim.world.common.day))
+    sim.touch('place');
   const state = pstate.housing?.[housing];
   return state === undefined ? null : { place, pstate, def, state };
 }
@@ -636,7 +637,8 @@ function onStep(sim: SimContext): void {
   const pstate = sim.world.places[id];
   if (place === undefined || pstate === undefined) return;
   if (Object.keys(place.housings).length === 0) return;
-  if (ensureHousings(place, pstate, sim.world.common.day)) sim.touch('place');
+  if (ensureHousings(sim.content, sim.world.players, place, pstate, sim.world.common.day))
+    sim.touch('place');
   for (const def of Object.values(place.housings)) {
     const state = pstate.housing?.[def.id];
     if (state === undefined) continue;

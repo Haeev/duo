@@ -88,6 +88,24 @@ export const HousingSchema = v.strictObject({
   garden: v.nullable(RectSchema),
   /** Meubles déjà possédés à l'arrivée (inventaire de la maison), par type. */
   stock: v.record(IdSchema, v.pipe(CountSchema, v.minValue(1))),
+  /**
+   * Meubles des joueurs déjà posés à l'arrivée (coordonnées du lieu, comme une pose du mode déco):
+   * ils se déplacent et se rangent comme les autres. Un logement d'une partie déjà commencée reçoit
+   * dans son inventaire, une seule fois, ce qu'une version ultérieure ajoute ici ou dans `stock`.
+   */
+  furnished: v.exactOptional(
+    v.pipe(
+      v.array(
+        v.strictObject({
+          prop: IdSchema,
+          x: FiniteSchema,
+          y: FiniteSchema,
+          rotation: v.picklist([0, 1, 2, 3]),
+        }),
+      ),
+      v.maxLength(40),
+    ),
+  ),
 });
 export type HousingDef = v.InferOutput<typeof HousingSchema>;
 
