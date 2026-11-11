@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-nuit-blanche",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.nuit-blanche",
+      "of": "actor",
+      "atMost": 0
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Pas dormi. Moi non plus: c'est le service. Toi, c'est quoi ? ... Ne réponds pas. Article 3: pas de question personnelle.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

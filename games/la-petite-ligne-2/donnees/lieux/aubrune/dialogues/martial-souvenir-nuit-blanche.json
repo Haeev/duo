@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-nuit-blanche",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.nuit-blanche",
+      "of": "actor",
+      "atMost": 0
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Une nuit blanche ? Moi, c'est la veillée de Pâques, une fois l'an. Le lendemain, je monte la côte à pied. Toi, prends le plat.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

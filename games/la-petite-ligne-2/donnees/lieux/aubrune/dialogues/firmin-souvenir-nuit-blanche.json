@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-nuit-blanche",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.nuit-blanche",
+      "of": "actor",
+      "atMost": 0
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Pas dormi ? Moi, une fois, en 1987. Le lendemain, j'ai annoncé le 7 h 40 à 7 h 04. Méfie-toi des chiffres, aujourd'hui.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

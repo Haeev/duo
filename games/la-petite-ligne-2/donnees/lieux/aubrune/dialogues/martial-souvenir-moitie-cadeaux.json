@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-moitie-cadeaux",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.martial.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Trois offrandes de ta moitié ! Mon tronc a renoncé. J'ai pris la sacoche du vélo. Elle grince: c'est sa façon de dire merci.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

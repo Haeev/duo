@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "rosalie-don-sifflet",
+  "villager": "rosalie",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.fini",
+      "equals": true
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.train.en-gare",
+      "equals": true
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Tu as entendu Georgette en entrant en gare ? Trois coups et un long: le sifflet du samedi. Je l'ai inventé. Il est à vous.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

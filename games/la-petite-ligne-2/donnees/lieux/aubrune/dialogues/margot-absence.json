@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "margot-absence",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.margot.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.margot.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Te voilà ! Paulin a dit « Non, plus personne ne vient ». Traduction: il guettait la route depuis plusieurs jours.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ta moitié est passée sans toi. Paulin a dit « Hm ». Je traduis: « Et l'autre ? ». Je ne traduis pas tout, mais ça, si.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

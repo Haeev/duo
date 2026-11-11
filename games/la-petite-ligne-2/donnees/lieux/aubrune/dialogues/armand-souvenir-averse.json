@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-averse",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Hier, dehors à deux sous la pluie ! Les grenouilles aussi étaient dehors. Elles chantaient. Vous... enfin, vous aviez l'air.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-premier-achat",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "commerces.fournil-pradel.premier-achat",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Ton premier achat au fournil. Celui-là, je l'avais façonné les yeux fermés. C'est souvent le meilleur. Je ne sais pas pourquoi.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

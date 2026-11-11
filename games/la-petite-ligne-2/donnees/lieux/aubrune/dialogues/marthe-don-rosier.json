@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "marthe-don-rosier",
+  "villager": "marthe",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.marthe-manque",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Une bouture de rosier, pour la place nue sur la dalle des Lacombe. Plante-la. Je n'irai pas voir. J'irai le jeudi, à 17 h 40.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-moitie-cadeaux",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.lucie.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Trois colis de ta moitié pour moi ! D'habitude, je livre, je ne reçois pas. Je vais devoir tenir un registre. Ha !",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "achille-don-pain-perdu",
+  "villager": "achille",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.parrain",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Mmh. Le pain de la veille, trempé, doré. Je le fais aux apprentis le premier matin. Tu n'es pas apprenti, mais tu m'as trouvé le mien.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

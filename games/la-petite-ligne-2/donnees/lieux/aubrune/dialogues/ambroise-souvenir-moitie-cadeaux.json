@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-moitie-cadeaux",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.ambroise.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Trois cadeaux de ta moitié. Alignés sur l'établi, par ordre d'arrivée. Ne les déplace pas. Ne les regarde pas trop.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-premiere-prise",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "souvenirs.premiere-prise",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Ton premier poisson ! Moi j'en ai pris un grand comme le bras. Enfin, comme la main. Enfin, je l'ai presque vu.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

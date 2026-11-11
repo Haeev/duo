@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "honorine-absence",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.honorine.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.honorine.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Te voilà, petit oiseau ! J'ai raconté à tout le bourg que tu dansais chez le préfet, à Hautefonte. Ça a très bien pris.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié venait seule. Je lui ai dit que tu m'avais écrit. C'est faux. Mais sa tête ! Ça valait le mensonge.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

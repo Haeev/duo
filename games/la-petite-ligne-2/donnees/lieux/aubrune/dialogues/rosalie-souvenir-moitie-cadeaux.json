@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-moitie-cadeaux",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.rosalie.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Trois cadeaux de ta moitié ! Je les garde en cabine, près du sifflet. Georgette croit que c'est pour elle. Je la laisse croire.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

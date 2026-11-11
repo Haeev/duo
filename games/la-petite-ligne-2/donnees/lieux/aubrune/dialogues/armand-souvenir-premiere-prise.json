@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-premiere-prise",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "souvenirs.premiere-prise",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Ta première prise ! J'en ferai une leçon de choses. Avec un dessin. Enfin, si tu me décris les nageoires. Lentement.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

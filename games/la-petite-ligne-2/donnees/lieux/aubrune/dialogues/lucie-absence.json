@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "lucie-absence",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.lucie.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.lucie.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Te revoilà ! Plusieurs jours que je passe devant chez vous: rien à livrer, personne à saluer. Ma tournée allait trop vite. Ha !",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ta moitié est passée, toi pas. Je lui avais confié un bonjour pour toi. Pas livré ? Je le livre moi-même. Bonjour !",
+      "emote": null,
+      "next": null
+    }
+  }
+}

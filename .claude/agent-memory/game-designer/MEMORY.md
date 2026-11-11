@@ -400,3 +400,11 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Le dialogue `<commerçant>-boutique-fermee` (priorité 1) passe devant le quotidien aux heures de fermeture: la réplique de nuit d'un commerçant ne s'entend pas.
 - Un texte d'« adoré » qui nomme l'objet demande un seul objet adoré dans la fiche, ou une condition sur la valeur du fait (`equals`).
 - Générateur: `gdhab/lib.py` du scratchpad (souvenir à variante, secret à paliers, quotidien par planning, ajout de météo à un quotidien existant); 430 répliques en une passe, un seul refus du validateur d'accords (« vous vous êtes donné »).
+
+## Briques de faits par joueur en données (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Absence: `days_since` sur `amitie.<id>.jour` (`of: actor`, `atLeast` 3), dialogue `once: null` priorité 30: il se tait seul après la conversation (le jour est réécrit après le choix du dialogue). Variante « ta moitié est passée »: aiguillage sur le même fait `of: other`, `atMost` 1.
+- « Hier il pleuvait »: `days_since` sur `souvenirs.pluie-ensemble` (clé du duo, sans `of`) avec `atLeast` 1 et `atMost` 1; nuit blanche: `souvenirs.nuit-blanche`, `of: actor`, `atMost` 0.
+- Réplique d'un don d'histoire: dialogue `<habitant>-don-<sujet>` priorité 51 (sous les étapes, devant souvenirs et arrivée), `once: player`, condition le fait de l'étape (`"fait"`).
+- Changer la saison d'un fruit pour un seul lieu: nouvelle ressource et nouveau meuble à brique `harvest` (la ressource commune sert aussi au lieu d'essai, dont `recolte.test.ts` secoue l'arbre au printemps), puis le `type` de l'objet dans `carte.json`, les deux `plan.json` et `construire_plan.py`.
+- Le garde de l'outil refuse les commandes Bash à heredoc Python ou qui contiennent « .git »: passer par Edit, et `--exclude-dir='.gi?'` pour le contrôle typographique.

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "colette-don-perche",
+  "villager": "colette",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.epilogue",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "La perche meunière, c'est la recette du grand-père, celui du mur, trempé. Franchement: fais-la avec une autre perche. Pas elle.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

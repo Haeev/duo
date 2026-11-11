@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-nuit-blanche",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.nuit-blanche",
+      "of": "actor",
+      "atMost": 0
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Une nuit blanche ? En 1938, j'ai dansé trois nuits de suite. C'est vrai. Ou deux. Une, au moins. Va dormir: c'est épuisant.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

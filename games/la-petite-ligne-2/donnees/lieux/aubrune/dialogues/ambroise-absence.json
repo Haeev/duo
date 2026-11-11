@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "ambroise-absence",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.ambroise.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.ambroise.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Plusieurs jours. J'ai compté. Pas par inquiétude: je compte tout. Les jours, les tours de clé, les gens qui ne passent plus.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Ta moitié venait à l'heure. Toi, plusieurs jours de retard. Ce n'est pas un reproche. C'est un relevé.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

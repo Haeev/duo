@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "jeanne-absence",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.jeanne.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.jeanne.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "T'étais où ? J'avais parié que tu revenais avant trois jours. J'ai perdu une bille. Tu me la dois, en vrai.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Ta moitié est venue tous les jours, et toi non. J'avais parié que vous veniez ensemble. Deux billes de perdues, là.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

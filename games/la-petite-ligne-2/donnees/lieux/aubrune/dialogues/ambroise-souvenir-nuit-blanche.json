@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-nuit-blanche",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.nuit-blanche",
+      "of": "actor",
+      "atMost": 0
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Pas dormi. Ça se voit: tu marches comme un balancier sans poids. Une nuit ne se rattrape pas. Une sieste, si. Va.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

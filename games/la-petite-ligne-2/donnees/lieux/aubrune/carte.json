@@ -981,7 +981,7 @@
     },
     {
       "id": "pommier-verger",
-      "type": "fruitier",
+      "type": "pommier-d-automne",
       "x": 309.5,
       "y": 118.5,
       "rotation": 0,

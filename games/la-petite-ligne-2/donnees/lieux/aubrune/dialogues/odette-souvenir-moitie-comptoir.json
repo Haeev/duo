@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-moitie-comptoir",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "ventes.epicerie-ferrand.radis",
+      "of": "other",
+      "value": 10
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ta moitié m'a vendu dix radis, et plus. Je les compte en goûtant. Il en manque toujours un ou deux: c'est la vérification.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

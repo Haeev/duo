@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-moitie-comptoir",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "ventes.cour-des-delmas.mures",
+      "of": "other",
+      "value": 10
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ta moitié nous a vendu des mûres, dix fois plutôt qu'une. Paulin a dit non. Puis il en a mangé. Au cahier, ça compte pour un oui.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

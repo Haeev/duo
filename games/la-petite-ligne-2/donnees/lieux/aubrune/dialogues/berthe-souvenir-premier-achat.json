@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-premier-achat",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "commerces.fournil-pradel.premier-achat",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Ton premier achat chez Achille ? C'est ma farine dedans. Tu as mangé un bout de mon moulin. Bienvenue.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

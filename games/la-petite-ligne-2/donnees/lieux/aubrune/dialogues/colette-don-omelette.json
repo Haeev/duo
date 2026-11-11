@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "colette-don-omelette",
+  "villager": "colette",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.oeufs",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "L'omelette aux herbes, ma mère la faisait le soir où la tarte ratait. Tiens, la recette. Garde-la pour les jours où tout rate.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

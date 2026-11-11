@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-nuit-blanche",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.nuit-blanche",
+      "of": "actor",
+      "atMost": 0
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Tu n'as pas dormi ? Bienvenue. À quatre heures, la nuit sent la farine. Tu l'as sentie ? Alors ta nuit n'est pas perdue.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "jeanne-don-lampe",
+  "villager": "jeanne",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.tunnel",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "La lampe de la niche ! J'avais parié qu'il y avait un trésor dans le tunnel. Gagné. Tu peux la garder: moi, j'ai le pari.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

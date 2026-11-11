@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-nuit-blanche",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.nuit-blanche",
+      "of": "actor",
+      "atMost": 0
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Une nuit blanche ? Ça se voit, mon cœur. Assieds-toi: un nuage de poudre, et personne ne saura. Sauf moi. Et je le dirai.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

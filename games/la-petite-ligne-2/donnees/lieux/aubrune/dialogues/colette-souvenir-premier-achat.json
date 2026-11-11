@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-premier-achat",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "commerces.cafe-de-la-halte.premier-achat",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ton premier bol payé chez moi. Franchement, le premier, j'aurais dû l'offrir. Le deuxième, tu le paies. Le troisième, on verra.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

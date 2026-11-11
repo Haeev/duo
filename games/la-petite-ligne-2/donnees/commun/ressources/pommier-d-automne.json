@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "pommier-d-automne",
+  "name": "Pommier",
+  "kind": "shake",
+  "verb": "Secouer",
+  "clip": "shake",
+  "seconds": 0.8,
+  "tool": null,
+  "minTier": 0,
+  "work": 1,
+  "dirty": false,
+  "effort": 0.1,
+  "after": "bare",
+  "respawnDays": 1,
+  "toGround": true,
+  "rolls": 2,
+  "loot": [
+    {
+      "item": "pomme",
+      "min": 1,
+      "max": 2,
+      "weight": 1,
+      "rare": false,
+      "hours": null,
+      "weathers": [],
+      "seasons": ["autumn"]
+    }
+  ]
+}

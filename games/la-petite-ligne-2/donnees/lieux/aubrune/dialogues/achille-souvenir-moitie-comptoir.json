@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-moitie-comptoir",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "ventes.fournil-pradel.oeuf",
+      "of": "other",
+      "value": 6
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Ta moitié m'a porté six œufs, et d'autres encore. Six aubes. Je les ai cassées doucement. Elles sont devenues brioche.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

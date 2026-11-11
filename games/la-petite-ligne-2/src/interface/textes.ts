@@ -167,9 +167,9 @@ export const TEXTS = {
     toolBlunt: 'Outil émoussé',
     /** Décision à deux (`decision_changed`): l'autre a choisi, deux avis, décision prise. */
     decision: {
-      waiting: '{nom} a choisi : à toi de dire',
-      split: 'Deux avis : mettez-vous d’accord',
-      agreed: 'Décision prise à deux',
+      waiting: '{nom} a dit son choix : à toi de dire le tien',
+      split: 'Deux avis différents : parlez-en, puis redites-le',
+      agreed: 'C’est décidé, à deux',
     },
     /**
      * Rappel durable d'une décision à deux ouverte (bandeau du HUD et onglet Quêtes du carnet):
@@ -181,14 +181,14 @@ export const TEXTS = {
       theirs: '{nom} a choisi « {choix} ». À toi : dis ton choix à {habitant}.',
       mine: 'Tu as choisi « {choix} ». {nom} n’a pas encore dit le sien à {habitant}.',
       split:
-        'Toi : « {mien} ». {nom} : « {sien} ». Mettez-vous d’accord et redites-le à {habitant}, chacun peut changer d’avis.',
+        'Toi : « {mien} ». {nom} : « {sien} ». Parlez-en, puis redites le même choix à {habitant}. Vous pouvez encore changer d’avis.',
       nobody: 'l’habitant concerné',
     },
     /** Récompense qui n'est pas un objet (`reward_given`), par nature. */
     reward: {
-      recipe: 'Recette apprise : {nom}',
-      plan: 'Plan appris : {nom}',
-      piece: 'Nouvelle tenue au miroir : {nom}',
+      recipe: 'Nouvelle recette : {nom}',
+      plan: 'Nouveau plan : {nom}',
+      piece: 'Une tenue de plus au miroir : {nom}',
     },
     /** Rappel de la course, une fois (`astuce-course.ts`); `{touche}` selon le clavier réel. */
     runHint: 'Maintiens {touche} pour courir (ça creuse un peu l’appétit)',

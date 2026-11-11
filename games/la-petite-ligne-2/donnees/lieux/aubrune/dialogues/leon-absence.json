@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "leon-absence",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.leon.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.leon.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "T'étais où ? Moi, je suis allé à Hautefonte à pied. Enfin, jusqu'au gué. Enfin, je t'attendais dans le foin.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Ta moitié est venue sans toi ! J'ai sauté dans le foin pour elle. Vingt fois. Enfin, trois. Mais c'était pour toi aussi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

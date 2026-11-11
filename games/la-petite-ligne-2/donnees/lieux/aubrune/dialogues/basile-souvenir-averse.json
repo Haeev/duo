@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-averse",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Pluie, hier. À deux, dehors. Le bois aime la pluie. Moi aussi. Un peu.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

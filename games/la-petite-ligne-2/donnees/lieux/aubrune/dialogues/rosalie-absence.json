@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "rosalie-absence",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.rosalie.jour",
+      "of": "actor",
+      "atLeast": 8
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.rosalie.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Georgette a sifflé pour rien, ces derniers samedis. Elle te cherchait sur le quai. Elle boude encore. Fais-lui un signe.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Ta moitié est déjà venue me dire bonjour. Toi, tu as raté des samedis. Georgette tient les comptes. Elle est rancunière.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-premiere-prise",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "souvenirs.premiere-prise",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Ton premier poisson ! Georgette passe sur le pont tous les samedis: la prochaine fois, fais signe avec. Je sifflerai.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

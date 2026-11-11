@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-moitie-cadeaux",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.anatole.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Trois gratifications de ta moitié. Article 14. ... J'ai écrit à la Compagnie. Pas de réponse. Je garde tout.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

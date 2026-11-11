@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-premiere-prise",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "souvenirs.premiere-prise",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Ta première prise. Il n'y a pas d'article sur la pêche. J'ai cherché toute une nuit. Félicitations, donc. Sans article.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

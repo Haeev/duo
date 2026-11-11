@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-moitie-cadeaux",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.firmin.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ta moitié en est à trois colis au registre des arrivages agréables. Je n'ai jamais rempli une page aussi vite.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

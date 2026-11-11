@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-averse",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Hier, sous l'averse, dehors à deux ? Il y avait du chaud ici, une serviette et de la place. La prochaine fois, entrez.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

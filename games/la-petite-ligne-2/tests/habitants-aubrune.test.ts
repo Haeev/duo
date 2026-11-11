@@ -100,6 +100,10 @@ function writable(): (key: string) => boolean {
     new RegExp(`^entendu\\.${AUBRUNE}\\.(${heard.join('|')})\\.j[01]$`),
     new RegExp(`^${AUBRUNE}\\.(${rooms.join('|')})$`),
     new RegExp(`^scenes\\.${AUBRUNE}\\.(${Object.keys(p.scenes).join('|')})$`),
+    // Souvenirs du moteur (`regles/souvenirs.ts`) et dernier jour de conversation (`amitie.ts`).
+    /^souvenirs\.(premiere-prise|nuit-blanche)\.j[01]$/,
+    /^souvenirs\.pluie-ensemble$/,
+    new RegExp(`^amitie\\.(${villagers})\\.jour\\.j[01]$`),
   ];
   return (key) => written.has(key) || engine.some((pattern) => pattern.test(key));
 }
@@ -349,6 +353,129 @@ describe("vie quotidienne des habitants d'Aubrune", () => {
         expect(LONG_DASHES.test(node.text), d.id).toBe(false);
       }
     }
+  });
+
+  it('quatre répliques nouvelles chacun: absence, ta moitié chez lui, temps partagé, première fois', () => {
+    const canBeWritten = writable();
+    const reads = (d: DialogueDef, pattern: RegExp, of?: 'actor' | 'other'): boolean =>
+      ['remembered', 'days_since', 'fact_at_least']
+        .flatMap((type) => typed(d.when, type))
+        .some((c) => pattern.test(String(c.key)) && (of === undefined || c.of === of));
+    const ctxOf = (sim: Sim) => ({
+      world: sim.world,
+      content: sim.content,
+      actor: 0 as PlayerIndex,
+    });
+    for (const v of villagers) {
+      const mine = dialoguesOf(v);
+      for (const d of mine)
+        for (const key of conditionKeys(d.when))
+          expect(canBeWritten(key), `${d.id}: fait ${key}`).toBe(true);
+      const memories = mine.filter((d) => d.id.startsWith(`${v}-souvenir-`));
+      const partner = new RegExp(`^(commerces\\.|ventes\\.|habitants\\.${v}\\.cadeaux$)`);
+      expect(
+        memories.filter((d) => reads(d, partner, 'other')).length,
+        `${v}: ce que ta moitié a fait chez lui`,
+      ).toBeGreaterThanOrEqual(1);
+      expect(
+        memories.filter((d) => reads(d, /^souvenirs\.(pluie-ensemble|nuit-blanche)$/)).length,
+        `${v}: pluie d'hier ou nuit blanche`,
+      ).toBeGreaterThanOrEqual(1);
+      expect(
+        memories.filter((d) =>
+          reads(
+            d,
+            /^(souvenirs\.premiere-prise|commerces\.[a-z-]+\.(premier-achat|premiere-vente))$/,
+            'actor',
+          ),
+        ).length,
+        `${v}: une première fois`,
+      ).toBeGreaterThanOrEqual(1);
+
+      // L'absence: à volonté, au plus tôt après trois jours sans lui parler; variante si ta moitié
+      // lui a parlé la veille ou le jour même.
+      const absence = mine.find((d) => d.id === `${v}-absence`);
+      expect(absence?.once, `absence de ${v}`).toBeNull();
+      expect(absence?.priority).toBe(30);
+      if (absence === undefined) continue;
+      const [gap] = typed(absence.when, 'days_since');
+      expect(gap?.key).toBe(`amitie.${v}.jour`);
+      expect(gap?.of).toBe('actor');
+      expect(Number(gap?.atLeast)).toBeGreaterThanOrEqual(3);
+      const sim = freshSim();
+      sim.world.common.day = 20;
+      const at = (player: 0 | 1, day: number): void => {
+        sim.world.progress.memory[`amitie.${v}.jour.j${String(player)}`] = {
+          v: day,
+          by: player,
+          day,
+        };
+      };
+      at(0, 20 - Number(gap?.atLeast) + 1);
+      expect(evaluateAll(ctxOf(sim), absence.when), `${v}: pas encore absent`).toBe(false);
+      at(0, 20 - Number(gap?.atLeast));
+      expect(evaluateAll(ctxOf(sim), absence.when), `${v}: absent`).toBe(true);
+      expect(walk(sim, absence).nodes, `${v}: absence seule`).toEqual(['absence']);
+      at(1, 19);
+      expect(walk(sim, absence).nodes, `${v}: ta moitié est passée`).toEqual(['moitie']);
+    }
+  });
+
+  it("l'absence se dit à la première conversation après trois jours, puis plus ce jour-là", () => {
+    const sim = freshSim();
+    for (const key of ['acte1.fini', 'acte2.train', 'acte2.fini', 'decor.cafe-ouvert'])
+      remember(contextOf(sim), `aubrune.${key}`, true, 'duo');
+    sim.world.players[0].needs.hygiene = 100;
+    sim.world.minutes = 780;
+    wait(sim, 1);
+    const heard: string[] = [];
+    for (let i = 0; i < 8 && !heard.some((n) => n.startsWith('lucie-quotidien')); i++)
+      heard.push(...talk(sim, 0, 'lucie'));
+    expect(heard.some((n) => n.startsWith('lucie-absence'))).toBe(false);
+    sim.world.common.day += 3;
+    sim.world.players[0].needs.hygiene = 100;
+    expect(talk(sim, 0, 'lucie')[0]).toBe('lucie-absence#absence');
+    expect(talk(sim, 0, 'lucie')[0]).not.toMatch(/^lucie-absence/);
+  });
+
+  it("chaque don d'histoire (graine, recette, trésor, air) a sa réplique dans la voix de qui donne", () => {
+    const p = place();
+    // Étapes qui donnent une entrée, une recette ou de quoi semer: le fait qu'elles retiennent.
+    const plants = /^(graines|plants|griffes|bouture)-/;
+    const gifts = new Set<string>();
+    for (const quest of Object.values(p.quests))
+      for (const chapter of quest.chapters)
+        for (const step of chapter.steps) {
+          const gives = step.onDone.some(
+            (e) =>
+              e.type === 'give_recipe' ||
+              e.type === 'give_entry' ||
+              (e.type === 'give_item' && plants.test(e.item)),
+          );
+          const fact = step.onDone.find((e) => e.type === 'remember' && e.value === 'fait');
+          if (gives && fact?.type === 'remember') gifts.add(fact.key);
+        }
+    expect(gifts.size).toBeGreaterThanOrEqual(17);
+    const lines = p.dialogues.filter((d) => d.id.includes('-don-'));
+    for (const key of gifts) {
+      const found = lines.filter((d) =>
+        typed(d.when, 'remembered').some((c) => c.key === key && c.equals === 'fait'),
+      );
+      expect(found.length, `réplique du don de ${key}`).toBe(1);
+    }
+    for (const d of lines) {
+      expect(d.once, d.id).toBe('player');
+      // Sous les étapes (52 et plus), au-dessus des souvenirs et de la première rencontre.
+      expect(d.priority, d.id).toBe(51);
+      expect(d.id.startsWith(`${d.villager}-don-`), d.id).toBe(true);
+      for (const node of Object.values(d.nodes))
+        if (node.kind === 'line') {
+          expect(node.speaker, d.id).toBe(d.villager);
+          expect(node.text.length, d.id).toBeLessThanOrEqual(150);
+          expect(LONG_DASHES.test(node.text), d.id).toBe(false);
+        }
+    }
+    expect(lines.some((d) => d.id === 'rosalie-don-sifflet')).toBe(true);
   });
 
   it('le train du samedi ramène Rosalie, et celui de 5 h 12 le Contrôleur', () => {

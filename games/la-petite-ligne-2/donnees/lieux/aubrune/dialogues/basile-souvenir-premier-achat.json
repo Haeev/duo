@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-premier-achat",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "commerces.menuiserie-cornu.premier-achat",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Ton premier achat. Ici. Je l'avais choisi. Exprès.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

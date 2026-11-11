@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "anatole-absence",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.anatole.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.anatole.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Plusieurs nuits sans te voir à 5 h 12. Article 9: le voyageur absent n'est pas signalé. Je l'ai signalé. À moi-même.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Ta moitié est venue à l'arrêt. Seule. Article 22: un billet par personne. J'ai poinçonné le tien dans le vide. Par habitude.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

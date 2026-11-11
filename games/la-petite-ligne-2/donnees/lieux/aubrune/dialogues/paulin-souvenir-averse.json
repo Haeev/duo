@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-averse",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Hier, sous la pluie, dehors à deux. Non, ce n'est pas raisonnable. Les champs ont bu. Moi, j'ai regardé. Bon. C'était bien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}
