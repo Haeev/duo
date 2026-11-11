@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "la-petite-ligne-2",
   "name": "La Petite Ligne (refonte)",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "sdk": "1.0",
   "view": "iso",
   "engine": "three",
@@ -13,7 +13,7 @@
   "entry": "index.html",
   "thumbnail": "vignette.png",
   "description": "À deux, de lieu en lieu par le train: une histoire à suivre, une maison à refaire, des voisins à aider. Version d'essai de la refonte.",
-  "whatsNew": "Première version d'essai de la refonte de La Petite Ligne, à côté de l'ancien jeu qui reste disponible. Elle se construit étape par étape: les parties d'essai repartent de zéro à chaque nouvelle version.",
+  "whatsNew": "Le chantier de la maison se paie enfin: une ardoise devant chaque pièce à refaire. Les meubles se rangent et se posent, et 45 sont à trouver. Nouveau à deux: la draisine, la pêche de la Baronne, la musique jouée et son accordage. Le train du samedi prend vos commandes et apporte le courrier. Trouvailles de berge, tenues à la mercerie, portraits des habitants, secondes confidences, décor des fêtes. Image plus légère sur les petites cartes graphiques, et le carnet de l'invité se remplit comme celui de l'hôte. Vos deux ordinateurs doivent avoir cette version; pour tout voir dans l'ordre, commencez une partie neuve.",
   "actions": [
     { "id": "up", "label": "Avancer", "keys": ["KeyW"] },
     { "id": "down", "label": "Reculer", "keys": ["KeyS"] },
