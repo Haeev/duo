@@ -3,13 +3,12 @@
  * ordre d'arrivée et envoie à l'invité, à chaque pas, les événements, le canal rapide et les
  * tranches qui ont changé (« joueurs » au pas même, « lieu » et « progression » à leur cadence).
  * La file des commandes de l'invité (coussin, rattrapage, commande devinée) est dans
- * `file-commandes.ts`, la progression par différences et par morceaux dans `progression.ts`,
- * l'état lent du lieu de même dans `par-cles.ts` (canal 5, `etat-lieu.ts`).
+ * `file-commandes.ts`; la progression (canal 8, `progression.ts`) et l'état lent du lieu (canal 5,
+ * `etat-lieu.ts`) partent par différences et par morceaux, par la même méthode (`par-cles.ts`).
  */
 import type { Logger, Net, NetChannel } from '@duo/sdk';
 import type { PlayerIndex } from '../donnees/schemas/communs';
 import type { PlaceSlow } from '../etat/lieu';
-import type { ProgressState } from '../etat/progression';
 import { SLICES, type Slice } from '../etat/monde';
 import type { Intent, StepInput } from '../simulation/noyau/entrees';
 import type { GameEvent } from '../simulation/noyau/evenements';
@@ -27,10 +26,10 @@ import {
 } from './canaux';
 import { createCommandQueue } from './file-commandes';
 import {
-  cloneProgress,
   PROGRESS_PART_CHANNEL,
+  PROGRESS_TARGET,
   ProgressPartSchema,
-  progressParts,
+  progressDoc,
 } from './progression';
 import { PLACE_PART_CHANNEL, PlacePartSchema } from './etat-lieu';
 import { cloneDoc, keyedParts } from './par-cles';
@@ -123,9 +122,10 @@ export function createHost(
   const queue = createCommandQueue(settings.input);
   const switchListeners = new Set<(change: PlaceSwitch) => void>();
   const largest: Record<string, number> = {};
-  /** Progression telle que l'invité la connaît après la dernière révision envoyée. */
-  let sentProgress: ProgressState | null = null;
+  /** Progression (à plat, `progressDoc`) telle que l'invité la connaît après la dernière révision envoyée. */
+  let sentProgress: Record<string, unknown> | null = null;
   let progressRev = -1;
+  let progressFullTick = 0;
   /** État du lieu tel que l'invité le connaît après la dernière révision envoyée, et son lieu. */
   let sentPlace: { readonly id: string; readonly state: PlaceSlow } | null = null;
   let placeRev = -1;
@@ -154,32 +154,32 @@ export function createHost(
     return true;
   }
 
-  /** Progression: différence depuis la dernière révision, ou complète (`full`). */
+  /**
+   * Progression: différence depuis la dernière révision, ou complète (`full`, premier envoi,
+   * reprise, filet). Tous ses champs partent, sans liste écrite ici (`progression.ts`).
+   */
   function sendProgress(full: boolean): void {
-    const current = sim.world.progress;
+    const current = progressDoc(sim.world.progress);
     const base = full ? null : sentProgress;
-    const parts = progressParts(
-      base,
-      current,
-      progressRev + 1,
-      progressRev,
-      sim.world.tick,
-      settings.progress.partBytes,
-    );
+    const head = {
+      target: PROGRESS_TARGET,
+      rev: progressRev + 1,
+      baseRev: progressRev,
+      tick: sim.world.tick,
+    };
+    const revision = keyedParts(base, current, head, settings.progress.partBytes);
     // Une différence vide n'a rien à dire; une révision complète part toujours (reprise, filet).
-    const empty = parts.length === 1 && parts[0] !== undefined && isEmpty(parts[0]);
-    if (!(empty && base !== null)) {
-      for (const part of parts) {
-        // Un morceau refusé casserait la révision: l'invité attend alors la prochaine complète.
-        if (!fits('progressPart', part)) {
-          sentProgress = null;
-          return;
-        }
+    if (revision.empty && !revision.full) return;
+    for (const part of revision.parts)
+      if (!fits('progressPart', part)) {
+        // Un morceau refusé casserait la révision: la prochaine part complète.
+        sentProgress = null;
+        return;
       }
-      for (const part of parts) progressChannel.send(part);
-      progressRev += 1;
-      sentProgress = cloneProgress(current);
-    }
+    for (const part of revision.parts) progressChannel.send(part);
+    progressRev += 1;
+    sentProgress = cloneDoc(current);
+    if (revision.full) progressFullTick = sim.world.tick;
   }
 
   /**
@@ -227,6 +227,17 @@ export function createHost(
     sent[slice] = { revision: sim.revisions[slice], tick: sim.world.tick };
   }
 
+  /**
+   * Le lieu et la progression, sur un canal fiable et ordonné, ne repartent complets qu'à leur
+   * filet (toutes les 30 s): avant, la progression entière repartait toutes les 5 s sans raison.
+   * « commun » et « joueurs » sont de petites tranches entières: leur filet est le rappel même.
+   */
+  function fullDue(slice: Slice, tick: number): boolean {
+    if (slice === 'place') return tick - placeFullTick >= settings.place.fullEveryTicks;
+    if (slice === 'progress') return tick - progressFullTick >= settings.progress.fullEveryTicks;
+    return true;
+  }
+
   function sendFast(): void {
     const message = fastMessage(sim.world, sim.content, queue.ack());
     if (fits('fast', message)) fast.send(message);
@@ -265,9 +276,7 @@ export function createHost(
       for (const slice of SLICES) {
         const due = tick - sent[slice].tick;
         const changed = sim.revisions[slice] !== sent[slice].revision;
-        // Le lieu, sur un canal fiable, ne repart complet qu'à son filet (débit d'un grand lieu).
-        const placeFull = tick - placeFullTick >= settings.place.fullEveryTicks;
-        if (due >= SLICE_KEEPALIVE_TICKS) sendSlice(slice, slice !== 'place' || placeFull);
+        if (due >= SLICE_KEEPALIVE_TICKS) sendSlice(slice, fullDue(slice, tick));
         else if (changed && due >= SLICE_EVERY_TICKS[slice]) sendSlice(slice);
       }
       return sim.events;
@@ -293,8 +302,4 @@ export function createHost(
       switchListeners.clear();
     },
   };
-}
-
-function isEmpty(part: { set: object; drop: object }): boolean {
-  return Object.keys(part.set).length === 0 && Object.keys(part.drop).length === 0;
 }

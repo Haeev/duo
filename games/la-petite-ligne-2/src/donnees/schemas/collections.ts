@@ -139,9 +139,13 @@ const Count = v.pipe(IntSchema, v.minValue(0), v.maxValue(9999));
  * Une entrée trouvée, en tuple pour tenir le budget de la progression:
  * [premier joueur, jour, minute, météo, saison, prises du joueur 0, prises du joueur 1, record?, joueur du record?].
  * Météo et saison: index dans `WEATHERS` et `SEASONS`.
+ *
+ * Tuples stricts: `v.tuple` accepte un tableau plus long et le coupe à sa longueur, donc la forme
+ * à 7 éléments avalait celle à 9 et le record disparaissait à chaque validation (relecture de la
+ * sauvegarde, réception chez l'invité).
  */
 export const FindSchema = v.union([
-  v.tuple([
+  v.strictTuple([
     v.picklist([0, 1]),
     v.pipe(IntSchema, v.minValue(1)),
     v.pipe(IntSchema, v.minValue(0), v.maxValue(1440)),
@@ -150,7 +154,7 @@ export const FindSchema = v.union([
     Count,
     Count,
   ]),
-  v.tuple([
+  v.strictTuple([
     v.picklist([0, 1]),
     v.pipe(IntSchema, v.minValue(1)),
     v.pipe(IntSchema, v.minValue(0), v.maxValue(1440)),
