@@ -306,10 +306,31 @@ export async function passDoor(
     await walk(duo, journal, map, targets, `devant la porte (${seat.side.who})`, {
       tolerance: 0.2,
     });
+    const before = await doorReport(duo, seat, door);
     if (await holdUntil(duo, seat.side, [key], inside, 15_000)) return true;
-    journal.log(`porte pas passée (${seat.side.who}, essai ${String(attempt + 1)})`);
+    journal.log(
+      `porte pas passée (${seat.side.who}, essai ${String(attempt + 1)}): parti de ${before}; resté en ${await doorReport(duo, seat, door)}`,
+    );
+    await seat.side.shot(`porte-pas-passee-${String(attempt + 1)}`);
   }
   return false;
+}
+
+/** Relevé devant une porte: où est le joueur chez l'hôte, et qui se tient à moins de 2 m d'elle. */
+async function doorReport(duo: Duo, seat: Seat, door: Point): Promise<string> {
+  const w = await duo.host.world();
+  if (w === null) return 'monde absent';
+  const here = me(w, seat).body;
+  const near = [
+    ...w.players.map((p, i) => ({ id: `joueur ${String(i)}`, body: p.body })),
+    ...Object.entries(w.places[w.common.place]?.villagers ?? {}).map(([id, v]) => ({
+      id,
+      body: v.body,
+    })),
+  ]
+    .filter((b) => Math.hypot(b.body.x - door.x, b.body.y - door.y) < 2)
+    .map((b) => `${b.id} ${b.body.x.toFixed(2)}; ${b.body.y.toFixed(2)}`);
+  return `${here.x.toFixed(2)}; ${here.y.toFixed(2)} (près de la porte: ${near.join(', ') || 'personne'})`;
 }
 
 /** Ce que vise la touche d'action de ce joueur, vu de sa machine. */
@@ -317,6 +338,22 @@ export async function aimOf(
   seat: Seat,
 ): Promise<{ id?: string; verb?: string; refusal?: string | null } | null> {
   return await seat.side.aim(seat.index);
+}
+
+/**
+ * Ce que vise ce joueur quand sa machine et l'hôte sont d'accord (même cible, même verbe), `null`
+ * sinon. La machine de l'invité prédit son propre corps: juste après un petit pas, sa bulle peut
+ * montrer une cible que l'hôte, qui fait autorité, ne lui donne pas (le pas s'est perdu en route);
+ * la touche d'action n'y ferait rien.
+ */
+export async function agreedAim(
+  duo: Duo,
+  seat: Seat,
+): Promise<{ id?: string; verb?: string; refusal?: string | null } | null> {
+  const mine = await aimOf(seat);
+  if (seat.side === duo.host) return mine;
+  const theirs = await duo.host.aim(seat.index);
+  return mine !== null && mine.id === theirs?.id && mine.verb === theirs?.verb ? mine : null;
 }
 
 /**
@@ -330,7 +367,7 @@ export async function aimAt(
   id: string,
   journal: Journal,
 ): Promise<boolean> {
-  const aimed = async (): Promise<boolean> => (await aimOf(seat))?.id === id;
+  const aimed = async (): Promise<boolean> => (await agreedAim(duo, seat))?.id === id;
   if (await aimed()) return true;
   await tapToward(duo, seat, at, aimed, journal, 8);
   return await aimed();
@@ -349,7 +386,7 @@ export async function aimAtVillager(
 ): Promise<boolean> {
   // Un comptoir tenu se vise aussi: la touche y parle au commerçant, par-dessus le comptoir.
   const aimed = async (): Promise<boolean> => {
-    const a = await aimOf(seat);
+    const a = await agreedAim(duo, seat);
     // « Parler » seulement: l'établi de Basile (`basile-etabli`) contient aussi son nom.
     return (
       a?.verb === 'Parler' &&

@@ -1,10 +1,11 @@
 // Comptoir tenu (`held` de la brique `shop`): depuis le côté client, la touche d'action s'adresse
-// au commerçant qui se tient derrière. Dialogue en attente d'abord, sinon la boutique; « Parler »
-// depuis la boutique; une réplique de quête ne rouvre pas la boutique derrière elle. Test court.
+// au commerçant qui se tient derrière. Seule sa réplique d'HISTOIRE en attente (étape de quête
+// ouverte) passe avant la boutique, une fois; souvenirs, cadeaux et petites phrases attendent
+// « Parler » de la boutique; une réplique de quête ne rouvre pas la boutique derrière elle. Test court.
 import { describe, expect, it } from 'vitest';
 import type { Content } from '../src/donnees/charger';
 import { aimOf } from '../src/simulation/briques/visee';
-import { startTalk, talkView } from '../src/simulation/dialogues/conversation';
+import { pickDialogue, startTalk, talkView } from '../src/simulation/dialogues/conversation';
 import { DIALOGUES } from '../src/simulation/dialogues/reglages';
 import type { Sim } from '../src/simulation/noyau/pas';
 import { remember } from '../src/simulation/regles/memoire';
@@ -20,31 +21,118 @@ const SHOP = 'epicerie-ferrand';
 /** Côté client du comptoir de l'épicerie (pièce en (48; 210), comptoir en (50,5; 213)), face à lui. */
 const CLIENT = { x: 51.4, y: 213, facing: Math.PI } as const;
 const NEWS = 'aubrune.essai.comptoir';
+const QUEST = 'suite-essai-comptoir';
+/** Fait écrit à l'ouverture de l'étape factice (il ouvre la réplique d'histoire), puis à sa fin. */
+const STEP = 'aubrune.essai.comptoir.etape';
+const STEP_DONE = 'aubrune.essai.comptoir.fini';
+/** Faits qui ouvrent le cadeau et le souvenir factices (hors de toute quête). */
+const GIFT = 'aubrune.essai.comptoir.cadeau';
+const MEMORY = 'aubrune.essai.comptoir.souvenir';
 
-/** Aubrune à 10 h, plus un dialogue factice d'histoire d'Odette (répété, ouvert par un fait). */
+function oneLine(
+  id: string,
+  priority: number,
+  when: Json[],
+  once: string | null,
+  text: string,
+): Json {
+  return {
+    schema: 1,
+    id,
+    villager: KEEPER,
+    priority,
+    when,
+    once,
+    start: 'n1',
+    nodes: { n1: { kind: 'line', speaker: KEEPER, text, emote: null, next: null } },
+  };
+}
+
+/**
+ * Aubrune à 10 h, plus une suite factice d'une étape qui ouvre une réplique d'histoire d'Odette
+ * (répétée, priorité 55), un cadeau plus prioritaire (58, une fois) et un souvenir (30, une fois).
+ */
 function counterContent(): Content {
   return contentWith((files) => {
     const settings = files['commun/reglages.json'] as { start: Json };
     settings.start = { ...settings.start, place: AUBRUNE, minute: 600 };
-    files['lieux/aubrune/dialogues/odette-essai-comptoir.json'] = {
+    files['lieux/aubrune/dialogues/odette-essai-comptoir.json'] = oneLine(
+      'odette-essai-comptoir',
+      55,
+      [{ type: 'remembered', key: STEP, equals: 'ouvert' }],
+      null,
+      'Approche, j’ai une nouvelle pour toi.',
+    );
+    files['lieux/aubrune/dialogues/odette-essai-cadeau.json'] = oneLine(
+      'odette-essai-cadeau',
+      58,
+      [{ type: 'remembered', key: GIFT, equals: true }],
+      'player',
+      'Tiens, c’est pour toi.',
+    );
+    files['lieux/aubrune/dialogues/odette-essai-souvenir.json'] = oneLine(
+      'odette-essai-souvenir',
+      30,
+      [{ type: 'remembered', key: MEMORY, equals: true }],
+      'player',
+      'Tu te souviens du premier jour ?',
+    );
+    // Le chargement refuse une condition qu'aucune donnée n'écrit: ce dialogue jamais joué (le
+    // moins prioritaire d'un autre habitant) écrit les deux faits que le test pose à la main.
+    files['lieux/aubrune/dialogues/achille-essai-comptoir.json'] = {
       schema: 1,
-      id: 'odette-essai-comptoir',
-      villager: KEEPER,
-      priority: 55,
-      when: [{ type: 'remembered', key: NEWS, equals: true }],
+      id: 'achille-essai-comptoir',
+      villager: 'achille',
+      priority: -100,
+      when: [],
       once: null,
-      start: 'n1',
+      start: 'e1',
       nodes: {
-        n1: {
-          kind: 'line',
-          speaker: KEEPER,
-          text: 'Approche, j’ai une nouvelle pour toi.',
-          emote: null,
-          next: null,
+        e1: {
+          kind: 'effects',
+          effects: [
+            { type: 'remember', key: NEWS, value: true, by: 'duo' },
+            { type: 'remember', key: STEP_DONE, value: true, by: 'duo' },
+          ],
+          next: 'n1',
         },
+        n1: { kind: 'line', speaker: 'achille', text: 'Mmh.', emote: null, next: null },
       },
     };
+    files[`lieux/aubrune/quetes/${QUEST}.json`] = {
+      schema: 1,
+      id: QUEST,
+      kind: 'side',
+      title: 'La nouvelle d’Odette',
+      giver: KEEPER,
+      requires: [{ type: 'remembered', key: NEWS, equals: true }],
+      chapters: [
+        {
+          id: 'chapitre-1',
+          title: 'La nouvelle',
+          steps: [
+            {
+              id: 'nouvelle',
+              objective: 'Écoute la nouvelle d’Odette.',
+              target: { villager: KEEPER },
+              done: [{ type: 'remembered', key: STEP_DONE, equals: true }],
+              together: false,
+              onStart: [{ type: 'remember', key: STEP, value: 'ouvert', by: 'duo' }],
+              onDone: [{ type: 'remember', key: STEP, value: 'fait', by: 'duo' }],
+            },
+          ],
+        },
+      ],
+    };
   });
+}
+
+/** Ouvre la suite factice: son étape écrit le fait qui ouvre la réplique d'histoire d'Odette. */
+function openStory(sim: Sim): void {
+  remember(contextOf(sim), NEWS, true, 'duo');
+  wait(sim, 0.5);
+  expect(sim.world.progress.quests[QUEST]?.done).toBe(false);
+  expect(sim.world.progress.memory[STEP]?.v).toBe('ouvert');
 }
 
 function sim10h(content: Content): Sim {
@@ -88,9 +176,9 @@ describe('comptoir tenu', () => {
     expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Acheter', refusal: null });
   });
 
-  it('dialogue en attente: il se joue d’abord, sans boutique derrière; ensuite la boutique', () => {
+  it('réplique d’histoire en attente: elle se joue d’abord, sans boutique derrière; ensuite la boutique', () => {
     const sim = sim10h(content);
-    remember(contextOf(sim), NEWS, true, 'duo');
+    openStory(sim);
     expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Parler', refusal: null });
     const events = act(sim, 0, { type: 'act' });
     expect(events).toContainEqual(
@@ -110,11 +198,109 @@ describe('comptoir tenu', () => {
     // Le lendemain, la nouvelle repasse avant la boutique.
     sim.world.common.day += 1;
     expect(aimOf(sim, 0)?.verb).toBe('Parler');
+    // L'étape franchie, ce n'est plus de l'histoire: le comptoir vend, ce jour comme les suivants.
+    remember(contextOf(sim), STEP_DONE, true, 'duo');
+    wait(sim, 0.5);
+    expect(sim.world.progress.quests[QUEST]?.done).toBe(true);
+    expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Acheter' });
+  });
+
+  it('trois dialogues en attente (cadeau, histoire, souvenir): un seul appui avant la boutique, celui de l’histoire', () => {
+    const sim = sim10h(content);
+    openStory(sim);
+    remember(contextOf(sim), GIFT, true, 'duo');
+    remember(contextOf(sim), MEMORY, true, 'duo');
+    // En face, Odette dirait d'abord le cadeau (le plus prioritaire); au comptoir, l'histoire seule.
+    expect(pickDialogue(sim, 0, KEEPER)?.id).toBe('odette-essai-cadeau');
+    expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Parler', refusal: null });
+    act(sim, 0, { type: 'act' });
+    expect(readThrough(sim)).toEqual(['odette-essai-comptoir#n1']);
+    expect(sim.world.players[0].talk).toBeNull();
+    wait(sim, 0.2);
+    // Deuxième appui: la boutique, alors que le cadeau et le souvenir attendent toujours.
+    expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Acheter' });
+    expect(act(sim, 0, { type: 'act' })).toContainEqual({
+      type: 'shop_opened',
+      player: 0,
+      shop: SHOP,
+    });
+    // Ils se disent par « Parler » de la boutique, dans l'ordre d'une conversation en face (le
+    // cadeau, puis la nouvelle tant que l'étape est ouverte, puis le souvenir), et le comptoir
+    // vend entre-temps.
+    const heard: string[] = [];
+    const talkFromShop = (): void => {
+      act(sim, 0, { type: 'shop_talk', shop: SHOP });
+      heard.push(...readThrough(sim));
+      act(sim, 0, { type: 'talk_close' });
+      wait(sim, 0.2);
+      expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Acheter' });
+    };
+    talkFromShop();
+    talkFromShop();
+    remember(contextOf(sim), STEP_DONE, true, 'duo');
+    wait(sim, 0.5);
+    talkFromShop();
+    expect(heard).toEqual([
+      'odette-essai-cadeau#n1',
+      'odette-essai-comptoir#n1',
+      'odette-essai-souvenir#n1',
+    ]);
+  });
+
+  it('sans histoire en attente (souvenir, cadeau, première visite): la boutique au premier appui', () => {
+    const sim = sim10h(content);
+    remember(contextOf(sim), GIFT, true, 'duo');
+    remember(contextOf(sim), MEMORY, true, 'duo');
+    // Les vraies répliques d'Odette aussi: le train revenu (souvenir) et des œufs à vendre (accueil).
+    remember(contextOf(sim), 'aubrune.acte2.train', true, 'duo');
+    sim.world.players[0].toolbar[0] = { item: 'oeuf', count: 3 };
+    wait(sim, 0.2);
+    expect(pickDialogue(sim, 0, KEEPER)?.id).toBe('odette-essai-cadeau');
+    expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Acheter', refusal: null });
+    expect(act(sim, 0, { type: 'act' })).toContainEqual({
+      type: 'shop_opened',
+      player: 0,
+      shop: SHOP,
+    });
+    expect(sim.world.players[0].talk).toBeNull();
+  });
+
+  it('remarque d’hygiène plus prioritaire: elle masque l’histoire, la boutique s’ouvre', () => {
+    const sim = sim10h(content);
+    openStory(sim);
+    sim.world.players[0].needs.hygiene = 5;
+    wait(sim, 0.2);
+    expect(pickDialogue(sim, 0, KEEPER)?.id).toBe('odette-hygiene');
+    expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Acheter' });
+    // Lavé, l'histoire repasse devant.
+    sim.world.players[0].needs.hygiene = 100;
+    wait(sim, 0.2);
+    expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Parler' });
+  });
+
+  it('faim à 0 sans un sou: la soupe offerte passe avant la boutique, une fois', () => {
+    const sim = sim10h(content);
+    sim.world.players[0].money = 0;
+    sim.world.players[0].needs.hunger = 0;
+    wait(sim, 0.1);
+    expect(sim.world.players[0].tiers.hunger).toBe('blocked');
+    expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Parler', refusal: null });
+    act(sim, 0, { type: 'act' });
+    expect(sim.world.players[0].talk?.dialogue).toBe('odette-soupe-offerte');
+    readThrough(sim);
+    expect(sim.world.players[0].needs.hunger).toBeGreaterThan(30);
+    wait(sim, 0.2);
+    expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Acheter' });
+    // Affamé mais avec de quoi payer: la boutique sert mieux, elle s'ouvre.
+    sim.world.players[0].money = 500;
+    sim.world.players[0].needs.hunger = 0;
+    wait(sim, 0.1);
+    expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Acheter' });
   });
 
   it('en face: la nouvelle réentendue le même jour débouche sur l’offre de la boutique', () => {
     const sim = sim10h(content);
-    remember(contextOf(sim), NEWS, true, 'duo');
+    openStory(sim);
     // Première écoute du jour, par-dessus le comptoir: pas d'offre derrière la réplique.
     expect(startTalk(contextOf(sim), 0, KEEPER)).toBe(true);
     expect(readThrough(sim)).toEqual(['odette-essai-comptoir#n1']);
@@ -163,7 +349,7 @@ describe('comptoir tenu', () => {
 
   it('commerçant pas à son poste: la boutique s’ouvre, sans détour; à son poste, sa position ne compte pas', () => {
     const sim = sim10h(content);
-    remember(contextOf(sim), NEWS, true, 'duo');
+    openStory(sim);
     const keeper = sim.world.places[AUBRUNE]?.villagers[KEEPER];
     const life = keeper?.life;
     if (keeper === undefined || life === undefined) throw new Error('Odette absente');

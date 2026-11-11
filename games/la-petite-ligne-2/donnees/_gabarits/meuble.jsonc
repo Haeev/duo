@@ -34,8 +34,8 @@
   //     "need": "hygiene", "amount": 40, "cap": 60 }                           soulager un besoin
   //   { "brick": "shop", "shop": "<commerce du lieu>" }                        vendre et acheter
   //   { "brick": "shop", "shop": "<commerce>", "held": true }   comptoir tenu: le commerçant se
-  //     tient derrière; de face, la touche d'action lui parle s'il a quelque chose à dire
-  //     (histoire, quête, première rencontre), sinon ouvre la boutique
+  //     tient derrière; de face, la touche d'action ouvre la boutique, sauf s'il a une réplique
+  //     d'histoire en attente (quête en cours, décision à deux), dite d'abord, une fois
   //   { "brick": "cook", "station": "stove" }                                  cuisiner, fabriquer
   //   { "brick": "open", "startsOpen": false }                                 ouvrir
   //   { "brick": "repair", "tools": ["axe", "spade"], "seconds": 1.5 }         réparer

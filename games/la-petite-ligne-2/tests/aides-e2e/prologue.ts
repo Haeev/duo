@@ -571,10 +571,67 @@ export interface WalkResult {
 }
 export type WalkState = 'arrivé' | 'bloqué' | 'sans cible' | 'trop long';
 
-const STUCK_MS = 5000;
+/** Sans avancer pendant ce temps, le joueur est tenu pour bloqué (plusieurs petits pas perdus compris). */
+const STUCK_MS = 8000;
 /** Distance au but sous laquelle on avance par petits pas, et durée d'un appui (ms). */
 const NEAR_M = 1.2;
 const PULSE_MS = 160;
+/**
+ * Appui le plus long quand les petits pas restent sans effet (image plus longue que l'appui).
+ * Guère plus: un appui « perdu » peut n'être qu'en retard, et un long appui qui arrive ensuite
+ * emmène le joueur 0,6 m plus loin (relevé: sorti du fournil par la porte, à un pas du comptoir).
+ */
+const PULSE_MAX_MS = 400;
+/**
+ * Immobilité exigée pour être « arrivé »: même position chez l'hôte pendant ce temps (ms), à
+ * `REST_M` près. Sous charge, les commandes de l'invité arrivent avec jusqu'à une demi-seconde de
+ * retard: lâcher les touches n'arrête pas le joueur tout de suite.
+ */
+const REST_MS = 700;
+const REST_M = 0.02;
+/** Appui bref pour se tourner vers une cible (`tapToward`). */
+const TAP_MS = 170;
+/** Après un petit pas: délai pour voir le joueur bouger chez l'hôte, puis pour le voir arrêté (ms). */
+const PULSE_SEEN_MS = 1200;
+const PULSE_SETTLE_MS = 2500;
+
+/**
+ * Attend chez l'hôte l'effet d'un petit pas parti de `from`: le joueur bouge ou se tourne, puis
+ * s'arrête (deux relevés de pas différents, même endroit et même cap). Faux: rien n'a changé
+ * (appui plus court qu'une image, jamais vu par le jeu). Décider du pas suivant sur une position
+ * arrêtée évite d'empiler des pas dont l'effet n'est pas encore arrivé (le joueur dépassait alors
+ * le but, puis oscillait).
+ */
+async function settleAfterPulse(
+  duo: Duo,
+  seat: Seat,
+  from: Point & { readonly facing?: number },
+): Promise<boolean> {
+  const t0 = Date.now();
+  let moved = false;
+  let previous: { x: number; y: number; facing: number; tick: number } | null = null;
+  for (;;) {
+    const w = await duo.host.world();
+    const elapsed = Date.now() - t0;
+    if (w !== null) {
+      const here = me(w, seat).body;
+      moved ||=
+        Math.hypot(here.x - from.x, here.y - from.y) > REST_M ||
+        (from.facing !== undefined && Math.abs(here.facing - from.facing) > REST_M);
+      const still =
+        previous !== null &&
+        w.tick > previous.tick &&
+        Math.hypot(here.x - previous.x, here.y - previous.y) <= REST_M &&
+        Math.abs(here.facing - previous.facing) <= REST_M;
+      if (moved && still) return true;
+      if (previous === null || w.tick > previous.tick)
+        previous = { x: here.x, y: here.y, facing: here.facing, tick: w.tick };
+    }
+    if (!moved && elapsed > PULSE_SEEN_MS) return false;
+    if (elapsed > PULSE_SETTLE_MS) return moved;
+    await duo.host.page.waitForTimeout(60);
+  }
+}
 /** Dernier lacet de caméra déduit, par machine: il survit d'une marche à l'autre. */
 const YAW = new WeakMap<Side, number>();
 
@@ -609,6 +666,10 @@ export async function walkBoth(
   const last: (Point | null)[] = [null, null];
   const paths: Point[][] = [[], []];
   const stuckSince = [0, 0];
+  /** Durée du petit pas de chaque joueur: allongée tant qu'il reste sans effet. */
+  const pulse = [PULSE_MS, PULSE_MS];
+  /** Dans la tolérance: où et depuis quand (horloge et pas de l'hôte) le joueur ne bouge plus. */
+  const rest: ({ x: number; y: number; since: number; tick: number } | null)[] = [null, null];
   const t0 = Date.now();
   await Promise.all(
     duoSeats.map((seat) =>
@@ -668,10 +729,17 @@ export async function walkBoth(
           path.shift();
         const remaining = Math.hypot(target.x - here.x, target.y - here.y);
         if (remaining < tolerance) {
-          state[i] = 'arrivé';
           await setKeys(i, new Set());
+          // Arrivé une fois immobile seulement: les dernières commandes, en retard sous charge,
+          // déplacent encore le joueur après le relâchement (relevé: près d'un mètre au-delà du
+          // but, hors de l'axe d'une porte). S'il ressort de la tolérance, les petits pas reprennent.
+          const still = rest[i] ?? null;
+          if (still === null || Math.hypot(here.x - still.x, here.y - still.y) > REST_M)
+            rest[i] = { x: here.x, y: here.y, since: Date.now(), tick: w.tick };
+          else if (Date.now() - still.since >= REST_MS && w.tick > still.tick) state[i] = 'arrivé';
           continue;
         }
+        rest[i] = null;
         const before = last[i] ?? null;
         if (before === null || Math.hypot(here.x - before.x, here.y - before.y) > 0.06)
           last[i] = { x: here.x, y: here.y };
@@ -688,11 +756,17 @@ export async function walkBoth(
         await setKeys(i, want);
         // Près du but, de petits pas: en rendu logiciel une image dure jusqu'à un quart de seconde
         // de jeu, une touche tenue ferait dépasser la cible de près d'un mètre.
-        if (remaining < NEAR_M) {
-          await seat.side.page.waitForTimeout(PULSE_MS);
-          await setKeys(i, new Set());
-        }
         const moved = before === null || Math.hypot(here.x - before.x, here.y - before.y) > 0.02;
+        if (remaining < NEAR_M) {
+          await seat.side.page.waitForTimeout(pulse[i] ?? PULSE_MS);
+          // L'autre joueur ne court pas pendant qu'on attend l'effet de ce pas: il reprend à son tour.
+          await setKeys(0, new Set());
+          await setKeys(1, new Set());
+          // Un appui plus court qu'une image n'est jamais vu par le jeu (machine chargée): resté
+          // sans effet, le pas s'allonge un peu; dès que le joueur bouge, il reprend sa durée.
+          const seen = await settleAfterPulse(duo, seat, here);
+          pulse[i] = seen ? PULSE_MS : Math.min((pulse[i] ?? PULSE_MS) * 1.5, PULSE_MAX_MS);
+        }
         stuckSince[i] = moved ? 0 : stuckSince[i] === 0 ? Date.now() : (stuckSince[i] ?? 0);
         if (stuckSince[i] !== 0 && Date.now() - (stuckSince[i] ?? 0) > STUCK_MS) {
           state[i] = 'bloqué';
@@ -781,7 +855,9 @@ export async function calibrateYaw(duo: Duo, journal: Journal): Promise<void> {
 
 /**
  * Se tourner vers un point par petits pas, comme un joueur qui rectifie son cap: un appui bref
- * vers lui puis une pause pour laisser arriver le résultat (les entrées sont en retard ici).
+ * vers lui, puis l'attente de son effet chez l'hôte (les entrées sont en retard ici). Un appui
+ * resté sans effet (plus court qu'une image sur une machine chargée) ne compte pas dans
+ * `maxTaps`, trois fois au plus: le suivant dure un peu plus.
  */
 export async function tapToward(
   duo: Duo,
@@ -791,7 +867,9 @@ export async function tapToward(
   journal: Journal,
   maxTaps = 6,
 ): Promise<void> {
-  for (let n = 0; n < maxTaps && !(await aimed()); n++) {
+  let tapMs = TAP_MS;
+  let lost = 0;
+  for (let n = 0; n < maxTaps && !(await aimed());) {
     const w = await duo.host.world();
     if (w === null) return;
     const here = me(w, seat).body;
@@ -812,9 +890,15 @@ export async function tapToward(
       `TAP ${seat.side.who} ${keys.join('')} depuis ${here.x.toFixed(2)},${here.y.toFixed(2)} cap ${here.facing.toFixed(2)} lacet ${yaw.toFixed(2)}`,
     );
     for (const k of keys) await seat.side.page.keyboard.down(k);
-    await seat.side.page.waitForTimeout(170);
+    await seat.side.page.waitForTimeout(tapMs);
     for (const k of keys) await seat.side.page.keyboard.up(k);
-    await seat.side.page.waitForTimeout(1000);
+    const seen = await settleAfterPulse(duo, seat, here);
+    if (seen || lost >= 3) n += 1;
+    else lost += 1;
+    tapMs = seen ? TAP_MS : Math.min(tapMs * 1.5, PULSE_MAX_MS);
+    // La bulle de la machine du joueur suit l'état de l'hôte avec un temps de retard.
+    for (let t0 = Date.now(); seen && Date.now() - t0 < 1000 && !(await aimed());)
+      await seat.side.page.waitForTimeout(100);
   }
 }
 

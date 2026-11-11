@@ -1,13 +1,17 @@
 // C1 commerce au comptoir de l'épicerie d'Aubrune (cahier 4.6, `simulation/commerces/README.md`):
 // les deux joueurs entrent par la porte de la place, au clavier; Espace face au comptoir tenu
-// fait parler l'épicière si elle a une réplique en attente, sinon ouvre la boutique. Achat (bourse
-// décomptée chez l'hôte et chez l'invité), « Parler » (P), vente d'un œuf, puis commerce fermé la
-// nuit. Sauvegarde de départ « aubrune-recette » (10 h, 20 € chacun, trois œufs chacun).
+// ouvre la boutique au premier appui: l'épicière a des souvenirs à dire, mais aucune réplique
+// d'histoire en attente (suites finies), et seule l'histoire passe avant la boutique. Achat (bourse
+// décomptée chez l'hôte et chez l'invité), « Parler » (P) où se disent les souvenirs, vente d'un
+// œuf, puis commerce fermé la nuit. Sauvegarde de départ « aubrune-recette » (10 h, 20 € chacun,
+// trois œufs chacun).
 import { expect, test } from '@playwright/test';
+import { actUntil, talkScreen } from '../aides-e2e/conversation';
 import { startDuo } from '../aides-e2e/duo';
 import {
   ANNEX_Y,
   STRICT,
+  agreedAim,
   aimAt,
   aimOf,
   countOf,
@@ -82,25 +86,31 @@ test('C1 commerce: entrer, acheter, parler, vendre, puis fermé la nuit', async 
   // Face au comptoir: la touche d'action le vise (et pas l'étal voisin).
   expect(await aimAt(duo, h, COUNTER, COUNTER_ID, journal), 'comptoir visé').toBe(true);
 
-  // La commerçante parle d'abord si elle a une réplique en attente, sinon la boutique s'ouvre.
+  // L'épicière a de quoi dire à ce joueur (le souvenir du train revenu, son accueil de première
+  // visite), mais rien de l'histoire: le comptoir vend dès le premier appui, sans conversation.
   const shop = host.game().locator('.lpl-ui .shop');
   const talking = host.game().locator('.lpl-ui .dialogue');
   const first = await aimOf(h);
   journal.log(`premier appui au comptoir: ${first?.verb ?? '?'}`);
-  if (first?.verb === 'Parler') {
-    await host.press('Space', 400);
-    await expect(talking, 'l’épicière parle par-dessus le comptoir').toBeVisible({
-      timeout: 15_000,
-    });
-    await shot(host, '2-replique-en-attente');
-    await waitDialoguesClosed(duo, ctx);
-    await expect.poll(async () => (await aimOf(h))?.verb, { timeout: 20_000 }).toBe('Acheter');
-  } else expect(first?.verb, 'sans réplique en attente, le comptoir vend').toBe('Acheter');
-  for (let i = 0; i < 4 && !(await shop.isVisible()); i++) {
-    await host.press('Space', 400);
-    await host.page.waitForTimeout(2500);
-  }
-  await expect(shop, 'la boutique s’ouvre chez l’hôte').toBeVisible();
+  expect(first?.verb, 'sans réplique d’histoire en attente, le comptoir vend').toBe('Acheter');
+  /** Espace au comptoir tant que la bulle dit « Acheter » et que rien n'est ouvert. */
+  const openShop = async (label: string): Promise<void> => {
+    await actUntil(
+      host,
+      label,
+      async () => {
+        if ((await talkScreen(host)).state !== 'closed') return false;
+        if ((await agreedAim(duo, h))?.id !== COUNTER_ID)
+          await aimAt(duo, h, COUNTER, COUNTER_ID, journal);
+        const aim = await agreedAim(duo, h);
+        return aim?.id === COUNTER_ID && aim.verb === 'Acheter';
+      },
+      async () => await shop.isVisible(),
+    );
+  };
+  await openShop('la boutique s’ouvre chez l’hôte');
+  const opened = await duo.until(host, 'monde lu', () => true);
+  expect(player(opened, h).talk, 'aucune réplique avant la boutique').toBeNull();
   await expect(guest.game().locator('.lpl-ui .shop'), 'pas chez l’invité').toBeHidden();
 
   // Achat du premier article de l'étal (Entrée): la bourse baisse chez l'hôte, et l'invité le voit.
@@ -120,10 +130,13 @@ test('C1 commerce: entrer, acheter, parler, vendre, puis fermé la nuit', async 
   await shot(host, '3-achat-hote');
   await shot(guest, '3-achat-vu-par-invite');
 
-  // « Parler » (P) depuis la boutique: la conversation s'ouvre, la boutique s'efface.
+  // « Parler » (P) depuis la boutique: la conversation s'ouvre, la boutique s'efface. C'est là
+  // que l'épicière dit ce que le comptoir n'a pas fait passer avant la boutique.
   await host.press('KeyP');
   await expect(talking, 'P ouvre la conversation').toBeVisible({ timeout: 15_000 });
   await expect(shop).toBeHidden();
+  await expect.poll(async () => (await talkScreen(host)).text, { timeout: 15_000 }).not.toBe('');
+  journal.log(`« Parler »: ${(await talkScreen(host)).text}`);
   await shot(host, '4-parler');
   for (let i = 0; i < 12 && (await talking.isVisible()); i++) {
     await host.press('Backspace');
@@ -131,12 +144,9 @@ test('C1 commerce: entrer, acheter, parler, vendre, puis fermé la nuit', async 
   }
   await waitDialoguesClosed(duo, ctx);
 
-  // Vente d'un œuf: onglet « Vendre » (E), l'œuf choisi, Entrée.
-  for (let i = 0; i < 4 && !(await shop.isVisible()); i++) {
-    if ((await aimOf(h))?.id !== COUNTER_ID) await aimAt(duo, h, COUNTER, COUNTER_ID, journal);
-    await host.press('Space', 400);
-    await host.page.waitForTimeout(2500);
-  }
+  // Vente d'un œuf: onglet « Vendre » (E), l'œuf choisi, Entrée. La conversation fermée, le
+  // comptoir vend toujours (ce qu'il reste à dire à l'épicière attend « Parler »).
+  await openShop('la boutique se rouvre');
   await expect(shop, 'la boutique se rouvre').toBeVisible();
   await host.page.waitForTimeout(800);
   await host.press('KeyE');

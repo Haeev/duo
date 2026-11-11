@@ -3,10 +3,14 @@
 // l'eau »: désaccord, le bandeau le dit chez les deux, chacun y lit le choix de l'autre. Puis
 // l'invité change d'avis: accord, le bandeau s'efface et l'étape « decision » de la suite « La
 // Baronne » est franchie chez les deux. Sauvegarde « aubrune-recette » (décision ouverte, 10 h).
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
-import { startDuo, type ProbeWorld, type Side } from '../aides-e2e/duo';
+import { actUntil, pickChoice, readTalk, talkScreen } from '../aides-e2e/conversation';
+import { startDuo, type Duo, type ProbeWorld, type Side } from '../aides-e2e/duo';
 import {
   ANNEX_Y,
+  agreedAim,
   aimAtVillager,
   passDoor,
   loadMapWithInteriors,
@@ -25,50 +29,95 @@ const MAP = loadMapWithInteriors('aubrune');
 const QUEST = 'la-baronne';
 /** Porte du fournil sur la grand-rue (`carte.json`, `porte-fournil`), mur sud. */
 const BAKERY_DOOR = { x: 232.5, y: 106.5 };
-/** Devant le comptoir du fournil (`interieurs/fournil.json`: pièce en (68; 210)), côté client. */
+/**
+ * Devant le comptoir du fournil (`interieurs/fournil.json`: pièce en (68; 210), comptoir de
+ * (72; 212) à (74; 213), porte en (71,5; 214,5)), côté client: l'hôte, entré le premier, va au
+ * fond; l'invité s'arrête près de la porte. Dans l'autre sens, l'invité devait contourner l'hôte
+ * par le sud, sur le rang de la porte, et ressortait dans la rue (relevé: bloqué au bord du ru).
+ * À un demi-mètre de ce rang (y = 214) pour la même raison.
+ */
 const COUNTER_SIDE = [
-  { x: 72.6, y: 213.9 },
-  { x: 73.6, y: 213.9 },
+  { x: 73.6, y: 213.5 },
+  { x: 72.6, y: 213.5 },
 ] as const;
 const BANNER = '.lpl-ui .decision-rappel';
+const DATA = join(import.meta.dirname, '../../donnees');
+/** Portée de la touche d'action (m): en deçà, on parle à Achille en face (`commun/reglages.json`). */
+const REACH = (
+  JSON.parse(readFileSync(join(DATA, 'commun/reglages.json'), 'utf8')) as {
+    reach: { action: number };
+  }
+).reach.action;
+/** « Partir » de l'offre de boutique d'Achille (`talk.leave` de sa fiche de commerce). */
+const LEAVE = (
+  JSON.parse(readFileSync(join(DATA, 'lieux/aubrune/commerces/fournil-pradel.json'), 'utf8')) as {
+    talk: { leave: string };
+  }
+).talk.leave;
 
-/** Parle à Achille, va jusqu'aux choix, prend l'option dont le texte contient `option`. */
-async function say(seat: Seat, option: string, journal: Journal): Promise<void> {
+/**
+ * Parle à Achille par-dessus son comptoir, lit jusqu'aux choix, prend l'option dont le texte
+ * contient `option`, puis lit la réponse d'Achille jusqu'à la fin de la conversation. Chaque
+ * touche attend l'écran (`aides-e2e/conversation.ts`): un Espace parti à l'aveugle validait le
+ * premier choix à la place du joueur, ou achetait du pain une fois la boutique ouverte.
+ */
+async function say(duo: Duo, seat: Seat, option: string, journal: Journal): Promise<void> {
   const side: Side = seat.side;
-  const choices = side.game().locator('.lpl-ui .choice');
-  const talking = side.game().locator('.lpl-ui .dialogue');
-  for (let i = 0; i < 4 && !(await talking.isVisible()); i++) {
-    await side.press('Space', 400);
-    await side.page.waitForTimeout(2500);
-  }
-  await expect(talking, `${side.who}: Achille parle`).toBeVisible();
-  const heard: string[] = [];
-  for (let i = 0; i < 16 && !(await choices.first().isVisible()); i++) {
-    const line = await uiText(side, '.lpl-ui .dialogue .dlg__text');
-    if (line !== '' && heard.at(-1) !== line) heard.push(line);
-    await side.press('Space', 400);
-    await side.page.waitForTimeout(900);
-  }
-  journal.log(`${side.who} entend: ${heard.join(' | ')}`);
-  await expect(choices.first(), `${side.who}: les choix paraissent`).toBeVisible();
-  for (let i = 0; i < 6; i++) {
-    const focused = await uiText(side, '.lpl-ui .choice.focus');
-    if (focused.includes(option)) break;
-    await side.press('KeyS');
-    await side.page.waitForTimeout(600);
-  }
-  expect(await uiText(side, '.lpl-ui .choice.focus'), `${side.who}: choix « ${option} »`).toContain(
-    option,
+  const shop = side.game().locator('.lpl-ui .shop');
+  // Décision en attente de ce joueur: le comptoir s'adresse à Achille, pas à la boutique.
+  await actUntil(
+    side,
+    `${side.who}: Achille parle`,
+    async () => {
+      if (await shop.isVisible()) return false;
+      if ((await agreedAim(duo, seat))?.verb === 'Parler') return true;
+      // L'hôte ne confirme pas la bulle (un petit pas s'est perdu en route): on revise Achille.
+      await aimAtVillager(duo, seat, 'achille', MAP, journal);
+      return false;
+    },
+    async () => (await talkScreen(side)).state !== 'closed',
+    {
+      describe: async () => {
+        const w = await duo.host.world();
+        const body = w === null ? null : player(w, seat).body;
+        return `visée chez lui ${JSON.stringify(await side.aim(seat.index))}, chez l’hôte ${JSON.stringify(await duo.host.aim(seat.index))}, corps chez l’hôte ${JSON.stringify(body)}, conversation chez l’hôte ${JSON.stringify(w === null ? null : player(w, seat).talk)}`;
+      },
+    },
   );
-  journal.log(`${side.who} choisit « ${option} »`);
-  await side.press('Enter');
-  await side.page.waitForTimeout(1500);
+  const { lines, end } = await readTalk(side);
+  journal.log(`${side.who} entend: ${lines.join(' | ')}`);
+  expect(end.state, `${side.who}: les choix paraissent`).toBe('choice');
+  expect(end.choices.join(' / '), `${side.who}: choix « ${option} »`).toContain(option);
+  const taken = await pickChoice(side, option);
+  journal.log(`${side.who} choisit « ${taken} »`);
   // La réplique qui suit (« Une voix », « Deux voix, deux avis », ou l'accord) se lit puis se ferme.
-  for (let i = 0; i < 12 && (await talking.isVisible()); i++) {
-    await side.press('Space', 400);
-    await side.page.waitForTimeout(1200);
-  }
-  await expect(talking, `${side.who}: conversation finie`).toBeHidden({ timeout: 20_000 });
+  const answer = await readTalk(side);
+  journal.log(`${side.who}, réponse d’Achille: ${answer.lines.join(' | ')}`);
+  expect(answer.lines.length, `${side.who}: Achille répond au choix`).toBeGreaterThan(0);
+  if (answer.end.state === 'choice') {
+    // La règle (`commerces/README.md`): réentendue le même jour EN FACE d'Achille (le joueur a dû
+    // contourner le comptoir pour le viser), la réplique débouche sur l'offre de la boutique;
+    // par-dessus le comptoir, jamais. On décline l'offre.
+    const w = await duo.until(duo.host, 'monde lu', () => true);
+    const achille = w.places.aubrune?.villagers?.achille?.body;
+    const me = player(w, seat).body;
+    const gap = achille === undefined ? Infinity : Math.hypot(achille.x - me.x, achille.y - me.y);
+    journal.log(`${side.who}: offre de la boutique à ${gap.toFixed(2)} m d’Achille`);
+    expect(gap, `${side.who}: offre de boutique en face d’Achille seulement`).toBeLessThanOrEqual(
+      REACH,
+    );
+    expect(answer.end.choices.join(' / '), `${side.who}: c’est l’offre de la boutique`).toContain(
+      LEAVE,
+    );
+    await pickChoice(side, LEAVE);
+    expect((await readTalk(side)).end.state, `${side.who}: conversation finie`).toBe('closed');
+  } else expect(answer.end.state, `${side.who}: conversation finie`).toBe('closed');
+  await duo.until(
+    duo.host,
+    `${side.who}: conversation finie chez l’hôte`,
+    (w) => player(w, seat).talk === null,
+  );
+  await expect(shop, `${side.who}: pas de boutique derrière la décision`).toBeHidden();
 }
 
 test('D1 décision à deux: désaccord vu par les deux, puis accord', async ({ browser }) => {
@@ -115,7 +164,7 @@ test('D1 décision à deux: désaccord vu par les deux, puis accord', async ({ b
 
   // L'invité choisit seul « au café »: une voix, le bandeau chez les deux.
   expect(await aimAtVillager(duo, g, 'achille', MAP, journal), 'Achille visé (invité)').toBe(true);
-  await say(g, 'au café', journal);
+  await say(duo, g, 'au café', journal);
   await expect
     .poll(async () => await uiText(guest, BANNER), { timeout: 30_000 })
     .toContain('Tu as choisi');
@@ -126,7 +175,7 @@ test('D1 décision à deux: désaccord vu par les deux, puis accord', async ({ b
 
   // L'hôte dit « à l'eau »: désaccord. Chacun voit son choix et celui de l'autre.
   expect(await aimAtVillager(duo, h, 'achille', MAP, journal), 'Achille visé (hôte)').toBe(true);
-  await say(h, 'relâche', journal);
+  await say(duo, h, 'relâche', journal);
   for (const [side, other] of [
     [host, 'Zoé'],
     [guest, 'Loïc'],
@@ -145,7 +194,7 @@ test('D1 décision à deux: désaccord vu par les deux, puis accord', async ({ b
   expect(await aimAtVillager(duo, g, 'achille', MAP, journal), 'Achille revisé (invité)').toBe(
     true,
   );
-  await say(g, 'relâche', journal);
+  await say(duo, g, 'relâche', journal);
   for (const side of [host, guest]) {
     await duo.until(
       side,
