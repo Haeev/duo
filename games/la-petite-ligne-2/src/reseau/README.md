@@ -2,19 +2,23 @@
 
 ADR 0007, 0019 et 0020. L'hôte fait autorité; l'invité affiche les autres derrière un coussin de gigue et prédit son propre déplacement et le début de ses gestes.
 
-| Fichier             | Rôle                                                                                                                          |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `canaux.ts` (L0)    | canaux, schémas des messages, budgets de taille                                                                               |
-| `tranches.ts`       | de l'état aux messages                                                                                                        |
-| `hote.ts`           | pas, envois par tranche (« joueurs » au pas même, « lieu » tous les 6 pas, progression tous les 15), bascule de lieu, reprise |
-| `par-cles.ts`       | état envoyé par différences et par morceaux, une clé par entité, sans rien connaître du contenu (M3)                          |
-| `etat-lieu.ts`      | l'état lent du lieu par `par-cles.ts`, sur le canal fiable 5 (morceaux de 16 Kio au plus)                                     |
-| `file-commandes.ts` | file des commandes de l'invité chez l'hôte: coussin, rattrapage, commande devinée (2 au plus)                                 |
-| `progression.ts`    | progression par différences et par morceaux, sur le canal fiable 8 (proposé à L0)                                             |
-| `invite.ts`         | état reçu (`world()`), état à afficher (`render(now, alpha)`), geste prédit, bascule, reprise                                 |
-| `interpolation.ts`  | coussin de gigue (95e centile du retard observé, 2 à 10 pas) et interpolation                                                 |
-| `prediction.ts`     | contrat `Predictor` que fournit la simulation, prédiction du déplacement et réconciliation                                    |
-| `reglages.ts`       | valeurs du réseau                                                                                                             |
+| Fichier             | Rôle                                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `canaux.ts` (L0)    | canaux, schémas des messages, budgets de taille                                                                                      |
+| `tranches.ts`       | de l'état aux messages                                                                                                               |
+| `hote.ts`           | pas, envois par tranche (« joueurs » au pas même, « lieu » tous les 6 pas, progression tous les 15), bascule de lieu, reprise        |
+| `par-cles.ts`       | état envoyé par différences et par morceaux, une clé par entité, sans rien connaître du contenu (M3)                                 |
+| `etat-lieu.ts`      | l'état lent du lieu par `par-cles.ts`, sur le canal fiable 5 (morceaux de 16 Kio au plus)                                            |
+| `file-commandes.ts` | file des commandes de l'invité chez l'hôte: coussin, rattrapage, commande devinée (2 au plus)                                        |
+| `progression.ts`    | progression par différences et par morceaux, sur le canal fiable 8 (proposé à L0)                                                    |
+| `invite.ts`         | état reçu (`world()`), état à afficher (`render(now, alpha)`), geste prédit, bascule, reprise                                        |
+| `interpolation.ts`  | coussin de gigue (95e centile du retard observé, 2 à 10 pas) et interpolation                                                        |
+| `prediction.ts`     | contrat `Predictor` que fournit la simulation, prédiction du déplacement et réconciliation                                           |
+| `reglages.ts`       | valeurs du réseau                                                                                                                    |
+| `compatibilite.ts`  | carte d'identité échangée sur le canal 9 (version, protocole, empreinte des schémas et de la fabrication); un écart arrête la partie |
+| `garde.ts`          | validation des messages reçus par le jeu: chaque refus est compté, journalisé (le premier par canal) et signalé une fois au joueur   |
+
+Compatibilité (ADR 0006, MA2 de la revue du 2026-11-11): le schéma de la carte et le canal 9 ne changent jamais. Pour un changement incompatible que les schémas ne voient pas (sens d'un champ, ordre des habitants du canal rapide), incrémenter `NET_PROTOCOL`. Un pair muet au bout de `COMPAT_WAIT_STEPS` pas (3 s) a un jeu d'avant la vérification: il est désigné comme le plus ancien. L'hôte peut jouer un aller-retour de pas avant la réponse, puis s'arrête; l'invité ne se déclare pas prêt.
 
 ## Ce que la simulation (L2) branche
 

@@ -7,6 +7,14 @@ import type { GameAction } from './actions';
 import type { Content } from './donnees/charger';
 import type { PlayerIndex } from './donnees/schemas/communs';
 import type { ReadonlyWorld, WorldState } from './etat/monde';
+import {
+  compatText,
+  COMPAT_TEXTS,
+  createCompatCheck,
+  localHello,
+  type CompatHello,
+} from './reseau/compatibilite';
+import { guardNet } from './reseau/garde';
 import { createGuest, type Guest } from './reseau/invite';
 import { createHost, type Host } from './reseau/hote';
 import { createSaveTrigger, type SaveTrigger } from './sauvegarde/declencheur';
@@ -48,6 +56,16 @@ export interface SessionOptions {
   readonly content: Content;
   /** Horloge locale en millisecondes (`performance.now` par défaut; les tests donnent la leur). */
   readonly now?: () => number;
+  /** Carte d'identité de ce jeu (tests: simuler un autre jeu en face). */
+  readonly hello?: CompatHello;
+  /** Pas d'attente de la carte de l'autre (`COMPAT_WAIT_STEPS` par défaut). */
+  readonly compatWaitSteps?: number;
+}
+
+/** Ce que le joueur doit savoir du réseau: jeux incompatibles (partie arrêtée) ou message refusé. */
+export interface SessionAlert {
+  readonly kind: 'incompatible' | 'rejected';
+  readonly text: string;
 }
 
 export interface Session {
@@ -57,6 +75,10 @@ export interface Session {
   ready(): boolean;
   /** Remarque de la reprise à montrer aux joueurs (partie neuve après refus, remplaçant), `null` sinon. */
   readonly notice: ResumeNotice | null;
+  /** Alerte réseau à montrer, une seule fois chacune (l'écouteur reçoit aussi celle déjà levée). */
+  onAlert(listener: (alert: SessionAlert) => void): () => void;
+  /** Les deux jeux sont incompatibles: plus aucun pas, rien n'est envoyé ni enregistré. */
+  blocked(): boolean;
   /** Sauvegarde sur demande (hôte); chez l'invité: `refused`. */
   saveNow(): Promise<SaveStatus>;
   /** Simulation de l'hôte (tests et outils), `null` chez l'invité. */
@@ -75,6 +97,35 @@ export function createSession(options: SessionOptions): Session {
   let local: PlayerIndex = 0;
   let notice: ResumeNotice | null = null;
   let saves: SaveTrigger | null = null;
+
+  // Compatibilité des deux jeux et messages refusés (ADR 0006, MA2 de la revue du 2026-11-11).
+  const peerName = duo.remotePlayer.name;
+  const alertListeners = new Set<(alert: SessionAlert) => void>();
+  let alert: SessionAlert | null = null;
+  const raise = (next: SessionAlert): void => {
+    if (alert?.kind === 'incompatible' || alert?.kind === next.kind) return;
+    alert = next;
+    for (const listener of alertListeners) listener(next);
+  };
+  const net = guardNet(duo.net, (rejection) => {
+    if (rejection.count === 1) duo.log.warn('réseau: message refusé par son schéma', rejection);
+    raise({ kind: 'rejected', text: COMPAT_TEXTS.rejected.replaceAll('{nom}', peerName) });
+  });
+  const compat = createCompatCheck(
+    duo.net,
+    options.hello ?? localHello(duo.manifest.id, duo.manifest.version),
+    options.compatWaitSteps,
+  );
+  const offVerdict = compat.onVerdict((verdict) => {
+    const text = compatText(verdict, peerName);
+    if (text === null) return;
+    duo.log.warn('réseau: jeux incompatibles, partie arrêtée', verdict);
+    raise({ kind: 'incompatible', text });
+  });
+  const blocked = (): boolean => {
+    const kind = compat.verdict().kind;
+    return kind !== 'waiting' && kind !== 'ok';
+  };
 
   if (duo.role === 'host') {
     const members: [Member, Member] = [
@@ -96,7 +147,7 @@ export function createSession(options: SessionOptions): Session {
     const hostSim = createSim(content, world ?? createWorld(content, duo.seed, members));
     sim = hostSim;
     local = hostSim.world.players[0].member === duo.localPlayer.id ? 0 : 1;
-    host = createHost(hostSim, duo.net, duo.log, local, { advance: step });
+    host = createHost(hostSim, net, duo.log, local, { advance: step });
     duo.saves.provide(() => snapshotOf(hostSim.world, content));
     saves = createSaveTrigger({
       target: duo.saves,
@@ -107,7 +158,7 @@ export function createSession(options: SessionOptions): Session {
     });
     host.sendAll();
   } else {
-    const g = createGuest(content, duo.net, duo.localPlayer.id, {
+    const g = createGuest(content, net, duo.localPlayer.id, {
       predictor: createPredictor(content),
       now,
     });
@@ -158,9 +209,11 @@ export function createSession(options: SessionOptions): Session {
   // Départ commun des deux machines: l'invité écoute enfin; tout repart complet (le lieu compris,
   // dont la première complète, envoyée avant que l'invité ne soit prêt, s'est perdue).
   const offStart = duo.on('start', () => {
+    compat.resend();
     host?.resume();
   });
   const offResume = duo.on('resume', () => {
+    compat.resend();
     host?.resume();
     guest?.resume();
   });
@@ -168,6 +221,8 @@ export function createSession(options: SessionOptions): Session {
   return {
     view,
     step(input) {
+      compat.step();
+      if (blocked()) return;
       if (host !== null) {
         const events = host.step(input);
         saves?.notify(events);
@@ -175,10 +230,20 @@ export function createSession(options: SessionOptions): Session {
       } else guest?.step(input);
     },
     ready() {
+      if (blocked()) return false;
       return guest === null ? true : guest.ready();
     },
     notice,
+    onAlert(listener) {
+      alertListeners.add(listener);
+      if (alert !== null) listener(alert);
+      return () => {
+        alertListeners.delete(listener);
+      };
+    },
+    blocked,
     saveNow() {
+      if (blocked()) return Promise.resolve('refused');
       return saves?.saveNow() ?? Promise.resolve('refused');
     },
     hostSim() {
@@ -187,6 +252,9 @@ export function createSession(options: SessionOptions): Session {
     dispose() {
       offResume();
       offStart();
+      offVerdict();
+      compat.dispose();
+      alertListeners.clear();
       saves?.dispose();
       host?.dispose();
       guest?.dispose();
