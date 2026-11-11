@@ -750,3 +750,10 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Poser un module sur le relief sommet par sommet (`y + heightAt(x, z)`): la hauteur est continue, deux modules voisins se rejoignent exactement, sur toute pente.
 - Module en miroir (`scale.x = -1`): inverser l'ordre de deux index par triangle, sinon les faces se retournent.
 - Lisière d'Aubrune: berges en escalier (cases reliées par un coin seulement) et cases seules entre un ru et une haie: le choix du module se fait par score (raccords, côté de l'eau, coin d'eau à moitié), pas par table de cas.
+
+## Postes, pose de liaison et caméra des pièces (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Contrôle des postes (`tests/aides-postes.ts`): emprise de la simulation réduite à la boîte du modèle livré, lue dans le bloc JSON du GLB (nœud nommé comme le modèle, translations cumulées; façade du modèle vers +z, quart de tour r = 1: (x, z) devient (z, -x)). Les emprises 1 x 1 seules donnaient de fausses fautes (paroi de wagon au bord de sa case, banquette contre couchette).
+- Pose de liaison: `blendWeights` part de zéro pour un personnage neuf; avec `dt` petit ou nul il paraît quelques images bras écartés. Poids posés d'un coup à la création et après `placed = false`. `AnimationAction.isRunning()` est faux pour marche et course (`timeScale` 0): compter `enabled && isScheduled()`.
+- Caméra encrée: plongée de 35 degrés (6 m) à 50 degrés (18 m et plus), jamais zénithale. Une vue de face (lacet 0 ou 180) rapprochée se lit pourtant comme une vue de dessus: dans les bancs, lacet sur une diagonale et 18 m.
+- La fabrique des sauvegardes lancée par `--config <chemin absolu>` rejoue encore toute la suite (104 fichiers, 4 min 30 sous charge). Ensuite, configuration Playwright jetable sans `globalSetup`.
