@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "tabouret-de-ferme",
+  "name": "Tabouret de ferme",
+  "model": "stool-farm",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "sit",
+      "seats": 1,
+      "restPerMinute": 6
+    }
+  ],
+  "deco": {
+    "layer": "floor",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 1
+  }
+}

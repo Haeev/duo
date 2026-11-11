@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "pile-de-livres",
+  "name": "Pile de livres",
+  "model": "book-stack",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": true,
+  "series": null,
+  "bricks": [],
+  "deco": {
+    "layer": "top",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 1
+  }
+}

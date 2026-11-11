@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "caisse-de-legumes",
+  "name": "Cagette de légumes",
+  "model": "vegetable-crate",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": null,
+  "bricks": [],
+  "deco": {
+    "layer": "floor",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 1
+  }
+}

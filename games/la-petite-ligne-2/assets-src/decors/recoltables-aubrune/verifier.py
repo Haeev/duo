@@ -135,7 +135,7 @@ def main():
             continue
         fiche = lire_json(os.path.join(donnees, "meubles", nom))
         # Meuble de cette chaîne: posé au centre de son emprise, il doit tenir dans ses cases.
-        if fiche["model"] in bornes and miens[fiche["model"]]["family"] == "meuble":
+        if fiche["model"] in bornes and miens[fiche["model"]]["family"] in ("meuble", "objet"):
             mini, maxi = bornes[fiche["model"]]
             demi_w, demi_d = fiche["size"]["w"] / 2 + 0.005, fiche["size"]["h"] / 2 + 0.005
             if mini[0] < -demi_w or maxi[0] > demi_w or mini[2] < -demi_d or maxi[2] > demi_d:

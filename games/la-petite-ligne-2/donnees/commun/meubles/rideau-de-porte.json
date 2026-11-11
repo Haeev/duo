@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "rideau-de-porte",
+  "name": "Rideau de passage",
+  "model": "door-curtain",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": true,
+  "series": null,
+  "bricks": [],
+  "deco": {
+    "layer": "wall",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 1
+  }
+}

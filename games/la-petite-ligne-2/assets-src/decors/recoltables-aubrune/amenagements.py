@@ -781,9 +781,14 @@ def luminaire(entree: dict, ctx: Contexte) -> list[dict]:
         barre(s, (0, 2.86, 0.0), (0, 2.86, 0.62), 0.022, 4, "metal", fer[0], bouts=(False, True))
         barre(s, (0, 2.42, 0.06), (0, 2.84, 0.42), 0.014, 3, "metal", fer[1], bouts=(False, False))
         barre(s, (0, 2.86, 0.55), (0, 2.74, 0.55), 0.012, 3, "metal", fer[1], bouts=(False, False))
-        s.tube([(0, 2.74, 0.55, 0.05), (0, 2.68, 0.55, 0.09), (0, 2.6, 0.55, 0.3)], 8, "metal", ctx.un("email"), bouts=(True, False))
-        s.tube([(0, 2.66, 0.55, 0.075), (0, 2.5, 0.55, 0.095), (0, 2.42, 0.55, 0.05)], 6, "flamme", ctx.un("verre_lampe"), bouts=(False, True))
-        foyer = [0.0, 2.52, 0.55]
+        s.tube([(0, 2.74, 0.55, 0.05), (0, 2.68, 0.55, 0.09), (0, 2.6, 0.55, 0.26)], 8, "metal", ctx.un("email"), bouts=(True, False))
+        # Globe de verre pendu sous l'abat-jour, assez bas et large pour qu'on le voie luire
+        # sous le bord à 50 degrés de plongée (le haut reste caché par l'émail).
+        s.tube([(0, 2.62, 0.55, 0.07), (0, 2.5, 0.55, 0.15), (0, 2.32, 0.55, 0.17), (0, 2.18, 0.55, 0.12), (0, 2.12, 0.55, 0.04)], 8, "flamme", ctx.un("verre_lampe"), bouts=(False, True))
+        # Lèvre de l'abat-jour éclairée par en dessous: un liseré qui luit tout autour du bord, vu
+        # de n'importe quel côté (le globe, lui, peut être caché par le poteau).
+        s.tube([(0, 2.6, 0.55, 0.265), (0, 2.555, 0.55, 0.255)], 8, "flamme", ctx.un("verre_lampe"), bouts=(False, False))
+        foyer = [0.0, 2.36, 0.55]
     elif sorte == "lanterne-murale":
         # Lanterne de porte: platine vissée au mur (le mur est derrière, en -z), potence en col de
         # cygne, lanterne à quatre vitres à 2,3 m: au-dessus d'une tête, sous le linteau de l'étage.
@@ -888,10 +893,12 @@ def ouvrage(entree: dict, ctx: Contexte) -> list[dict]:
         boite(s, -0.5, 0.5, 0, 0.45, -0.5, 0.5, "pierre", ctx.un("pierre_claire"), dessus=ctx.un("pierre_claire", 1))
         bois = ctx.tons("bois_grise")
         H = 9.0
-        s.tube([(0, 0.45, 0, 0.2), (0, H, 0, 0.11)], 4, "bois", bois[0], bouts=(False, True), coupe=bois[1])
+        # Mât carré épais (34 cm au pied, 20 cm en tête): il doit se lire à la caméra de jeu.
+        s.tube([(0, 0.45, 0, 0.34), (0, H, 0, 0.2)], 4, "bois", bois[0], bouts=(False, True), coupe=bois[1])
         for k in range(1, 6):
             y = 0.45 + k * 1.4
-            boite(s, -0.24 + k * 0.015, 0.24 - k * 0.015, y, y + 0.06, -0.24 + k * 0.015, 0.24 - k * 0.015, "bois", bois[1], tremble=0.0)
+            d = 0.27 - k * 0.017
+            boite(s, -d, d, y, y + 0.08, -d, d, "bois", bois[1], tremble=0.0)
         _echelle(s, 0.0, -0.32, 0.45, H - 0.6, 0.4, ctx, mat="bois", couleur=bois[1])
         # Plate-forme et garde-corps sous le bras.
         boite(s, -0.5, 0.5, 7.6, 7.68, -0.62, 0.3, "bois", bois[1])
@@ -907,14 +914,19 @@ def ouvrage(entree: dict, ctx: Contexte) -> list[dict]:
         for k, c in enumerate(("feu_rouge", "feu_vert")):
             anneau(s, (0.18 + k * 0.17, y, 0.21), 0.0, 0.07, 0.02, 7, "vitre", ctx.un(c), axe="z", faces_bord=False)
         # Lanterne au sommet et chapeau.
-        boite(s, -0.14, 0.14, H, H + 0.32, -0.14, 0.14, "metal", fer[0], tremble=0.0)
-        boite(s, -0.1, 0.1, H + 0.06, H + 0.24, 0.14, 0.15, "flamme", ctx.un("feu_rouge"), tremble=0.0, sans="y- z-")
-        s.tube([(0, H + 0.32, 0, 0.22), (0, H + 0.5, 0, 0.04)], 4, "metal", fer[1], bouts=(False, False))
+        # Lanterne lisible: boîtier de 44 cm, grand verre rouge vers la voie et verres de côté,
+        # visière au-dessus du verre, chapeau à quatre pans.
+        boite(s, -0.22, 0.22, H, H + 0.5, -0.22, 0.22, "metal", fer[0], tremble=0.0)
+        boite(s, -0.17, 0.17, H + 0.08, H + 0.42, 0.22, 0.235, "flamme", ctx.un("feu_rouge"), tremble=0.0, sans="y- z-")
+        for c in (-1, 1):
+            boite(s, *sorted((c * 0.22, c * 0.235)), H + 0.12, H + 0.38, -0.12, 0.12, "flamme", ctx.un("verre_lampe"), tremble=0.0, sans="y-")
+        boite(s, -0.2, 0.2, H + 0.43, H + 0.46, 0.22, 0.36, "metal", fer[1], tremble=0.0)
+        s.tube([(0, H + 0.5, 0, 0.36), (0, H + 0.74, 0, 0.06)], 4, "metal", fer[1], bouts=(False, False))
         # Levier de manœuvre au pied et son fil vers le haut.
         barre(s, (0.42, 0.45, 0.42), (0.6, 1.25, 0.6), 0.03, 4, "metal", ctx.un("peint_rouge"), bouts=(False, True))
         barre(s, (0.1, 1.0, 0.12), (0.1, y - 0.2, 0.2), 0.008, 3, "metal", fer[1], bouts=(False, False))
         # Le feu rouge de la lanterne (voie fermée) regarde la voie: son foyer est devant le verre.
-        return [_modele(entree["id"], s, states={}, variants=[], pourquoi=entree.get("pourquoi"), light=_lumiere(entree, (0.0, H + 0.15, 0.3)))]
+        return [_modele(entree["id"], s, states={}, variants=[], pourquoi=entree.get("pourquoi"), light=_lumiere(entree, (0.0, H + 0.25, 0.4)))]
     if sorte == "roue":
         # Roue à aubes de 6,6 m: deux jantes, rayons, aubes, moyeu sur deux piles de pierre. Le bas
         # plonge dans le bief (le sol du lieu y est creusé). Construite axe est-ouest puis tournée:

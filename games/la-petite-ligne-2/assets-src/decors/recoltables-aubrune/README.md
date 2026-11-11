@@ -97,6 +97,18 @@ Branchement en jeu (`src/rendu/lieu/files.ts`, données dans `reglages-files.ts`
 - Haies, talus, rangs: une file par cases (`RUN_SORTS`), un module par case choisi d'après ses voisines (forme tirée de la case, bout, angle, quart de tour, miroir du bout de talus, côté de l'eau), chaque sorte fusionnée en un maillage par tuile, chaque file d'une seule pièce de contour.
 - Repères: un modèle par nature (`LANDMARK_LOOKS`: `chateau-d-eau`, `signal`, `roue`, `portail`, `pigeonnier`), orienté par la voie ou le bief. La grue à eau `water-crane` n'est pas posée: le plan ne donne pas sa place (à ajouter au plan par le level designer, puis une nature de repère).
 
+## Objets d'intérieur (`interieurs.py`, `aubrune-objets.glb`)
+
+29 objets qui densifient les pièces (budget 150, 300 pour `coat-rack`, `dresser`, `wood-stove`, `vegetable-crate`), chacun avec sa fiche posable dans `donnees/commun/meubles/` (`deco.layer`). Origine au centre de l'emprise, avant vers +z; selon la couche: `floor` et `rug` au plancher, `top` à y = 0 sur le plateau qui le porte (le rendu doit l'élever au `top` du meuble porteur), `wall` contre le mur en z = -0,5 avec ses hauteurs réelles (cadre à 1,62 m, régulateur à 2 m). Lampes (`table-lamp`, `oil-lamp`, `wood-stove`): verre ou abat-jour en `flamme`, `lumiere` dans l'entrée, comme les lampes du dehors. Le contrôle refuse un objet qui sort des cases de sa fiche.
+
+Ajouter un objet: copier l'entrée `famille = "objet"` la plus proche dans `recoltables.toml` (même `sorte`, ou `forme` pour un cadre, `groupe` pour les bocaux), changer `id` et `graine`, `construire.sh`, puis copier une fiche voisine (`lampe-de-table.json`, `cadre-portrait.json`) avec `"model": "<id>"`. Une forme nouvelle est une branche de `_objet`.
+
+## Trains vus du dehors (`vehicules.py`, `aubrune-trains.glb`)
+
+`railcar` (l'autorail du 5 h 12), et le train du samedi: `tank-engine`, `passenger-coach`, `luggage-van` (budget 2 500 par véhicule). Origine au centre du véhicule au niveau du ballast, longueur le long de z, avant vers +z; mesures de la voie du jeu: roues sur le rail (dessus à 0,26 m, rails à 0,72 m de l'axe), caisse de 2,7 m (15 cm de jeu au nez du quai à 1,5 m de l'axe), plancher à 1 m, deux marches de 29 cm sous chaque porte, portes des deux côtés. Les vitres des voyageurs sont en `vitrage` (verre qui s'allume avec les lampes, comme `flamme`): la nuit la caisse est éclairée; `lumiere` pose la flaque de la voiture sur le quai. Tampon contre tampon: autorail 14,52 m, locomotive 8,9 m (tampons de 4,46 m à l'avant et 4,61 m à l'arrière du centre), voiture 12,92 m, fourgon 9,92 m. Aucun véhicule n'est branché: le rendu des trains (`src/rendu/voyage/`, quai d'Aubrune) les lira par leur identifiant.
+
+Planche: `bash planche/trains-interieurs.sh` (11 vues, environ 3 min), qui écrit `docs/jeux/jeu-1/refonte/planches/trains-et-interieurs.png`.
+
 ## Livrés sans fiche de jeu (à brancher par le game designer et le level designer)
 
 `berry-bush` (buisson à baies), `rock`, `rock-mossy`, `boulder`, `boulder-mossy` et leurs états `chipped` (aucune ressource de pierre à miner dans les données), `wild-herbs`. Les états `winter` attendent que le rendu lise la saison.

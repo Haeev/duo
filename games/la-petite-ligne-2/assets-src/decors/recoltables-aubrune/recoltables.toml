@@ -27,6 +27,8 @@ rang = "aubrune-lisieres"
 meuble = "aubrune-meubles"
 luminaire = "aubrune-luminaires"
 ouvrage = "aubrune-ouvrages"
+objet = "aubrune-objets"
+vehicule = "aubrune-trains"
 
 # Plafonds de triangles. Culture: par plant (`plants` du manifeste), le modèle est une case de 1 m.
 [budgets]
@@ -48,6 +50,9 @@ rang = 60
 meuble = 600
 luminaire = 300
 ouvrage = 2500
+# Objets d'intérieur: 150 (300 pour les gros, `budget` de l'entrée). Un train: 2 500 par véhicule.
+objet = 150
+vehicule = 2500
 
 # ---------------------------------------------------------------- matériaux (noms stables)
 # Le rendu encré tire du NOM la couche de traits et la prise au vent (`nature`: leaf = feuillage
@@ -72,6 +77,7 @@ metal = { couche = "plain" }
 vitre = { couche = "plain" }                   # verre, glace, bocaux
 etoffe = { couche = "plain" }
 flamme = { couche = "plain", nature = "flame" }  # verre d'une lampe: il luit quand elle est allumée
+vitrage = { couche = "plain", nature = "flame" }  # fenêtres d'une voiture de voyageurs: allumées avec les lampes
 
 # ---------------------------------------------------------------- nuancier d'Aubrune (teintes d'écran)
 # Accordé à la scène d'essai validée (`src/rendu/demo-encre/`): herbe tendre, terre blonde, bois miel.
@@ -169,6 +175,28 @@ soupe = ["#C98A43"]
 feu_rouge = ["#D2452F"]
 verre_lampe = ["#EFE2B4"]
 feu_vert = ["#6FAE6A"]
+# Trains: livrées de la petite ligne (autorail bleu canard et crème, voitures de teck, fourgon brun).
+livree_autorail = ["#3F6F7A"]
+livree_creme = ["#E9DDBE"]
+livree_teck = ["#8E5B3A", "#A36C47"]
+livree_fourgon = ["#6E4A36"]
+livree_loco = ["#3E6A4E"]
+toit_train = ["#7D7F80"]
+tampon_rouge = ["#B0453A"]
+# Intérieurs.
+abat_jour = ["#E6CF9A"]
+portrait_fond = ["#4A3A30"]
+portrait_peau = ["#E2B994"]
+confiture = ["#9E2F3A", "#D07A2E", "#6B2C4A"]
+manteau = ["#4E5A6E", "#7A5238"]
+feutre = ["#3A302B"]
+rideau = ["#C9A27A", "#B0604C"]
+vaisselle = ["#E8E0CC", "#7C9DB0", "#E6D6B2", "#B0604C"]
+patate = ["#C9A266"]
+carotte = ["#D97A2E"]
+tresse = ["#B0604C", "#7C9DB0", "#E6D6B2", "#96A98C"]
+reliure = ["#7A3B32", "#3F5A6E", "#5E6E3E", "#8A6444"]
+encre_journal = ["#9A9184"]
 
 # ---------------------------------------------------------------- essences d'arbres
 # `fut`: hauteur du tronc jusqu'à la fourche, rayon au pied, pans. `houppier`: forme (rond, ovale,
@@ -687,3 +715,257 @@ famille = "ouvrage"
 sorte = "pigeonnier"
 graine = 599
 pourquoi = "pigeonnier de la ferme (10 m): rez de moellons, bandeau contre les rats, envol au sud"
+
+# ---------------------------------------------------------------- objets d'intérieur (fiches de donnees/commun/meubles)
+# Origine au centre de l'emprise de la fiche, avant vers +z. Selon la couche de pose de la fiche:
+# au sol (y = 0 au plancher), sur un meuble (y = 0 au plateau qui le porte), au mur (le mur en
+# z = -0,5, hauteurs depuis le plancher). Lampes: `lumiere` comme les lampes du dehors.
+[[modeles]]
+id = "table-lamp"
+famille = "objet"
+sorte = "lampe-de-table"
+graine = 701
+lumiere = { rayon = 3.2, force = 0.8 }
+pourquoi = "lampe de chevet ou de buffet: l'abat-jour de tissu luit, la flaque tombe sur le meuble et le lit"
+
+[[modeles]]
+id = "oil-lamp"
+famille = "objet"
+sorte = "lampe-a-petrole"
+graine = 703
+lumiere = { rayon = 2.8, force = 0.7 }
+pourquoi = "lampe à pétrole sur la table du repas: on mange et on lit dans sa flaque"
+
+[[modeles]]
+id = "wall-clock"
+famille = "objet"
+sorte = "horloge-murale"
+graine = 709
+pourquoi = "régulateur de la salle: le cadran à 2 m se lit de toute la pièce, au-dessus des têtes"
+
+[[modeles]]
+id = "mantel-clock"
+famille = "objet"
+sorte = "pendule"
+graine = 719
+pourquoi = "pendule de cheminée ou de buffet, cadran vers la pièce"
+
+[[modeles]]
+id = "picture-portrait"
+famille = "objet"
+sorte = "cadre"
+forme = "portrait"
+graine = 727
+pourquoi = "portrait de l'aïeule, à hauteur d'yeux (1,62 m au centre)"
+
+[[modeles]]
+id = "picture-landscape"
+famille = "objet"
+sorte = "cadre"
+forme = "paysage"
+graine = 733
+pourquoi = "paysage du coteau et du clocher, au-dessus d'un meuble bas"
+
+[[modeles]]
+id = "picture-oval"
+famille = "objet"
+sorte = "cadre"
+forme = "ovale"
+graine = 739
+pourquoi = "médaillon ovale doré: la photographie de mariage, dans la chambre"
+
+[[modeles]]
+id = "wall-shelf"
+famille = "objet"
+sorte = "etagere-murale"
+graine = 743
+pourquoi = "étagère à 1,5 m sur deux consoles: confitures, livres, pichet, à portée de main"
+
+[[modeles]]
+id = "coat-rack"
+famille = "objet"
+sorte = "patere"
+graine = 751
+budget = 300
+pourquoi = "patère près de la porte d'entrée (1,65 m): manteau, veste, chapeau qu'on prend en sortant"
+
+[[modeles]]
+id = "dresser"
+famille = "objet"
+sorte = "vaisselier"
+graine = 757
+budget = 300
+pourquoi = "vaisselier contre le mur de la salle: buffet bas, assiettes debout sur deux étagères"
+
+[[modeles]]
+id = "wood-stove"
+famille = "objet"
+sorte = "poele"
+graine = 761
+budget = 300
+lumiere = { rayon = 2.2, couleur = "#E2843A", force = 0.6 }
+pourquoi = "poêle à bois: le feu se voit par la porte, le tuyau monte et rentre dans le mur (le conduit)"
+
+[[modeles]]
+id = "laundry-basket"
+famille = "objet"
+sorte = "panier"
+graine = 769
+pourquoi = "panier à linge d'osier, l'anse au-dessus, du linge plié dedans"
+
+[[modeles]]
+id = "indoor-logs"
+famille = "objet"
+sorte = "buches"
+graine = 773
+pourquoi = "bûches rangées à côté du poêle, sections vers la pièce: on se sert sans aller au bûcher"
+
+[[modeles]]
+id = "jam-jars"
+famille = "objet"
+sorte = "bocaux"
+groupe = "confitures"
+graine = 787
+pourquoi = "trois confitures de l'été, couvercles de tissu noués"
+
+[[modeles]]
+id = "stoneware-pots"
+famille = "objet"
+sorte = "bocaux"
+groupe = "gres"
+graine = 797
+pourquoi = "pots de grès et cruche: la saumure et le cidre de la cuisine"
+
+[[modeles]]
+id = "tin-canisters"
+famille = "objet"
+sorte = "bocaux"
+groupe = "boites"
+graine = 809
+pourquoi = "boîtes de fer peintes: sucre, café, farine"
+
+[[modeles]]
+id = "flower-vase"
+famille = "objet"
+sorte = "bouquet"
+graine = 811
+pourquoi = "bouquet cueilli au pré (coquelicots, ombelles, boutons d'or) dans un vase de faïence"
+
+[[modeles]]
+id = "door-curtain"
+famille = "objet"
+sorte = "rideau-de-porte"
+graine = 821
+pourquoi = "rideau de passage dans l'embrasure, retenu à gauche: on passe, l'autre pièce reste à l'abri"
+
+[[modeles]]
+id = "rug-round"
+famille = "objet"
+sorte = "tapis-rond"
+graine = 823
+pourquoi = "tapis rond tressé de chiffons, sous la table ou devant le lit (2 x 2 cases)"
+
+[[modeles]]
+id = "rug-runner"
+famille = "objet"
+sorte = "tapis-long"
+graine = 827
+pourquoi = "chemin de couloir à bandes (3 x 1 cases), le long du passage"
+
+[[modeles]]
+id = "stool-farm"
+famille = "objet"
+sorte = "tabouret"
+graine = 829
+pourquoi = "tabouret à trois pieds: on s'assied près du poêle ou au comptoir"
+
+[[modeles]]
+id = "table-bench"
+famille = "objet"
+sorte = "banc-de-table"
+graine = 839
+pourquoi = "banc de ferme le long de la table du repas (2 places)"
+
+[[modeles]]
+id = "bucket"
+famille = "objet"
+sorte = "seau"
+graine = 853
+pourquoi = "seau de zinc à anse, l'eau de la pompe pour la cuisine"
+
+[[modeles]]
+id = "broom"
+famille = "objet"
+sorte = "balai"
+graine = 857
+pourquoi = "balai de paille debout dans un coin, le manche contre le mur (z = -0,5)"
+
+[[modeles]]
+id = "book-stack"
+famille = "objet"
+sorte = "pile-de-livres"
+graine = 859
+pourquoi = "pile de livres sur la table de chevet ou le buffet"
+
+[[modeles]]
+id = "newspaper"
+famille = "objet"
+sorte = "journal"
+graine = 863
+pourquoi = "le journal du matin plié sur la table: il arrive par l'autorail de 5 h 12"
+
+[[modeles]]
+id = "bread-basket"
+famille = "objet"
+sorte = "corbeille-de-pain"
+graine = 877
+pourquoi = "corbeille de pain sur la table: une miche, un bout de baguette du fournil"
+
+[[modeles]]
+id = "vegetable-crate"
+famille = "objet"
+sorte = "caisse-de-legumes"
+graine = 881
+budget = 300
+pourquoi = "cagette de la récolte au sol de la cuisine ou devant l'épicerie: choux, pommes de terre, carottes"
+
+[[modeles]]
+id = "small-keg"
+famille = "objet"
+sorte = "tonnelet"
+graine = 883
+pourquoi = "tonnelet de cidre couché sur son chantier, robinet vers la pièce"
+
+# ---------------------------------------------------------------- trains vus du dehors
+# Origine au centre du véhicule, au niveau du ballast, dans l'axe de la voie; longueur le long de z,
+# avant vers +z. Voie et quai du jeu: rails à 0,72 m de l'axe (dessus à 0,26 m), quai de 12 cm dont
+# le bord est à 1,5 m de l'axe. `lumiere`: la voiture éclairée la nuit (vitres en `vitrage`).
+[[modeles]]
+id = "railcar"
+famille = "vehicule"
+sorte = "autorail"
+graine = 901
+lumiere = { rayon = 4.5, force = 0.55 }
+pourquoi = "l'autorail du 5 h 12 (14,3 m): une caisse, deux cabines, il dessert la halte la nuit, fenêtres éclairées"
+
+[[modeles]]
+id = "tank-engine"
+famille = "vehicule"
+sorte = "locomotive"
+graine = 907
+pourquoi = "locomotive du train du samedi: caisses à eau, cheminée vers l'avant (+z), cabine à l'arrière"
+
+[[modeles]]
+id = "passenger-coach"
+famille = "vehicule"
+sorte = "voiture"
+graine = 911
+lumiere = { rayon = 4.0, force = 0.5 }
+pourquoi = "voiture à compartiments du samedi: quatre portières par flanc, on monte du quai par deux marches"
+
+[[modeles]]
+id = "luggage-van"
+famille = "vehicule"
+sorte = "fourgon"
+graine = 919
+pourquoi = "fourgon en queue: bagages par la porte roulante, le chef de train dans la vigie, feux de queue"

@@ -335,3 +335,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - À 50 degrés, un profil extrudé de haie se lit en pavé même bosselé: ce sont des masses claires sur un corps sombre plus petit qui font la haie. Une roue ou une meule d'axe est-ouest se voit par la tranche: axe nord-sud.
 - Planche par `planche/provisoires.sh`: 10 vues en 2 min 30; vue « de l'ouest » (`lacet: 90`) pour un repère haut à côté d'une voie (12 m ne tiennent pas avec la voie dans le cadre à 18 m vus du sud).
 - Garde-fou: `sed -i` avec plusieurs expressions et des apostrophes dans le texte inséré est refusé; patchs par script écrit avec Write (`splice.py`: remplace un bloc entre deux lignes repères).
+
+## Trains et objets d'intérieur encrés (vérifié le 2026-11-11)
+
+- Même chaîne `recoltables-aubrune/`: familles `vehicule` (`vehicules.py`) et `objet` (`interieurs.py`). Un nouveau nom de matériau s'ajoute à trois endroits: `MATERIAUX` de `formes.py` (sinon `AssertionError: <nom>`), `[materiaux]` du toml, et il ne peut prendre que `leaf`, `stem` ou `flame` comme nature (schéma du manifeste): pas de vitre `window` pour un décor. Fenêtres allumées la nuit d'un véhicule: matériau `vitrage` de nature `flame`.
+- Voie du jeu: rails à 0,72 m de l'axe, dessus du rail à 0,26 m (traverses de 12 cm, rails de 14 cm); quai de 12 cm, nez à 1,5 m de l'axe. L'ancienne planche des aménagements dessinait une voie d'un mètre: ne pas la recopier.
+- Planche d'un train: quai au sud (côté caméra), voie au nord, sinon la caisse cache le quai et on ne voit que le flanc sans portes. À 50 degrés, le toit fait la moitié de l'image: couvre-joints, aérateurs et radiateur à ailettes le rendent lisible.
+- Un globe pendu sous un abat-jour reste caché à 50 degrés: une lèvre en `flamme` sous le bord de l'abat-jour se voit de tous les côtés.
+- `construire.py` écrit `decors.json` en indentation 1: passer `pnpm exec prettier --write` dessus avant de rendre (la version versionnée est formatée).
+- Ids de fiche à éviter: `tabouret` (le test des gabarits l'ajoute lui-même). Tout meuble posable sans vignette fait échouer `interface-plume.test.ts`: l'inscrire dans `WITHOUT_THUMB` avec sa raison. Ajouter un GLB au dossier des décors: l'inscrire dans la liste de `tests/rendu/decors.test.ts`.
+- Planche de pièce: vue de biais `lacet: -35` (murs nord et ouest visibles), `large` 9,5, centre décalé vers le nord-ouest (les objets muraux montent dans l'image). Objets « sur un meuble »: champ `y` des objets de la page (`planche.mjs`), lumières des modèles posés par `lumieres: true`.

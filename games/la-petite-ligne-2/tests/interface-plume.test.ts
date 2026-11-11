@@ -111,12 +111,48 @@ const COLLECTIONS_AUBRUNE = [
   'vairon',
   'violette',
 ] as const;
-const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map(
-  COLLECTIONS_AUBRUNE.map((id) => [
+/** Objets d'intérieur livrés en 3D le 2026-11-11 (`recoltables-aubrune/interieurs.py`), avant leur dessin. */
+const NEW_DECOR = [
+  'balai',
+  'banc-de-table',
+  'bocaux-de-confiture',
+  'boites-a-provisions',
+  'bouquet',
+  'buches-d-interieur',
+  'cadre-ovale',
+  'cadre-paysage',
+  'cadre-portrait',
+  'caisse-de-legumes',
+  'corbeille-de-pain',
+  'etagere-murale',
+  'horloge-murale',
+  'journal',
+  'lampe-a-petrole',
+  'lampe-de-table',
+  'panier-a-linge',
+  'patere',
+  'pendule',
+  'pile-de-livres',
+  'poele',
+  'pots-de-gres',
+  'rideau-de-porte',
+  'seau',
+  'tabouret-de-ferme',
+  'tapis-long',
+  'tapis-rond',
+  'tonnelet',
+  'vaisselier',
+] as const;
+const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>([
+  ...COLLECTIONS_AUBRUNE.map((id): [string, string] => [
     id,
     'collections d’Aubrune: à dessiner, voir docs/jeux/jeu-1/refonte/collections-aubrune-assets.md',
   ]),
-);
+  ...NEW_DECOR.map((id): [string, string] => [
+    id,
+    'modèle 3D livré avant sa vignette: à dessiner par l’artiste 2D',
+  ]),
+]);
 
 describe('vignettes à la plume', () => {
   const ids = svgIds(path.join(OUT, 'vignettes'));

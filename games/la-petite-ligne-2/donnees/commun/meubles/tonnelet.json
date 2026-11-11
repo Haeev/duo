@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "tonnelet",
+  "name": "Tonnelet",
+  "model": "small-keg",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": null,
+  "bricks": [],
+  "deco": {
+    "layer": "floor",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 1
+  }
+}
