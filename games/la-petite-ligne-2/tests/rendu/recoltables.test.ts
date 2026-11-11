@@ -34,15 +34,11 @@ function parse(file: string): Promise<GLTF> {
 }
 
 /**
- * Meubles laissés hors du contrôle, chacun avec sa raison. Aucune ressource du dehors n'y figure:
- * seulement les étals d'essai, qui ont un stock à prendre (brique `gather`) mais sont des meubles
- * du lot commerces, pas des récoltables.
+ * Meubles laissés hors du contrôle, chacun avec sa raison. Aucune ressource du dehors n'y figure.
+ * Les étals à stock (haches forgées, soupe, tourte) ont leur modèle et leur état vide depuis les
+ * aménagements d'Aubrune: ils sont contrôlés comme les autres.
  */
-const EXCEPTIONS: Readonly<Record<string, string>> = {
-  'etal-de-haches-forgees': "étal d'essai (meuble de commerce), pas une ressource du dehors",
-  'etal-de-soupe': "étal d'essai (meuble de commerce), pas une ressource du dehors",
-  'etal-de-tourte': "étal d'essai (meuble de commerce), pas une ressource du dehors",
-};
+const EXCEPTIONS: Readonly<Record<string, string>> = {};
 
 let models: DecorModels;
 beforeAll(async () => {

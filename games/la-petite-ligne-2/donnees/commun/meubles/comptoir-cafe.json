@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "comptoir-cafe",
   "name": "Comptoir du café",
-  "model": "barrel",
+  "model": "comptoir-cafe",
   "size": {
     "w": 1,
     "h": 1

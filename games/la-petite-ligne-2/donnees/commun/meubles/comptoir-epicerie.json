@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "comptoir-epicerie",
   "name": "Comptoir de l'épicerie",
-  "model": "table-farm",
+  "model": "comptoir-epicerie",
   "size": {
     "w": 2,
     "h": 1

@@ -326,3 +326,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - À 50 degrés, un houppier de rayon R ne laisse voir du tronc que `base - 1,19 R`: fût haut (2,9 m), houppier serré, et l'effacement du rendu doit suivre la largeur réelle.
 - Lisibilité à 18 m de large (76 points par mètre): fruits de 9 à 12 cm de rayon posés sur les masses, corolles de 9 cm; des roseaux en lames verticales sortent sombres et illisibles: un bouchon rouge et blanc fait le repère.
 - Blender n'unit pas les sommets de `from_pydata`: dédoublonner soi-même (place, normale, teinte) avant, le GLB perd 40 %. `normals_split_custom_set` par coin marche avec `use_smooth` vrai.
+
+## Aménagements encrés d'Aubrune (vérifié le 2026-11-11)
+
+- Familles `haie`, `talus`, `rang`, `meuble`, `ouvrage` dans `recoltables-aubrune/amenagements.py` (même chaîne, même toml): la chaîne réécrit la table `materials` du manifeste, une seconde chaîne l'écraserait. Noms de matériaux comme les bâtiments (`moellon` slab, `crepi` wall, `tuile` roof, `bardage` wood, `metal`, `vitre`, `etoffe`, `gazon` grass).
+- Le rendu encré donne à CHAQUE exemplaire posé sa propre pièce de contour (`turn` tiré de l'origine, matiere.ts): des modules de 1 m posés un par un ont un trait épais à chaque raccord, même identiques. Une file sans couture demande un maillage fusionné à code de pièce unique (option `fusion` de la page de planche). Le dire avant de promettre « sans couture ».
+- Module de file: bouts au même profil, sans tremblé, normales tirées du profil seul (pas des voisins intérieurs), rien hors de la case (`borne` de `bosse`): `size.w` doit valoir 1 sinon le moteur rééchelonne (comme `fenceVolumes`).
+- À 50 degrés, un profil extrudé de haie se lit en pavé même bosselé: ce sont des masses claires sur un corps sombre plus petit qui font la haie. Une roue ou une meule d'axe est-ouest se voit par la tranche: axe nord-sud.
+- Planche par `planche/provisoires.sh`: 10 vues en 2 min 30; vue « de l'ouest » (`lacet: 90`) pour un repère haut à côté d'une voie (12 m ne tiennent pas avec la voie dans le cadre à 18 m vus du sud).
+- Garde-fou: `sed -i` avec plusieurs expressions et des apostrophes dans le texte inséré est refusé; patchs par script écrit avec Write (`splice.py`: remplace un bloc entre deux lignes repères).

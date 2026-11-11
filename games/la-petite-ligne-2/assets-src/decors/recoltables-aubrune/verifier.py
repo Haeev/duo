@@ -20,6 +20,8 @@ SOURCE = "recoltables-aubrune"
 POIDS_MAX = 2_500_000
 # Une case de potager fait 1 m; le feuillage d'un plant mûr peut déborder un peu sur l'allée.
 CASE_MAX = {"parcelle": 1.0, "culture": 1.12}
+# Modules posés case par case sur une file (aménagements).
+MODULES = ("haie", "talus", "rang")
 
 
 def lire_glb(chemin):
@@ -56,6 +58,7 @@ def main():
             if mat["name"] not in materiaux:
                 erreurs.append(f"{fichier}: matériau « {mat['name']} » absent de la table materials")
     total = 0
+    bornes = {}
     for ident, m in sorted(miens.items()):
         g = glbs.get(m["file"])
         if g is None:
@@ -68,7 +71,11 @@ def main():
         if any(k in noeud for k in ("translation", "rotation", "scale", "children")):
             erreurs.append(f"{ident}: transformation ou enfants sur le nœud (tout doit être appliqué)")
         tris, bas = 0, 1e9
+        mini, maxi = [1e9] * 3, [-1e9] * 3
         for prim in g["meshes"][noeud["mesh"]]["primitives"]:
+            acc = g["accessors"][prim["attributes"]["POSITION"]]
+            mini = [min(a, b) for a, b in zip(mini, acc["min"])]
+            maxi = [max(a, b) for a, b in zip(maxi, acc["max"])]
             attributs = prim["attributes"]
             for voulu in ("POSITION", "NORMAL", "COLOR_0"):
                 if voulu not in attributs:
@@ -84,6 +91,16 @@ def main():
             erreurs.append(f"{ident}: {tris} triangles pour un budget de {m['budget']}" + (" par plant" if "plants" in m else ""))
         if bas < -0.002:
             erreurs.append(f"{ident}: descend sous le sol ({bas:.3f} m)")
+        bornes[ident] = (mini, maxi)
+        # Module de file (haie, talus, rang): il court sur exactement 1 m et ne déborde pas de
+        # sa case, sinon deux modules voisins se chevauchent ou laissent un jour.
+        if m["family"] in MODULES:
+            long_axe = 2 if m["family"] == "rang" else 0
+            travers = 0 if long_axe == 2 else 2
+            if abs(mini[long_axe] + 0.5) > 0.002:
+                erreurs.append(f"{ident}: le module commence à {mini[long_axe]:.3f} m (attendu -0,5)")
+            if maxi[long_axe] > 0.502 or mini[long_axe] < -0.502 or maxi[travers] > 0.502 or mini[travers] < -0.502:
+                erreurs.append(f"{ident}: déborde de sa case de 1 m ({mini} .. {maxi})")
         if m.get("cell") and max(m["size"]["w"], m["size"]["d"]) > CASE_MAX[m["family"]] + 0.001:
             erreurs.append(f"{ident}: {m['size']['w']} x {m['size']['d']} m déborde de sa case")
         for autre in m.get("variants", []) + list(m.get("states", {}).values()):
@@ -117,6 +134,12 @@ def main():
         if not nom.endswith(".json"):
             continue
         fiche = lire_json(os.path.join(donnees, "meubles", nom))
+        # Meuble de cette chaîne: posé au centre de son emprise, il doit tenir dans ses cases.
+        if fiche["model"] in bornes and miens[fiche["model"]]["family"] == "meuble":
+            mini, maxi = bornes[fiche["model"]]
+            demi_w, demi_d = fiche["size"]["w"] / 2 + 0.005, fiche["size"]["h"] / 2 + 0.005
+            if mini[0] < -demi_w or maxi[0] > demi_w or mini[2] < -demi_d or maxi[2] > demi_d:
+                erreurs.append(f"meuble {fiche['id']}: le modèle « {fiche['model']} » sort de ses {fiche['size']['w']} x {fiche['size']['h']} cases ({mini} .. {maxi})")
         briques = {b["brick"]: b for b in fiche["bricks"]}
         if "harvest" not in briques and "field" not in briques:
             continue

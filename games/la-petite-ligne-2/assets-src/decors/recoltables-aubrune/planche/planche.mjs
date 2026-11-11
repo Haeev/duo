@@ -11,6 +11,7 @@
  * Elle rend les places à l'écran des étiquettes (`reperes`) et les compteurs de l'image.
  */
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 import { InkKit, inkifyModel, inkTag, KIND, LAYER } from '../../../../src/rendu/encre/index';
 import { createFloorMap } from '../../../../src/rendu/encre/sol';
@@ -103,6 +104,7 @@ async function start() {
     }
     let triangles = 0;
     const missing = [];
+    const files = new Map();
     for (const item of vue.objets) {
       // Vues de famille: le modèle nommé, tel quel (on cherche une clé qui ne tire pas une autre
       // forme). Compositions (`tirage`): la forme, le cap et l'échelle tirés comme en jeu.
@@ -129,7 +131,41 @@ async function start() {
       });
       object.position.set(item.x, 0, item.z);
       object.rotation.y = ((item.quart ?? 0) * Math.PI) / 2;
-      scene.add(object);
+      if (item.fusion === undefined) {
+        scene.add(object);
+        continue;
+      }
+      // File de modules (haie, berge): ce que le moteur devra faire pour qu'elle se lise d'un
+      // seul tenant. Le rendu donne à chaque exemplaire posé sa propre pièce de contour (trait
+      // épais à chaque raccord); fusionnés en un maillage, avec un seul code de pièce, les
+      // modules n'ont plus de trait entre eux.
+      object.updateMatrixWorld(true);
+      object.traverse((child) => {
+        if (!child.isMesh) return;
+        const part = child.geometry.clone();
+        part.applyMatrix4(child.matrixWorld);
+        (files.get(item.fusion) ?? files.set(item.fusion, []).get(item.fusion)).push(part);
+      });
+    }
+    for (const parts of files.values()) {
+      const merged = mergeGeometries(parts);
+      const ink = merged.getAttribute('aInk');
+      const piece = ink.getY(0);
+      for (let i = 0; i < ink.count; i += 1) ink.setY(i, piece);
+      const mesh = new THREE.Mesh(merged, kit.volume);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.frustumCulled = false;
+      scene.add(mesh);
+    }
+    // Volumes de mise en scène (rails et traverses d'une voie): des boîtes teintées, rien de plus.
+    for (const b of vue.boites ?? []) {
+      const geometry = box(b.w, b.h, b.d, b.x, b.y, b.z, b.couleur);
+      inkTag(geometry, { layer: LAYER[b.couche ?? 'plain'] });
+      const mesh = new THREE.Mesh(geometry, kit.volume);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      scene.add(mesh);
     }
     for (const person of vue.silhouettes ?? []) {
       const figure = silhouette(kit.volume);
