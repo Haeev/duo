@@ -757,7 +757,7 @@ Pièces: cave voûtée (5 x 4). Meubles: cave-coffre (coffre), maison-cave-etage
 **l'épicerie Ferrand** (`interieurs/epicerie-rdc.json`, 7 x 9 m, 63 m², niveau 0): la boutique donne sur la place (porte à l'est), la cuisine derrière.
 
 ```text
-E C . E C E E
+E C . E C C E
 . . . . . . .
 . * C . . . P
 . . C . . . B
@@ -768,7 +768,7 @@ B T T . . . .
 C * T . C T E
 ```
 
-Pièces: boutique (7 x 5); cuisine (7 x 4). Meubles: epicerie-comptoir (comptoir-epicerie), epicerie-etal (etal-de-tourte), epicerie-cuisiniere (cuisiniere), epicerie-table (table-a-manger), epicerie-rdc-etagere-1 (etagere-murale), epicerie-rdc-etagere-2 (etagere-murale), epicerie-rdc-etagere-3 (etagere-murale), epicerie-rdc-caisse-1 (caisse-de-legumes), epicerie-rdc-caisse-2 (caisse-de-legumes), epicerie-rdc-tonnelet (tonnelet), epicerie-rdc-horloge (horloge-murale), epicerie-rdc-balai (balai), epicerie-rdc-portrait (cadre-portrait), epicerie-rdc-buches (buches-d-interieur), epicerie-rdc-seau (seau), epicerie-rdc-vaisselier (vaisselier), epicerie-rdc-panier (panier-a-linge), epicerie-rdc-tonnelet-2 (tonnelet), epicerie-rdc-caisse-3 (caisse-de-legumes), epicerie-rdc-tapis-de-sol (tapis-rond), epicerie-rdc-bocaux (bocaux-de-confiture, sur epicerie-comptoir), epicerie-rdc-boites (boites-a-provisions, sur epicerie-comptoir), epicerie-rdc-pain (corbeille-de-pain, sur epicerie-table), epicerie-rdc-lampe (lampe-a-petrole, sur epicerie-table). Points: odette-comptoir (comptoir, Odette), odette-cuisine (poste, Odette).
+Pièces: boutique (7 x 5); cuisine (7 x 4). Meubles: epicerie-comptoir (comptoir-epicerie), epicerie-cuisiniere (cuisiniere), epicerie-table (table-a-manger), epicerie-rdc-etagere-1 (etagere-murale), epicerie-rdc-etagere-2 (etagere-murale), epicerie-rdc-etagere-3 (etagere-murale), epicerie-rdc-caisse-1 (caisse-de-legumes), epicerie-rdc-caisse-2 (caisse-de-legumes), epicerie-rdc-caisse-4 (caisse-de-legumes), epicerie-rdc-tonnelet (tonnelet), epicerie-rdc-horloge (horloge-murale), epicerie-rdc-balai (balai), epicerie-rdc-portrait (cadre-portrait), epicerie-rdc-buches (buches-d-interieur), epicerie-rdc-seau (seau), epicerie-rdc-vaisselier (vaisselier), epicerie-rdc-panier (panier-a-linge), epicerie-rdc-tonnelet-2 (tonnelet), epicerie-rdc-caisse-3 (caisse-de-legumes), epicerie-rdc-tapis-de-sol (tapis-rond), epicerie-rdc-bocaux (bocaux-de-confiture, sur epicerie-comptoir), epicerie-rdc-boites (boites-a-provisions, sur epicerie-comptoir), epicerie-rdc-pain (corbeille-de-pain, sur epicerie-table), epicerie-rdc-lampe (lampe-a-petrole, sur epicerie-table). Points: odette-comptoir (comptoir, Odette), odette-cuisine (poste, Odette).
 
 **la pension Ferrand, étage** (`interieurs/epicerie-etage.json`, 7 x 9 m, 63 m², niveau 1): la chambre du premier soir, deux lits simples; l'escalier arrive sur un palier, la chambre d'Odette à côté.
 

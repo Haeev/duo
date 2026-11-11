@@ -834,7 +834,7 @@ interieur('epicerie-rdc', 'epicerie', "l'épicerie Ferrand", 7, 9,
           # Les pensionnaires traversent la cuisine pour monter: baie de 2 m (x 3-4), la table à l'ouest, près du
           # fourneau, hors du passage de la baie à l'escalier (coin sud-est).
           [('boutique', [0, 0, 7, 5]), ('cuisine', [0, 5, 7, 4])], [[0, 5, 3, 1], [5, 5, 2, 1]],
-          [('epicerie-comptoir', 'comptoir-epicerie', 'comptoir', 2.5, 3, 1), ('epicerie-etal', 'etal-de-tourte', 'etal', 5.5, 0.5, 0),
+          [('epicerie-comptoir', 'comptoir-epicerie', 'comptoir', 2.5, 3, 1),
            ('epicerie-cuisiniere', 'cuisiniere', 'stove', 0.5, 8.5, 0), ('epicerie-table', 'table-a-manger', 'table-farm', 2, 7.5, 0)],
           [('odette-comptoir', 1, 2.5, 'comptoir', 'Odette'), ('odette-cuisine', 1.5, 8.5, 'poste', 'Odette')],
           porte=(6.5, 2.5, 3), escaliers=[dict(x=6.5, y=8.5, vers='epicerie-etage', regard=2)], note="la boutique donne sur la place (porte à l'est), la cuisine derrière")
@@ -1208,7 +1208,8 @@ HABITE = {
         ('etagere-2', 'etagere-murale', 3.5, 0.5, 0, "les rayons de l'épicerie, entre les deux fenêtres"),
         ('etagere-3', 'etagere-murale', 6.5, 0.5, 0, "les rayons de l'épicerie, dans le coin de la porte"),
         ('caisse-1', 'caisse-de-legumes', 1.5, 0.5, 0, "la réserve de pommes de terre, derrière le comptoir"),
-        ('caisse-2', 'caisse-de-legumes', 4.5, 0.5, 0, "un cageot de pommes à côté de l'étal"),
+        ('caisse-2', 'caisse-de-legumes', 4.5, 0.5, 0, "un cageot de pommes contre le mur du fond"),
+        ('caisse-4', 'caisse-de-legumes', 5.5, 0.5, 0, "un cageot à la place de l'ancien étal: la tourte ne se donne plus, elle se vend en rayon"),
         ('tonnelet', 'tonnelet', 0.5, 4.5, 0, "l'huile au détail, derrière le comptoir"),
         ('horloge', 'horloge-murale', 6.5, 4.5, 3, "au mur est, vue du comptoir: l'heure de fermer"),
         ('balai', 'balai', 6.5, 3.5, 0, "à côté de la porte: Odette balaie devant chez elle"),

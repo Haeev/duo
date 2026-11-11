@@ -7303,14 +7303,6 @@
           "rotation": 1
         },
         {
-          "id": "epicerie-etal",
-          "type": "etal-de-tourte",
-          "modele": "etal",
-          "x": 5.5,
-          "y": 0.5,
-          "rotation": 0
-        },
-        {
           "id": "epicerie-cuisiniere",
           "type": "cuisiniere",
           "modele": "stove",
@@ -7369,7 +7361,16 @@
           "x": 4.5,
           "y": 0.5,
           "rotation": 0,
-          "pourquoi": "un cageot de pommes à côté de l'étal"
+          "pourquoi": "un cageot de pommes contre le mur du fond"
+        },
+        {
+          "id": "epicerie-rdc-caisse-4",
+          "type": "caisse-de-legumes",
+          "modele": "vegetable-crate",
+          "x": 5.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "un cageot à la place de l'ancien étal: la tourte ne se donne plus, elle se vend en rayon"
         },
         {
           "id": "epicerie-rdc-tonnelet",
