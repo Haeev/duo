@@ -195,10 +195,24 @@
       tampons.set(url, connu);
       return connu;
     }
-    var promesse = fetch(url).then(function (r) {
-      if (!r.ok) throw new Error(url + ': ' + r.status);
-      return r.arrayBuffer();
-    });
+    // La page publiée ne sert pas les fichiers `.glb`: chaque modèle est publié en JSON, ses octets
+    // en base64 (`outils/emballer-modeles.mjs`). Les autres fichiers (textures PNG) sont lus tels quels.
+    var promesse = /\.glb$/.test(url)
+      ? fetch(url + '.json')
+          .then(function (r) {
+            if (!r.ok) throw new Error(url + ': ' + r.status);
+            return r.json();
+          })
+          .then(function (emballe) {
+            var binaire = window.atob(String(emballe.base64 || ''));
+            var octets = new Uint8Array(binaire.length);
+            for (var i = 0; i < binaire.length; i += 1) octets[i] = binaire.charCodeAt(i);
+            return octets.buffer;
+          })
+      : fetch(url).then(function (r) {
+          if (!r.ok) throw new Error(url + ': ' + r.status);
+          return r.arrayBuffer();
+        });
     tampons.set(url, promesse);
     promesse.catch(function () {
       tampons.delete(url);
