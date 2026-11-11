@@ -3,9 +3,10 @@
 // demandent les répliques (dialogues et scènes) existe dans le portrait de celui qui la dit.
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   hasDrawnPortrait,
+  loadPortraits,
   moodOfEmote,
   portraitMarkup,
   PORTRAIT_MOODS,
@@ -35,8 +36,7 @@ function lines(): { file: string; speaker: string; emote: string | null }[] {
     const emote = typeof o.emote === 'string' ? o.emote : null;
     if (o.kind === 'line' && typeof o.speaker === 'string')
       out.push({ file, speaker: o.speaker, emote });
-    if (o.do === 'say' && typeof o.who === 'string')
-      out.push({ file, speaker: o.who, emote });
+    if (o.do === 'say' && typeof o.who === 'string') out.push({ file, speaker: o.who, emote });
     for (const v of Object.values(o)) walk(file, v);
   };
   for (const [file, data] of Object.entries(files))
@@ -49,6 +49,11 @@ const villagers = Object.keys(files)
   .map((f) => (files[f] as { id: string }).id);
 
 describe('portraits des habitants', () => {
+  // Les dessins sont un lot à part, chargé au démarrage du jeu (`main.ts`).
+  beforeAll(async () => {
+    await loadPortraits();
+  });
+
   it('chaque habitant de chaque lieu a son portrait dessiné, en cinq expressions', () => {
     expect(villagers).toContain('controleur');
     expect(villagers).toContain('martial');

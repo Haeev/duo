@@ -5,7 +5,7 @@
  * pendant l'écriture (classe `parle`). L'expression se choisit par `mood`, ou par un ancêtre:
  * `data-expr="<humeur>"`, ou l'humeur du marchand (`shop-bust--joy`, `--yes`, `--no`); voir
  * `plume.css`. L'émotion d'une réplique (`emote` des données) donne l'humeur par `moodOfEmote`.
- * Sans dessin, un substitut est généré depuis l'identifiant (teintes stables) et se marque
+ * Les dessins se chargent à part (`loadPortraits()`, attendu au démarrage). Sans dessin, un substitut est généré depuis l'identifiant (teintes stables) et se marque
  * « provisoire »; `tests/portraits-habitants.test.ts` veille à ce qu'aucun personnage qui parle
  * n'en ait besoin.
  */
@@ -31,21 +31,28 @@ export function moodOfEmote(emote: string | null): PortraitMood {
   return (emote === null ? undefined : MOOD_OF_EMOTE[emote]) ?? 'neutre';
 }
 
-const DRAWN = import.meta.glob<string>('../../assets/commun/interface/portraits/*.svg', {
-  query: '?raw',
-  import: 'default',
-  eager: true,
-});
-const DRAWN_BY_ID = new Map(
-  Object.entries(DRAWN).map(([path, svg]) => [path.slice(path.lastIndexOf('/') + 1, -4), svg]),
-);
+/** Portraits dessinés, vides jusqu'à la fin de `loadPortraits()`. */
+let DRAWN_BY_ID: ReadonlyMap<string, string> = new Map();
+let loading: Promise<void> | null = null;
+
+/**
+ * Charge les portraits dessinés (lot à part, `portraits-dessins.ts`). Le jeu l'attend avant de
+ * créer son interface (`main.ts`): aucun portrait n'est affiché avant, donc jamais de substitut
+ * provisoire à la place d'un dessin. Les appels suivants rendent la même promesse.
+ */
+export function loadPortraits(): Promise<void> {
+  loading ??= import('./portraits-dessins').then((m) => {
+    DRAWN_BY_ID = m.DRAWN_PORTRAITS;
+  });
+  return loading;
+}
 
 /** Les joueurs partagent le portrait d'essai `joueur` tant que l'éditeur n'en dessine pas. */
 const PLAYER_IDS = /^(joueur|player)(-\d+)?$/;
 
 let serial = 0;
 
-/** Vrai si l'identifiant a un portrait dessiné (sinon: substitut provisoire). */
+/** Vrai si l'identifiant a un portrait dessiné (sinon: substitut provisoire). Après `loadPortraits()`. */
 export function hasDrawnPortrait(id: string): boolean {
   return DRAWN_BY_ID.has(PLAYER_IDS.test(id) ? 'joueur' : id);
 }

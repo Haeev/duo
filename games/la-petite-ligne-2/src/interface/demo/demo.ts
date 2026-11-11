@@ -24,6 +24,10 @@ import { worldSources } from '../carnet/lectures';
 import { createInterface } from '../index';
 import { histoireFiles, setupHistoire } from './histoire';
 import planAubrune from '../../../donnees/lieux/aubrune/plan.json';
+import { loadPortraits } from '../portrait';
+
+// Portraits dessinés: lot à part, attendu avant toute interface (comme `main.ts`).
+await loadPortraits();
 
 const content = loadContent({ ...DATA_FILES, ...histoireFiles() });
 const world: WorldState = createWorld(content, 7, [

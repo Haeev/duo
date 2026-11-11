@@ -13,6 +13,10 @@ import type { GameEvent } from '../../../simulation/noyau/evenements';
 import { createWorld } from '../../../simulation/noyau/monde';
 import { createSim, step } from '../../../simulation/noyau/pas';
 import { createInterface } from '../../index';
+import { loadPortraits } from '../../portrait';
+
+// Portraits dessinés: lot à part, attendu avant toute interface (comme `main.ts`).
+await loadPortraits();
 
 const content = loadContent(DATA_FILES);
 const world = createWorld(content, 7, [
