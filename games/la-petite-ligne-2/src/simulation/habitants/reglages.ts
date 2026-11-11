@@ -58,6 +58,11 @@ export interface VillagerSettings {
   readonly arrivalClearanceSteps: number;
   /** Plus loin que ceci (m) de son poste, sans trajet (mené par une scène, poussé), il y retourne. */
   readonly returnDistance: number;
+  /**
+   * Arrêté au bord de la voie par un train (à quai, qui arrive ou qui repart): au bout de ce
+   * temps (s), il cherche un autre chemin (un autre passage); sinon il attend que la voie se libère.
+   */
+  readonly trainRetrySeconds: number;
 }
 
 export const VILLAGERS: VillagerSettings = {
@@ -91,4 +96,5 @@ export const VILLAGERS: VillagerSettings = {
   arrivalClearance: 2.2,
   arrivalClearanceSteps: 12,
   returnDistance: 0.5,
+  trainRetrySeconds: 4,
 };

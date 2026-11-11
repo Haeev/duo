@@ -16,6 +16,7 @@ import type { PlaceContent } from '../../donnees/charger';
 import type { MapDef } from '../../donnees/schemas/lieu';
 import type { CalendarEventDef, TrainDef } from '../../donnees/schemas/temps';
 import type { Look } from '../briques/types';
+import { decodeTerrain } from '../../donnees/carte';
 import { MINUTES_PER_DAY } from '../noyau/constantes';
 import { eventsOn } from './agenda';
 import { TRAINS, type TrainSettings } from './reglages-trains';
@@ -43,6 +44,15 @@ export interface TrainPose {
   moving: boolean;
   /** Tête de la rame (m, depuis le début de la voie): de quoi suivre son avance. */
   head: number;
+  /** Voie suivie (`rails` de la carte). */
+  track: string;
+  /**
+   * Ce que la rame occupe ou va occuper sur sa voie (m depuis son début, `reachFrom` <= `reachTo`):
+   * de sa place à celle de son arrêt à l'arrivée, à quai sa seule longueur, au départ jusqu'à la
+   * fin de son démarrage. Passages à niveau et habitants le lisent.
+   */
+  reachFrom: number;
+  reachTo: number;
   readonly vehicles: VehiclePose[];
 }
 
@@ -198,7 +208,15 @@ export function poseTrain(
     behind += vehicle.front + vehicle.back;
   });
   const aligned = project(track, point.x, point.y) + arriving * train.stop.shift;
-  const head = aligned + arriving * toAligned + travel;
+  const stopHead = aligned + arriving * toAligned;
+  const head = stopHead + travel;
+  // Emprise sur la voie: la rame d'ici à là où elle va (son arrêt, ou la fin de son départ).
+  const goal = now.phase === 'leaving' ? stopHead + leaving * train.departure.distance : stopHead;
+  const tailNow = head - arriving * behind;
+  const tailGoal = goal - arriving * behind;
+  out.reachFrom = Math.min(head, tailNow, goal, tailGoal);
+  out.reachTo = Math.max(head, tailNow, goal, tailGoal);
+  out.track = train.track;
   out.event = event.id;
   out.phase = now.phase;
   out.moving = now.phase !== 'stopped';
@@ -249,6 +267,9 @@ export function trainPoses(
       phase: 'stopped',
       moving: false,
       head: 0,
+      track: '',
+      reachFrom: 0,
+      reachTo: 0,
       vehicles: [],
     });
     if (poseTrain(place, event, minutes, out)) count++;
@@ -378,4 +399,150 @@ export function touchesTrain(
 /** Un train est-il là (arrivée, quai ou départ) dans ce lieu, à l'heure de l'état ? */
 export function trainsPresent(look: Look, place: PlaceContent): boolean {
   return current(look, place).count > 0;
+}
+
+// ---- Passages à niveau ----
+
+/** Un passage à niveau: là où une voie à ciel ouvert croise une route de la carte. */
+export interface LevelCrossing {
+  readonly track: string;
+  /** Bords de la route le long de la voie (m depuis son début), et son milieu sur la carte. */
+  readonly from: number;
+  readonly to: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+const crossingCache = new WeakMap<PlaceContent, readonly LevelCrossing[]>();
+
+/**
+ * Passages à niveau du lieu, tirés de la carte: chaque traversée d'une case des natures de
+ * `TRAINS.crossing` par une voie à ciel ouvert. Calculés une fois par lieu.
+ */
+export function levelCrossings(
+  place: PlaceContent,
+  settings: TrainSettings = TRAINS,
+): readonly LevelCrossing[] {
+  const known = crossingCache.get(place);
+  if (known !== undefined) return known;
+  const out: LevelCrossing[] = [];
+  const { map } = place;
+  const terrain = map.terrain;
+  if (terrain !== undefined) {
+    const cells = decodeTerrain(map);
+    const codes = new Set(
+      settings.crossing.natures.map((n) => terrain.legend.indexOf(n)).filter((i) => i >= 0),
+    );
+    const at = { x: 0, y: 0 };
+    for (const rail of map.rails ?? []) {
+      if (rail.tunnel === true) continue;
+      const track = trackOf(place, rail.id);
+      if (track === null || cells === null) continue;
+      let start = -1;
+      const close = (end: number): void => {
+        const mid = (start + end) / 2;
+        pointOn(track, mid, at);
+        out.push({ track: rail.id, from: start, to: end, x: at.x, y: at.y });
+        start = -1;
+      };
+      const step = settings.crossing.sample;
+      for (let s = 0; s <= track.length; s += step) {
+        pointOn(track, s, at);
+        const cx = Math.floor(at.x);
+        const cy = Math.floor(at.y);
+        const inside =
+          cx >= 0 &&
+          cy >= 0 &&
+          cx < map.width &&
+          cy < map.height &&
+          codes.has(cells[cy * map.width + cx] ?? -1);
+        if (inside && start < 0) start = s;
+        else if (!inside && start >= 0) close(s);
+      }
+      if (start >= 0) close(track.length);
+    }
+  }
+  crossingCache.set(place, out);
+  return out;
+}
+
+/** Le passage à niveau est-il fermé (sonnerie, lisses baissées) à l'heure de l'état ? */
+export function crossingClosed(
+  look: Look,
+  place: PlaceContent,
+  crossing: LevelCrossing,
+  settings: TrainSettings = TRAINS,
+): boolean {
+  const memo = current(look, place);
+  const margin = settings.crossing.margin;
+  for (let i = 0; i < memo.count; i++) {
+    const pose = memo.pool[i];
+    if (pose?.track !== crossing.track) continue;
+    if (pose.reachFrom < crossing.to + margin && pose.reachTo > crossing.from - margin) return true;
+  }
+  return false;
+}
+
+/** Un passage à niveau du lieu sonne-t-il à l'heure de l'état ? */
+export function crossingBellRinging(
+  look: Look,
+  place: PlaceContent,
+  settings: TrainSettings = TRAINS,
+): boolean {
+  if (current(look, place).count === 0) return false;
+  return levelCrossings(place, settings).some((c) => crossingClosed(look, place, c, settings));
+}
+
+// ---- Habitants ----
+
+/**
+ * Le disque (x, y, rayon) est-il sur le chemin d'une rame (sa place, et celle où elle va) ? Un
+ * habitant n'y entre pas: il attend au bord ou passe ailleurs.
+ */
+export function inTrainWay(
+  look: Look,
+  place: PlaceContent,
+  x: number,
+  y: number,
+  radius: number,
+  settings: TrainSettings = TRAINS,
+  stoppedOnly = false,
+): boolean {
+  const memo = current(look, place);
+  for (let i = 0; i < memo.count; i++) {
+    const pose = memo.pool[i];
+    if (pose === undefined || (stoppedOnly && pose.moving)) continue;
+    const track = trackOf(place, pose.track);
+    if (track === null) continue;
+    const s = project(track, x, y);
+    if (s < pose.reachFrom - radius || s > pose.reachTo + radius) continue;
+    pointOn(track, s, front);
+    if (Math.hypot(front.x - x, front.y - y) < settings.halfWidth + radius) return true;
+  }
+  return false;
+}
+
+/**
+ * Le segment (a, b), parcouru par un corps de rayon `radius`, croise-t-il une rame à quai ? Une
+ * rame qui passe ne barre la voie que quelques minutes: on l'attend au bord, sans détour.
+ */
+export function segmentAcrossStoppedTrain(
+  look: Look,
+  place: PlaceContent,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
+  radius: number,
+  settings: TrainSettings = TRAINS,
+): boolean {
+  if (current(look, place).count === 0) return false;
+  const length = Math.hypot(bx - ax, by - ay);
+  const steps = Math.max(1, Math.ceil(length / settings.waySample));
+  for (let k = 0; k <= steps; k++) {
+    const t = k / steps;
+    if (inTrainWay(look, place, ax + (bx - ax) * t, ay + (by - ay) * t, radius, settings, true))
+      return true;
+  }
+  return false;
 }

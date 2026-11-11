@@ -451,6 +451,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'calendar_ended':
       case 'clock_struck':
       case 'calendar_started':
+      case 'crossing_bell':
       case 'collection_completed':
       case 'collection_found':
       case 'collection_record':

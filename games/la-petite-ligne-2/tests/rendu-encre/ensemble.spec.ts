@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { CAPTURES, type Duo, type Side, startDuo } from '../aides-e2e/duo';
+import { loadMap, point } from '../aides-e2e/prologue';
 
 interface Stats {
   readonly place: string | null;
@@ -88,6 +89,10 @@ const VIEWS: readonly View[] = [
   { name: 'talus', x: 196, y: 141.5, minutes: 16 * 60, yaw: 0, width: 18 },
   { name: 'ferme', x: 220, y: 162, minutes: 16 * 60, yaw: 0, width: 26 },
   { name: 'tunnel', x: 361, y: 59, minutes: 16 * 60, yaw: 0, width: 30 },
+  // Lits de voie (`lits-de-voie.ts`): ballast et fossés le long du quai (vue du budget), la
+  // tranchée et le coteau du portail.
+  { name: 'voie-quai', x: 196, y: 101.5, minutes: 16 * 60, yaw: 20, width: 24 },
+  { name: 'voie-tunnel', x: 360, y: 58, minutes: 16 * 60, yaw: 20, width: 30 },
   // Le bois le plus dense du lieu (végétation semée): la vue du budget.
   { name: 'bois', x: 48, y: 16, minutes: 16 * 60, width: 18 },
 ];
@@ -274,7 +279,10 @@ const TRAIN_WIDTH = Number(process.env.LPL2_LARGEUR_TRAINS ?? 24);
 const TRAIN_YAW = Number(process.env.LPL2_LACET_TRAINS ?? 20);
 
 test('ensemble: les trains', async ({ browser }) => {
-  test.skip(ONLY !== null && !ONLY.some((v) => v.startsWith('train')), 'vue non demandée');
+  test.skip(
+    ONLY !== null && !ONLY.some((v) => v.startsWith('train') || v === 'voie-passage-a-niveau'),
+    'vue non demandée',
+  );
   const duo = await startDuo(browser, 'ensemble-trains', { save: 'aubrune-apres-scene' });
   const host = duo.host;
   const day = (await host.world())?.common.day ?? 1;
@@ -304,11 +312,55 @@ test('ensemble: les trains', async ({ browser }) => {
   writeFileSync(FILE, JSON.stringify(measures, null, 1));
   await host.page.setViewportSize({ width: 240, height: 135 });
 
+  // Le passage à niveau du garde (x 182,5): la rame approche en freinant, la sonnerie sonne
+  // (`crossing_bell`, de 9 h 56 jusqu'à ce que la queue ait passé la route).
+  if (ONLY === null || ONLY.includes('voie-passage-a-niveau')) {
+    await both(duo, 182.5, 102.4);
+    await duo.setMinutes(9 * 60 + 50);
+    await settle(host, 'aubrune', 1000);
+    await camera(host, 20, 26);
+    await host.page.setViewportSize({ width: 1366, height: 768 });
+    await host.page.waitForTimeout(2000);
+    // La rame entre en freinant: sa tête à une dizaine de mètres de la route.
+    await duo.setMinutes(10 * 60 + 4 - 5.2);
+    await host.page.waitForTimeout(1500);
+    measures['voie-passage-a-niveau'] = await stats(host);
+    await (
+      await host.game().frameElement()
+    ).screenshot({ path: join(CAPTURES, `${PREFIX}-voie-passage-a-niveau.png`), timeout: 120_000 });
+    writeFileSync(FILE, JSON.stringify(measures, null, 1));
+    await host.page.setViewportSize({ width: 240, height: 135 });
+  }
+
   // L'autorail de 5 h 12, à quai la nuit: vitres et lampes allumées, le Contrôleur sur le quai.
   await duo.setMinutes(5 * 60 + 25);
   await settle(host, 'aubrune', 4000);
   await camera(host, TRAIN_YAW, TRAIN_WIDTH);
   await shot(host, 'autorail-5h12');
+  expect(duo.errors).toEqual([]);
+  await duo.close();
+});
+
+// Le trajet du prologue (`rendu/voyage/scene.ts`): l'autorail livré, vitres allumées la nuit, les
+// deux personnages à bord derrière la caisse fondue.
+test('ensemble: le trajet du prologue', async ({ browser }) => {
+  test.skip(ONLY !== null && !ONLY.includes('prologue-autorail'), 'vue non demandée');
+  const duo = await startDuo(browser, 'ensemble-trajet', { save: 'train-de-nuit-porte' });
+  const host = duo.host;
+  const door = point(loadMap('train-de-nuit'), 'porte');
+  await host.page.setViewportSize({ width: 1366, height: 768 });
+  await duo.teleport(0, door.x - 0.4, door.y, Math.PI / 2);
+  await duo.teleport(1, door.x + 0.4, door.y, Math.PI / 2);
+  await duo.until(host, 'en route', (w) => w.common.phase === 'travel', 60_000);
+  // La nuit: les vitres et la flaque de la salle (le vrai trajet arrive au petit matin).
+  await duo.setMinutes(22 * 60);
+  // Montée finie, le train roule (de 40 à 80 % des 10 s de la scène).
+  await host.page.waitForTimeout(Number(process.env.LPL2_ATTENTE_TRAJET ?? 3800));
+  measures['prologue-autorail'] = await stats(host);
+  await (
+    await host.game().frameElement()
+  ).screenshot({ path: join(CAPTURES, `${PREFIX}-prologue-autorail.png`), timeout: 120_000 });
+  writeFileSync(FILE, JSON.stringify(measures, null, 1));
   expect(duo.errors).toEqual([]);
   await duo.close();
 });

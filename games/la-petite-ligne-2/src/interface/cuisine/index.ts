@@ -443,6 +443,7 @@ export function createKitchen(
       case 'brick_used':
       case 'calendar_ended':
       case 'calendar_started':
+      case 'crossing_bell':
       case 'collection_completed':
       case 'collection_found':
       case 'collection_record':

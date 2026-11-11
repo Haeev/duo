@@ -114,17 +114,26 @@ describe('cloche des heures', () => {
 });
 
 describe('passage à niveau', () => {
-  it('sonne à l arrivée et au départ des trains du lieu', () => {
-    for (const event of [
-      'train-du-samedi',
-      'depart-du-train-du-samedi',
-      'autorail-de-5h12',
-      'depart-de-l-autorail',
-    ]) {
-      const started: GameEvent = { type: 'calendar_started', place: 'aubrune', event };
-      expect(soundForEvent(tables.events, started, 0)?.sound).toBe('passage-a-niveau');
-    }
-    const other: GameEvent = { type: 'calendar_started', place: 'aubrune', event: 'fete' };
-    expect(soundForEvent(tables.events, other, 0)).toBeNull();
+  it('sonne tant que la sonnerie de la simulation sonne, et se tait ensuite', () => {
+    const on: GameEvent = { type: 'crossing_bell', place: 'aubrune', ringing: true };
+    const off: GameEvent = { type: 'crossing_bell', place: 'aubrune', ringing: false };
+    expect(soundForEvent(tables.events, on, 0)).toMatchObject({
+      sound: 'passage-a-niveau',
+      stop: false,
+    });
+    expect(soundForEvent(tables.events, off, 1)).toMatchObject({
+      sound: 'passage-a-niveau',
+      stop: true,
+    });
+    // La sonnerie est tenue: elle reprend sur ses coups jusqu'à ce qu'on la fasse taire.
+    const bell = tables.sounds['passage-a-niveau'];
+    expect(bell?.loop?.to).toBeGreaterThan(bell?.loop?.from ?? Number.POSITIVE_INFINITY);
+    // L'arrivée d'un train ne sonne plus d'elle-même: c'est la rame qui approche qui sonne.
+    const started: GameEvent = {
+      type: 'calendar_started',
+      place: 'aubrune',
+      event: 'train-du-samedi',
+    };
+    expect(soundForEvent(tables.events, started, 0)).toBeNull();
   });
 });

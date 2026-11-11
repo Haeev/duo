@@ -376,6 +376,10 @@ class Engine implements GameRenderer {
   /** Temps de la scène affiché (s): suit celui de l'état, sans à-coups chez l'invité. */
   private tripClock = 0;
   private readonly tripFrame = createTripFrame();
+  private readonly tripLights: { lamps: InkLights['lamps']; windows: InkLights['windows'] } = {
+    lamps: [],
+    windows: [],
+  };
   private readonly tripPose: Mutable<CameraPose> = { x: 0, y: 0, yaw: 0, pitch: 0, width: 1 };
   /** Temps restant du fondu d'entrée ou de sortie de la scène du trajet (s). */
   private cutFade = 0;
@@ -488,7 +492,12 @@ class Engine implements GameRenderer {
     const state = world.places[world.common.place];
     if (this.trip === null) {
       if (state === undefined) return false;
-      this.trip = new TripScene(this.standInMaterial, TRIP_SETTINGS, this.ink !== null);
+      this.trip = new TripScene(
+        this.standInMaterial,
+        TRIP_SETTINGS,
+        this.ink !== null,
+        this.options.models ?? null,
+      );
       this.scene.add(this.trip.root);
       this.tripCast = tripCast(world, state);
       this.tripClock = tripSeconds({ world });
@@ -514,7 +523,7 @@ class Engine implements GameRenderer {
       this.options.view.content.settings.travel.minSeconds,
       this.tripFrame,
     );
-    this.trip.apply(frame, this.tripClock);
+    this.trip.apply(frame);
     for (const index of PLAYER_INDICES) {
       const actor = frame.players[index];
       const body = cast.bodies[index];
@@ -534,12 +543,15 @@ class Engine implements GameRenderer {
     pose.width = frame.cameraWidth;
     this.characters.update({ dt, world: cast.world, place: cast.place, cameraYaw: pose.yaw });
     this.poseCamera(pose);
+    this.trip.fade(dt, frame.players, this.toCamera);
     this.highlight.update(dt, null, this.resolveAim);
     this.daylight.update(world.minutes, pose.x, pose.y, viewRadius(pose, this.aspect));
     this.background.copy(this.daylight.tableColor);
     this.indoor = false;
     this.forgetPassage();
-    this.draw(dt, world, pose.x, pose.y, viewRadius(pose, this.aspect), null);
+    // La lampe de l'autorail: ses vitres et sa flaque la nuit, rien d'autre n'éclaire la scène.
+    this.tripLights.lamps = this.trip.lamps;
+    this.draw(dt, world, pose.x, pose.y, viewRadius(pose, this.aspect), this.tripLights);
     this.measure(dt);
     return true;
   }

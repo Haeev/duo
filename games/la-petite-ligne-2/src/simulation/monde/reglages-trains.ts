@@ -19,6 +19,20 @@ export const TRAINS = {
    * voie. La caisse suit la corde entre eux dans les courbes, comme un vrai véhicule.
    */
   bogieShare: 0.7,
+  /**
+   * Passages à niveau: là où une voie à ciel ouvert croise une case de ces natures de terrain
+   * (la carte n'a pas d'autre donnée des ouvrages). Le chemin de planches du quai (`chemin`) est
+   * une traversée de service, sans sonnerie. La sonnerie sonne dès que la rame entre en freinant
+   * (ou démarre) et que son chemin jusqu'à l'arrêt (ou jusqu'à son départ) passe sur la route, et
+   * se tait quand sa queue l'a dégagée de `margin` mètres.
+   */
+  crossing: { natures: ['route', 'rue'] as readonly string[], margin: 1, sample: 0.25 },
+  /**
+   * Habitants: l'emprise d'une rame s'étend de sa place à celle où elle va (arrêt, ou fin de son
+   * départ): on ne traverse pas devant un train qui arrive. Pas d'échantillonnage d'une arête du
+   * graphe des chemins contre cette emprise (m).
+   */
+  waySample: 0.5,
 } as const;
 
 export type TrainSettings = typeof TRAINS;

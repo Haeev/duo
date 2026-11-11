@@ -44,6 +44,7 @@ import { DECOR_MANIFEST } from './decors-manifeste';
 import { type BuildingLight, gameLightSheets } from './eclairage';
 import { type Footprint, KeepOut } from './emprises';
 import { type LandmarkPose, landmarkPoses, layRuns, sortAvailable } from './files';
+import { layTrackBeds } from './lits-de-voie';
 import { RUN_SORTS } from './reglages-files';
 import { GeometryBuilder } from './geometrie';
 import { buildRoom } from './piece-geometrie';
@@ -357,9 +358,21 @@ export class TiledPlace {
             ),
           );
     this.landmarkPoses = ink === null || plants === null ? [] : landmarkPoses(map, this.field, has);
+    const beds =
+      ink === null || plants === null
+        ? null
+        : layTrackBeds(
+            map,
+            this.field,
+            has,
+            undefined,
+            undefined,
+            this.landmarkPoses.map((pose) => pose.footprint),
+          );
     this.plants = ink === null ? null : plants;
     const kept: Footprint[] = [
       ...(runs?.footprints() ?? []),
+      ...(beds?.footprints() ?? []),
       ...this.landmarkPoses.map((pose) => pose.footprint),
     ];
     this.kit = {
@@ -372,6 +385,7 @@ export class TiledPlace {
       plants: ink === null ? null : plants,
       fences: !(ink !== null && modelledFences),
       runs,
+      beds,
       // Rien ne se sème dans un meuble (un potager en est un), un repère ou un bâtiment.
       keepOut:
         ink === null
@@ -696,12 +710,17 @@ export class TiledPlace {
    * géométrie reste à la source des décors.
    */
   private placeLandmark(pose: LandmarkPose): boolean {
-    const geometry = this.plants?.geometryOf(pose.model) ?? null;
-    if (geometry === null) return false;
+    const shared = this.plants?.geometryOf(pose.model) ?? null;
+    if (shared === null) return false;
+    const base = this.heightAt(pose.x, pose.z);
+    const geometry =
+      pose.drape === undefined || this.relief === null
+        ? shared
+        : this.tracker.track(drapeOnGround(shared, pose, base, (x, y) => this.heightAt(x, y)));
     const mesh = new Mesh(geometry, this.kit.materials.ground);
     mesh.name = `repere-${pose.id}`;
     const bury = this.relief?.settings.mesh.bury ?? 0;
-    mesh.position.set(pose.x, this.heightAt(pose.x, pose.z) - bury - pose.sink, pose.z);
+    mesh.position.set(pose.x, base - bury - pose.sink, pose.z);
     mesh.rotation.y = pose.yaw;
     mesh.scale.setScalar(pose.scale);
     mesh.castShadow = true;
@@ -1098,4 +1117,36 @@ export class TiledPlace {
     this.root.clear();
     this.tracker.dispose();
   }
+}
+
+/**
+ * Copie de la géométrie d'un repère dont le pied suit le relief: chaque sommet bas reçoit l'écart
+ * entre le sol sous lui et le sol au pied du repère (pleinement au ras du sol, plus du tout à
+ * `drape` m), dans le repère du modèle (cap et échelle de la pose).
+ */
+function drapeOnGround(
+  source: BufferGeometry,
+  pose: LandmarkPose,
+  base: number,
+  heightAt: (x: number, y: number) => number,
+): BufferGeometry {
+  const geometry = source.clone();
+  const position = geometry.getAttribute('position');
+  const drape = pose.drape ?? 0;
+  const cos = Math.cos(pose.yaw);
+  const sin = Math.sin(pose.yaw);
+  for (let i = 0; i < position.count; i++) {
+    const y = position.getY(i) * pose.scale;
+    const weight = drape > 0 ? Math.min(1, Math.max(0, 1 - y / drape)) : 0;
+    if (weight === 0) continue;
+    const lx = position.getX(i) * pose.scale;
+    const lz = position.getZ(i) * pose.scale;
+    // Même sens que `rotation.y`: x' = x cos + z sin, z' = -x sin + z cos.
+    const wx = pose.x + lx * cos + lz * sin;
+    const wz = pose.z - lx * sin + lz * cos;
+    position.setY(i, position.getY(i) + (weight * (heightAt(wx, wz) - base)) / pose.scale);
+  }
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  return geometry;
 }

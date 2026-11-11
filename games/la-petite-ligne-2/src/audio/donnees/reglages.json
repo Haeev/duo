@@ -26,6 +26,7 @@
     }
   },
   "maxVoices": 24,
+  "heldFadeSeconds": 0.4,
   "defaults": { "master": 0.8, "effects": 1, "interface": 0.9, "babble": 0.8, "ambience": 0.8 },
   "storageKey": "la-petite-ligne-2.son"
 }

@@ -6,7 +6,13 @@ import { ContentError, type Content } from '../src/donnees/charger';
 import { DATA_SCHEMA, type WorldState } from '../src/etat/monde';
 import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { calendarOf } from '../src/simulation/monde/calendrier';
-import { trainPoses, type TrainPose } from '../src/simulation/monde/trains';
+import {
+  crossingBellRinging,
+  inTrainWay,
+  levelCrossings,
+  trainPoses,
+  type TrainPose,
+} from '../src/simulation/monde/trains';
 import { isBlockedCell } from '../src/simulation/noyau/grille';
 import { skipToMorning } from '../src/simulation/noyau/horloge';
 import { currentBlockers } from '../src/simulation/noyau/obstacles';
@@ -219,5 +225,78 @@ describe('trains des événements', () => {
     expect(pose?.vehicles[0]?.x).toBeCloseTo(202 - 5 - 3, 5);
     expect(Math.cos(pose?.vehicles[1]?.yaw ?? 0)).toBeCloseTo(0, 5);
     expect(() => fake('voie-perdue')).toThrow(ContentError);
+  });
+
+  it('trouve les passages à niveau de la carte: routes et rues, pas le chemin de planches du quai', () => {
+    const place = content.places[AUBRUNE];
+    if (place === undefined) throw new Error('Aubrune absent');
+    const mids = levelCrossings(place).map((c) => Math.round(c.x * 2) / 2);
+    // Le garde, la rue de l'Église, les Hameaux (`ouvrages` du plan); pas la traversée de service (214).
+    expect(mids).toEqual([182.5, 259.5, 291.5]);
+  });
+
+  it("sonne dès l'approche, se tait quand la route est dégagée, et de même au départ", () => {
+    const place = content.places[AUBRUNE];
+    if (place === undefined) throw new Error('Aubrune absent');
+    const sim = saturday(595.9);
+    const ringing = (): boolean => crossingBellRinging(sim, place);
+    const bells = (list: Sim['events']): boolean[] =>
+      list.flatMap((e) => (e.type === 'crossing_bell' ? [e.ringing] : []));
+    expect(ringing()).toBe(false);
+    // Le freinage commence à 596 (8 minutes avant l'arrêt): la sonnerie part avec lui.
+    expect(bells(wait(sim, 1))).toEqual([true]);
+    // Elle sonne tant que la queue n'a pas passé la route, et se tait avant l'arrêt (604).
+    sim.world.minutes = 600;
+    expect(ringing()).toBe(true);
+    sim.world.minutes = 603.5;
+    expect(ringing()).toBe(false);
+    expect(bells(wait(sim, 1))).toEqual([false]);
+    // À quai, la route reste ouverte: aucune sonnerie.
+    sim.world.minutes = 700;
+    expect(ringing()).toBe(false);
+    // Départ refoulé vers l'ouest à 880: la sonnerie part au démarrage, se tait quand il a passé.
+    sim.world.minutes = 879.9;
+    wait(sim, 0.1);
+    expect(bells(wait(sim, 1))).toEqual([true]);
+    sim.world.minutes = 887;
+    expect(ringing()).toBe(false);
+  });
+
+  it("garde les habitants hors du chemin d'un train: ils passent ailleurs ou attendent, sans se figer", () => {
+    // Un habitant dont le planning traverse la voie par la planche du quai (x 214) juste quand
+    // la locomotive du samedi y est à l'arrêt: au nord (n2) jusqu'à 10 h 05, puis au quai est.
+    const crossing = aubrune((files) => {
+      const villager = files['lieux/aubrune/habitants/achille.json'] as { life: Json };
+      const at = (point: string, from: number, to: number): Json => ({
+        from,
+        to,
+        days: ['sat'],
+        at: { point },
+        activity: 'flaner',
+        gesture: null,
+      });
+      // Deux lignes d'abord (la première qui convient l'emporte); le reste de sa vie suit.
+      const schedule = villager.life.schedule as Json[];
+      villager.life.schedule = [at('n2', 540, 605), at('quai-e', 605, 700), ...schedule];
+    });
+    const place = crossing.places[AUBRUNE];
+    if (place === undefined) throw new Error('Aubrune absent');
+    const sim = saturday(604.5, crossing);
+    wait(sim, 1 / 30);
+    const body = sim.world.places[AUBRUNE]?.villagers.achille?.body;
+    if (body === undefined) throw new Error('habitant absent');
+    expect(body.y).toBeLessThan(TRACK_Y - 2);
+    let entered = 0;
+    let inside = inTrainWay(sim, place, body.x, body.y, 0);
+    // Une minute et demie de jeu réel: le temps de faire le tour par un passage à niveau.
+    for (let k = 0; k < 2700; k++) {
+      wait(sim, 1 / 30);
+      const now = inTrainWay(sim, place, body.x, body.y, 0);
+      if (now && !inside) entered += 1;
+      inside = now;
+    }
+    expect(entered).toBe(0);
+    // Il est arrivé de l'autre côté (pas figé au bord de la voie).
+    expect(Math.hypot(body.x - 213.5, body.y - 102)).toBeLessThan(0.6);
   });
 });

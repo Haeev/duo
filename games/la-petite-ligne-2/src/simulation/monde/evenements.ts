@@ -25,6 +25,11 @@ export const WORLD_EVENTS = [
   /** Un événement du calendrier commence ou finit au lieu courant. */
   v.strictObject({ type: v.literal('calendar_started'), place: IdSchema, event: IdSchema }),
   v.strictObject({ type: v.literal('calendar_ended'), place: IdSchema, event: IdSchema }),
+  /**
+   * La sonnerie des passages à niveau du lieu courant part (une rame approche en freinant ou
+   * démarre, et va passer sur la route) ou se tait (la route est dégagée): son, lisses.
+   */
+  v.strictObject({ type: v.literal('crossing_bell'), place: IdSchema, ringing: v.boolean() }),
   /** Un coup de la cloche des heures (`stroke` sur `strokes`): rejoué chez l'invité pour le son. */
   v.strictObject({
     type: v.literal('clock_struck'),

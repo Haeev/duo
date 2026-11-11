@@ -35,6 +35,7 @@ import {
 } from './decors-manifeste';
 import type { KeepOut } from './emprises';
 import type { RunCell, RunLayout } from './files';
+import { trackBedGeometry, type TrackBedLayout } from './lits-de-voie';
 import type { RunSort } from './reglages-files';
 import { HARVEST_LOOK, type HarvestLookSettings } from './reglages-recoltes';
 import type { TileSettings } from './reglages-tuiles';
@@ -116,6 +117,8 @@ export interface TileKit {
    * tuile; leurs cases n'ont plus de boîte. Absent: les boîtes du décor provisoire.
    */
   readonly runs?: RunLayout | null;
+  /** Rendu encré: lits de voie (ballast, fossés, tranchée) en modules livrés (`lits-de-voie.ts`). */
+  readonly beds?: TrackBedLayout | null;
 }
 
 /** Végétation semée d'une tuile: ce qui se dessine, et ce qui en porte l'ombre sans se dessiner. */
@@ -572,6 +575,26 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
       view.add(mesh);
       yield;
     }
+
+  // Lits de voie: un maillage par tuile, chaque voie d'une seule pièce.
+  const beds = kit.beds ?? null;
+  const plants = kit.plants ?? null;
+  if (beds !== null && plants !== null) {
+    const geometry = trackBedGeometry(
+      beds,
+      beds.inTile(tile),
+      (model) => plants.geometryOf(model),
+      (x, z) => relief?.heightAt(x, z) ?? 0,
+      kit.field,
+    );
+    if (geometry !== null) {
+      const mesh = new Mesh(view.tracker.track(geometry), materials.ground);
+      mesh.name = 'lit-de-voie';
+      mesh.receiveShadow = true;
+      view.add(mesh);
+      yield;
+    }
+  }
 
   if (shapes.pebble !== undefined && shapes.tuft !== undefined) {
     // Semis de petits volumes: ce qui ponctue le sol est un volume, pas un dessin à plat.

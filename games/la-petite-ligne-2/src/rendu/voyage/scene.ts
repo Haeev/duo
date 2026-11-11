@@ -1,9 +1,9 @@
 /**
- * Diorama du trajet en formes simples (aucun modèle de train n'est encore livré): voie en
- * contrebas, deux quais avec abri et panneau, arbres en boules de mousse, poteaux, collines, et un
- * petit train (locomotive et wagon à fenêtres ouvertes, pour voir les deux personnages à bord).
- * Tout partage le matériau à couleurs de sommets des formes provisoires: un seul programme, trois
- * maillages fusionnés (décor, train, fumée). Construit à l'entrée dans le train, libéré à la sortie.
+ * Diorama du trajet: voie en contrebas, deux quais avec abri et panneau, arbres en boules de
+ * mousse, poteaux, collines, en formes simples sur le matériau à couleurs de sommets des formes
+ * provisoires (un maillage fusionné); et l'autorail livré (manifeste des décors), au rendu encré,
+ * vitres allumées la nuit par sa lampe. Les deux personnages montent dans sa salle: la caisse se
+ * fond devant eux. Construit à l'entrée dans le train, libéré à la sortie.
  */
 import {
   BoxGeometry,
@@ -16,11 +16,18 @@ import {
   IcosahedronGeometry,
   type Material,
   Mesh,
-  SphereGeometry,
+  type Object3D,
+  Vector4,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { inkTag } from '../encre/conversion';
+import { inkifyModel, inkTag } from '../encre/conversion';
 import { LAYER } from '../encre/couches';
+import { INK_INNER, type Lamp } from '../encre/matiere';
+import { INK_SETTINGS } from '../encre/reglages';
+import { Fadable, isMesh } from '../fondu';
+import { DECOR_MANIFEST, type DecorManifest } from '../lieu/decors-manifeste';
+import type { ModelSource } from '../lieu/lieu';
+import { Occlusion, type Vec3 } from '../occultation';
 import { TRIP_SETTINGS, type TripSettings } from './reglages';
 import { doorX, type TripFrame } from './sequence';
 
@@ -197,151 +204,147 @@ function sceneryGeometry(s: TripSettings): BufferGeometry {
   return p.merge();
 }
 
-/** Locomotive (avant à x = 0, vers +x) et wagon derrière elle, au niveau du quai. */
-function trainGeometry(s: TripSettings): BufferGeometry {
-  const p = new Parts();
-  const c = s.colors;
-  const w = s.wagon;
-  const hw = w.halfWidth;
-  const wheelY = -s.ground.trench + 0.1 + s.rails.height + 0.4;
-  // Wagon de x = -length à 0: châssis, plancher, parois à fenêtres, toit.
-  const x0 = -w.length;
-  const x1 = -0.25;
-  p.box(x0, x1, -0.32, 0, -hw, hw, c.chassis);
-  p.box(x0 + 0.1, x1 - 0.1, 0, 0.02, -hw + 0.08, hw - 0.08, c.interior);
-  const door = doorX(s);
-  const doorHalf = w.door / 2;
-  for (const side of [-1, 1]) {
-    const z0 = side * hw - (side > 0 ? 0.08 : 0);
-    const z1 = z0 + 0.08;
-    // Bas de caisse (coupé par la portière côté quai), bandeau et haut de caisse.
-    if (side > 0) {
-      p.box(x0, door - doorHalf, 0, w.sill, z0, z1, c.livery);
-      p.box(door + doorHalf, x1, 0, w.sill, z0, z1, c.livery);
-      p.box(door - doorHalf, door + doorHalf, w.lintel + 0.15, w.top, z0, z1, c.livery);
-    } else p.box(x0, x1, 0, w.sill, z0, z1, c.livery);
-    p.box(x0, x1, w.sill, w.sill + 0.06, z0 - 0.01, z1 + 0.01, c.band);
-    p.box(x0, x1, w.lintel, w.top, z0, z1, c.livery);
-    // Montants entre les fenêtres (et de part et d'autre de la portière).
-    for (let x = x0; x <= x1 + 0.01; x += (x1 - x0) / 6) {
-      if (side > 0 && Math.abs(x - door) < doorHalf + 0.05) continue;
-      p.box(x - 0.12, x + 0.12, w.sill, w.lintel, z0, z1, c.band);
-    }
-    if (side > 0)
-      for (const dx of [-doorHalf, doorHalf])
-        p.box(door + dx - 0.08, door + dx + 0.08, 0, w.lintel + 0.15, z0, z1, c.band);
-  }
-  // Bouts du wagon et toit bombé.
-  p.box(x0, x0 + 0.08, 0, w.top, -hw, hw, c.livery);
-  p.box(x1 - 0.08, x1, 0, w.top, -hw, hw, c.livery);
-  p.box(x0 - 0.05, x1 + 0.05, w.top, w.top + 0.08, -hw - 0.1, hw + 0.1, c.roof);
-  // Bombé écrasé: rien ne descend sous le haut de caisse (on verrait sa courbe par les fenêtres).
-  p.cylinder(hw * 0.95, x1 - x0, (x0 + x1) / 2, w.top - 0.02, 0, 'x', c.roof, 14, 0.22);
-  // Banquettes intérieures, le long de la paroi nord.
-  p.box(x0 + 0.6, x1 - 0.6, 0, 0.45, -hw + 0.1, -hw + 0.6, c.chassis);
-  p.box(x0 + 0.6, x1 - 0.6, 0.45, 1.0, -hw + 0.1, -hw + 0.25, c.chassis);
-  // Bogies et roues du wagon.
-  for (const bx of [x0 + 1.6, x1 - 1.6])
-    for (const dx of [-0.55, 0.55])
-      for (const side of [-1, 1])
-        p.cylinder(0.4, 0.1, bx + dx, wheelY, side * (s.rails.gauge / 2), 'z', c.wheel, 14);
+/** Lampe de la caisse: elle suit le train (position réécrite à chaque image). */
+interface TripLamp extends Lamp {
+  x: number;
+  y: number;
+  z: number;
+}
 
-  // Locomotive de x = 0,25 à 6,6: cabine à l'arrière, chaudière, cheminée, tampons.
-  const l0 = 0.25;
-  const l1 = 6.6;
-  p.box(l0, l1, -0.32, 0.25, -hw + 0.1, hw - 0.1, c.chassis);
-  p.box(l0, l0 + 2.1, 0.25, w.top - 0.1, -hw + 0.05, hw - 0.05, c.livery);
-  p.box(l0 + 0.4, l0 + 1.7, 1.2, 1.9, hw - 0.06, hw - 0.04, c.wheel);
-  p.box(l0 - 0.1, l0 + 2.3, w.top - 0.1, w.top + 0.02, -hw - 0.05, hw + 0.05, c.roof);
-  p.cylinder(0.85, l1 - l0 - 2.3, (l0 + 2.1 + l1 - 0.2) / 2, 1.1, 0, 'x', c.livery, 16);
-  p.cylinder(0.87, 0.12, l0 + 3.3, 1.1, 0, 'x', c.brass, 16);
-  p.cylinder(0.87, 0.12, l0 + 4.8, 1.1, 0, 'x', c.brass, 16);
-  p.cylinder(0.86, 0.3, l1 - 0.3, 1.1, 0, 'x', c.wheel, 16);
-  p.cylinder(0.22, 0.9, l1 - 0.9, 2.3, 0, 'y', c.wheel, 10);
-  p.cylinder(0.3, 0.12, l1 - 0.9, 2.75, 0, 'y', c.wheel, 10);
-  p.ball(0.3, l0 + 3.9, 2.0, 0, c.brass, 0.8);
-  for (const side of [-1, 1]) {
-    p.cylinder(0.1, 0.3, l1 + 0.1, 0.1, side * 0.75, 'x', c.wheel, 8);
-    p.cylinder(0.16, 0.06, l1 + 0.27, 0.1, side * 0.75, 'x', c.chassis, 10);
-    for (const wx of [l0 + 1.2, l0 + 2.9, l0 + 4.6])
-      p.cylinder(
-        0.55,
-        0.12,
-        wx,
-        wheelY + 0.15,
-        side * (s.rails.gauge / 2 + 0.02),
-        'z',
-        c.chassis,
-        16,
-      );
-  }
-  // Attelage entre la locomotive et le wagon.
-  p.box(x1, l0, -0.15, 0.0, -0.15, 0.15, c.wheel);
-  return p.merge();
+/** Un pied de personnage, dans le repère de la scène. */
+interface Feet {
+  x: number;
+  y: number;
+  z: number;
 }
 
 /** La scène du trajet, posée dans la scène du moteur le temps du voyage. */
 export class TripScene {
   readonly root = new Group();
+  /** La lampe de la salle (`light` du manifeste): vitres allumées et flaque la nuit. */
+  readonly lamps: Lamp[] = [];
   private readonly world: Mesh;
-  private readonly train: Mesh;
-  private readonly puffGeometry: BufferGeometry;
-  private readonly puffs: Mesh[] = [];
+  private readonly train: Object3D;
+  private readonly owned: BufferGeometry[] = [];
+  private readonly fadable: Fadable;
+  private readonly occlusion = new Occlusion();
+  private readonly box = { min: { x: 0, y: 0, z: 0 }, max: { x: 0, y: 0, z: 0 } };
+  private readonly lamp: TripLamp | null;
+  private readonly light: { readonly at: readonly number[] } | null;
+  private readonly feet: Feet[] = [
+    { x: 0, y: 0, z: 0 },
+    { x: 0, y: 0, z: 0 },
+  ];
 
   constructor(
     material: Material,
     private readonly settings: TripSettings = TRIP_SETTINGS,
     /** Rendu encré (ADR 0023): les géométries reçoivent leurs morceaux et leurs couches de traits. */
     inked = false,
+    /** Modèles livrés: l'autorail du manifeste; sans lui, une caisse provisoire à ses mesures. */
+    models: ModelSource | null = null,
+    manifest: DecorManifest = DECOR_MANIFEST,
   ) {
     this.root.name = 'trajet';
     const tag = (geometry: BufferGeometry, layer?: number): BufferGeometry =>
       inked ? inkTag(geometry, layer === undefined ? {} : { layer }) : geometry;
-    this.world = new Mesh(tag(sceneryGeometry(settings)), material);
+    const scenery = tag(sceneryGeometry(settings));
+    this.owned.push(scenery);
+    this.world = new Mesh(scenery, material);
     this.world.castShadow = true;
     this.world.receiveShadow = true;
-    this.train = new Mesh(tag(trainGeometry(settings)), material);
-    this.train.castShadow = true;
-    this.train.receiveShadow = true;
-    this.puffGeometry = tag(
-      paint(new SphereGeometry(1, 10, 8), settings.colors.smoke),
-      LAYER.plain,
-    );
-    for (let i = 0; i < settings.smoke.puffs; i += 1) {
-      const puff = new Mesh(this.puffGeometry, material);
-      puff.visible = false;
-      this.puffs.push(puff);
-      this.root.add(puff);
+    const t = settings.train;
+    const model = models?.instantiate(t.model, 'trajet') ?? null;
+    const sheet = manifest.models[t.model];
+    if (model !== null) {
+      this.train = inked ? inkifyModel(model, material) : model;
+    } else {
+      // Sans modèle livré: une caisse provisoire aux mesures de l'autorail, jamais un trou.
+      const box = paint(
+        new BoxGeometry(t.halfWidth * 2, t.height - t.floor + 0.3, t.length),
+        settings.colors.standIn,
+      );
+      box.translate(0, t.floor - 0.3 + (t.height - t.floor + 0.3) / 2, 0);
+      this.owned.push(tag(box, LAYER.plain));
+      this.train = new Mesh(box, material);
     }
+    // La tête de la caisse (+z du modèle) vers la marche du train (+x de la scène).
+    this.train.rotation.y = Math.PI / 2;
+    this.train.name = 'trajet-autorail';
+    const light = model === null ? undefined : sheet?.light;
+    const glass = light === undefined || !inked ? null : new Vector4(2, 0, 0, 0);
+    this.train.traverse((child) => {
+      if (!isMesh(child)) return;
+      child.castShadow = true;
+      child.receiveShadow = true;
+      if (glass !== null) child.userData[INK_INNER] = glass;
+    });
+    this.light = light ?? null;
+    this.lamp =
+      light === undefined
+        ? null
+        : {
+            x: 0,
+            y: 0,
+            z: 0,
+            radius: light.radius * INK_SETTINGS.lamps.vehicle.radius,
+            shadow: false,
+            phase: 0,
+            gain: (light.gain ?? 1) * INK_SETTINGS.lamps.vehicle.gain,
+            ...(glass === null ? {} : { glass }),
+          };
+    if (this.lamp !== null) this.lamps.push(this.lamp);
+    this.fadable = new Fadable(this.train, new Color(0, 0, 0));
+    this.occlusion.add({ id: 'autorail', min: this.box.min, max: this.box.max });
     this.root.add(this.world, this.train);
   }
 
-  /** Place le train, le décor et la fumée pour cette image. `seconds`: temps de la scène. */
-  apply(frame: TripFrame, seconds: number): void {
+  /** Place le train et le décor pour cette image. */
+  apply(frame: TripFrame): void {
+    const t = this.settings.train;
     this.world.position.x = frame.worldX;
-    this.train.position.x = frame.trainX;
-    // Fumée: des bouffées en boucle au-dessus de la cheminée, plus nombreuses quand le train roule.
-    const smoke = this.settings.smoke;
-    const chimneyX = frame.trainX + 6.6 - 0.9;
-    const pace = Math.min(1, Math.abs(frame.trainSpeed) / 12);
-    for (let i = 0; i < this.puffs.length; i += 1) {
-      const puff = this.puffs[i];
-      if (puff === undefined) continue;
-      const age = (seconds / smoke.life + i / this.puffs.length) % 1;
-      puff.visible = pace > 0.05 || frame.stage === 'arrive' || frame.stage === 'board';
-      puff.position.set(
-        chimneyX - age * smoke.drift * (0.3 + pace),
-        2.9 + age * smoke.rise,
-        -age * 0.4,
-      );
-      puff.scale.setScalar(smoke.size * (0.6 + age * 1.6) * (1 - age * 0.5));
+    const cx = frame.trainX + t.center;
+    this.train.position.set(cx, -t.floor, 0);
+    if (this.lamp !== null && this.light !== null) {
+      // Le modèle est tourné d'un quart: son z devient le x de la scène, son x le -z.
+      const [ax = 0, ay = 0, az = 0] = this.light.at;
+      this.lamp.x = cx + az;
+      this.lamp.y = -t.floor + ay;
+      this.lamp.z = -ax;
     }
+    this.box.min.x = cx - t.length / 2;
+    this.box.max.x = cx + t.length / 2;
+    this.box.min.y = -t.floor;
+    this.box.max.y = t.height - t.floor;
+    this.box.min.z = -t.halfWidth;
+    this.box.max.z = t.halfWidth;
+  }
+
+  /**
+   * La caisse se fond devant les deux personnages quand elle les cache (à bord, ou derrière elle),
+   * comme un bâtiment (choix du client: le fondu, jamais la découpe). `toCamera`: du sol vers la caméra.
+   */
+  fade(
+    dt: number,
+    players: readonly { readonly x: number; readonly y: number }[],
+    toCamera: Vec3,
+  ): void {
+    players.forEach((p, i) => {
+      const feet = this.feet[i];
+      if (feet === undefined) return;
+      feet.x = p.x;
+      feet.y = 0;
+      feet.z = p.y;
+    });
+    if (this.occlusion.update(dt, this.feet, toCamera).length > 0)
+      this.fadable.apply(this.occlusion.opacity('autorail'), 0);
   }
 
   dispose(): void {
     this.root.removeFromParent();
-    this.world.geometry.dispose();
-    this.train.geometry.dispose();
-    this.puffGeometry.dispose();
+    this.fadable.dispose();
+    for (const geometry of this.owned) geometry.dispose();
+    // Le modèle livré partage ses géométries avec la source des modèles: elle les libère.
+    this.lamps.length = 0;
   }
 }

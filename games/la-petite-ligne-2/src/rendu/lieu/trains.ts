@@ -26,6 +26,7 @@ import {
 import { inkifyModel, inkTag } from '../encre/conversion';
 import { LAYER } from '../encre/couches';
 import { INK_INNER, type Lamp } from '../encre/matiere';
+import { INK_SETTINGS } from '../encre/reglages';
 import { Fadable, isMesh } from '../fondu';
 import { Occlusion, type Vec3 } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
@@ -151,12 +152,13 @@ export class TrainLayer {
             x: 0,
             y: 0,
             z: 0,
-            radius: light.radius,
+            // Au milieu de la caisse: force et rayon accordés à ceux des lampes du dehors.
+            radius: light.radius * INK_SETTINGS.lamps.vehicle.radius,
             shadow: false,
             share: 0,
             // Allumée avec les premières lampes du dehors (à la nuit tombante), pas au moindre soupçon.
             phase: 0,
-            ...(light.gain === undefined ? {} : { gain: light.gain }),
+            gain: (light.gain ?? 1) * INK_SETTINGS.lamps.vehicle.gain,
             ...(glass === null ? {} : { glass }),
           };
     if (lamp !== null) this.lamps.push(lamp);

@@ -16,6 +16,9 @@ import { areaAt, doorChain } from '../lieux/traversee';
 
 const NONE: ReadonlySet<string> = new Set();
 
+/** Arête du graphe à éviter pour l'instant (le chemin d'un train): vrai si le segment l'est. */
+export type AvoidSegment = (ax: number, ay: number, bx: number, by: number) => boolean;
+
 /** Un point de trajet (m). `jump`: on y arrive en franchissant une porte, pas en marchant. */
 export interface RoutePoint {
   readonly x: number;
@@ -245,9 +248,18 @@ function graphRoute(
   tx: number,
   ty: number,
   closed: ReadonlySet<string>,
+  avoid: AvoidSegment | null = null,
 ): Route | null {
   const paths = place.map.graph;
   if (paths === undefined) return null;
+  // Arêtes barrées pour ce trajet (un train sur leur chemin): relevées une fois, pas à chaque nœud.
+  const barred = new Set<(typeof paths.edges)[number]>();
+  if (avoid !== null)
+    for (const edge of paths.edges) {
+      const a = paths.nodes[edge.a];
+      const b = paths.nodes[edge.b];
+      if (a !== undefined && b !== undefined && avoid(a.x, a.y, b.x, b.y)) barred.add(edge);
+    }
   // Les nœuds du dehors seulement: ceux des intérieurs se rejoignent par les portes.
   const ids = Object.keys(paths.nodes)
     .sort()
@@ -256,12 +268,22 @@ function graphRoute(
       return p !== undefined && areaAt(place, p.x, p.y) === '';
     });
   if (ids.length === 0) return null;
-  const nearest = (x: number, y: number): string => {
-    let best = ids[0] ?? '';
+  // Un nœud sous un train à quai ne sert ni de départ ni d'arrivée: on part du plus proche libre.
+  const usable =
+    avoid === null
+      ? ids
+      : ids.filter((id) => {
+          const p = paths.nodes[id];
+          return p !== undefined && !avoid(p.x, p.y, p.x, p.y);
+        });
+  // `reach`: on y va tout droit depuis (x, y); sans traverser un train à quai pour le départ.
+  const nearest = (x: number, y: number, reach: boolean): string => {
+    let best = usable[0] ?? '';
     let bestD = Number.POSITIVE_INFINITY;
-    for (const id of ids) {
+    for (const id of usable) {
       const p = paths.nodes[id];
       if (p === undefined) continue;
+      if (reach && avoid?.(x, y, p.x, p.y) === true) continue;
       const d = Math.hypot(p.x - x, p.y - y);
       if (d < bestD) {
         bestD = d;
@@ -270,8 +292,8 @@ function graphRoute(
     }
     return best;
   };
-  const from = nearest(fx, fy);
-  const to = nearest(tx, ty);
+  const from = nearest(fx, fy, true);
+  const to = nearest(tx, ty, false);
   const dist = new Map<string, number>([[from, 0]]);
   const prev = new Map<string, string>();
   const done = new Set<string>();
@@ -284,7 +306,12 @@ function graphRoute(
     const p = paths.nodes[cur];
     if (p === undefined) continue;
     for (const edge of paths.edges) {
-      if (edge.kind === 'porte' || edge.kind === 'interieur' || !edgePassable(edge, closed))
+      if (
+        edge.kind === 'porte' ||
+        edge.kind === 'interieur' ||
+        !edgePassable(edge, closed) ||
+        barred.has(edge)
+      )
         continue;
       const other = edge.a === cur ? edge.b : edge.b === cur ? edge.a : null;
       const q = other === null ? undefined : paths.nodes[other];
@@ -308,7 +335,10 @@ function graphRoute(
   return { points, doors: [] };
 }
 
-/** Trajet dans une seule pièce: dehors, le graphe d'abord; dans un intérieur, la grille. */
+/**
+ * Trajet dans une seule pièce: dehors, le graphe d'abord (en évitant `avoid` s'il le peut, sinon
+ * par le même chemin: il attendra au bord); dans un intérieur, la grille.
+ */
 function legRoute(
   content: Content,
   place: PlaceContent,
@@ -319,8 +349,10 @@ function legRoute(
   tx: number,
   ty: number,
   closed: ReadonlySet<string>,
+  avoid: AvoidSegment | null,
 ): Route {
   return (
+    (outside && avoid !== null ? graphRoute(place, fx, fy, tx, ty, closed, avoid) : null) ??
     (outside ? graphRoute(place, fx, fy, tx, ty, closed) : null) ??
     gridRoute(gridOf(content, place, state, closed), fx, fy, tx, ty) ?? {
       points: [{ x: tx, y: ty }],
@@ -335,6 +367,7 @@ function legRoute(
  * D'une pièce à l'autre, un trajet par pièce, relié par les portes (`doorChain`); sans porte qui
  * les relie, l'habitant est posé à l'arrivée (un seul point `jump`). `shutDoors`: portes fermées
  * pour lui (`closedDoorSet`); si seules elles relient les deux pièces, `null`: il ne passe pas.
+ * `avoid`: arêtes du graphe à contourner si un autre chemin existe (le chemin d'un train).
  */
 export function findRoute(
   content: Content,
@@ -356,6 +389,7 @@ export function findRoute(
   ty: number,
   closed: ReadonlySet<string>,
   shutDoors: ReadonlySet<string>,
+  avoid?: AvoidSegment | null,
 ): Route | null;
 export function findRoute(
   content: Content,
@@ -367,6 +401,7 @@ export function findRoute(
   ty: number,
   closed: ReadonlySet<string> = NONE,
   shutDoors: ReadonlySet<string> = NONE,
+  avoid: AvoidSegment | null = null,
 ): Route | null {
   const chain = doorChain(place, fx, fy, tx, ty, shutDoors);
   if (chain === null) {
@@ -374,13 +409,35 @@ export function findRoute(
     return { points: [{ x: tx, y: ty, jump: true }], doors: [] };
   }
   if (chain.length === 0)
-    return legRoute(content, place, state, areaAt(place, fx, fy) === '', fx, fy, tx, ty, closed);
+    return legRoute(
+      content,
+      place,
+      state,
+      areaAt(place, fx, fy) === '',
+      fx,
+      fy,
+      tx,
+      ty,
+      closed,
+      avoid,
+    );
   const points: RoutePoint[] = [];
   const doors: { at: number; id: string }[] = [];
   let x = fx;
   let y = fy;
   const append = (toX: number, toY: number): void => {
-    const leg = legRoute(content, place, state, areaAt(place, x, y) === '', x, y, toX, toY, closed);
+    const leg = legRoute(
+      content,
+      place,
+      state,
+      areaAt(place, x, y) === '',
+      x,
+      y,
+      toX,
+      toY,
+      closed,
+      avoid,
+    );
     for (const door of leg.doors) doors.push({ at: door.at + points.length, id: door.id });
     points.push(...leg.points);
   };
