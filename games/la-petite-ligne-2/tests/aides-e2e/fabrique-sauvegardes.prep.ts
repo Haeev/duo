@@ -8,7 +8,7 @@ import { expect, it } from 'vitest';
 import { createWorld } from '../../src/simulation/noyau/monde';
 import { gameDataFiles, MEMBERS, SEED } from '../aides';
 import { loadContent } from '../../src/donnees/charger';
-import { contentWith, contextOf, wait } from '../aides-l3';
+import { act, contentWith, contextOf, wait } from '../aides-l3';
 import { createSim } from '../../src/simulation/noyau/pas';
 import type { WorldState } from '../../src/etat/monde';
 import { markLookRevealed } from '../../src/simulation/regles/apparence';
@@ -121,9 +121,11 @@ it('fabrique la sauvegarde « aubrune-acte2 » (acte 1 fini, acte 2 commencé pa
   write('aubrune-acte2', 'Aubrune, acte 2', sim.world);
 });
 
-it('fabrique la sauvegarde « aubrune-briques » (histoire principale finie, la Baronne à décider, 10 h)', () => {
-  // Pour les captures des briques (`tests/rendu-encre/briques.spec.ts`): tout le bourg est là et
-  // ouvert, la maison du garde n'a pas encore sa cuisine, la décision de la Baronne attend les deux.
+/**
+ * Aubrune à 10 h, histoire principale finie, la décision de la Baronne ouverte (sauvegardes
+ * « aubrune-briques » et « aubrune-recette »).
+ */
+function lateAubrune(): ReturnType<typeof createSim> {
   const content = contentWith((files) => {
     const settings = files['commun/reglages.json'] as { start: Json };
     settings.start = { ...settings.start, place: 'aubrune', minute: 600 };
@@ -166,5 +168,62 @@ it('fabrique la sauvegarde « aubrune-briques » (histoire principale finie, la 
   sim.world.minutes = 600;
   wait(sim, 2);
   expect(sim.world.progress.quests[DECISION]?.step).toBe('decision');
-  write('aubrune-briques', 'Aubrune, les briques', sim.world);
+  return sim;
+}
+
+it('fabrique la sauvegarde « aubrune-briques » (histoire principale finie, la Baronne à décider, 10 h)', () => {
+  // Pour les captures des briques (`tests/rendu-encre/briques.spec.ts`): tout le bourg est là et
+  // ouvert, la maison du garde n'a pas encore sa cuisine, la décision de la Baronne attend les deux.
+  write('aubrune-briques', 'Aubrune, les briques', lateAubrune().world);
+});
+
+it('fabrique la sauvegarde « aubrune-recette » (briques, salle restaurée, devis de cuisine, outils et plats)', () => {
+  // Parcours du contenu d'Aubrune (`tests/e2e/commerce.spec.ts`, `maison.spec.ts`,
+  // `endurance.spec.ts`, `decision.spec.ts`, `nuit.spec.ts`, `recolte.spec.ts`): la partie
+  // « briques », plus la salle commune restaurée et le devis de la cuisine ouvert chez Basile
+  // (fait de la scène du règlement retrouvé), 150 € au coffre commun, de quoi la monter (planches
+  // et pierres), une hache et des plats.
+  const sim = lateAubrune();
+  const { content } = sim;
+  const ctx = contextOf(sim);
+  remember(ctx, 'aubrune.maison.premiere-piece', true, 'duo');
+  const [a, b] = sim.world.players;
+  // La salle commune se restaure à deux, comme en jeu (intentions du logement), dans la pièce.
+  a.body = { x: 22, y: 213.5, facing: 0, speed: 0 };
+  b.body = { x: 23, y: 213.5, facing: 0, speed: 0 };
+  for (const p of [0, 1] as const)
+    act(sim, p, { type: 'housing_work', housing: 'maison-du-garde', room: 'salle', on: true });
+  wait(sim, 8);
+  expect(sim.world.progress.memory['aubrune.maison-du-garde.salle']?.v).toBe('restored');
+  remember(ctx, 'aubrune.maison.cuisine', true, 'duo');
+  remember(ctx, 'aubrune.maison.rechaud', true, 'duo');
+  sim.world.common.chest = 15_000;
+  expect(addItem(content, a, 'planche', 3)).toBe(0);
+  expect(addItem(content, a, 'pierre', 4)).toBe(0);
+  expect(addItem(content, a, 'hache', 1)).toBe(0);
+  expect(addItem(content, a, 'pain', 2)).toBe(0);
+  expect(addItem(content, b, 'pain', 1)).toBe(0);
+  // Le pain en première case de la barre: c'est la case au focus à l'ouverture du carnet, où
+  // l'on mange (Entrée).
+  for (const p of [a, b]) {
+    const slots = [...p.toolbar, ...(p.bag?.slots ?? [])];
+    const bread = slots.find((st) => st?.item === 'pain') ?? null;
+    const zone = p.toolbar.includes(bread) ? p.toolbar : (p.bag?.slots ?? []);
+    const at = zone.indexOf(bread);
+    zone[at] = p.toolbar[0] ?? null;
+    p.toolbar[0] = bread;
+  }
+  // Sur la place, devant l'épicerie: chacun à un pas de l'autre.
+  a.body = { x: 199.5, y: 116.5, facing: Math.PI, speed: 0 };
+  b.body = { x: 199.5, y: 118.5, facing: Math.PI, speed: 0 };
+  sim.world.minutes = 600;
+  wait(sim, 1);
+  write('aubrune-recette', 'Aubrune, recette du contenu', sim.world);
+  // La même partie au premier jour de l'été (jour 15, 10 h): les ronces ont des mûres (leur
+  // butin n'a lieu qu'en été et en automne; au printemps, « Cueillir » est barré).
+  sim.world.common.day = 15;
+  sim.world.minutes = 14 * 1440 + 600;
+  wait(sim, 1);
+  expect(sim.world.common.day).toBe(15);
+  write('aubrune-ete', 'Aubrune, premier jour de l’été', sim.world);
 });

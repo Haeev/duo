@@ -112,3 +112,16 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - La sonde (`?sonde=1`) désactive l'éditeur de personnage au démarrage (`editorAtStart: !probed`): pour voir ce que voit un vrai joueur, `startDuo(..., { probe: false })` (aucune lecture du monde, seulement le DOM et les captures). Reprise (CA-34): `startDuo(..., { keepServer: true })` puis `startDuo(..., { server })` sur le même faux hôte et dossier de données.
 - Les textes à glissement d'ouverture (bandeaux de répliques) donnent de faux « hors de l'écran »: ne retenir un défaut d'affichage qu'après trois relevés d'affilée.
 - Heure du prologue: un seul joueur couché franchit « dormir » (sommeil à 80) sans saut de nuit; deux couchés: réveil 6 h, arrivée 8 h 03. `tests/prologue-heure.test.ts`.
+
+## Parcours du contenu d'Aubrune (vérifié le 2026-11-11)
+
+- `vitest.prep.config.ts` passe par `mergeConfig`, qui ajoute les motifs au lieu de les remplacer: sans filtre de fichier, la fabrication des sauvegardes lançait toute la suite rapide (2 min) avant chaque recette. Toujours nommer le fichier `.prep.ts` en argument.
+- Aubrune en rendu logiciel sur machine chargée: une vue de 960x540 qui charge ses tuiles (départ, caméra tournée) réveille le chien de garde (« Le jeu ne répond plus »). Charger et jouer en 320x180 (`test.use({ viewport })`), n'agrandir que le temps d'une capture (`shot` de `tests/aides-e2e/contenu.ts`).
+- La simulation de l'hôte y tourne à 30 % du temps réel ou moins: une marche de 40 m au clavier dépasse 3 min. Mise en place explicite (`placeAt`) jusqu'au début du geste, puis clavier pour la porte, le comptoir, l'action.
+- `setCamera(0, largeur)` chez les deux: lacet 0, Z va au nord, D à l'est; `walkBoth` marche alors sans étalonnage.
+- `carte.json` d'Aubrune ne décrit pas les intérieurs (annexe vide au sud de `outdoor`): planifier avec `loadMapWithInteriors` (pièces, meubles solides, portes). Éviter les cases de porte en marchant (`avoid`), sinon on entre (épicerie) ou on ressort.
+- Passer une porte: dans l'axe à moins de 0,2 m, puis tenir la touche; arrêté à 0,7 m de l'axe, on pousse le mur (`passDoor`).
+- Viser un habitant: exiger le verbe « Parler » (l'établi `basile-etabli` contient le nom de Basile). Un comptoir tenu se vise aussi (« Parler » ou « Acheter »).
+- `waitDialoguesClosed` en petite fenêtre relève de faux « hors de l'écran » (mineurs): ne compter que les contournements en mode strict.
+- Ronces: butin en été et en automne seulement (« rien maintenant » au printemps): sauvegarde « aubrune-ete » (jour 15). Ne jamais appuyer sur Espace « pour voir » dans une maison: le lit couche le joueur, le réchaud ouvre la cuisine.
+- Empreinte de fabrication (compatibilité): la recalculer comme `vite.config.ts` et la remplacer dans le JS servi à l'invité par `page.route` (`onGuestPage`); l'invité peut recevoir un premier état avant le verdict.
