@@ -40,23 +40,65 @@ async function loadFromAssets(file: string): Promise<GLTF> {
   return loader.loadAsync(url);
 }
 
+/** Fusionne des morceaux déjà marqués en une géométrie que `inkTag` ne reprendra pas. */
+function joinParts(parts: readonly BufferGeometry[]): BufferGeometry {
+  // `inkTag` retient les géométries qu'il a vues: celle-ci lui est montrée vide, puis remplie,
+  // pour que la conversion par la teinte (`inkifyModel`, à la pose) ne repasse pas dessus.
+  const merged = inkTag(new BufferGeometry());
+  const joined = mergeGeometries([...parts]);
+  merged.copy(joined);
+  joined.dispose();
+  for (const part of parts) part.dispose();
+  merged.computeBoundingBox();
+  merged.computeBoundingSphere();
+  return merged;
+}
+
 /**
  * Modèle aux matériaux nommés (`materials` du manifeste: feuillage, ecorce, pierre...): ses
  * primitives sont fusionnées en un seul maillage (un appel de dessin par exemplaire), la couche
  * de traits et la prise au vent de chaque morceau viennent du NOM de son matériau, la teinte
  * reste celle des sommets. Rend `null` si aucun matériau du modèle n'est nommé dans la table:
  * il garde alors la conversion par la teinte (`inkifyModel`).
+ *
+ * Parties mobiles (`nodes`: noms de nœuds du manifeste): chaque nœud nommé est fusionné à part et
+ * reste un enfant nommé du modèle, posé à son pivot (le jeu le fait tourner). Même pièce de
+ * contour que le corps, mêmes couches; un appel de dessin de plus par partie mobile seulement.
  */
 export function mergeNamed(
   root: Object3D,
   index: number,
   materials: Readonly<Record<string, DecorMaterial>>,
-): Mesh | null {
-  const meshes: Mesh[] = [];
+): Mesh | null;
+export function mergeNamed(
+  root: Object3D,
+  index: number,
+  materials: Readonly<Record<string, DecorMaterial>>,
+  nodes: readonly string[],
+): Object3D | null;
+export function mergeNamed(
+  root: Object3D,
+  index: number,
+  materials: Readonly<Record<string, DecorMaterial>>,
+  nodes: readonly string[] = [],
+): Object3D | null {
   root.updateMatrixWorld(true);
+  const wanted = new Set(nodes);
+  // Propriétaire de chaque maillage: le nœud mobile le plus proche au-dessus de lui, sinon la racine.
+  const owners: Object3D[] = [root];
+  const meshes: Mesh[] = [];
   root.traverse((object) => {
+    if (object !== root && wanted.has(object.name) && !owners.includes(object)) owners.push(object);
     if ((object as Partial<Mesh>).isMesh === true) meshes.push(object as Mesh);
   });
+  const ownerOf = (object: Object3D): Object3D => {
+    let at: Object3D | null = object;
+    while (at !== null && at !== root) {
+      if (owners.includes(at)) return at;
+      at = at.parent;
+    }
+    return root;
+  };
   const nameOf = (mesh: Mesh): string =>
     (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material)?.name ?? '';
   const first = meshes[0];
@@ -64,10 +106,28 @@ export function mergeNamed(
   if (first === undefined || !meshes.some((mesh) => materials[nameOf(mesh)] !== undefined))
     return null;
   const undo = root.matrixWorld.clone().invert();
-  const parts = meshes.map((mesh, at) => {
+  const parts = new Map<Object3D, BufferGeometry[]>(owners.map((owner) => [owner, []]));
+  let min = [Infinity, Infinity, Infinity];
+  let max = [-Infinity, -Infinity, -Infinity];
+  meshes.forEach((mesh, at) => {
     const rule = materials[nameOf(mesh)];
     const geometry = mesh.geometry.clone();
     geometry.applyMatrix4(undo.clone().multiply(mesh.matrixWorld));
+    // La boîte du modèle entier (repère de la racine): la classe de taille du contour.
+    geometry.computeBoundingBox();
+    const box = geometry.boundingBox;
+    if (box !== null) {
+      min = [
+        Math.min(min[0] ?? 0, box.min.x),
+        Math.min(min[1] ?? 0, box.min.y),
+        Math.min(min[2] ?? 0, box.min.z),
+      ];
+      max = [
+        Math.max(max[0] ?? 0, box.max.x),
+        Math.max(max[1] ?? 0, box.max.y),
+        Math.max(max[2] ?? 0, box.max.z),
+      ];
+    }
     // Chaque matériau commence ses numéros de morceau plus loin: le trait passe entre eux.
     const partStart = at * 17;
     inkTag(
@@ -78,29 +138,44 @@ export function mergeNamed(
     );
     for (const name of Object.keys(geometry.attributes))
       if (!['position', 'normal', 'color', 'aInk'].includes(name)) geometry.deleteAttribute(name);
-    return geometry;
+    const owner = ownerOf(mesh);
+    // Une partie mobile garde ses sommets dans son propre repère: elle tourne autour de son pivot.
+    if (owner !== root) geometry.applyMatrix4(undo.clone().multiply(owner.matrixWorld).invert());
+    parts.get(owner)?.push(geometry);
   });
-  // `inkTag` retient les géométries qu'il a vues: celle-ci lui est montrée vide, puis remplie,
-  // pour que la conversion par la teinte (`inkifyModel`, à la pose) ne repasse pas dessus.
-  const merged = inkTag(new BufferGeometry());
-  const joined = mergeGeometries(parts);
-  merged.copy(joined);
-  joined.dispose();
-  for (const part of parts) part.dispose();
-  merged.computeBoundingBox();
-  merged.computeBoundingSphere();
-  const box = merged.boundingBox;
-  const diagonal =
-    box === null
-      ? 1
-      : Math.hypot(box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z);
+  const diagonal = Number.isFinite(min[0])
+    ? Math.hypot(
+        (max[0] ?? 0) - (min[0] ?? 0),
+        (max[1] ?? 0) - (min[1] ?? 0),
+        (max[2] ?? 0) - (min[2] ?? 0),
+      )
+    : 1;
   // Une seule pièce de contour pour tout le modèle, ses morceaux gardent leur trait intérieur.
-  const ink = merged.getAttribute('aInk');
   const code = inkCode(index, diagonal);
-  for (let i = 0; i < ink.count; i++) ink.setY(i, code);
-  const mesh = new Mesh(merged, first.material);
-  mesh.name = root.name;
-  return mesh;
+  const built = new Map<Object3D, Object3D>();
+  for (const owner of owners) {
+    const list = parts.get(owner) ?? [];
+    let made: Object3D;
+    if (list.length === 0) made = new Group();
+    else {
+      const merged = joinParts(list);
+      const ink = merged.getAttribute('aInk');
+      for (let i = 0; i < ink.count; i++) ink.setY(i, code);
+      made = new Mesh(merged, first.material);
+    }
+    made.name = owner === root ? root.name : owner.name;
+    if (owner !== root) {
+      // Posé à son pivot, dans le repère de la partie qui le porte (la racine le plus souvent).
+      const parent = ownerOf(owner.parent ?? root);
+      const relative = (
+        parent === root ? undo.clone() : parent.matrixWorld.clone().invert()
+      ).multiply(owner.matrixWorld);
+      relative.decompose(made.position, made.quaternion, made.scale);
+      built.get(parent)?.add(made);
+    }
+    built.set(owner, made);
+  }
+  return built.get(root) ?? null;
 }
 
 export class DecorModels implements ModelSource {
@@ -124,7 +199,12 @@ export class DecorModels implements ModelSource {
           const merged =
             manifest.materials === undefined
               ? null
-              : mergeNamed(node, this.prototypes.size, manifest.materials);
+              : mergeNamed(
+                  node,
+                  this.prototypes.size,
+                  manifest.materials,
+                  Object.keys(manifest.models[node.name]?.nodes ?? {}),
+                );
           this.prototypes.set(node.name, merged ?? node);
         }
       }),
@@ -171,7 +251,10 @@ export class DecorModels implements ModelSource {
    */
   geometryOf(model: string): BufferGeometry | null {
     const prototype = this.prototypes.get(model);
-    return prototype !== undefined && (prototype as Partial<Mesh>).isMesh === true
+    // Un modèle à parties mobiles ne se pose pas en instances: elles y resteraient figées.
+    return prototype !== undefined &&
+      (prototype as Partial<Mesh>).isMesh === true &&
+      prototype.children.length === 0
       ? (prototype as Mesh).geometry
       : null;
   }

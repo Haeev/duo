@@ -111,7 +111,7 @@ Avant la photo du prologue, un joueur n'a pas de visage: son personnage est une 
 
 ## Briques (ce qu'un meuble sait faire)
 
-`sit` s'asseoir, `sleep` dormir, `store` ranger, `gather` ramasser ou cueillir, `relieve` soulager un besoin, `shop` vendre et acheter, `cook` cuisiner ou fabriquer, `open` ouvrir, `repair` réparer, `harvest` point de récolte d'une ressource (`ressources/`), `field` terre cultivable (parcelles du potager, nombre selon les améliorations), `worksite` chantier d'une pièce de logement (la pièce le nomme par `site`). Paramètres: `_gabarits/meuble.jsonc`. Une chaise est un meuble avec `sit`; un coffre, un meuble avec `store`; un banc-coffre, les deux.
+`sit` s'asseoir, `sleep` dormir, `store` ranger, `gather` ramasser ou cueillir, `relieve` soulager un besoin, `shop` vendre et acheter, `cook` cuisiner ou fabriquer, `open` ouvrir, `repair` réparer, `harvest` point de récolte d'une ressource (`ressources/`), `field` terre cultivable (parcelles du potager, nombre selon les améliorations), `worksite` chantier d'une pièce de logement (la pièce le nomme par `site`), `barrier` barrière de passage à niveau (sa partie mobile `node` se baisse quand le passage le plus proche sonne, et barre la route dans le sens qui mène à la voie). Paramètres: `_gabarits/meuble.jsonc`. Une chaise est un meuble avec `sit`; un coffre, un meuble avec `store`; un banc-coffre, les deux.
 
 Il manque un comportement ? C'est une **brique nouvelle** à demander (schéma, état, comportement: trois fichiers du moteur, une fois), pas un cas particulier à glisser dans un contenu.
 

@@ -10,5 +10,5 @@
   "solid": false,
   "placeable": false,
   "series": null,
-  "bricks": []
+  "bricks": [{ "brick": "barrier", "node": "lisse", "seconds": 4 }]
 }

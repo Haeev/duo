@@ -5,6 +5,11 @@
 import type { GameEvent } from '../simulation/noyau/evenements';
 import type { EventRule, EventTable } from './schemas';
 
+/** Un événement que le son écoute: ceux de la simulation, et ceux que le moteur se donne (joints). */
+export interface HeardEvent {
+  readonly type: string;
+}
+
 export interface EventSound {
   readonly sound: string;
   /** Joueur qui a fait le geste (`null`: sans position, ou un coffre commun). */
@@ -40,28 +45,42 @@ function ruleMatches(rule: EventRule, type: string, event: Fields): boolean {
   return true;
 }
 
-/** Le son que cet événement déclenche pour le joueur `local`, ou `null` (aucune règle, ou pas pour lui). */
-export function soundForEvent(
+/**
+ * Les sons que cet événement déclenche pour le joueur `local`, dans l'ordre de la table. Le premier
+ * gabarit qui convient décide, même s'il n'est pas pour ce joueur; une règle `also` laisse la
+ * recherche continuer après elle (la butée sonne, et la règle suivante fait taire le roulement).
+ */
+export function soundsForEvent(
   table: EventTable,
-  event: GameEvent,
+  event: HeardEvent | GameEvent,
   local: 0 | 1 | null,
-): EventSound | null {
+): EventSound[] {
   const fields = event as unknown as Fields;
+  const out: EventSound[] = [];
   for (const rule of table.rules) {
     if (!ruleMatches(rule, event.type, fields)) continue;
     const raw = fields[rule.actor];
     const actor = raw === 0 || raw === 1 ? raw : null;
     const own = actor !== null && actor === local;
-    // Le premier gabarit qui convient décide, même s'il n'est pas pour ce joueur.
-    if (rule.audience === 'own' && !own) return null;
-    if (rule.audience === 'other' && own) return null;
-    return {
-      sound: rule.sound,
-      actor,
-      placed: rule.placed && actor !== null,
-      own,
-      stop: rule.stop === true,
-    };
+    const heard = !(rule.audience === 'own' && !own) && !(rule.audience === 'other' && own);
+    if (heard)
+      out.push({
+        sound: rule.sound,
+        actor,
+        placed: rule.placed && actor !== null,
+        own,
+        stop: rule.stop === true,
+      });
+    if (rule.also !== true) break;
   }
-  return null;
+  return out;
+}
+
+/** Le premier son que cet événement déclenche pour le joueur `local`, ou `null`. */
+export function soundForEvent(
+  table: EventTable,
+  event: HeardEvent | GameEvent,
+  local: 0 | 1 | null,
+): EventSound | null {
+  return soundsForEvent(table, event, local)[0] ?? null;
 }

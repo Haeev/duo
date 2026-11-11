@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { surfaceUnder } from '../src/audio/sol';
 import { soundForEvent } from '../src/audio/regles';
+import { heldPick, JointTracker, type JointHit } from '../src/audio/tenus';
 import { loadTables } from '../src/audio/table';
 import type { CookStepKind } from '../src/donnees/schemas/recette';
 import { strokesFor, BELL } from '../src/simulation/monde/reglages-cloche';
@@ -158,23 +159,77 @@ describe('draisine', () => {
     expect(tables.sounds['draisine-balancier']?.files.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('roule tant qu il avance, se tait à l arrêt ou quand un train le range', () => {
-    const roll = 'draisine-roulement-moyenne';
-    const started: GameEvent = { type: 'vehicle_started', vehicle: 'draisine' };
-    const stopped: GameEvent = {
-      type: 'vehicle_stopped',
-      vehicle: 'draisine',
-      stop: null,
-      end: true,
-    };
-    const putAway: GameEvent = { type: 'vehicle_in', vehicle: 'draisine', reason: 'train' };
-    expect(soundForEvent(tables.events, started, 0)).toMatchObject({ sound: roll, stop: false });
-    expect(soundForEvent(tables.events, stopped, 0)).toMatchObject({ sound: roll, stop: true });
-    expect(soundForEvent(tables.events, putAway, 1)).toMatchObject({ sound: roll, stop: true });
+  it('roule selon sa vitesse: trois allures en boucle, silence à l arrêt', () => {
+    const [held] = tables.tuning.held;
+    if (held === undefined) throw new Error('roulement absent des réglages');
+    expect(held.source).toBe('vehicle.speed');
+    expect(heldPick(held, 0)).toBeNull();
+    expect(heldPick(held, 2.4)?.sound).toBe('draisine-roulement-lente');
+    expect(heldPick(held, 5)?.sound).toBe('draisine-roulement-moyenne');
+    expect(heldPick(held, 8)).toEqual({ sound: 'draisine-roulement-rapide', rate: 1.1 });
     for (const pace of ['lente', 'moyenne', 'rapide']) {
       const loop = tables.sounds[`draisine-roulement-${pace}`]?.loop;
       expect(loop?.to, pace).toBeGreaterThan(loop?.from ?? Number.POSITIVE_INFINITY);
     }
+    // Plus aucune règle d'événement ne lance ni ne fait taire le roulement: la vitesse s'en charge.
+    const started: GameEvent = { type: 'vehicle_started', vehicle: 'draisine' };
+    const putAway: GameEvent = { type: 'vehicle_in', vehicle: 'draisine', reason: 'train' };
+    expect(soundForEvent(tables.events, started, 0)).toBeNull();
+    expect(soundForEvent(tables.events, putAway, 1)).toBeNull();
+  });
+
+  it('la butée sonne en bout de voie, pas à un arrêt ordinaire', () => {
+    const stopped = (end: boolean): GameEvent => ({
+      type: 'vehicle_stopped',
+      vehicle: 'draisine',
+      stop: null,
+      end,
+    });
+    expect(soundForEvent(tables.events, stopped(true), 0)?.sound).toBe('draisine-butee');
+    expect(soundForEvent(tables.events, stopped(false), 0)).toBeNull();
+  });
+
+  it('le frein frotte quand on le serre en roulant, pas quand on retourne le sens à l arrêt', () => {
+    const brake = (on: boolean, speed: number): GameEvent => ({
+      type: 'vehicle_brake',
+      vehicle: 'draisine',
+      player: 1,
+      on,
+      speed,
+    });
+    expect(soundForEvent(tables.events, brake(true, 4), 0)).toMatchObject({
+      sound: 'draisine-frein',
+      placed: true,
+      own: false,
+    });
+    expect(soundForEvent(tables.events, brake(true, 0), 0)).toBeNull();
+    expect(soundForEvent(tables.events, brake(false, 4), 0)).toBeNull();
+  });
+
+  it('un joint par essieu tous les six mètres, joué par les tables', () => {
+    const joints = tables.tuning.joints;
+    if (joints === undefined) throw new Error('joints absents des réglages');
+    const draisine = { out: true, speed: 6 };
+    const world = {
+      common: { place: 'aubrune' },
+      places: { aubrune: { vehicles: { draisine } } },
+    } as unknown as Parameters<JointTracker['update']>[0];
+    const tracker = new JointTracker(joints);
+    const hits: JointHit[] = [];
+    const heard: number[] = [];
+    // Un peu plus de trois secondes à 6 m/s, 60 images par seconde: 19 m, trois joints par essieu.
+    for (let i = 0; i < 190; i++) {
+      tracker.update(world, 1 / 60, hits);
+      for (const hit of hits) heard.push(hit.axle);
+    }
+    expect(heard.filter((axle) => axle === 0)).toHaveLength(Math.floor(19 / joints.everyMeters));
+    expect(heard.filter((axle) => axle === 1)).toHaveLength(3);
+    const hit = { type: joints.event, vehicle: 'draisine', axle: 0 };
+    expect(soundForEvent(tables.events, hit, 0)?.sound).toBe('draisine-joint');
+    // Rangée, ou au pas d'homme, elle ne claque plus.
+    draisine.speed = 0.1;
+    tracker.update(world, 1, hits);
+    expect(hits).toHaveLength(0);
   });
 
   it('l annonce d un train n est pas une sonnerie tenue', () => {

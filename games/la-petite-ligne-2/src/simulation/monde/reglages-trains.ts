@@ -33,6 +33,11 @@ export const TRAINS = {
    * graphe des chemins contre cette emprise (m).
    */
   waySample: 0.5,
+  /**
+   * Barrières de passage à niveau (brique `barrier`): une barrière se lie au passage à niveau le
+   * plus proche dont le milieu est à moins de `linkMeters` de son centre; au-delà, elle reste levée.
+   */
+  barriers: { linkMeters: 12 },
 } as const;
 
 export type TrainSettings = typeof TRAINS;

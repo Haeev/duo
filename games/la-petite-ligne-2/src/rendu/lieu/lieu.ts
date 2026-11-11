@@ -321,7 +321,8 @@ export class PlaceScene {
   private batch(model: string, volumes: readonly SceneVolume[]): Batch | null {
     const first = volumes[0];
     const sample = first === undefined ? null : (this.models?.instantiate(model, first.id) ?? null);
-    if (sample === null || !isMesh(sample)) return null;
+    // Un modèle à parties mobiles garde un objet par volume: ses parties bougent chacune.
+    if (sample === null || !isMesh(sample) || sample.children.length > 0) return null;
     if (this.inked !== null) inkifyModel(sample, this.inked, glassOf(model));
     const mesh = new InstancedMesh(sample.geometry, sample.material, volumes.length);
     mesh.name = `lot-${model}`;
@@ -406,6 +407,11 @@ export class PlaceScene {
   /** Verre de la lampe posée pour ce volume, si son modèle déclare une lumière. */
   glassOf(volume: string): InkInner | undefined {
     return this.glasses.get(volume);
+  }
+
+  /** L'objet posé pour cet identifiant (carte ou meuble posé), `null` s'il n'y en a pas. */
+  objectOf(id: string): Object3D | null {
+    return (this.fixed.get(id) ?? this.dynamic.get(id))?.object ?? null;
   }
 
   /** L'objet de la scène qui porte cet identifiant, s'il peut être visé. */

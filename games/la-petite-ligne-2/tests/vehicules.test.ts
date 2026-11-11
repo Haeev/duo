@@ -243,9 +243,14 @@ describe('la draisine: remise, montée, descente', () => {
     hold(sim, 0.3, [{ moveY: 1 }, {}]);
     expect(vehicle(sim).riders).toEqual([0, 1]);
     // Frein (touche de course): arrêt en moins de trois secondes, puis une direction fait descendre.
-    hold(sim, 3, [{ run: true }, {}]);
+    const braking = hold(sim, 3, [{ run: true }, {}]).filter((e) => e.type === 'vehicle_brake');
     expect(vehicle(sim).speed).toBe(0);
-    hold(sim, 0.1);
+    // Le son l'entend: frein serré par le joueur 0, en roulant (`vehicle_brake`).
+    expect(braking[0]).toMatchObject({ player: 0, on: true });
+    expect(braking[0]?.type === 'vehicle_brake' && braking[0].speed).toBeGreaterThan(1);
+    expect(hold(sim, 0.1).filter((e) => e.type === 'vehicle_brake')).toMatchObject([
+      { player: 0, on: false },
+    ]);
     const at = poseOf(content, sim.world);
     hold(sim, 0.1, [{ moveY: 1 }, {}]);
     expect(vehicle(sim).riders).toEqual([null, 1]);

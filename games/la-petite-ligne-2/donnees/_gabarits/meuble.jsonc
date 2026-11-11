@@ -41,5 +41,9 @@
   //   { "brick": "repair", "tools": ["axe", "spade"], "seconds": 1.5 }         réparer
   //   { "brick": "worksite" }   chantier d'une pièce de logement (une ardoise de devis): la
   //     pièce le nomme par son champ "site" (logement.jsonc); sans pièce, il est inerte
+  //   { "brick": "barrier", "node": "lisse", "seconds": 4 }   barrière de passage à niveau: la
+  //     partie mobile "node" du modèle (angles "baissee" et "levee" du manifeste des décors) se
+  //     baisse quand le passage à niveau le plus proche sonne; baissée, on ne passe pas de la
+  //     route vers la voie (on en sort). Rien à sauvegarder; pas une cible
   "bricks": [{ "brick": "sit", "seats": 1, "restPerMinute": 6 }],
 }

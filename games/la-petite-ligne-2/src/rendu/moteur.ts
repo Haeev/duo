@@ -90,6 +90,7 @@ import { ROOM_SETTINGS } from './lieu/reglages-pieces';
 import { RELIEF_SETTINGS } from './lieu/reglages-relief';
 import { TrainLayer, type TrainStats } from './lieu/trains';
 import { RailVehicleLayer } from './lieu/vehicules';
+import { BarrierLayer } from './lieu/barrieres';
 import type { TilePlants } from './lieu/tuile';
 import { TILE_SETTINGS, type SurfaceKind } from './lieu/reglages-tuiles';
 import { Daylight, nightShare } from './lumiere';
@@ -297,6 +298,8 @@ class Engine implements GameRenderer {
   private trains: TrainLayer | null = null;
   /** Véhicules de voie des joueurs (`lieu/vehicules.ts`), `null` dans un lieu qui n'en a pas. */
   private vehicles: RailVehicleLayer | null = null;
+  /** Barrières de passage à niveau du lieu (`lieu/barrieres.ts`), `null` s'il n'en a pas. */
+  private barriers: BarrierLayer | null = null;
   private readonly fog = new Fog(0x000000, 1e4, 2e4);
   private overview: number | null = null;
   private signature = Number.NaN;
@@ -726,6 +729,7 @@ class Engine implements GameRenderer {
     this.trains = null;
     this.vehicles?.dispose();
     this.vehicles = null;
+    this.barriers = null;
     this.signature = Number.NaN;
     this.harvested = Number.NaN;
     this.mapped = Number.NaN;
@@ -802,6 +806,8 @@ class Engine implements GameRenderer {
       (this.tiled?.relief ?? null) === null ? null : this.groundAt,
     );
     this.scene.add(this.place.root);
+    const barriers = new BarrierLayer(content, place);
+    this.barriers = barriers.size > 0 ? barriers : null;
     if (tiled && TrainLayer.wanted(content, id)) {
       this.trains = new TrainLayer(
         place,
@@ -899,6 +905,7 @@ class Engine implements GameRenderer {
         this.trains = null;
         this.vehicles?.dispose();
         this.vehicles = null;
+        this.barriers = null;
       } else this.loadPlace(placeId);
     }
     // Dans le train: la scène du trajet à la place du lieu (qui se construit derrière).
@@ -948,6 +955,9 @@ class Engine implements GameRenderer {
       this.highlight.releaseIfDetached();
       this.refreshLights(place);
     }
+
+    // Barrières de passage à niveau: baissées tant que leur passage sonne (état déduit des trains).
+    this.barriers?.update(dt, world, place);
 
     const body = world.players[local].body;
     // Passage de porte: l'image d'avant reste et s'éteint, puis tout se pose d'un coup au noir.

@@ -9,6 +9,21 @@ import { LAYER, type LayerName } from '../encre/couches';
 
 const Size = v.object({ w: v.number(), d: v.number(), h: v.number() });
 
+/**
+ * Partie mobile d'un modèle (`nodes`): nœud enfant nommé du GLB, posé à son pivot (m, repère du
+ * modèle). Le jeu le fait tourner autour de `axe`; les autres champs sont les réglages de l'artiste
+ * (débattement en degrés, angles baissé et levé en degrés, rayon d'une roue en m).
+ */
+const DecorNodeSchema = v.object({
+  pivot: v.tuple([v.number(), v.number(), v.number()]),
+  axe: v.optional(v.picklist(['x', 'y', 'z'])),
+  debattement: v.optional(v.number()),
+  baissee: v.optional(v.number()),
+  levee: v.optional(v.number()),
+  rayon: v.optional(v.pipe(v.number(), v.minValue(0.01))),
+});
+export type DecorNode = v.InferOutput<typeof DecorNodeSchema>;
+
 const DecorModelSchema = v.object({
   file: v.string(),
   family: v.string(),
@@ -36,6 +51,8 @@ const DecorModelSchema = v.object({
   states: v.optional(v.record(v.string(), v.string())),
   /** Écarts de pose tirés par exemplaire: cap libre, échelle entre deux bornes. */
   jitter: v.optional(v.object({ yaw: v.boolean(), scale: v.tuple([v.number(), v.number()]) })),
+  /** Parties mobiles, par nom de nœud: le chargeur les garde à part, enfants nommés du modèle. */
+  nodes: v.optional(v.record(v.string(), DecorNodeSchema)),
   /**
    * Le modèle éclaire: foyer dans son repère (m, avant vers +z), rayon de la flaque au sol,
    * couleur ajoutée (sinon la teinte des lampes de l'ambiance), force, ombre locale ou non.

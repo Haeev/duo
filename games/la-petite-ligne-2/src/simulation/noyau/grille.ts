@@ -13,6 +13,26 @@ export interface Blockers {
   readonly fixed: Uint8Array;
   /** 1: case bloquée par un meuble solide (refait quand un meuble change). */
   readonly props: Uint8Array;
+  /**
+   * Lisses baissées (barrières de passage à niveau): des traits qu'on ne franchit que dans un
+   * sens, hors de la grille (`keepOffBars`). Absent: aucune.
+   */
+  readonly bars?: readonly Bar[];
+}
+
+/**
+ * Une lisse sur la carte: centre (x, y), sens de sa longueur (ax, ay), demi-longueur, et la
+ * normale (nx, ny) qui regarde la voie: venu de la route (l'autre côté) on s'y arrête, venu de
+ * la voie on la passe.
+ */
+export interface Bar {
+  readonly x: number;
+  readonly y: number;
+  readonly ax: number;
+  readonly ay: number;
+  readonly half: number;
+  readonly nx: number;
+  readonly ny: number;
 }
 
 export interface Vec2 {
@@ -184,4 +204,54 @@ export function reachableCells(b: Blockers, fromX: number, fromY: number): Set<n
     }
   }
   return seen;
+}
+
+/**
+ * Après un déplacement de (fromX, fromY) à `pos`: un corps venu de la route (côté opposé à la
+ * normale d'une lisse) ne s'en approche pas à moins de son rayon, ni ne passe par ses bouts; il
+ * glisse le long. Venu du côté de la voie, il passe: personne n'est enfermé. Si la retenue le
+ * mettait dans un mur, il reste où il était. Sans allocation.
+ */
+export function keepOffBars(
+  b: Blockers,
+  fromX: number,
+  fromY: number,
+  pos: Vec2,
+  radius: number,
+): void {
+  const bars = b.bars;
+  if (bars === undefined || bars.length === 0) return;
+  let moved = false;
+  for (const bar of bars) {
+    const from = (fromX - bar.x) * bar.nx + (fromY - bar.y) * bar.ny;
+    if (from >= 0) continue;
+    const dx = pos.x - bar.x;
+    const dy = pos.y - bar.y;
+    const along = dx * bar.ax + dy * bar.ay;
+    const u = dx * bar.nx + dy * bar.ny;
+    // Déjà plus près que son rayon (la lisse est tombée devant lui): il n'avance plus vers elle.
+    const limit = Math.max(from, -radius);
+    if (Math.abs(along) <= bar.half) {
+      if (u > limit) {
+        pos.x -= (u - limit) * bar.nx;
+        pos.y -= (u - limit) * bar.ny;
+        moved = true;
+      }
+      continue;
+    }
+    // Au bout de la lisse: le corps en contourne l'extrémité.
+    const end = Math.sign(along) * bar.half;
+    const ex = pos.x - (bar.x + end * bar.ax);
+    const ey = pos.y - (bar.y + end * bar.ay);
+    const d = Math.hypot(ex, ey);
+    if (d < radius && u > limit && d > 1e-9) {
+      pos.x += (ex / d) * (radius - d);
+      pos.y += (ey / d) * (radius - d);
+      moved = true;
+    }
+  }
+  if (moved && bodyCollides(b, pos.x, pos.y, radius)) {
+    pos.x = fromX;
+    pos.y = fromY;
+  }
 }

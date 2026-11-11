@@ -71,6 +71,8 @@ export const EventRuleSchema = v.strictObject({
   placed: v.boolean(),
   /** Fait taire `sound` (un son tenu) au lieu de le jouer. */
   stop: v.exactOptional(v.boolean()),
+  /** La recherche continue après cette règle: un même événement joue (ou fait taire) plusieurs sons. */
+  also: v.exactOptional(v.boolean()),
 });
 export type EventRule = v.InferOutput<typeof EventRuleSchema>;
 
@@ -148,6 +150,43 @@ export const AmbienceTableSchema = v.strictObject({
 });
 export type AmbienceTable = v.InferOutput<typeof AmbienceTableSchema>;
 
+const Rate = v.pipe(FiniteSchema, v.minValue(0.5), v.maxValue(2));
+const EventName = v.pipe(v.string(), v.regex(/^[a-z_]+$/));
+
+/**
+ * Son tenu réglé par une valeur du monde (le roulement de la draisine selon sa vitesse): à chaque
+ * image, l'allure dont le seuil `from` est atteint joue en boucle, fondue avec la précédente en
+ * `crossfadeSeconds`; sous le premier seuil, silence. Dans une allure, la vitesse de lecture va
+ * de `rate[0]` à son seuil à `rate[1]` au seuil suivant (à `top` pour la dernière).
+ */
+export const HeldSchema = v.strictObject({
+  /** `vehicle.speed`: la plus grande vitesse des véhicules de voie sortis du lieu (m/s). */
+  source: v.picklist(['vehicle.speed']),
+  steps: v.pipe(
+    v.array(v.strictObject({ from: v.pipe(FiniteSchema, v.minValue(0)), sound: IdSchema })),
+    v.minLength(1),
+    v.maxLength(6),
+  ),
+  rate: v.tuple([Rate, Rate]),
+  top: v.pipe(FiniteSchema, v.minValue(0.1)),
+  crossfadeSeconds: v.pipe(FiniteSchema, v.minValue(0.02), v.maxValue(3)),
+});
+export type HeldDef = v.InferOutput<typeof HeldSchema>;
+
+/**
+ * Joints de rail: le moteur compte le chemin de chaque véhicule de voie sorti (sa vitesse, image
+ * par image) et se donne l'événement `event` (`vehicle`, `axle`) chaque fois qu'un essieu passe un
+ * joint, tous les `everyMeters`; `axles`: décalage de chaque essieu (m). Joué par `rules`.
+ */
+export const JointsSchema = v.strictObject({
+  everyMeters: v.pipe(FiniteSchema, v.minValue(1), v.maxValue(50)),
+  axles: v.pipe(v.array(v.pipe(FiniteSchema, v.minValue(0))), v.minLength(1), v.maxLength(4)),
+  /** Plus lent, on n'entend plus les joints (m/s). */
+  minSpeed: v.pipe(FiniteSchema, v.minValue(0)),
+  event: EventName,
+});
+export type JointsDef = v.InferOutput<typeof JointsSchema>;
+
 export const TuningSchema = v.strictObject({
   space: v.strictObject({
     /** Distance (m) sous laquelle un son placé garde son plein niveau, et pente de l'atténuation. */
@@ -173,6 +212,10 @@ export const TuningSchema = v.strictObject({
   maxVoices: v.pipe(IntSchema, v.minValue(4)),
   /** Fondu (s) d'un son tenu qu'une règle `stop` fait taire (la sonnerie s'éteint, pas de coupure). */
   heldFadeSeconds: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0.02), v.maxValue(3)), 0.4),
+  /** Sons tenus réglés par une valeur du monde. */
+  held: v.exactOptional(v.array(HeldSchema), []),
+  /** Joints de rail des véhicules de voie; absent: aucun. */
+  joints: v.exactOptional(JointsSchema),
   defaults: v.strictObject({
     master: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1)),
     effects: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1)),

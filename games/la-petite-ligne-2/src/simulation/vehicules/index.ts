@@ -219,16 +219,21 @@ function advance(
   // Frein et sens de marche: la touche de course de qui est à bord.
   let brake = false;
   let turn = false;
+  // Qui serre le frein, ou qui le lâche (il le tenait au pas d'avant).
+  let by: PlayerIndex | null = null;
   for (const seat of SEATS) {
     const player = state.riders[seat];
     if (player === null) continue;
     const held = sim.inputs[player].run;
     if (held && !runtime.braking[player] && state.speed <= rest) turn = true;
+    if (held !== runtime.braking[player]) by ??= player;
     brake ||= held;
   }
   if (brake !== state.brake) {
     state.brake = brake;
     sim.touch('place');
+    const player = by ?? state.riders[0] ?? state.riders[1] ?? 0;
+    sim.emit({ type: 'vehicle_brake', vehicle: def.id, player, on: brake, speed: state.speed });
   }
   if (turn) {
     state.dir = state.dir === 1 ? -1 : 1;

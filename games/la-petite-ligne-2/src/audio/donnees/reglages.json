@@ -27,6 +27,40 @@
   },
   "maxVoices": 24,
   "heldFadeSeconds": 0.4,
-  "defaults": { "master": 0.8, "effects": 1, "interface": 0.9, "babble": 0.8, "ambience": 0.8 },
+  "held": [
+    {
+      "source": "vehicle.speed",
+      "steps": [
+        {
+          "from": 0.3,
+          "sound": "draisine-roulement-lente"
+        },
+        {
+          "from": 3.5,
+          "sound": "draisine-roulement-moyenne"
+        },
+        {
+          "from": 6.5,
+          "sound": "draisine-roulement-rapide"
+        }
+      ],
+      "rate": [0.9, 1.1],
+      "top": 8,
+      "crossfadeSeconds": 0.3
+    }
+  ],
+  "joints": {
+    "everyMeters": 6,
+    "axles": [0, 1.6],
+    "minSpeed": 0.3,
+    "event": "vehicle_joint"
+  },
+  "defaults": {
+    "master": 0.8,
+    "effects": 1,
+    "interface": 0.9,
+    "babble": 0.8,
+    "ambience": 0.8
+  },
   "storageKey": "la-petite-ligne-2.son"
 }

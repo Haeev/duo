@@ -73,6 +73,18 @@ export function parseTables(raw: {
         known(id, `reglages.json: steps.surfaces.${surface}`);
       if (!(tuning.steps.default in tuning.steps.surfaces))
         problems.push('reglages.json: steps.default: surface inconnue');
+      tuning.held.forEach((held, index) => {
+        held.steps.forEach((step, at) => {
+          known(step.sound, `reglages.json: held.${String(index)}.steps.${String(at)}`);
+          if (step.sound in sounds && sounds[step.sound]?.loop === undefined)
+            problems.push(
+              `reglages.json: held.${String(index)}.steps.${String(at)}: « ${step.sound} » n'a pas de boucle (loop)`,
+            );
+          const before = held.steps[at - 1];
+          if (before !== undefined && before.from >= step.from)
+            problems.push(`reglages.json: held.${String(index)}.steps: seuils non croissants`);
+        });
+      });
     }
   }
   if (voices !== null) {
