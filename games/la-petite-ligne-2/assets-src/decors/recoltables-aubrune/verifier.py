@@ -8,13 +8,23 @@ et `COLOR_0`, sans UV; triangles comptés dans le GLB, égaux au manifeste et so
 famille (par plant pour une culture); rien sous le sol; une case de potager tient dans sa case;
 variantes et états qui pointent vers des modèles livrés. Puis les fiches: tout meuble à brique
 `harvest` ou `field` a son modèle et l'état que sa ressource laisse (`stump`, `bare`), toute
-culture a un modèle par stade. Sortie: `VERIFICATION recoltables: N erreur(s)`.
+culture a un modèle par stade. Enfin les volumes (`controle_volumes.py`), ce que le client voit
+en tournant autour d'un modèle dans sa visionneuse: aucun trou vu de côté ni de dessus, aucune
+pièce qui flotte à plus d'un centimètre de ce qui la porte, aucune pièce qui en traverse une
+autre de part en part. Sortie: `VERIFICATION recoltables: N erreur(s)`.
+
+    python3 verifier.py <dossier> <donnees/commun> [--sans-volumes] [--seuls id,id]
 """
 
 import json
 import os
 import struct
 import sys
+import tomllib
+from concurrent.futures import ProcessPoolExecutor
+
+ICI = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, ICI)
 
 SOURCE = "recoltables-aubrune"
 POIDS_MAX = 2_500_000
@@ -36,6 +46,32 @@ def lire_glb(chemin):
 def lire_json(chemin):
     with open(chemin, encoding="utf8") as f:
         return json.load(f)
+
+
+# Une culture pose sur le billon de la case bêchée (un autre modèle): ses pièces les plus basses
+# sont à 15 cm. Un module de file est ouvert à ses deux bouts (son voisin le ferme).
+# Un véhicule pose ses roues sur le rail (dessus à 0,26 m au-dessus de son origine).
+SOLS = {"culture": 0.16, "vehicule": 0.27}
+
+BOUTS = {"haie": 0, "talus": 0, "rang": 2, "voie": 2}
+
+
+def _volumes(travail):
+    """Défauts de volume d'un lot de modèles d'un même GLB (un processus par lot)."""
+    from controle_volumes import controler, lire_glb, maillage
+
+    chemin, modeles = travail
+    gltf, binaire = lire_glb(chemin)
+    racines = {gltf["nodes"][i]["name"]: gltf["nodes"][i] for i in gltf["scenes"][0]["nodes"]}
+    out = []
+    for ident, famille, mural in modeles:
+        if ident not in racines:
+            continue
+        V, T, M = maillage(gltf, binaire, racines[ident])
+        sol = SOLS.get(famille, 0.01)
+        for d in controler(V, T, M, appui_mur=mural, sol=sol, bouts=BOUTS.get(famille)):
+            out.append(f"{ident}: {d}")
+    return out
 
 
 def main():
@@ -137,7 +173,8 @@ def main():
             continue
         fiche = lire_json(os.path.join(donnees, "meubles", nom))
         # Meuble de cette chaîne: posé au centre de son emprise, il doit tenir dans ses cases.
-        if fiche["model"] in bornes and miens[fiche["model"]]["family"] in ("meuble", "objet", "fete"):
+        if fiche["model"] in bornes and miens[fiche["model"]]["family"] in ("meuble", "objet", "fete", "mobilier"):
+
             mini, maxi = bornes[fiche["model"]]
             demi_w, demi_d = fiche["size"]["w"] / 2 + 0.005, fiche["size"]["h"] / 2 + 0.005
             if mini[0] < -demi_w or maxi[0] > demi_w or mini[2] < -demi_d or maxi[2] > demi_d:
@@ -160,10 +197,51 @@ def main():
                     erreurs.append(f"meuble {fiche['id']}: le modèle « {fiche['model']} » n'a pas l'état « {etat} »")
             if m["size"]["w"] > fiche["size"]["w"] + 0.01 or m["size"]["d"] > fiche["size"]["h"] + 0.01:
                 erreurs.append(f"meuble {fiche['id']}: {m['size']['w']} x {m['size']['d']} m déborde de {fiche['size']['w']} x {fiche['size']['h']} cases")
+    a_reprendre = []
+    if "--sans-volumes" not in sys.argv:
+        with open(os.path.join(ICI, "recoltables.toml"), "rb") as f:
+            connus = set(tomllib.load(f).get("volumes", {}).get("a_reprendre", []))
+        for d in volumes(dossier, donnees, miens):
+            ident = d.split(":")[0].split()[-1]
+            (a_reprendre if ident in connus else erreurs).append(d)
+        propres = sorted(i for i in connus if i in miens and not any(d.split(":")[0].split()[-1] == i for d in a_reprendre))
+        for i in propres:
+            print(f"NET {i}: plus aucun défaut de volume, à retirer de [volumes] a_reprendre")
+    for d in a_reprendre:
+        print("A REPRENDRE", d)
     for e in erreurs:
         print("ERREUR", e)
+    if a_reprendre:
+        print(f"VOLUMES: {len(a_reprendre)} défaut(s) connus dans {len({d.split(':')[0] for d in a_reprendre})} modèle(s) à reprendre ([volumes] de recoltables.toml)")
+
     print(f"VERIFICATION recoltables: {len(miens)} modèles, {total} triangles, {len(cultures)} cultures, {recoltables} meubles récoltables, {len(erreurs)} erreur(s)")
     sys.exit(1 if erreurs else 0)
 
 
-main()
+def volumes(dossier, donnees, miens):
+    """Contrôle des volumes, deux processus (la machine est partagée)."""
+    seuls = None
+    if "--seuls" in sys.argv:
+        seuls = set(sys.argv[sys.argv.index("--seuls") + 1].split(","))
+    with open(os.path.join(ICI, "recoltables.toml"), "rb") as f:
+        gabarits = tomllib.load(f)
+    muraux = {e["id"] for e in gabarits["modeles"] if e.get("appui") == "mur"}
+    for nom in sorted(os.listdir(os.path.join(donnees, "meubles"))):
+        if nom.endswith(".json"):
+            fiche = lire_json(os.path.join(donnees, "meubles", nom))
+            if fiche.get("deco", {}).get("layer") == "wall":
+                muraux.add(fiche["model"])
+    lots: dict[str, list] = {}
+    for ident, m in sorted(miens.items()):
+        if seuls is not None and ident not in seuls:
+            continue
+        lots.setdefault(m["file"], []).append((ident, m["family"], ident in muraux or m.get("stateOf", {}).get("model") in muraux))
+    # Lots d'au plus 12 modèles: les deux processus restent occupés jusqu'au bout.
+    travaux = [(os.path.join(dossier, f), ms[i:i + 12]) for f, ms in lots.items() for i in range(0, len(ms), 12)]
+    with ProcessPoolExecutor(max_workers=2) as pool:
+        resultats = list(pool.map(_volumes, travaux))
+    return [f"volume {d}" for r in resultats for d in r]
+
+
+if __name__ == "__main__":
+    main()

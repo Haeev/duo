@@ -31,6 +31,7 @@ objet = "aubrune-objets"
 vehicule = "aubrune-trains"
 fete = "aubrune-fetes"
 voie = "aubrune-lisieres"
+mobilier = "aubrune-mobilier"
 
 # Plafonds de triangles. Culture: par plant (`plants` du manifeste), le modèle est une case de 1 m.
 [budgets]
@@ -59,6 +60,8 @@ vehicule = 2500
 fete = 600
 # Voie en tranchée: module de 1 m le long de la voie, mais large (ballast, fossés, talus).
 voie = 240
+# Mobilier repris de l'ancienne chaîne (lits, armoire, voiture du train...): `mobilier.py`.
+mobilier = 900
 
 # ---------------------------------------------------------------- matériaux (noms stables)
 # Le rendu encré tire du NOM la couche de traits et la prise au vent (`nature`: leaf = feuillage
@@ -124,7 +127,10 @@ coquelicot = ["#C5443D", "#D2523F"]
 coeur = ["#3A302B"]
 ombelle = ["#F3EDE0", "#E9E0C8"]
 bouton_or = ["#D4A33E"]
-mure = ["#3F2A4A", "#C0304A", "#4A2F4F"]
+mure = ["#2E2233", "#C0304A", "#4A2F4F"]
+tige_ronce = ["#94505A", "#A35C5E", "#87485A"]
+epine = ["#C9A27A"]
+
 groseille = ["#C5443D", "#B5383A"]
 pomme = ["#C5443D", "#D4A33E", "#CF5540"]
 radis = ["#D8527A", "#CC4A6E"]
@@ -153,6 +159,14 @@ email = ["#E8E0CC", "#D9CFB8"]
 fond = ["#3A2E28"]
 noir = ["#1E1815"]
 braise = ["#E2843A", "#F0B24A", "#D0622E"]
+flamme_coeur = ["#FFE7A0"]
+flamme = ["#FFC24F", "#FFA238", "#FFD36E"]
+
+velours = ["#8A3A3A", "#9E4642"]
+nuit = ["#22303F", "#3A4E66"]
+
+cendre = ["#9A938B", "#B1AAA1"]
+
 peint_vert = ["#557C69"]
 peint_rouge = ["#B0604C"]
 peint_bleu = ["#7C9DB0"]
@@ -347,16 +361,21 @@ variantes = [{ suffixe = "b", graine = 113, taille = 0.94 }]
 etats = ["bare", "stump", "winter"]
 
 # ---------------------------------------------------------------- buissons et ronces
-# `forme`: "fourre" (ronce: fourré bas et arceaux qui retombent dessus) ou "boule" (buisson à baies).
+# `forme`: "fourre" (ronce: coeur bas, longues tiges arquées qui retombent au sol, épines, feuilles
+# à trois ou cinq folioles, mûres en grappes) ou "boule" (buisson à baies).
 [[modeles]]
 id = "bramble"
 famille = "buisson"
 forme = "fourre"
 feuillage = "feuille_ronce"
-fruits = { teinte = "mure", nombre = 7, rayon = 0.09 }
-rayon = 0.52
-hauteur = 0.66
+# Mûres: une grappe de 4 ou 5 sur le haut d'un arc (`nombre` grappes), noires et rouges.
+fruits = { teinte = "mure", nombre = 6, rayon = 0.037 }
+tiges = 6
+rayon = 0.6
+hauteur = 0.72
 graine = 131
+# Tiges, épines et feuilles composées tout le long des arcs: plus qu'un buisson rond.
+budget = 1500
 variantes = [{ suffixe = "b", graine = 149, taille = 0.92 }]
 etats = ["bare"]
 # Plus grande que la famille: à 18 m de vue, un fourré de 1,4 m se perdait dans l'herbe.
@@ -791,7 +810,10 @@ id = "four"
 famille = "meuble"
 sorte = "four"
 graine = 443
-pourquoi = "four de maçonnerie (fournil, foyer de la forge): gueule devant, conduit derrière contre le mur"
+# `bare`: le four éteint (bûches noircies, cendre). Aucune brique ne le demande encore: la fiche
+# `four.json` (brique `cook`) n'a pas d'état; le rendu le montrera quand le four aura le sien.
+etats = ["bare"]
+pourquoi = "four de maçonnerie (fournil, foyer de la forge): gueule devant où brûle le feu, conduit derrière contre le mur"
 
 [[modeles]]
 id = "cuisiniere"
@@ -896,7 +918,10 @@ id = "poulailler"
 famille = "meuble"
 sorte = "poulailler"
 graine = 541
-pourquoi = "poulailler sur pilotis (3 x 2 cases): la rampe descend vers le parc, au sud"
+# Cabane, parc grillagé et portillon: plus qu'un meuble ordinaire.
+budget = 1500
+pourquoi = "poulailler de ferme (3 x 2 cases): cabane sur pilotis au nord-ouest, pondoir à l'ouest, rampe et parc grillagé au sud et à l'est, portillon au sud"
+
 
 [[modeles]]
 id = "etal"
@@ -982,7 +1007,7 @@ id = "bandstand"
 famille = "fete"
 sorte = "estrade"
 graine = 1209
-budget = 1100
+budget = 1200
 pourquoi = "estrade de la fanfare (4 x 3 cases): plancher à 60 cm, marches devant, cordon de fanions, chaises, pupitres et grosse caisse"
 
 [[modeles]]
@@ -1167,6 +1192,7 @@ pourquoi = "vaisselier contre le mur de la salle: buffet bas, assiettes debout s
 id = "wood-stove"
 famille = "objet"
 sorte = "poele"
+appui = "mur"
 graine = 761
 budget = 300
 lumiere = { rayon = 2.2, couleur = "#E2843A", force = 0.6 }
@@ -1335,3 +1361,205 @@ famille = "vehicule"
 sorte = "fourgon"
 graine = 919
 pourquoi = "fourgon en queue: bagages par la porte roulante, le chef de train dans la vigie, feux de queue"
+
+# ---------------------------------------------------------------- mobilier (mobilier.py)
+# Les meubles de l'ancienne chaîne arrondie (`assets-src/decors/`, retirée le 2026-11-11), refaits
+# en style encré sous les mêmes identifiants: les fiches de `donnees/commun/meubles` n'ont pas
+# changé. Origine au centre de l'emprise, avant vers +z. `appui = "mur"`: l'objet tient au mur
+# (le contrôle des volumes le juge porté par son dos). Ajouter: copier l'entrée de la même
+# `sorte`, changer `id` et `graine`, puis la fiche avec `"model": "<id>"`.
+[[modeles]]
+id = "bed-double"
+famille = "mobilier"
+sorte = "lit"
+largeur = 1.5
+places = 2
+graine = 1301
+pourquoi = "lit double (2 x 2 cases): tête au mur nord, couchage à 50 cm, édredon sur les deux tiers, deux oreillers"
+
+[[modeles]]
+id = "bed-single"
+famille = "mobilier"
+sorte = "lit"
+largeur = 1.0
+places = 1
+graine = 1303
+pourquoi = "lit d'une personne (1 x 2 cases), comme le lit double"
+
+[[modeles]]
+id = "chair-farm"
+famille = "mobilier"
+sorte = "chaise"
+graine = 1307
+pourquoi = "chaise de ferme paillée: assise à 45 cm, bord avant à 21 cm (le personnage s'y assied), dossier à deux barreaux"
+
+[[modeles]]
+id = "table-farm"
+famille = "mobilier"
+sorte = "table"
+graine = 1319
+pourquoi = "table de ferme (2 cases), plateau à 75 cm"
+
+[[modeles]]
+id = "wardrobe"
+famille = "mobilier"
+sorte = "armoire"
+graine = 1321
+pourquoi = "armoire à deux portes à panneaux (1,95 m), dos au mur, corniche"
+
+[[modeles]]
+id = "chest"
+famille = "mobilier"
+sorte = "coffre"
+graine = 1327
+pourquoi = "coffre à couvercle bombé cerclé de fer (le coffre commun de la halte, le coffre de la maison)"
+
+[[modeles]]
+id = "bench-platform"
+famille = "mobilier"
+sorte = "banc"
+graine = 1361
+pourquoi = "banc de quai (2 cases): pieds de fonte vert wagon, lattes; assise à 45 cm"
+
+[[modeles]]
+id = "tub"
+famille = "mobilier"
+sorte = "baignoire"
+graine = 1367
+pourquoi = "baignoire sur pieds de fonte: robinet en col de cygne et ses deux croisillons, bonde sous le bec (aucune fiche ne la pose encore)"
+
+[[modeles]]
+id = "fence"
+famille = "mobilier"
+sorte = "barriere"
+graine = 1373
+pourquoi = "module de 2 m de la barrière qui longe la voie (`decor.fenceModel`): deux poteaux, trois lisses qui rejoignent celles du module voisin"
+
+[[modeles]]
+id = "platform-sign"
+famille = "mobilier"
+sorte = "poteau-quai"
+graine = 1381
+pourquoi = "poteau de quai: deux colonnettes de fonte et la plaque émaillée du nom de la halte, à 2,2 m (on la lit du train)"
+
+[[modeles]]
+id = "water-pump"
+famille = "mobilier"
+sorte = "pompe"
+graine = 1399
+pourquoi = "pompe à eau de fonte: le bec verse vers le bas dans l'auge de pierre, le bras de levier derrière"
+
+[[modeles]]
+id = "train-wall"
+famille = "mobilier"
+sorte = "paroi"
+graine = 1409
+pourquoi = "paroi de la voiture du train de nuit (1 m): soubassement de teck, haut crème, face intérieure vers +z"
+
+[[modeles]]
+id = "train-wall-window"
+famille = "mobilier"
+sorte = "paroi-fenetre"
+graine = 1423
+pourquoi = "paroi à fenêtre: la nuit dehors, deux reflets sur la glace, rideaux de velours retenus"
+
+[[modeles]]
+id = "train-wall-map"
+famille = "mobilier"
+sorte = "paroi-plan"
+graine = 1427
+pourquoi = "paroi au plan de la ligne: le tracé rouge et ses haltes, sous cadre"
+
+[[modeles]]
+id = "train-wall-corner"
+famille = "mobilier"
+sorte = "angle-caisse"
+graine = 1429
+pourquoi = "angle de caisse: le poteau qui raccorde deux parois"
+
+[[modeles]]
+id = "train-door"
+famille = "mobilier"
+sorte = "porte-train"
+graine = 1433
+pourquoi = "porte de voiture: battant de teck à glace, poignée de laiton"
+
+[[modeles]]
+id = "train-wall-lamp"
+famille = "mobilier"
+sorte = "applique"
+appui = "mur"
+graine = 1439
+pourquoi = "applique de laiton à tulipe de verre (elle luit le soir), dos contre la paroi"
+
+[[modeles]]
+id = "train-luggage-rack"
+famille = "mobilier"
+sorte = "porte-bagages"
+appui = "mur"
+graine = 1447
+pourquoi = "filet à bagages (3 cases) à 1,75 m, deux valises dessus, dos contre la paroi"
+
+[[modeles]]
+id = "train-luggage-rack-empty"
+famille = "mobilier"
+sorte = "porte-bagages"
+vide = true
+appui = "mur"
+graine = 1451
+pourquoi = "le même filet, vide"
+
+[[modeles]]
+id = "train-table"
+famille = "mobilier"
+sorte = "tablette"
+graine = 1453
+pourquoi = "tablette de compartiment: plateau à 75 cm tenu au mur et par un pied de fonte"
+
+[[modeles]]
+id = "train-seat"
+famille = "mobilier"
+sorte = "banquette-train"
+graine = 1459
+pourquoi = "banquette de velours: assise à 45 cm, bord avant à 32,5 cm, dossier et appui-tête"
+
+[[modeles]]
+id = "train-berth"
+famille = "mobilier"
+sorte = "couchette"
+graine = 1471
+pourquoi = "couchette (1 x 2 cases): couchage à 48 cm, oreiller, couverture pliée"
+
+# ---------------------------------------------------------------- volumes (contrôle de verifier.py)
+# Modèles dont le contrôle des volumes (controle_volumes.py: trous vus de dos, pièces qui flottent,
+# pièces qui en traversent une autre) trouve encore des défauts, relevés le 2026-11-11 et pas encore
+# repris: ils s'affichent en « A REPRENDRE » sans faire échouer la construction. Tout autre modèle
+# doit être net. Une entrée se retire dès que son modèle est net (le contrôle le signale: NET).
+[volumes]
+a_reprendre = [
+    "apple-tree", "apple-tree-b", "apple-tree-b-bare", "apple-tree-b-winter", "apple-tree-bare",
+    "apple-tree-stump", "apple-tree-winter", "ash-tree", "ash-tree-b", "ash-tree-b-far",
+    "ash-tree-b-shade", "ash-tree-b-winter", "ash-tree-far", "ash-tree-shade", "ash-tree-stump",
+    "ash-tree-winter", "bandstand", "banquet-table", "berry-bush", "berry-bush-bare", "birch-tree",
+    "birch-tree-b", "birch-tree-b-far", "birch-tree-b-shade", "birch-tree-b-winter",
+    "birch-tree-far", "birch-tree-shade", "birch-tree-stump", "birch-tree-winter", "book-stack",
+    "boulder-mossy", "boulder-mossy-chipped", "bucket", "chalk-board", "coat-rack", "comptoir",
+    "comptoir-epicerie", "comptoir-fournil", "crop-capucine-1", "crop-capucine-1-thirsty",
+    "crop-capucine-2", "crop-carotte-1-thirsty", "crop-giroflee-1-thirsty", "crop-giroflee-2",
+    "crop-marguerite-2", "crop-muguet-1", "crop-muguet-1-thirsty", "crop-muguet-2",
+    "crop-nigelle-2", "crop-pomme-de-terre-1", "crop-pomme-de-terre-1-thirsty",
+    "crop-pomme-de-terre-2", "crop-rose-des-lacombe-1", "crop-rose-des-lacombe-1-thirsty",
+    "crop-rose-des-lacombe-2", "crop-tomate-1", "crop-tomate-1-thirsty", "crop-tomate-2",
+    "crop-tomate-2-thirsty", "crop-tomate-3", "crop-tournesol-1", "crop-tournesol-1-thirsty",
+    "crop-tournesol-2", "crossing-gate-flowered", "cuisiniere", "dig-spot", "door-curtain",
+    "dovecote", "dresser", "etal", "etal-bare", "festival-banner", "fishing-spot", "garden-bed",
+    "garden-bed-watered", "great-oak-tree", "great-oak-tree-stump", "great-oak-tree-winter",
+    "hedge-corner", "hedge-end", "indoor-logs", "insect-spot", "luggage-van", "meule",
+    "mill-wheel", "oak-tree", "oak-tree-b", "oak-tree-b-far", "oak-tree-b-shade",
+    "oak-tree-b-winter", "oak-tree-far", "oak-tree-shade", "oak-tree-stump", "oak-tree-winter",
+    "oil-lamp", "passenger-coach", "picture-landscape", "picture-oval", "picture-portrait",
+    "plan-de-travail", "platform-lantern", "rail-cutting", "rail-cutting-b", "railcar", "ratelier",
+    "ratelier-forge", "rug-round", "rug-runner", "semaphore", "small-keg", "street-lantern",
+    "tank-engine", "tapped-barrel", "tin-canisters", "vegetable-crate", "wall-clock",
+    "wall-lantern", "wall-shelf", "water-tower", "woodpile"
+]

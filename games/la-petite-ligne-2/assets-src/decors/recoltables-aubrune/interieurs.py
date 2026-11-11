@@ -17,6 +17,7 @@ from __future__ import annotations
 import math
 
 from amenagements import _lumiere, _modele, _pot, barre, boite, bosse, colonne
+from feu import langue
 from formes import Atelier, at, penche, ton
 
 MUR = -0.5
@@ -196,8 +197,18 @@ def _objet(sorte: str, entree: dict, ctx, g: float) -> tuple[Atelier, dict]:
         for sx in (-1, 1):
             for sz in (-1, 1):
                 boite(s, sx * 0.21 - 0.03, sx * 0.21 + 0.03, 0, 0.14, -0.02 + sz * 0.2 - 0.03, -0.02 + sz * 0.2 + 0.03, "metal", fer[1], sans="y- y+")
-        boite(s, -0.16, 0.16, 0.26, 0.5, 0.22, 0.235, "metal", fer[1], sans="y- z-")
-        _plaque(s, -0.12, 0.12, 0.3, 0.46, 0.237, "flamme", ctx.un("braise"))
+        # Porte du foyer: un cadre de fonte autour de la fenêtre (sans verre: on y voit le feu),
+        # le fond noir de suie, les braises sur la grille et trois langues de flamme.
+        for x0, x1, y0, y1 in ((-0.16, 0.16, 0.26, 0.3), (-0.16, 0.16, 0.46, 0.5), (-0.16, -0.12, 0.3, 0.46), (0.12, 0.16, 0.3, 0.46)):
+            boite(s, x0, x1, y0, y1, 0.221, 0.248, "metal", fer[1], sans="z-", tremble=0.0)
+
+        _plaque(s, -0.118, 0.118, 0.302, 0.458, 0.2215, "metal", ctx.un("fond"))
+        for k, x in enumerate((-0.08, -0.03, 0.02, 0.07)):
+            s.octa(0.026, 0.014, 0.012, at(x, 0.305, 0.232, k), "braise", ctx.un("braise", k))
+        for k, (x, h) in enumerate(((-0.05, 0.1), (0.02, 0.13), (0.07, 0.08))):
+            langue(s, (x, 0.297, 0.233), h, 0.014, ctx.un("flamme_coeur") if k == 1 else ctx.un("braise", k), g + k * 7, vers=(0.004 * (k - 1), 0.0))
+
+
         s.octa(0.02, 0.02, 0.02, at(0.13, 0.38, 0.245), "metal", laiton)
         s.tube([(-0.08, 0.7, 0.02, 0.1), (-0.08, 0.84, 0.02, 0.11), (-0.08, 0.88, 0.02, 0.05)], 7, "metal", ctx.un("cuivre"), bouts=(False, True))
         barre(s, (0.02, 0.8, 0.02), (0.1, 0.86, 0.04), 0.012, 3, "metal", ctx.un("cuivre"))

@@ -18,6 +18,7 @@ import { hex } from '../../../../src/rendu/encre/couches';
 import { createFloorMap } from '../../../../src/rendu/encre/sol';
 import { DecorModels } from '../../../../src/rendu/lieu/decors';
 import { DECOR_MANIFEST, variantOf } from '../../../../src/rendu/lieu/decors-manifeste';
+import { gamePlaceBuildings } from '../../../../src/rendu/lieu/batiments';
 
 function linear(hex) {
   return new THREE.Color(hex);
@@ -70,6 +71,8 @@ async function start() {
   const kit = new InkKit();
   const models = new DecorModels(DECOR_MANIFEST);
   await models.ready;
+  const buildings = gamePlaceBuildings();
+  await buildings.ready;
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 400);
   let scene = null;
   let floorMap = null;
@@ -176,6 +179,21 @@ async function start() {
       mesh.frustumCulled = false;
       scene.add(mesh);
     }
+    // Bâtiments du lieu (`batiments`: id, x, z, quart), fusionnés comme le jeu les fusionne.
+    for (const b of vue.batiments ?? []) {
+      const model = buildings.model(b.lieu ?? 'aubrune', b.id);
+      if (model === null) {
+        missing.push(b.id);
+        continue;
+      }
+      const mesh = new THREE.Mesh(model.geometry, kit.volume);
+      mesh.position.set(b.x, 0, b.z);
+      mesh.rotation.y = ((b.quart ?? 0) * Math.PI) / 2;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.frustumCulled = false;
+      scene.add(mesh);
+    }
     // Volumes de mise en scène (rails et traverses d'une voie): des boîtes teintées, rien de plus.
     for (const b of vue.boites ?? []) {
       const geometry = box(b.w, b.h, b.d, b.x, b.y, b.z, b.couleur);
@@ -202,13 +220,15 @@ async function start() {
       z: Math.cos(yaw) * Math.cos(pitch),
     };
     const [cx, cz] = vue.centre;
+    // `cibleY`: hauteur du point visé (gros plan sur un détail en hauteur).
+    const cy = vue.cibleY ?? 0;
     const span = vue.large ?? 18;
     camera.left = -span / 2;
     camera.right = span / 2;
     camera.top = (span * h) / w / 2;
     camera.bottom = -camera.top;
-    camera.position.set(cx + toCamera.x * 120, toCamera.y * 120, cz + toCamera.z * 120);
-    camera.lookAt(cx, 0, cz);
+    camera.position.set(cx + toCamera.x * 120, cy + toCamera.y * 120, cz + toCamera.z * 120);
+    camera.lookAt(cx, cy, cz);
     camera.updateProjectionMatrix();
     const depth = (span * h) / w / Math.sin(pitch);
     const frame = {
@@ -243,7 +263,7 @@ async function start() {
       await new Promise((resolve) => setTimeout(resolve, 30));
     }
     const reperes = (vue.etiquettes ?? []).map((label) => {
-      const p = new THREE.Vector3(label.x, label.y ?? 0, label.z).project(camera);
+      const p = new THREE.Vector3(label.x, label.y ?? cy, label.z).project(camera);
       return { ...label, px: ((p.x + 1) / 2) * w, py: ((1 - p.y) / 2) * h };
     });
     return {

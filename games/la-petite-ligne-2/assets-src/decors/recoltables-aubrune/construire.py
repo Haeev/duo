@@ -151,7 +151,9 @@ def fiche_de(m: dict) -> dict:
         "size": {"w": round(float(haut[0] - bas[0]), 3), "d": round(float(haut[2] - bas[2]), 3), "h": round(float(haut[1]), 3)},
         "bottom": round(float(bas[1]), 4),
     }
-    for cle in ("states", "variants", "jitter", "collision", "plants", "pourquoi", "top", "light"):
+    # `seat` (assise: hauteur, bord avant) et `bed` (couchage) sont lus par le jeu.
+    for cle in ("states", "variants", "jitter", "collision", "plants", "pourquoi", "top", "light", "seat", "bed"):
+
         if m.get(cle):
             fiche[cle] = m[cle]
     if "etat" in m:

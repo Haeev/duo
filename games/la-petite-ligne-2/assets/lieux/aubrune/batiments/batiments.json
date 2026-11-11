@@ -261,7 +261,7 @@
     "ecole": {
       "boite": [
         [-4.133, -0.018, -3.685],
-        [4.139, 8.841, 3.907]
+        [4.139, 8.841, 3.889]
       ],
       "budget": 6000,
       "economie": 0,
@@ -328,19 +328,19 @@
       "fichier": "ecole.glb",
       "hauteur": 8.841,
       "lueurs": [],
-      "morceaux": 835,
+      "morceaux": 836,
       "noeud": "ecole",
       "nom": "l'école-mairie",
-      "octets": 552416,
+      "octets": 553544,
       "porte": {
         "facade": "sud",
         "position": 0.5,
         "x": 0.0,
         "z": 3.0
       },
-      "triangles": 5833,
+      "triangles": 5845,
       "trianglesParMateriau": {
-        "bois": 400,
+        "bois": 412,
         "metal": 1114,
         "moellon": 169,
         "pierre": 1886,

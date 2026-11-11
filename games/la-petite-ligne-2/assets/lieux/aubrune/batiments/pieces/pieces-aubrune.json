@@ -323,14 +323,14 @@
   "drapeau": {
    "boite": [
     [
-     -0.022,
-     -0.033,
-     -0.025
+     -0.036,
+     -0.03,
+     -0.031
     ],
     [
-     0.872,
-     1.228,
-     0.91
+     0.863,
+     1.279,
+     0.89
     ]
    ],
    "description": "hampe et drapeau",
@@ -340,7 +340,7 @@
     "volet"
    ],
    "teinte": null,
-   "triangles": 48
+   "triangles": 60
   },
   "enseigne-bandeau": {
    "boite": [
