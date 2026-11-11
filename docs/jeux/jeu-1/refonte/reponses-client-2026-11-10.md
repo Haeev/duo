@@ -604,3 +604,13 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Recette de 14 h 16: suite rapide 1 017 tests verts; parcours à deux joueurs 25 sur 32. Quatre rouges étaient des parcours mal réglés (délai d'horloge sur une durée de jeu), corrigés. Restent deux comptoirs et la décision à deux, en reprise.
 - Estimation donnée au client du temps de jeu disponible en rushant: 6 à 7 h pour l'histoire d'Aubrune, 10 à 12 h avec les suites et la maison jusqu'à la troisième pièce, 15 à 20 h pour tout voir (une année de jeu). Non mesuré: personne n'a joué ce contenu.
 - Questions ouvertes au tableau de bord: q30 à q35.
+
+## 11 novembre, 16 h 08: réponses du client aux questions q30 à q35 (posées au tableau de bord, répondues entre 15 h 36 et 15 h 38)
+
+- q30, Nour et Inès: « Oui, en réserve pour un autre lieu ».
+- q31, petites activités: « Oui: draisine et quilles » (ricochets et balles de foin retirés du contrat).
+- q32, musique: « Non, garde l'accordage ». Contre la recommandation du manager: l'instrument se désaccorde et s'accorde chez Armand, comme au cahier (diapason compris). À produire.
+- q33, cinq retraits mineurs et deux points à acter: « Oui à tout » (Armand acheteur, fossile en morceaux, pellicule et appareils améliorés, meule gratuite, repas spécial avec un habitant: retirés; sacs offerts et coffre commun depuis le carnet: actés).
+- q34, Duo 0.4.0: « Ce soir avec le jeu ». Accord explicite du client pour publier l'application ce soir.
+- q35, jupe longue et robe en course: « Raccourcir l'ourlet au genou ». Contre la recommandation du manager. À produire.
+- Le client, le même après-midi: « oublie pas de toujours garder à jour le suivi c'est important » (inscrit au manuel) et « garde cette vignette c'est bien ».
