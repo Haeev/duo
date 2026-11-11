@@ -639,3 +639,5 @@ Urgence 2, le jeu n'est pas au niveau:
 - **Mode déco**: plan 2D de rectangles nommés, jugé « affreux » sur capture (libellés qui se chevauchent, portes et ardoise dessinées comme des meubles). À refaire: la vraie pièce vue du dessus, meubles saisis à la souris (cahier, mode déco).
 - **Assises**: le personnage s'assoit à côté du tabouret (aucune position ni hauteur d'assise déclarée par meuble).
 - **Hygiène**: plafonnée à 60 à Aubrune (pompes seulement; ni baquet posé dans la maison ni salle d'eau).
+
+Le client, à 22 h 20: « la version pc tourne fluide aussi du coup ». La fluidité sur le PC n'est plus un blocage (pas de chiffre F9 pour l'instant). Plan de fin d'Aubrune demandé par le client à 22 h 12, rangé du plus petit effort au plus gros: `plan-fin-aubrune.md`.

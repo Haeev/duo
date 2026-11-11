@@ -70,7 +70,7 @@ Dans cet ordre, les plus visibles d'abord.
 | 4.2 | **Gestes des activités**: pêcher (lancer, ferrer, épuisette), cuisiner, pomper, arroser, scier, pomper la draisine, jouer d'un instrument | artiste 3D, dev gameplay 3D | chaque activité a son geste, relu en capture |
 | 4.3 | **Saisons et météo à l'écran**: ambiances des quatre saisons, feuillage d'automne, neige au sol, pluie et neige qui tombent, dans le budget de pixels du PC | tech-artist | une capture par saison et par temps; coût mesuré avec l'outil F9 |
 | 4.4 | **Le bourg qui change** au fil des actes: volets, vitrines, fumées des maisons rouvertes (objets avec condition, d'après le plan vu du dessus) | level-designer, artiste 3D | trois captures: début, après l'acte 2, après l'acte 3 |
-| 4.5 | **Fluidité sur le PC**: selon tes cinq relevés F9 de la 0.22.0. Si la pièce à 100 % reste sous 30 images par seconde: nouvelle passe sur le coût par pixel | tech-artist | relevé du PC au-dessus de 30 partout, 45 visés |
+| 4.5 | **Fluidité sur le PC**: le client la dit fluide sur la 0.22.0 (message du 11 novembre, 22 h 20). Reste à garder ce niveau: un relevé F9 de contrôle quand il veut, et chaque ajout de rendu (saisons, déco) mesuré avant fusion | tech-artist, seulement en cas de recul | aucune saccade signalée en séance; relevé au-dessus de 30 images par seconde si on le mesure |
 | 4.6 | **Les 120 anciens modèles** de la liste `a_reprendre`, par familles, les plus vus d'abord | artiste 3D (deux exemplaires) | contrôle des volumes vert, liste vide ou justifiée |
 | 4.7 | **Revue visuelle complète** par le directeur artistique (6,7 sur 10 ce matin), reprises jusqu'à 9 sur 10, toutes les captures montrées dans le suivi | directeur artistique, puis reprises | chaque écran et chaque lieu noté 9 ou plus, ou reprise planifiée |
 
@@ -83,7 +83,7 @@ Dans cet ordre, les plus visibles d'abord.
 
 ## Ce que j'attends de toi (rien ne bloque le lot 1)
 
-- Les cinq relevés F9 du PC sur la 0.22.0 (ils décident du point 4.5).
+- Un relevé F9 du PC quand tu y penses, pour avoir le chiffre (plus urgent: tu dis la version PC fluide).
 - La version affichée dans le salon de Duo pour La Petite Ligne (pour comprendre la vignette).
 - Tes retours de séance au fil de l'eau: je les classe dans ces lots.
 
