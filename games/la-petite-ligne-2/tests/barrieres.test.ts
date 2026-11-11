@@ -37,6 +37,10 @@ function withGates(hidden = false): Content {
         : {}),
       pourquoi: 'lisse posée par le test, en travers de la route du Gué',
     });
+    // Le plan pose désormais ses propres lisses au même passage: le test travaille sur les siennes.
+    map.objects = map.objects.filter(
+      (o) => (o as { type?: string }).type !== 'lisse-de-passage-a-niveau',
+    );
     map.objects.push(gate('essai-lisse-nord', 95.5, 0), gate('essai-lisse-sud', 99.5, 2));
   });
 }
