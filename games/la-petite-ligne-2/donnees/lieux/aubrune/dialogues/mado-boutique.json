@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "id": "mado-boutique",
+  "villager": "mado",
+  "priority": 25,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 420,
+      "to": 1200
+    },
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "item_in_bag",
+          "item": "pierre",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ha ! De la visite ! Approche, mais touche à rien: tout ce qui est noir est chaud.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "J'achète la pierre et les bûches, le feu mange les deux. Pose ça là, je paie tout de suite.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Je vends la pierre à aiguiser, la hache et la bêche. Du solide: si ça casse, c'est toi.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "voir",
+          "text": "Je regarde ton râtelier.",
+          "when": [],
+          "effects": [
+            {
+              "type": "open_shop",
+              "shop": "forge-cazals"
+            }
+          ],
+          "next": null
+        },
+        {
+          "id": "offre",
+          "text": "Une pierre à aiguiser. (1,50 €)",
+          "when": [],
+          "effects": [],
+          "next": "payer"
+        },
+        {
+          "id": "partir",
+          "text": "Plus tard.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "payer": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "take_money",
+          "amount": 150
+        },
+        {
+          "type": "give_item",
+          "item": "pierre-a-aiguiser",
+          "count": 1
+        }
+      ],
+      "next": "merci",
+      "otherwise": "refus"
+    },
+    "merci": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Tiens. Passe-la sur le fil, pas sur tes doigts. Enfin, tu fais comme tu veux.",
+      "emote": "joy",
+      "next": null
+    },
+    "refus": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ha ! Poches pleines ou bourse vide, c'est pareil: ça passe pas. Reviens quand t'auras fait le tri.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

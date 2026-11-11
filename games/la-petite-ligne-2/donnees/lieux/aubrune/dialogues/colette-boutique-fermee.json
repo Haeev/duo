@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "colette-boutique-fermee",
+  "villager": "colette",
+  "priority": 1,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 420
+    }
+  ],
+  "once": null,
+  "start": "ferme",
+  "nodes": {
+    "ferme": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "C'est fermé, les chaises sont sur les tables. Reviens à sept heures, le café sera chaud.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -23,8 +23,8 @@
       "y": 1
     },
     "achille-comptoir": {
-      "x": 3,
-      "y": 2.4
+      "x": 4.5,
+      "y": 1.5
     }
   },
   "objects": [
@@ -40,6 +40,13 @@
       "type": "plan-de-travail",
       "x": 2,
       "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "fournil-comptoir",
+      "type": "comptoir-fournil",
+      "x": 5,
+      "y": 2.5,
       "rotation": 0
     }
   ],

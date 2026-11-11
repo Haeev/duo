@@ -646,7 +646,7 @@ Pièces: cave voûtée (5 x 4). Meubles: cave-coffre (coffre). Points: cave-lant
 . . . . . E .
 . . . . . . .
 . * C . . . P
-. . . . . . .
+. . C . . . .
 . . . . . . .
 # # # . . # #
 . . . . . . .
@@ -654,7 +654,7 @@ Pièces: cave voûtée (5 x 4). Meubles: cave-coffre (coffre). Points: cave-lant
 C * . . . . E
 ```
 
-Pièces: boutique (7 x 5); cuisine (7 x 4). Meubles: epicerie-comptoir (comptoir, à créer), epicerie-etal (etal-de-tourte), epicerie-cuisiniere (cuisiniere), epicerie-table (table-a-manger). Points: odette-comptoir (comptoir, Odette), odette-cuisine (poste, Odette).
+Pièces: boutique (7 x 5); cuisine (7 x 4). Meubles: epicerie-comptoir (comptoir-epicerie), epicerie-etal (etal-de-tourte), epicerie-cuisiniere (cuisiniere), epicerie-table (table-a-manger). Points: odette-comptoir (comptoir, Odette), odette-cuisine (poste, Odette).
 
 **la pension Ferrand, étage** (`interieurs/epicerie-etage.json`, 7 x 9 m, 63 m², niveau 1): la chambre du premier soir, deux lits simples; l'escalier arrive sur un palier, la chambre d'Odette à côté.
 
@@ -677,37 +677,37 @@ Pièces: chambre de la pension (7 x 5); chambre d’Odette (4 x 3); palier (2 x 
 ```text
 . P P . . F
 . . . . * .
-# # . * . .
-. . . C . .
+# # . . C C
+. . . . . .
 . . . P . .
 ```
 
-Pièces: boutique (6 x 3); fournil (6 x 2). Meubles: fournil-four (four), fournil-petrin (plan-de-travail), fournil-comptoir (comptoir, à créer). Points: achille-four (poste, Achille), achille-comptoir (comptoir, Achille).
+Pièces: boutique (6 x 3); fournil (6 x 2). Meubles: fournil-four (four), fournil-petrin (plan-de-travail), fournil-comptoir (comptoir-fournil). Points: achille-four (poste, Achille), achille-comptoir (comptoir, Achille).
 
 **la mercerie-coiffure** (`interieurs/mercerie.json`, 6 x 6 m, 36 m², niveau 0): porte au nord sur la rue; la cabine sert à essayer les tenues.
 
 ```text
 . . . P . .
-. . C . . .
+. C C . . .
 . . * . . .
 . . . . # .
 . C * . # *
 . . . . . A
 ```
 
-Pièces: boutique (6 x 3); salon de coiffure (4 x 3); cabine (2 x 3). Meubles: mercerie-comptoir (comptoir, à créer), mercerie-fauteuil (chaise), mercerie-armoire (armoire). Points: solange-comptoir (comptoir, Solange), jeanne-fauteuil (poste, Jeanne), mercerie-cabine (poste).
+Pièces: boutique (6 x 3); salon de coiffure (4 x 3); cabine (2 x 3). Meubles: mercerie-comptoir (comptoir-mercerie), mercerie-fauteuil (chaise), mercerie-armoire (armoire). Points: solange-comptoir (comptoir, Solange), jeanne-fauteuil (poste, Jeanne), mercerie-cabine (poste).
 
 **la forge** (`interieurs/forge.json`, 5 x 5 m, 25 m², niveau 0): foyer au nord sous la hotte; l'enclume est dehors, sous l'auvent.
 
 ```text
 . . F . .
 . . * . .
-C . . * E
+C . . * R
 . . . . .
 . . P . .
 ```
 
-Pièces: forge (5 x 5). Meubles: forge-foyer (four), forge-haches (etal-de-haches-forgees), forge-coffre (coffre). Points: mado-foyer (poste, Mado), mado-etabli (poste, Mado).
+Pièces: forge (5 x 5). Meubles: forge-foyer (four), forge-haches (ratelier-de-la-forge), forge-coffre (coffre). Points: mado-foyer (poste, Mado), mado-etabli (poste, Mado).
 
 **l'atelier de Basile** (`interieurs/atelier-basile.json`, 9 x 7 m, 63 m², niveau 0): atelier d'une pièce, porte à l'est vers l'auvent.
 
@@ -733,7 +733,7 @@ T C . . C T
 . . . P . .
 ```
 
-Pièces: cuisine et comptoir (6 x 2); salle (6 x 3). Meubles: cafe-cuisiniere (cuisiniere), cafe-plan (plan-de-travail), cafe-comptoir (comptoir, à créer), cafe-table-1 (table-a-manger), cafe-chaise-1 (chaise), cafe-chaise-2 (chaise), cafe-table-2 (table-a-manger), cafe-chaise-3 (chaise), cafe-chaise-4 (chaise). Points: colette-comptoir (comptoir, Colette).
+Pièces: cuisine et comptoir (6 x 2); salle (6 x 3). Meubles: cafe-cuisiniere (cuisiniere), cafe-plan (plan-de-travail), cafe-comptoir (comptoir-cafe), cafe-table-1 (table-a-manger), cafe-chaise-1 (chaise), cafe-chaise-2 (chaise), cafe-table-2 (table-a-manger), cafe-chaise-3 (chaise), cafe-chaise-4 (chaise). Points: colette-comptoir (comptoir, Colette).
 
 **l'école-mairie** (`interieurs/ecole.json`, 6 x 5 m, 30 m², niveau 0): une seule salle: l'instituteur est aussi secrétaire de mairie (armoire des archives, table du registre); les bancs regardent le tableau, au nord.
 

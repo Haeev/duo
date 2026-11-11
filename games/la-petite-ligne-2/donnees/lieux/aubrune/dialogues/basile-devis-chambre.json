@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "id": "basile-devis-chambre",
+  "villager": "basile",
+  "priority": 25,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison.chambre"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.salle"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "remembered",
+        "key": "aubrune.maison-du-garde.chambre"
+      }
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Chambre. Plancher neuf. Fenêtre.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Trois cents euros. Six planches. Deux bûches.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Le lit ira là. Au sec.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

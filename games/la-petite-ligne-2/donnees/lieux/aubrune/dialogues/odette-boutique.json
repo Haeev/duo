@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "id": "odette-boutique",
+  "villager": "odette",
+  "priority": 25,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 420,
+      "to": 1260
+    },
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "item_in_bag",
+          "item": "oeuf",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "radis",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "radis-croquant",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "tomate",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "mures",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Entre, entre ! Ici on trouve de tout, et le reste, je sais qui l'a.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "J'achète ce qui se mange: œufs, radis, tomates, mûres. Au prix de l'épicerie: honnête, pas fou.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Et je vends pommes, farine, grain et graines. Les nouvelles du bourg, elles, sont offertes.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "voir",
+          "text": "Je regarde ton épicerie.",
+          "when": [],
+          "effects": [
+            {
+              "type": "open_shop",
+              "shop": "epicerie-ferrand"
+            }
+          ],
+          "next": null
+        },
+        {
+          "id": "offre",
+          "text": "Une pomme, à croquer tout de suite. (0,90 €)",
+          "when": [],
+          "effects": [],
+          "next": "payer"
+        },
+        {
+          "id": "partir",
+          "text": "Plus tard.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "payer": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "take_money",
+          "amount": 90
+        },
+        {
+          "type": "change_need",
+          "need": "hunger",
+          "amount": 15,
+          "cap": 100
+        }
+      ],
+      "next": "merci",
+      "otherwise": "refus"
+    },
+    "merci": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Et une pomme ! Croque-la devant Achille: il croit qu'il n'y a que son pain qui craque.",
+      "emote": "joy",
+      "next": null
+    },
+    "refus": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Pas un sou ? Ça arrive aux meilleurs. Apporte-moi des œufs, je te les prends, et on en reparle.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

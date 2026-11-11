@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "menuiserie-cornu",
+  "name": "Menuiserie Cornu",
+  "keeper": "basile",
+  "icon": "coffre",
+  "hours": {
+    "from": 420,
+    "to": 1200
+  },
+  "sells": [
+    {
+      "item": "planche",
+      "price": 160,
+      "dailyStock": 12,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "marteau",
+      "price": 500,
+      "dailyStock": 1,
+      "restockDays": 7
+    }
+  ],
+  "buys": [
+    {
+      "item": "buche",
+      "price": 60
+    }
+  ],
+  "dailyBuyCap": 1200,
+  "dailyNeeds": ["buche"],
+  "friendship": [
+    {
+      "hearts": 3,
+      "factor": 1.1
+    }
+  ],
+  "refusal": "Pas du bois.",
+  "talk": {
+    "open": "Je regarde ton bois.",
+    "leave": "Rien. Bonne journée."
+  }
+}

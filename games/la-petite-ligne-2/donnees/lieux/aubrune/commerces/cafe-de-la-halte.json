@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "id": "cafe-de-la-halte",
+  "name": "Café de la Halte",
+  "keeper": "colette",
+  "icon": "bol",
+  "hours": {
+    "from": 420,
+    "to": 1320
+  },
+  "sells": [
+    {
+      "item": "soupe-de-legumes",
+      "price": 300,
+      "dailyStock": 4,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte2.train"
+      }
+    },
+    {
+      "item": "omelette",
+      "price": 350,
+      "dailyStock": 3,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte2.train"
+      }
+    }
+  ],
+  "buys": [
+    {
+      "item": "oeuf",
+      "price": 70
+    },
+    {
+      "item": "oeuf-roux",
+      "price": 110
+    },
+    {
+      "item": "radis",
+      "price": 70
+    },
+    {
+      "item": "radis-croquant",
+      "price": 100
+    },
+    {
+      "item": "tomate",
+      "price": 80
+    },
+    {
+      "item": "carotte",
+      "price": 110
+    },
+    {
+      "item": "poireau",
+      "price": 120
+    },
+    {
+      "item": "pomme-de-terre",
+      "price": 90
+    },
+    {
+      "item": "pomme",
+      "price": 60
+    },
+    {
+      "item": "mures",
+      "price": 40
+    },
+    {
+      "item": "coquelicot",
+      "price": 50
+    },
+    {
+      "item": "goujon",
+      "price": 120
+    },
+    {
+      "item": "ablette",
+      "price": 100
+    },
+    {
+      "item": "perche",
+      "price": 200
+    },
+    {
+      "item": "tanche",
+      "price": 250
+    },
+    {
+      "item": "truite",
+      "price": 300
+    },
+    {
+      "item": "brochet",
+      "price": 500
+    },
+    {
+      "item": "oeuf-au-plat",
+      "price": 120
+    },
+    {
+      "item": "omelette",
+      "price": 220
+    },
+    {
+      "item": "soupe-de-legumes",
+      "price": 200
+    },
+    {
+      "item": "pommes-sautees",
+      "price": 200
+    }
+  ],
+  "dailyBuyCap": 4500,
+  "dailyNeeds": ["goujon", "ablette", "perche", "truite", "radis", "tomate", "oeuf"],
+  "friendship": [
+    {
+      "hearts": 3,
+      "factor": 1.1
+    }
+  ],
+  "refusal": "Ça, je ne peux pas le servir. Garde-le pour quelqu'un dont c'est le métier.",
+  "talk": {
+    "open": "Je regarde ta carte.",
+    "leave": "Je passais dire bonjour."
+  }
+}

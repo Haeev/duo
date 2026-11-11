@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "id": "basile-boutique",
+  "villager": "basile",
+  "priority": 25,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 420,
+      "to": 1200
+    },
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "item_in_bag",
+          "item": "buche",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Planches. Marteau. Là.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "J'achète les bûches. Soixante centimes.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Pas de crédit.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "voir",
+          "text": "Je regarde ton bois.",
+          "when": [],
+          "effects": [
+            {
+              "type": "open_shop",
+              "shop": "menuiserie-cornu"
+            }
+          ],
+          "next": null
+        },
+        {
+          "id": "offre",
+          "text": "Une planche. (1,60 €)",
+          "when": [],
+          "effects": [],
+          "next": "payer"
+        },
+        {
+          "id": "partir",
+          "text": "Plus tard.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "payer": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "take_money",
+          "amount": 160
+        },
+        {
+          "type": "give_item",
+          "item": "planche",
+          "count": 1
+        }
+      ],
+      "next": "merci",
+      "otherwise": "refus"
+    },
+    "merci": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Bien sèche. Garde-la à plat.",
+      "emote": "joy",
+      "next": null
+    },
+    "refus": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Pas la place. Ou pas les sous. Reviens.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

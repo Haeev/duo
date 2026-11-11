@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "id": "cour-des-delmas",
+  "name": "Cour des Delmas",
+  "keeper": "margot",
+  "icon": "plume",
+  "hours": {
+    "from": 420,
+    "to": 1200
+  },
+  "sells": [
+    {
+      "item": "carotte",
+      "price": 160,
+      "dailyStock": 6
+    },
+    {
+      "item": "poireau",
+      "price": 180,
+      "dailyStock": 6
+    },
+    {
+      "item": "pomme-de-terre",
+      "price": 140,
+      "dailyStock": 8
+    },
+    {
+      "item": "grain",
+      "price": 10,
+      "dailyStock": null
+    },
+    {
+      "item": "graines-radis",
+      "price": 20,
+      "dailyStock": null
+    },
+    {
+      "item": "graines-tomate",
+      "price": 60,
+      "dailyStock": null
+    }
+  ],
+  "buys": [
+    {
+      "item": "mures",
+      "price": 40
+    },
+    {
+      "item": "coquelicot",
+      "price": 50
+    }
+  ],
+  "dailyBuyCap": 600,
+  "dailyNeeds": ["mures", "coquelicot"],
+  "friendship": [
+    {
+      "hearts": 3,
+      "factor": 1.1
+    }
+  ],
+  "refusal": "C'est gentil, mais on n'en a pas l'usage à la ferme. Demande au bourg.",
+  "talk": {
+    "open": "Je regarde ton étal.",
+    "leave": "Je passais voir la cour."
+  }
+}

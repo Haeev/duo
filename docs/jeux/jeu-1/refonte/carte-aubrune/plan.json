@@ -4602,10 +4602,10 @@
       "meubles": [
         {
           "id": "epicerie-comptoir",
-          "type": null,
+          "type": "comptoir-epicerie",
           "modele": "comptoir",
-          "x": 2,
-          "y": 2.5,
+          "x": 2.5,
+          "y": 3,
           "rotation": 1
         },
         {
@@ -4725,16 +4725,16 @@
         },
         {
           "id": "fournil-comptoir",
-          "type": null,
+          "type": "comptoir-fournil",
           "modele": "comptoir",
-          "x": 3,
-          "y": 3,
+          "x": 5,
+          "y": 2.5,
           "rotation": 0
         }
       ],
       "points": [
         { "id": "achille-four", "x": 4.5, "y": 1, "role": "poste", "qui": "Achille" },
-        { "id": "achille-comptoir", "x": 3, "y": 2.4, "role": "comptoir", "qui": "Achille" }
+        { "id": "achille-comptoir", "x": 4.5, "y": 1.5, "role": "comptoir", "qui": "Achille" }
       ],
       "porte": [3.5, 4.5, 2],
       "escaliers": [],
@@ -4757,7 +4757,7 @@
       "meubles": [
         {
           "id": "mercerie-comptoir",
-          "type": null,
+          "type": "comptoir-mercerie",
           "modele": "comptoir",
           "x": 2,
           "y": 1.5,
@@ -4810,7 +4810,7 @@
         },
         {
           "id": "forge-haches",
-          "type": "etal-de-haches-forgees",
+          "type": "ratelier-de-la-forge",
           "modele": "ratelier",
           "x": 4.5,
           "y": 2.5,
@@ -4906,9 +4906,9 @@
         },
         {
           "id": "cafe-comptoir",
-          "type": null,
+          "type": "comptoir-cafe",
           "modele": "comptoir",
-          "x": 4,
+          "x": 4.5,
           "y": 1.5,
           "rotation": 0
         },

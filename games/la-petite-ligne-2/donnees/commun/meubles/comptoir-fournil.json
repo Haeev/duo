@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "comptoir-fournil",
+  "name": "Comptoir du fournil",
+  "model": "table-farm",
+  "size": {
+    "w": 2,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "shop",
+      "shop": "fournil-pradel"
+    }
+  ]
+}

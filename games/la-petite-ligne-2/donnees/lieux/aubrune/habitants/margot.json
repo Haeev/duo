@@ -87,7 +87,8 @@
           "point": "fc"
         },
         "activity": "tenir-la-cour",
-        "gesture": null
+        "gesture": null,
+        "shop": "cour-des-delmas"
       },
       {
         "from": 1200,

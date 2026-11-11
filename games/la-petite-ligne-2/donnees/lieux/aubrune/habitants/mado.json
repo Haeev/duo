@@ -56,7 +56,8 @@
           "point": "gr6"
         },
         "activity": "forger",
-        "gesture": "marteler"
+        "gesture": "marteler",
+        "shop": "forge-cazals"
       },
       {
         "from": 1200,

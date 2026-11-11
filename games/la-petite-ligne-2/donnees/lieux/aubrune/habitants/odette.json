@@ -46,7 +46,8 @@
           "point": "pl-o"
         },
         "activity": "tenir-l-epicerie",
-        "gesture": null
+        "gesture": null,
+        "shop": "epicerie-ferrand"
       },
       {
         "from": 1260,

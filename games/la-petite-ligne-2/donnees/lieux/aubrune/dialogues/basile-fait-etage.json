@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "basile-fait-etage",
+  "villager": "basile",
+  "priority": 26,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.etage"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Étage fini. Maison finie.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Émile dirait rien. Bon signe.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

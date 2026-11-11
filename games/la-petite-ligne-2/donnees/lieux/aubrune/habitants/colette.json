@@ -62,7 +62,8 @@
           "point": "gr6"
         },
         "activity": "tenir-le-cafe",
-        "gesture": null
+        "gesture": null,
+        "shop": "cafe-de-la-halte"
       },
       {
         "from": 1320,

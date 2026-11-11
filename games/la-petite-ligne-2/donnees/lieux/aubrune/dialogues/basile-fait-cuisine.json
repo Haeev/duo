@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "basile-fait-cuisine",
+  "villager": "basile",
+  "priority": 26,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.cuisine"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Cuisinière posée. Tire bien.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Brûle rien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

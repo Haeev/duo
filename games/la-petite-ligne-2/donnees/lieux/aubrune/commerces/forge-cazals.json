@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "forge-cazals",
+  "name": "Forge Cazals",
+  "keeper": "mado",
+  "icon": "rouage",
+  "hours": {
+    "from": 420,
+    "to": 1200
+  },
+  "sells": [
+    {
+      "item": "pierre-a-aiguiser",
+      "price": 150,
+      "dailyStock": 6
+    },
+    {
+      "item": "hache",
+      "price": 800,
+      "dailyStock": 1,
+      "restockDays": 7
+    },
+    {
+      "item": "beche",
+      "price": 800,
+      "dailyStock": 1,
+      "restockDays": 7
+    }
+  ],
+  "buys": [
+    {
+      "item": "buche",
+      "price": 40
+    },
+    {
+      "item": "pierre",
+      "price": 30
+    }
+  ],
+  "dailyBuyCap": 800,
+  "dailyNeeds": ["pierre", "buche"],
+  "friendship": [
+    {
+      "hearts": 3,
+      "factor": 1.1
+    }
+  ],
+  "refusal": "Ça se forge pas, ça se brûle pas. Qu'est-ce que tu veux que j'en fasse ?",
+  "talk": {
+    "open": "Je regarde ton râtelier.",
+    "leave": "Je te laisse taper."
+  }
+}
