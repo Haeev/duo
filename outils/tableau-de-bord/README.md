@@ -9,6 +9,7 @@ Page web privée où le client suit la refonte de La Petite Ligne: avancement en
 | `index.html` | la page: styles, jetons, noyau `window.TDB` (onglets, données, remarques, dialogues) |
 | `avancement.js`, `questions.js`, `images.js`, `regles.js` | les quatre onglets de l'étape 1 |
 | `carte.js`, `modeles.js` | plan annotable et visionneuse 3D (autre lot); la page marche sans eux |
+| `sons.js`, `sons/` | onglet « Sons et musiques » (ordre 35) et ses fichiers `.m4a` avec `index.json`, fabriqués par `outils/publier-sons.mjs` |
 | `images/` | les images de la galerie, publiées à côté de la page |
 | `essai/` | banc d'essai local (fausse base en mémoire, données d'essai, captures). Jamais publié |
 
@@ -22,7 +23,7 @@ Un onglet est un script classique (pas un module) qui appelle une seule fonction
 window.TDB.registerTab({
   id: 'carte', // lettres ASCII et tirets; c'est aussi le `#carte` de l'adresse
   title: 'Carte', // libellé de l'onglet
-  order: 50, // tri croissant: avancement 10, questions 20, images 30, regles 40
+  order: 50, // tri croissant: avancement 10, questions 20, images 30, sons 35, regles 40
   mount(el, ctx) {
     // appelé UNE fois, à la première ouverture; `el` est le conteneur de l'onglet
   },
@@ -114,6 +115,7 @@ Précisions:
 - `questions.reponse`: le texte exact de l'option choisie, ou `''` si le client n'a écrit qu'une réponse libre.
 - `images.fichier`: chemin relatif sous `images/` (`scene/gare-v3.webp`), lettres, chiffres, `-`, `_`, `.` et `/` seulement. `images.famille`: `scene`, `personnages`, `interface` ou `plan` (autre valeur: famille affichée à la suite sous son propre nom).
 - Note du client sur une image: document `remarques/note-<type>-<id>` avec `forme: { sorte: 'note', valeur }` (0 à 10) et un `texte` vide. `ctx.notes.list` et `watch` ne renvoient pas ces documents.
+- Sons: `cible: { type: 'son', id }` (identifiant de `sons/index.json`). Remarque: `forme: { sorte: 'instant', t }` (secondes dans le son) ou `{ sorte: 'globale' }`. Avis: `remarques/note-son-<id>` avec `forme: { sorte: 'note', valeur: 10 | 0, avis: 'bien' | 'a-revoir' }`. Le noyau (`ctx.notes.add`, `setRating`) refuse encore ce type et cette forme: `sons.js` écrit ces documents lui-même par `ctx.data.write`; le manager répond comme pour les images (`statut`, `reponseManager`).
 
 ## Ajouter un onglet
 
@@ -126,6 +128,16 @@ Précisions:
 7. Ajouter des données d'essai dans `essai/donnees.js`, puis lancer `node outils/tableau-de-bord/essai/capturer.cjs` et regarder les captures.
 8. Publier le nouveau script avec la page.
 
+## Ajouter un son ou republier les sons
+
+1. Livrer le son dans le jeu (`assets/commun/son/`) et sa ligne dans `sons.json`, `evenements.json` ou `musique.json`, comme d'habitude.
+2. Lui donner un nom français dans `outils/sons-sources.json` (`noms`); un effet va dans la liste `sons` de sa famille (sinon il tombe dans « Autres effets »).
+3. Si un nouvel événement le déclenche, écrire sa phrase dans `evenements` (clé `événement condition=valeur`, ou l'événement seul).
+4. Lancer `node outils/tableau-de-bord/outils/publier-sons.mjs` (`--tout` pour tout réencoder). Il refuse s'il manque un nom ou une phrase, ou si l'ensemble dépasse 25 Mo.
+5. Lire le bilan (nombre, poids, sons pas encore branchés), puis publier `sons.js` et le dossier `sons/` avec la page.
+
+Rien n'est inventé: « où et quand » vient des règles du jeu; sans règle ni signal émis, l'index dit « pas encore branché ». « Nouveau » suit la date du premier commit du fichier (`nouveauDepuis`).
+
 ## Essai local
 
 `node outils/tableau-de-bord/essai/capturer.cjs [dossier de sortie]` sert le dossier sur un port local, enveloppe `index.html` dans le squelette de claude.ai, injecte une fausse base en mémoire (`essai/bouchon.js`, `essai/donnees.js`) et capture chaque écran en 1366x768 et 400x800, thème sombre et thème clair. Le script échoue si la console sort une erreur ou si la page déborde en largeur.
@@ -134,4 +146,4 @@ Le dossier est hors d'ESLint et de TypeScript (`outils/eslint.config.js`): ce so
 
 ## Publication (manager)
 
-Publier `index.html` avec les scripts d'onglets et le dossier `images/`. Le dossier `essai/` et ce README ne se publient pas. Après la première publication, remplir la base (`etat/avancement`, `questions`, `images`, `regles`, `journal`).
+Publier `index.html` avec les scripts d'onglets et les dossiers `images/` et `sons/`. Le dossier `essai/` et ce README ne se publient pas. Après la première publication, remplir la base (`etat/avancement`, `questions`, `images`, `regles`, `journal`).

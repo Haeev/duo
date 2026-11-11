@@ -1,0 +1,1863 @@
+{
+  "jeu": "La Petite Ligne (refonte)",
+  "genereLe": "2026-11-11T09:18:49.100Z",
+  "format": "AAC dans un conteneur MP4 (.m4a)",
+  "debitKbps": 96,
+  "nouveauDepuis": "2026-11-11",
+  "octets": 17430104,
+  "sections": [
+    {
+      "id": "musiques",
+      "titre": "Musiques d'ambiance"
+    },
+    {
+      "id": "airs",
+      "titre": "Airs de la collection"
+    },
+    {
+      "id": "jingles",
+      "titre": "Jingles"
+    },
+    {
+      "id": "peche",
+      "titre": "Effets: pêche"
+    },
+    {
+      "id": "cuisine",
+      "titre": "Effets: cuisine"
+    },
+    {
+      "id": "meubles",
+      "titre": "Effets: meubles"
+    },
+    {
+      "id": "portes-boutique",
+      "titre": "Effets: portes, boutique et argent"
+    },
+    {
+      "id": "histoire",
+      "titre": "Effets: histoire (cloches, passage à niveau, 5 h 12)"
+    },
+    {
+      "id": "train-journee",
+      "titre": "Effets: train et journée"
+    },
+    {
+      "id": "pas",
+      "titre": "Effets: pas"
+    },
+    {
+      "id": "gestes",
+      "titre": "Effets: gestes et objets"
+    },
+    {
+      "id": "interface",
+      "titre": "Effets: interface"
+    },
+    {
+      "id": "ambiances",
+      "titre": "Ambiances de fond"
+    },
+    {
+      "id": "voix",
+      "titre": "Voix des habitants (babil)"
+    }
+  ],
+  "sons": [
+    {
+      "id": "musique-bourg-aube",
+      "section": "musiques",
+      "sorte": "musique",
+      "nom": "Le bourg à l'aube",
+      "ou": "À Aubrune à l'aube (5 h à 8 h), avec des pauses de silence.",
+      "branche": true,
+      "description": "Piano en arpèges, glockenspiel, contrebasse à l'archet, clarinette dans la seconde moitié; 4/4, 60, centre en sol.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "musique-bourg-aube.m4a",
+      "octets": 812233,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-aube-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-aube-air.ogg"
+      ]
+    },
+    {
+      "id": "musique-bourg-matin",
+      "section": "musiques",
+      "sorte": "musique",
+      "nom": "Le bourg le matin",
+      "ou": "À Aubrune le matin (8 h à 12 h 30), avec des pauses de silence.",
+      "branche": true,
+      "description": "Guitare, contrebasse, accordéon puis clarinette au motif, piano et glockenspiel à la reprise; 4/4, 96, centre en sol.",
+      "duree": 82,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "musique-bourg-matin.m4a",
+      "octets": 1007852,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-matin-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-matin-air.ogg"
+      ]
+    },
+    {
+      "id": "musique-bourg-apres-midi",
+      "section": "musiques",
+      "sorte": "musique",
+      "nom": "Le bourg l'après-midi",
+      "ou": "À Aubrune l'après-midi (12 h 30 à 18 h), avec des pauses de silence.",
+      "branche": true,
+      "description": "Clarinette puis accordéon, guitare, contrebasse, piano, glockenspiel; 6/8, 90, centre en sol.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "musique-bourg-apres-midi.m4a",
+      "octets": 812371,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-apres-midi-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-apres-midi-air.ogg"
+      ]
+    },
+    {
+      "id": "musique-bourg-soir",
+      "section": "musiques",
+      "sorte": "musique",
+      "nom": "Le bourg le soir",
+      "ou": "À Aubrune le soir (18 h à 21 h), avec des pauses de silence.",
+      "branche": true,
+      "description": "Accordéon lent, guitare, contrebasse, clarinette en tierce, éclats de glockenspiel; 4/4, 80, centre en mi (mode relatif: le motif décalé d'un degré).",
+      "duree": 74,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "musique-bourg-soir.m4a",
+      "octets": 908359,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-soir-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-soir-air.ogg"
+      ]
+    },
+    {
+      "id": "musique-bourg-nuit",
+      "section": "musiques",
+      "sorte": "musique",
+      "nom": "Le bourg la nuit",
+      "ou": "À Aubrune la nuit (21 h à 5 h), rarement, avec de longs silences.",
+      "branche": true,
+      "description": "Piano seul (le début de chaque phrase du motif), contrebasse à l'archet, un éclat de verre de loin en loin; 4/4, 60, centre en sol.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "musique-bourg-nuit.m4a",
+      "octets": 811680,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-nuit-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-nuit-air.ogg"
+      ]
+    },
+    {
+      "id": "musique-bourg-pluie",
+      "section": "musiques",
+      "sorte": "musique",
+      "nom": "Le bourg sous la pluie",
+      "ou": "À Aubrune par pluie, orage ou neige à l'aube (5 h à 8 h), le matin (8 h à 12 h 30), l'après-midi (12 h 30 à 18 h) ou le soir (18 h à 21 h), avec des pauses de silence.",
+      "branche": true,
+      "description": "Piano doux, gouttes de glockenspiel, contrebasse à l'archet, clarinette lointaine; 4/4, 80, centre en sol.",
+      "duree": 74,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "musique-bourg-pluie.m4a",
+      "octets": 909394,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-pluie-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/bourg-pluie-air.ogg"
+      ]
+    },
+    {
+      "id": "musique-riviere",
+      "section": "musiques",
+      "sorte": "musique",
+      "nom": "La rivière",
+      "ou": "À Aubrune au bord de la rivière la nuit (21 h à 5 h), rarement, avec de longs silences; à Aubrune au bord de la rivière à l'aube (5 h à 8 h), le matin (8 h à 12 h 30), l'après-midi (12 h 30 à 18 h) ou le soir (18 h à 21 h), avec des pauses de silence.",
+      "branche": true,
+      "description": "Guitare qui coule, piano en ruisseau aigu, clarinette, glockenspiel; 6/8, 72, centre en ré mixolydien (mélodie une quarte plus bas).",
+      "duree": 72,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "musique-riviere.m4a",
+      "octets": 883944,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/riviere-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/riviere-air.ogg"
+      ]
+    },
+    {
+      "id": "musique-train",
+      "section": "musiques",
+      "sorte": "musique",
+      "nom": "Le train",
+      "ou": "À l'embarquement et pendant le voyage en train, en continu; pendant « Visiteur du train » (lieu d'essai seulement), avec des pauses de silence.",
+      "branche": true,
+      "description": "Brosses en balancement, contrebasse qui marche, guitare, accordéon puis clarinette; 4/4, 120, centre en sol.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "musique-train.m4a",
+      "octets": 827829,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/train-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/train-air.ogg"
+      ]
+    },
+    {
+      "id": "musique-mystere",
+      "section": "musiques",
+      "sorte": "musique",
+      "nom": "Le mystère de 5 h 12",
+      "ou": "Pendant la scène « La sonnerie » (lieu d'essai seulement), en continu; à Aubrune vers 5 h 12 (4 h 45 à 5 h 30), rarement, avec de longs silences.",
+      "branche": true,
+      "description": "Quelques notes de piano séparées de silences, contrebasse à l'archet, éclats de verre; 4/4, 60, centre en mi mineur.",
+      "duree": 62,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "musique-mystere.m4a",
+      "octets": 762130,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/mystere-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/mystere-air.ogg"
+      ]
+    },
+    {
+      "id": "musique-fete",
+      "section": "musiques",
+      "sorte": "musique",
+      "nom": "Le bal de la fête",
+      "ou": "Pendant « Fête des barrières fleuries » le soir (18 h à 21 h) ou la nuit (21 h à 5 h), longuement, peu de silences; pendant « Concours de la soupe » le soir (18 h à 21 h) ou la nuit (21 h à 5 h), longuement, peu de silences; pendant « Fête d'essai » (lieu d'essai seulement), longuement, peu de silences.",
+      "branche": true,
+      "description": "Valse: contrebasse, guitare, accordéon, clarinette, piano, glockenspiel; 3/4, 108, centre en sol.",
+      "duree": 82,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "musique-fete.m4a",
+      "octets": 1007286,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/fete-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/fete-air.ogg"
+      ]
+    },
+    {
+      "id": "air-marche-de-la-halte",
+      "section": "airs",
+      "sorte": "musique",
+      "nom": "Marche de la halte",
+      "ou": "Air de la fiche « Marche de la halte » du carnet; pendant « Fête des barrières fleuries » à l'aube (5 h à 8 h), le matin (8 h à 12 h 30) ou l'après-midi (12 h 30 à 18 h), longuement, peu de silences.",
+      "branche": true,
+      "description": "La marche de la fanfare d'Armand, jouée sur le quai. Le trombone a un temps d'avance. Fanfare du quai: marche 2/4 à 120: bugle (trompette douce), tuba, cors, caisse claire; le trombone relance un temps avant le motif; trio à la clarinette, reprise en tutti avec glockenspiel.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "air-marche-de-la-halte.m4a",
+      "octets": 818579,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-marche-de-la-halte-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-marche-de-la-halte-air.ogg"
+      ]
+    },
+    {
+      "id": "air-valse-de-la-minute",
+      "section": "airs",
+      "sorte": "musique",
+      "nom": "Valse de la minute",
+      "ou": "Air de la fiche « Valse de la minute » du carnet; pendant « Première veillée du quai » ou « Veillée du quai », longuement, peu de silences.",
+      "branche": true,
+      "description": "La valse qu'Ambroise sifflote en réglant la pendule. Firmin la connaît par cœur, il ne le dira pas. Valse du dernier bal: 3/4 à 135, accordéon; le pont sifflé par Ambroise pendant que la pendule bat (bois très doux); reprise accordéon et clarinette en tierce.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "air-valse-de-la-minute.m4a",
+      "octets": 812164,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-valse-de-la-minute-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-valse-de-la-minute-air.ogg"
+      ]
+    },
+    {
+      "id": "air-carillon-des-deux-soeurs",
+      "section": "airs",
+      "sorte": "musique",
+      "nom": "Carillon des deux sœurs",
+      "ou": "Air de la fiche « Carillon des deux sœurs » du carnet; pendant « Nuit des lumignons » à l'aube (5 h à 8 h), le matin (8 h à 12 h 30) ou l'après-midi (12 h 30 à 18 h), longuement, peu de silences.",
+      "branche": true,
+      "description": "La Fêlée refondue, qui sonne juste à côté de sa grande sœur. Marthe et Honorine l'écoutent ensemble. Complainte de la Fêlée: clarinette en mi mineur doux sur harpe et contrebasse à l'archet; puis la grande cloche (sol) et la Fêlée refondue (ré) sonnent juste, en sol, boîte à musique.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "air-carillon-des-deux-soeurs.m4a",
+      "octets": 809714,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-carillon-des-deux-soeurs-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-carillon-des-deux-soeurs-air.ogg"
+      ]
+    },
+    {
+      "id": "air-chanson-des-marmites",
+      "section": "airs",
+      "sorte": "musique",
+      "nom": "Chanson des marmites",
+      "ou": "Air de la fiche « Chanson des marmites » du carnet; pendant « Concours de la soupe » à l'aube (5 h à 8 h), le matin (8 h à 12 h 30) ou l'après-midi (12 h 30 à 18 h), longuement, peu de silences.",
+      "branche": true,
+      "description": "La chanson du concours de la soupe, que tout le bourg reprend en tapant sur les couvercles. Berceuse d'Honorine: 3/4 à 100: boîte à musique seule; le bourg la reprend à l'accordéon et à la clarinette en tapant sur les couvercles (cloche de cymbale, tom grave); elle redevient berceuse.",
+      "duree": 74,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "air-chanson-des-marmites.m4a",
+      "octets": 913501,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-chanson-des-marmites-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-chanson-des-marmites-air.ogg"
+      ]
+    },
+    {
+      "id": "air-canon-de-la-repetition",
+      "section": "airs",
+      "sorte": "musique",
+      "nom": "Canon de la répétition",
+      "ou": "Pas encore branché dans le jeu: le bouton « Écouter » du carnet n'est pas encore relié, et aucune règle de musique ne le joue.",
+      "branche": false,
+      "description": "L'air de la répétition devant l'école, en canon, parce que personne ne partait ensemble. Ritournelle des grenouilles: 4/4 à 120: canon à trois voix à deux mesures d'écart (basson, clarinette, pizzicati) sur un ostinato; chacun s'arrête à son tour; le guiro fait les grenouilles.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "air-canon-de-la-repetition.m4a",
+      "octets": 815903,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-canon-de-la-repetition-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-canon-de-la-repetition-air.ogg"
+      ]
+    },
+    {
+      "id": "air-chant-de-la-coupe",
+      "section": "airs",
+      "sorte": "musique",
+      "nom": "Chant de la coupe",
+      "ou": "Pas encore branché dans le jeu: le bouton « Écouter » du carnet n'est pas encore relié, et aucune règle de musique ne le joue.",
+      "branche": false,
+      "description": "Le chant de Barnabé, qui garde le rythme de la hache. Il le fredonne en pétrissant, maintenant. Trombone du bief: blues gentil en ré mixolydien (le do naturel seule couleur bleue), 4/4 à 90 en balancement; trombone, puis appel et réponse avec la clarinette; un coup de bois par mesure pour la hache.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "air-chant-de-la-coupe.m4a",
+      "octets": 821651,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-chant-de-la-coupe-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-chant-de-la-coupe-air.ogg"
+      ]
+    },
+    {
+      "id": "air-sifflet-du-samedi",
+      "section": "airs",
+      "sorte": "musique",
+      "nom": "Le sifflet du samedi",
+      "ou": "Air de la fiche « Le sifflet du samedi » du carnet; pendant « Veillée du premier train » à l'aube (5 h à 8 h), le matin (8 h à 12 h 30) ou l'après-midi (12 h 30 à 18 h), longuement, peu de silences; pendant « Train du samedi », avec des pauses de silence.",
+      "branche": true,
+      "description": "Deux coups de sifflet, une note longue: Rosalie annonce le train à tout le bourg. Chanson de la draisine: 6/8 à 135: guitare en arpèges qui roulent, brosses sur les éclisses; la chanson commence par deux brèves et une longue, que le sifflet double.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "air-sifflet-du-samedi.m4a",
+      "octets": 813220,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-sifflet-du-samedi-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-sifflet-du-samedi-air.ogg"
+      ]
+    },
+    {
+      "id": "air-sonnerie-de-5h12",
+      "section": "airs",
+      "sorte": "musique",
+      "nom": "Sonnerie de 5 h 12",
+      "ou": "Air de la fiche « Sonnerie de 5 h 12 » du carnet; pendant « Nuit des lumignons » le soir (18 h à 21 h) ou la nuit (21 h à 5 h), longuement, peu de silences; pendant « Veillée du premier train » le soir (18 h à 21 h) ou la nuit (21 h à 5 h), longuement, peu de silences.",
+      "branche": true,
+      "description": "La sonnerie de 5 h 12, cloche et sifflet mêlés dans la nuit. Le bourg ne l'avait pas entendue depuis 1987. Hymne de la ligne: le motif du quai en choral à quatre voix: harmonium, puis cor, chœur, tous; la cloche (sol et sa tierce) et un sifflet lointain.",
+      "duree": 66,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "air-sonnerie-de-5h12.m4a",
+      "octets": 809263,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-sonnerie-de-5h12-fond.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/musique/air-sonnerie-de-5h12-air.ogg"
+      ]
+    },
+    {
+      "id": "jingle-prise-nouvelle",
+      "section": "jingles",
+      "sorte": "jingle",
+      "nom": "Nouvelle trouvaille",
+      "ou": "Quand on trouve une pièce de collection pour la première fois. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Arpège de glockenspiel qui monte (ré, sol, si, ré) sur un accord de guitare et d'accordéon.",
+      "duree": 2.73,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "jingle-prise-nouvelle.m4a",
+      "octets": 33823,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/jingle-prise-nouvelle.ogg"
+      ]
+    },
+    {
+      "id": "jingle-etape-quete",
+      "section": "jingles",
+      "sorte": "jingle",
+      "nom": "Étape de quête",
+      "ou": "Quand une étape de quête est faite. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "La quarte du motif, clarinette et verre.",
+      "duree": 2.03,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "jingle-etape-quete.m4a",
+      "octets": 24851,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/jingle-etape-quete.ogg"
+      ]
+    },
+    {
+      "id": "jingle-quete-terminee",
+      "section": "jingles",
+      "sorte": "jingle",
+      "nom": "Quête terminée",
+      "ou": "Quand une quête est terminée. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Le motif complet posé sur sol.",
+      "duree": 4.2,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "jingle-quete-terminee.m4a",
+      "octets": 51650,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/jingle-quete-terminee.ogg"
+      ]
+    },
+    {
+      "id": "jingle-reveil",
+      "section": "jingles",
+      "sorte": "jingle",
+      "nom": "Réveil",
+      "ou": "Au réveil, quand vous avez dormi tous les deux. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Arpège de guitare qui monte, clarinette, éclat de verre.",
+      "duree": 4.02,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "jingle-reveil.m4a",
+      "octets": 49280,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/jingle-reveil.ogg"
+      ]
+    },
+    {
+      "id": "jingle-repas-partage",
+      "section": "jingles",
+      "sorte": "jingle",
+      "nom": "Repas partagé",
+      "ou": "Quand vous partagez un repas. Seul le joueur concerné l'entend.",
+      "branche": true,
+      "description": "Trois notes d'accordéon en valse, basse qui rebondit.",
+      "duree": 3.8,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "jingle-repas-partage.m4a",
+      "octets": 46118,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/jingle-repas-partage.ogg"
+      ]
+    },
+    {
+      "id": "jingle-collection-complete",
+      "section": "jingles",
+      "sorte": "jingle",
+      "nom": "Collection complète",
+      "ou": "Quand une collection est complète. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Cascade pentatonique de glockenspiel, accord de sol qui s'ouvre.",
+      "duree": 3.59,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "jingle-collection-complete.m4a",
+      "octets": 44227,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/jingle-collection-complete.ogg"
+      ]
+    },
+    {
+      "id": "jingle-arrivee-aubrune",
+      "section": "jingles",
+      "sorte": "jingle",
+      "nom": "Arrivée à Aubrune",
+      "ou": "Quand on arrive à Aubrune, ou au début de la partie. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Le début du motif du quai, accordéon et guitare.",
+      "duree": 5.83,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "jingle-arrivee-aubrune.m4a",
+      "octets": 71609,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/musique/theme-arrivee-aubrune.ogg"
+      ]
+    },
+    {
+      "id": "effet-peche-lancer",
+      "section": "peche",
+      "sorte": "effet",
+      "nom": "Lancer la ligne",
+      "ou": "Quand on lance sa ligne. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Fouet de la canne, fil qui file, bouchon posé à 0,62 s.",
+      "duree": 0.95,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-peche-lancer.m4a",
+      "octets": 13139,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/peche-lancer.ogg"
+      ]
+    },
+    {
+      "id": "effet-peche-touche",
+      "section": "peche",
+      "sorte": "effet",
+      "nom": "Ça mord",
+      "ou": "Quand un poisson mord. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Le bouchon plonge, deux tintements (sol 6, ré 7).",
+      "duree": 0.6,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-peche-touche.m4a",
+      "octets": 6404,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/peche-touche.ogg"
+      ]
+    },
+    {
+      "id": "effet-peche-moulinet",
+      "section": "peche",
+      "sorte": "effet",
+      "nom": "Moulinet",
+      "ou": "Quand on range sa ligne sans prise (les deux joueurs l'entendent); à chaque tour de moulinet pendant la tirée (seul le joueur qui agit l'entend).",
+      "branche": true,
+      "description": "Cliquet qui accélère.",
+      "duree": 0.75,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-peche-moulinet.m4a",
+      "octets": 12279,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/peche-moulinet.ogg"
+      ]
+    },
+    {
+      "id": "effet-peche-prise",
+      "section": "peche",
+      "sorte": "effet",
+      "nom": "Poisson sorti de l'eau",
+      "ou": "Quand on sort un poisson de l'eau. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Gerbe et gouttes.",
+      "duree": 1,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-peche-prise.m4a",
+      "octets": 12192,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/peche-prise.ogg"
+      ]
+    },
+    {
+      "id": "effet-peche-bouchon",
+      "section": "peche",
+      "sorte": "effet",
+      "nom": "Le bouchon remonte",
+      "ou": "Quand on rate le ferrage. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "« bloup » du bouchon qui remonte.",
+      "duree": 0.42,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-peche-bouchon.m4a",
+      "octets": 4407,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/peche-bouchon.ogg"
+      ]
+    },
+    {
+      "id": "effet-peche-casse",
+      "section": "peche",
+      "sorte": "effet",
+      "nom": "Le poisson se décroche",
+      "ou": "Quand le poisson se décroche. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Claquement, corde qui vibre en descendant, sans drame.",
+      "duree": 0.62,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-peche-casse.m4a",
+      "octets": 7016,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/peche-casse.ogg"
+      ]
+    },
+    {
+      "id": "effet-cuisine-decoupe",
+      "section": "cuisine",
+      "sorte": "effet",
+      "nom": "Découpe",
+      "ou": "Quand on découpe en cuisine (seul l'autre joueur l'entend); à chaque coup de couteau, chez celui qui cuisine (seul le joueur qui agit l'entend).",
+      "branche": true,
+      "description": "",
+      "duree": 1.22,
+      "boucle": false,
+      "variantes": 3,
+      "canaux": 1,
+      "fichier": "effet-cuisine-decoupe.m4a",
+      "octets": 6402,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/cuisine-decoupe-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/cuisine-decoupe-2.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/cuisine-decoupe-3.ogg"
+      ]
+    },
+    {
+      "id": "effet-cuisine-mijote",
+      "section": "cuisine",
+      "sorte": "effet",
+      "nom": "Mijoter",
+      "ou": "Quand on remue la marmite (seul l'autre joueur l'entend); à chaque tour de cuillère, chez celui qui cuisine (seul le joueur qui agit l'entend).",
+      "branche": true,
+      "description": "",
+      "duree": 1.3,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-cuisine-mijote.m4a",
+      "octets": 17208,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/cuisine-mijote.ogg"
+      ]
+    },
+    {
+      "id": "effet-cuisine-friture",
+      "section": "cuisine",
+      "sorte": "effet",
+      "nom": "Friture",
+      "ou": "Quand on fait chauffer (seul l'autre joueur l'entend); quand on met sur le feu, chez celui qui cuisine (seul le joueur qui agit l'entend).",
+      "branche": true,
+      "description": "",
+      "duree": 1.3,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-cuisine-friture.m4a",
+      "octets": 16996,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/cuisine-friture.ogg"
+      ]
+    },
+    {
+      "id": "effet-plat-reussi",
+      "section": "cuisine",
+      "sorte": "effet",
+      "nom": "Plat réussi",
+      "ou": "Quand un plat est réussi. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Assiette qui tinte, ré, sol, si qui montent.",
+      "duree": 0.9,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-plat-reussi.m4a",
+      "octets": 8999,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/plat-reussi.ogg"
+      ]
+    },
+    {
+      "id": "effet-plat-rate",
+      "section": "cuisine",
+      "sorte": "effet",
+      "nom": "Plat raté",
+      "ou": "Quand un plat est raté. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Deux notes de bois qui descendent (ré, si), « plof ».",
+      "duree": 0.6,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-plat-rate.m4a",
+      "octets": 7521,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/plat-rate.ogg"
+      ]
+    },
+    {
+      "id": "effet-meuble-soulever",
+      "section": "meubles",
+      "sorte": "effet",
+      "nom": "Soulever un meuble",
+      "ou": "Quand on soulève ou prend un meuble. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 0.3,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-meuble-soulever.m4a",
+      "octets": 4444,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/meuble-soulever.ogg"
+      ]
+    },
+    {
+      "id": "effet-meuble-poser",
+      "section": "meubles",
+      "sorte": "effet",
+      "nom": "Poser un meuble",
+      "ou": "Quand on pose un meuble; quand on annule le déplacement d'un meuble. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Deux appuis de bois.",
+      "duree": 1.1,
+      "boucle": false,
+      "variantes": 2,
+      "canaux": 1,
+      "fichier": "effet-meuble-poser.m4a",
+      "octets": 5982,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/meuble-poser-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/meuble-poser-2.ogg"
+      ]
+    },
+    {
+      "id": "effet-meuble-tourner",
+      "section": "meubles",
+      "sorte": "effet",
+      "nom": "Tourner un meuble",
+      "ou": "Quand on tourne un meuble. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Pied qui frotte puis se cale.",
+      "duree": 0.42,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-meuble-tourner.m4a",
+      "octets": 6230,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/meuble-tourner.ogg"
+      ]
+    },
+    {
+      "id": "effet-meuble-ranger",
+      "section": "meubles",
+      "sorte": "effet",
+      "nom": "Ranger un meuble",
+      "ou": "Quand on range un meuble. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Froissement, couvercle, note de verre.",
+      "duree": 0.55,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-meuble-ranger.m4a",
+      "octets": 6442,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/meuble-ranger.ogg"
+      ]
+    },
+    {
+      "id": "effet-porte",
+      "section": "portes-boutique",
+      "sorte": "effet",
+      "nom": "Porte",
+      "ou": "Quand on passe une porte. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Loquet, grincement léger, porte refermée à 0,78 s (couvre le fondu d'entrée).",
+      "duree": 1.15,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-porte.m4a",
+      "octets": 9894,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/porte.ogg"
+      ]
+    },
+    {
+      "id": "effet-clochette-boutique",
+      "section": "portes-boutique",
+      "sorte": "effet",
+      "nom": "Clochette de la boutique",
+      "ou": "Quand on ouvre une boutique. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Clochette de laiton sur ressort (si 6, ré 7).",
+      "duree": 1.4,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-clochette-boutique.m4a",
+      "octets": 12611,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/clochette-boutique.ogg"
+      ]
+    },
+    {
+      "id": "effet-pieces-vente",
+      "section": "portes-boutique",
+      "sorte": "effet",
+      "nom": "Encaisser des pièces",
+      "ou": "Quand on gagne de l'argent (vente, récompense). Seul le joueur concerné l'entend.",
+      "branche": true,
+      "description": "Pièces qui tintent et tombent dans la bourse.",
+      "duree": 0.62,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-pieces-vente.m4a",
+      "octets": 6518,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/pieces-vente.ogg"
+      ]
+    },
+    {
+      "id": "effet-pieces-achat",
+      "section": "portes-boutique",
+      "sorte": "effet",
+      "nom": "Payer",
+      "ou": "Quand on dépense de l'argent (achat, loyer). Seul le joueur concerné l'entend.",
+      "branche": true,
+      "description": "Trois pièces posées sur le comptoir de bois.",
+      "duree": 0.55,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-pieces-achat.m4a",
+      "octets": 5593,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/pieces-achat.ogg"
+      ]
+    },
+    {
+      "id": "effet-monnaie",
+      "section": "portes-boutique",
+      "sorte": "effet",
+      "nom": "Monnaie (ancien son)",
+      "ou": "Pas encore branché dans le jeu: rien ne le déclenche pour l'instant.",
+      "branche": false,
+      "description": "",
+      "duree": 0.7,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-monnaie.m4a",
+      "octets": 5821,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/monnaie.ogg"
+      ]
+    },
+    {
+      "id": "effet-cloche-marthe",
+      "section": "histoire",
+      "sorte": "effet",
+      "nom": "La grande cloche, trois coups",
+      "ou": "Pendant la scène « En voiture » ou « L'autorail crème ». Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Trois coups de la grande cloche, juste (sol, tierce majeure), 8,5 s.",
+      "duree": 8.5,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-cloche-marthe.m4a",
+      "octets": 72698,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/cloche-marthe.ogg"
+      ]
+    },
+    {
+      "id": "effet-cloche-marthe-coup",
+      "section": "histoire",
+      "sorte": "effet",
+      "nom": "La grande cloche, un coup (les heures)",
+      "ou": "Aux heures pleines, de 7 h à 19 h, un coup par heure. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Un coup, 5,5 s.",
+      "duree": 5.5,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-cloche-marthe-coup.m4a",
+      "octets": 38260,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/cloche-marthe-coup.ogg"
+      ]
+    },
+    {
+      "id": "effet-cloche-felee",
+      "section": "histoire",
+      "sorte": "effet",
+      "nom": "La Fêlée",
+      "ou": "Pendant la scène « La Fêlée sonne ». Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "La petite cloche fendue, partiels désaccordés qui battent, un peu de râpe; drôle, pas inquiétante.",
+      "duree": 5,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-cloche-felee.m4a",
+      "octets": 52317,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/cloche-felee.ogg"
+      ]
+    },
+    {
+      "id": "effet-passage-a-niveau",
+      "section": "histoire",
+      "sorte": "effet",
+      "nom": "Sonnerie du passage à niveau",
+      "ou": "Quand arrive « Train du samedi », « Départ du train du samedi », « Autorail de 5 h 12 » ou « Départ de l'autorail » (le train passe la barrière). Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Timbre électrique (si 5) frappé 9 fois par seconde, 3,5 s.",
+      "duree": 4.6,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-passage-a-niveau.m4a",
+      "octets": 61141,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/passage-a-niveau.ogg"
+      ]
+    },
+    {
+      "id": "effet-cinq-douze",
+      "section": "histoire",
+      "sorte": "effet",
+      "nom": "Le 5 h 12",
+      "ou": "Pendant la scène « La sonnerie de 5 h 12 » ou « La pose longue ». Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Deux coups isolés du même timbre, de loin, puis un roulement grave qu'on peut prendre pour le vent.",
+      "duree": 7,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-cinq-douze.m4a",
+      "octets": 79211,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/cinq-douze.ogg"
+      ]
+    },
+    {
+      "id": "effet-train-arrive",
+      "section": "train-journee",
+      "sorte": "effet",
+      "nom": "Le train arrive",
+      "ou": "Quand le train arrive en gare. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 7,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-train-arrive.m4a",
+      "octets": 90176,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/train-arrive.ogg"
+      ]
+    },
+    {
+      "id": "effet-embarquement",
+      "section": "train-journee",
+      "sorte": "effet",
+      "nom": "Montée à bord",
+      "ou": "Quand vous montez dans le train. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 1.5,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-embarquement.m4a",
+      "octets": 11754,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/embarquement.ogg"
+      ]
+    },
+    {
+      "id": "effet-reveil",
+      "section": "train-journee",
+      "sorte": "effet",
+      "nom": "Réveil du matin",
+      "ou": "Au réveil, quand vous avez dormi tous les deux. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 3.4,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-reveil.m4a",
+      "octets": 25913,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/reveil.ogg"
+      ]
+    },
+    {
+      "id": "effet-pas-herbe",
+      "section": "pas",
+      "sorte": "effet",
+      "nom": "Pas dans l'herbe",
+      "ou": "À chaque foulée sur l'herbe (une tous les 0,85 m). Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 1.22,
+      "boucle": false,
+      "variantes": 3,
+      "canaux": 1,
+      "fichier": "effet-pas-herbe.m4a",
+      "octets": 12397,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-herbe-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-herbe-2.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-herbe-3.ogg"
+      ]
+    },
+    {
+      "id": "effet-pas-terre",
+      "section": "pas",
+      "sorte": "effet",
+      "nom": "Pas sur la terre",
+      "ou": "À chaque foulée sur la terre, le sable, la vase ou au potager. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 1.35,
+      "boucle": false,
+      "variantes": 3,
+      "canaux": 1,
+      "fichier": "effet-pas-terre.m4a",
+      "octets": 11704,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-terre-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-terre-2.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-terre-3.ogg"
+      ]
+    },
+    {
+      "id": "effet-pas-pave",
+      "section": "pas",
+      "sorte": "effet",
+      "nom": "Pas sur les pavés",
+      "ou": "À chaque foulée sur les pavés. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 1.16,
+      "boucle": false,
+      "variantes": 3,
+      "canaux": 1,
+      "fichier": "effet-pas-pave.m4a",
+      "octets": 7347,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-pave-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-pave-2.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-pave-3.ogg"
+      ]
+    },
+    {
+      "id": "effet-pas-bois",
+      "section": "pas",
+      "sorte": "effet",
+      "nom": "Pas sur le plancher",
+      "ou": "À chaque foulée sur un plancher. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 1.28,
+      "boucle": false,
+      "variantes": 3,
+      "canaux": 1,
+      "fichier": "effet-pas-bois.m4a",
+      "octets": 9207,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-bois-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-bois-2.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-bois-3.ogg"
+      ]
+    },
+    {
+      "id": "effet-pas-gravier",
+      "section": "pas",
+      "sorte": "effet",
+      "nom": "Pas sur le gravier",
+      "ou": "À chaque foulée sur les galets ou le ballast de la voie. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 1.34,
+      "boucle": false,
+      "variantes": 3,
+      "canaux": 1,
+      "fichier": "effet-pas-gravier.m4a",
+      "octets": 12240,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-gravier-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-gravier-2.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-gravier-3.ogg"
+      ]
+    },
+    {
+      "id": "effet-pas-eau",
+      "section": "pas",
+      "sorte": "effet",
+      "nom": "Pas dans l'eau",
+      "ou": "À chaque foulée dans l'eau d'un gué. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 1.64,
+      "boucle": false,
+      "variantes": 3,
+      "canaux": 1,
+      "fichier": "effet-pas-eau.m4a",
+      "octets": 21174,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-eau-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-eau-2.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-eau-3.ogg"
+      ]
+    },
+    {
+      "id": "effet-pas-tapis",
+      "section": "pas",
+      "sorte": "effet",
+      "nom": "Pas sur un tapis",
+      "ou": "À chaque foulée sur un tapis. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 1.16,
+      "boucle": false,
+      "variantes": 3,
+      "canaux": 1,
+      "fichier": "effet-pas-tapis.m4a",
+      "octets": 7970,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-tapis-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-tapis-2.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/pas-tapis-3.ogg"
+      ]
+    },
+    {
+      "id": "effet-reussite",
+      "section": "gestes",
+      "sorte": "effet",
+      "nom": "Geste réussi",
+      "ou": "Quand un geste aboutit et n'a pas de son à lui. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 0.34,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-reussite.m4a",
+      "octets": 5386,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/reussite.ogg"
+      ]
+    },
+    {
+      "id": "effet-ramasser",
+      "section": "gestes",
+      "sorte": "effet",
+      "nom": "Ramasser",
+      "ou": "Quand on ramasse un objet. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 0.16,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-ramasser.m4a",
+      "octets": 3333,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/ramasser.ogg"
+      ]
+    },
+    {
+      "id": "effet-poser",
+      "section": "gestes",
+      "sorte": "effet",
+      "nom": "Poser",
+      "ou": "Quand on pose le plat terminé en cuisine. Seul le joueur qui agit l'entend.",
+      "branche": true,
+      "description": "",
+      "duree": 0.2,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-poser.m4a",
+      "octets": 3199,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/poser.ogg"
+      ]
+    },
+    {
+      "id": "effet-asseoir",
+      "section": "gestes",
+      "sorte": "effet",
+      "nom": "S'asseoir",
+      "ou": "Quand on s'assoit. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 0.32,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-asseoir.m4a",
+      "octets": 4983,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/asseoir.ogg"
+      ]
+    },
+    {
+      "id": "effet-rangement-ouvre",
+      "section": "gestes",
+      "sorte": "effet",
+      "nom": "Ouvrir un rangement",
+      "ou": "Quand on ouvre un rangement. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 0.42,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-rangement-ouvre.m4a",
+      "octets": 6257,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/rangement-ouvre.ogg"
+      ]
+    },
+    {
+      "id": "effet-rangement-ferme",
+      "section": "gestes",
+      "sorte": "effet",
+      "nom": "Fermer un rangement",
+      "ou": "Pas encore branché dans le jeu: rien ne le déclenche pour l'instant.",
+      "branche": false,
+      "description": "",
+      "duree": 0.3,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-rangement-ferme.m4a",
+      "octets": 3620,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/rangement-ferme.ogg"
+      ]
+    },
+    {
+      "id": "effet-eau-pompe",
+      "section": "gestes",
+      "sorte": "effet",
+      "nom": "Eau de la pompe",
+      "ou": "Quand on se lave les mains à la pompe. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "",
+      "duree": 1.5,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-eau-pompe.m4a",
+      "octets": 19603,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/eau-pompe.ogg"
+      ]
+    },
+    {
+      "id": "effet-photo-declic",
+      "section": "gestes",
+      "sorte": "effet",
+      "nom": "Déclic de l'appareil photo",
+      "ou": "Quand on prend une photo. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Déclencheur, rideau, ressort.",
+      "duree": 0.32,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-photo-declic.m4a",
+      "octets": 3368,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/photo-declic.ogg"
+      ]
+    },
+    {
+      "id": "effet-cible",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Cible visée",
+      "ou": "Quand l'objet ou l'habitant visé change. Seul le joueur qui agit l'entend.",
+      "branche": true,
+      "description": "",
+      "duree": 0.07,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-cible.m4a",
+      "octets": 2153,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/cible.ogg"
+      ]
+    },
+    {
+      "id": "effet-choix",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Choix",
+      "ou": "À chaque choix dans un menu (saison, assiette). Seul le joueur qui agit l'entend.",
+      "branche": true,
+      "description": "",
+      "duree": 0.14,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-choix.m4a",
+      "octets": 2684,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/choix.ogg"
+      ]
+    },
+    {
+      "id": "effet-refus",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Refus",
+      "ou": "Quand une action est refusée; quand l'outil est émoussé. Seul le joueur concerné l'entend.",
+      "branche": true,
+      "description": "",
+      "duree": 0.22,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-refus.m4a",
+      "octets": 3699,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/refus.ogg"
+      ]
+    },
+    {
+      "id": "effet-sac-plein",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Sac plein",
+      "ou": "Quand le sac est plein. Seul le joueur concerné l'entend.",
+      "branche": true,
+      "description": "",
+      "duree": 0.4,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-sac-plein.m4a",
+      "octets": 5956,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/sac-plein.ogg"
+      ]
+    },
+    {
+      "id": "effet-carnet-ouvre",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Ouvrir le carnet",
+      "ou": "Quand on ouvre le carnet. Seul le joueur qui agit l'entend.",
+      "branche": true,
+      "description": "",
+      "duree": 0.34,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-carnet-ouvre.m4a",
+      "octets": 5364,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/carnet-ouvre.ogg"
+      ]
+    },
+    {
+      "id": "effet-carnet-ferme",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Fermer le carnet",
+      "ou": "Quand on ferme le carnet. Seul le joueur qui agit l'entend.",
+      "branche": true,
+      "description": "",
+      "duree": 0.4,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-carnet-ferme.m4a",
+      "octets": 5342,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/carnet-ferme.ogg"
+      ]
+    },
+    {
+      "id": "effet-page",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Page de dialogue",
+      "ou": "À chaque page de dialogue. Seul le joueur concerné l'entend.",
+      "branche": true,
+      "description": "",
+      "duree": 0.14,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-page.m4a",
+      "octets": 3076,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/page.ogg"
+      ]
+    },
+    {
+      "id": "effet-palier-bas",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Besoin bas",
+      "ou": "Quand un besoin devient bas; quand un besoin bloque. Seul le joueur concerné l'entend.",
+      "branche": true,
+      "description": "",
+      "duree": 0.7,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-palier-bas.m4a",
+      "octets": 9612,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/palier-bas.ogg"
+      ]
+    },
+    {
+      "id": "effet-palier-bonus",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Besoin comblé",
+      "ou": "Quand un besoin est comblé; quand vous partagez un repas. Seul le joueur concerné l'entend.",
+      "branche": true,
+      "description": "",
+      "duree": 0.95,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-palier-bonus.m4a",
+      "octets": 11624,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/palier-bonus.ogg"
+      ]
+    },
+    {
+      "id": "effet-decision-accord",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Décision à deux: d'accord",
+      "ou": "Quand vous tombez d'accord sur une décision à deux. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Ré et sol ensemble, puis si (accord de sol).",
+      "duree": 0.9,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-decision-accord.m4a",
+      "octets": 8294,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/decision-accord.ogg"
+      ]
+    },
+    {
+      "id": "effet-decision-desaccord",
+      "section": "interface",
+      "sorte": "effet",
+      "nom": "Décision à deux: pas d'accord",
+      "ou": "Quand vos choix divergent sur une décision à deux. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Do puis la, en suspens, sans reproche.",
+      "duree": 0.7,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-decision-desaccord.m4a",
+      "octets": 6705,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/decision-desaccord.ogg"
+      ]
+    },
+    {
+      "id": "ambiance-jour",
+      "section": "ambiances",
+      "sorte": "ambiance",
+      "nom": "Ambiance de jour",
+      "ou": "De jour, en fond continu; elle se fond avec la nuit de 5 h 30 à 7 h 30 et de 19 h à 21 h. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Vent, feuillage et oiseaux, en boucle de 32 s.",
+      "duree": 32,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "ambiance-jour.m4a",
+      "octets": 396017,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/ambiances/jour.ogg"
+      ]
+    },
+    {
+      "id": "ambiance-nuit",
+      "section": "ambiances",
+      "sorte": "ambiance",
+      "nom": "Ambiance de nuit",
+      "ou": "La nuit, en fond continu; elle se fond avec le jour de 5 h 30 à 7 h 30 et de 19 h à 21 h. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Vent grave et grillons, en boucle de 32 s.",
+      "duree": 32,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "ambiance-nuit.m4a",
+      "octets": 404163,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/ambiances/nuit.ogg"
+      ]
+    },
+    {
+      "id": "ambiance-trajet",
+      "section": "ambiances",
+      "sorte": "ambiance",
+      "nom": "Dans le train",
+      "ou": "Pendant le voyage en train, à la place des ambiances de jour et de nuit. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Les rails sous le wagon, en boucle de 8 s.",
+      "duree": 8,
+      "boucle": true,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "ambiance-trajet.m4a",
+      "octets": 101031,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/ambiances/trajet.ogg"
+      ]
+    },
+    {
+      "id": "voix-flute",
+      "section": "voix",
+      "sorte": "voix",
+      "nom": "Voix à la flûte",
+      "ou": "Quand parle un habitant à la voix « vif » ou « court et retenu » (6 habitants). Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Une seule note de l'instrument. En jeu, elle est rejouée à plusieurs hauteurs, une par lettre écrite: voyelle plus longue, consonne plus brève, la phrase monte à la question.",
+      "duree": 0.55,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "voix-flute.m4a",
+      "octets": 7927,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/babil/flute.ogg"
+      ]
+    },
+    {
+      "id": "voix-clarinette",
+      "section": "voix",
+      "sorte": "voix",
+      "nom": "Voix à la clarinette",
+      "ou": "Quand parle un habitant à la voix « neutre, pentatonique majeure » (4 habitants). Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Une seule note de l'instrument. En jeu, elle est rejouée à plusieurs hauteurs, une par lettre écrite: voyelle plus longue, consonne plus brève, la phrase monte à la question.",
+      "duree": 0.57,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "voix-clarinette.m4a",
+      "octets": 7672,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/babil/clarinette.ogg"
+      ]
+    },
+    {
+      "id": "voix-marimba",
+      "section": "voix",
+      "sorte": "voix",
+      "nom": "Voix au marimba",
+      "ou": "Quand parle un habitant à la voix « sautillant, large étendue » (3 habitants). Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Une seule note de l'instrument. En jeu, elle est rejouée à plusieurs hauteurs, une par lettre écrite: voyelle plus longue, consonne plus brève, la phrase monte à la question.",
+      "duree": 0.57,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "voix-marimba.m4a",
+      "octets": 7235,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/babil/marimba.ogg"
+      ]
+    },
+    {
+      "id": "voix-basson",
+      "section": "voix",
+      "sorte": "voix",
+      "nom": "Voix au basson",
+      "ou": "Quand parle un habitant à la voix « posé, gamme mineure » ou « lent, demi-ton grinçant » (4 habitants). Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Une seule note de l'instrument. En jeu, elle est rejouée à plusieurs hauteurs, une par lettre écrite: voyelle plus longue, consonne plus brève, la phrase monte à la question.",
+      "duree": 0.55,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "voix-basson.m4a",
+      "octets": 7878,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/babil/basson.ogg"
+      ]
+    },
+    {
+      "id": "voix-boite-a-musique",
+      "section": "voix",
+      "sorte": "voix",
+      "nom": "Voix à la boîte à musique",
+      "ou": "Quand parle un habitant à la voix « clair » (2 habitants). Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Une seule note de l'instrument. En jeu, elle est rejouée à plusieurs hauteurs, une par lettre écrite: voyelle plus longue, consonne plus brève, la phrase monte à la question.",
+      "duree": 0.55,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "voix-boite-a-musique.m4a",
+      "octets": 7852,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/babil/boite-a-musique.ogg"
+      ]
+    },
+    {
+      "id": "voix-ocarina",
+      "section": "voix",
+      "sorte": "voix",
+      "nom": "Voix à l'ocarina",
+      "ou": "Quand parle un habitant à la voix « rond, lent » (3 habitants). Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Une seule note de l'instrument. En jeu, elle est rejouée à plusieurs hauteurs, une par lettre écrite: voyelle plus longue, consonne plus brève, la phrase monte à la question.",
+      "duree": 0.55,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "voix-ocarina.m4a",
+      "octets": 7833,
+      "ajoutLe": "2026-11-10",
+      "nouveau": false,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/babil/ocarina.ogg"
+      ]
+    }
+  ]
+}
