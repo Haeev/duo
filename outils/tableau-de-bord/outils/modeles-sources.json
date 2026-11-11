@@ -1,10 +1,54 @@
 {
-  "budget": { "totalOctets": 41943040, "fichierOctets": 4194304, "fichiers": 150 },
+  "budget": {
+    "totalOctets": 41943040,
+    "fichierOctets": 4194304,
+    "fichiers": 150
+  },
   "familles": [
-    { "id": "personnages", "titre": "Personnages" },
-    { "id": "meubles", "titre": "Meubles" },
-    { "id": "objets", "titre": "Objets" },
-    { "id": "decors", "titre": "Décors" }
+    {
+      "id": "batiments",
+      "titre": "Bâtiments"
+    },
+    {
+      "id": "commerces",
+      "titre": "Commerces"
+    },
+    {
+      "id": "arbres",
+      "titre": "Arbres et plantes"
+    },
+    {
+      "id": "terrain",
+      "titre": "Terrain et rochers"
+    },
+    {
+      "id": "potager",
+      "titre": "Potager et cultures"
+    },
+    {
+      "id": "meubles",
+      "titre": "Meubles et objets d'intérieur"
+    },
+    {
+      "id": "trains",
+      "titre": "Trains"
+    },
+    {
+      "id": "reperes",
+      "titre": "Repères et ouvrages"
+    },
+    {
+      "id": "luminaires",
+      "titre": "Luminaires"
+    },
+    {
+      "id": "personnages",
+      "titre": "Personnages"
+    },
+    {
+      "id": "objets",
+      "titre": "Objets à ramasser"
+    }
   ],
   "fichesDeNoms": [
     "games/la-petite-ligne-2/donnees/commun/objets",
@@ -27,24 +71,113 @@
       "famille": "personnages",
       "dossier": "games/la-petite-ligne-2/assets/commun/personnages",
       "mannequin": [
-        { "fichier": "body.glb", "noeud": "body-base" },
-        { "fichier": "head.glb", "noeud": "head-round" }
+        {
+          "fichier": "body.glb",
+          "noeud": "body-base"
+        },
+        {
+          "fichier": "head.glb",
+          "noeud": "head-round"
+        }
       ]
     },
     {
-      "id": "decors",
-      "titre": "Décors livrés",
+      "id": "batiments",
+      "titre": "Bâtiments d'Aubrune",
       "mode": "racines",
-      "famille": "decors",
-      "familleParFichier": { "furniture.glb": "meubles" },
-      "dossier": "games/la-petite-ligne-2/assets/commun/decors"
+      "famille": "batiments",
+      "dossier": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments",
+      "manifeste": {
+        "fichier": "batiments.json",
+        "cle": "batiments",
+        "champFichier": "fichier",
+        "champNoeud": "noeud"
+      },
+      "familleParCle": {
+        "cafe": "commerces",
+        "epicerie": "commerces",
+        "fournil": "commerces",
+        "mercerie": "commerces",
+        "forge": "commerces",
+        "horloger": "commerces",
+        "scierie": "commerces"
+      }
+    },
+    {
+      "id": "decors",
+      "titre": "Décors communs",
+      "mode": "racines",
+      "famille": "reperes",
+      "dossier": "games/la-petite-ligne-2/assets/commun/decors",
+      "manifeste": {
+        "fichier": "decors.json",
+        "cle": "models"
+      },
+      "familleParFamille": {
+        "arbre": "arbres",
+        "buisson": "arbres",
+        "fleur": "arbres",
+        "haie": "arbres",
+        "rocher": "terrain",
+        "talus": "terrain",
+        "bois": "terrain",
+        "culture": "potager",
+        "parcelle": "potager",
+        "rang": "potager",
+        "lit": "meubles",
+        "banc": "meubles",
+        "chaise": "meubles",
+        "coffre": "meubles",
+        "meuble": "meubles",
+        "objet": "meubles",
+        "table": "meubles",
+        "tapis": "meubles",
+        "etagere": "meubles",
+        "evier": "meubles",
+        "tabouret": "meubles",
+        "rechaud": "meubles",
+        "baignoire": "meubles",
+        "armoire": "meubles",
+        "vehicule": "trains",
+        "couchette-train": "trains",
+        "porte-voiture": "trains",
+        "porte-bagages": "trains",
+        "banquette-train": "trains",
+        "tablette": "trains",
+        "paroi-voiture": "trains",
+        "angle-caisse": "trains",
+        "applique": "trains",
+        "ouvrage": "reperes",
+        "repere": "reperes",
+        "panneau": "reperes",
+        "poteau-quai": "reperes",
+        "puits": "reperes",
+        "pompe": "reperes",
+        "boite-aux-lettres": "reperes",
+        "barriere": "reperes",
+        "tonneau": "reperes",
+        "caisse": "reperes",
+        "buches": "reperes",
+        "luminaire": "luminaires",
+        "reverbere": "luminaires",
+        "lampe": "luminaires",
+        "maison": "batiments"
+      },
+      "familleParCle": {
+        "shop-front": "commerces"
+      }
     },
     {
       "id": "objets",
       "titre": "Objets livrés",
       "mode": "racines",
       "famille": "objets",
-      "dossier": "games/la-petite-ligne-2/assets/commun/objets"
+      "dossier": "games/la-petite-ligne-2/assets/commun/objets",
+      "manifeste": {
+        "fichier": "index.json",
+        "cle": "objects",
+        "champNoeud": "node"
+      }
     }
   ]
 }
