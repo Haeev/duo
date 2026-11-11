@@ -152,6 +152,10 @@
     {
       "item": "soupe-de-legumes",
       "price": 150
+    },
+    {
+      "item": "girolle",
+      "price": 100
     }
   ],
   "dailyBuyCap": 2000,

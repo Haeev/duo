@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "galet-veine",
+  "name": "Galet veiné",
+  "model": "pierre",
+  "family": "material",
+  "stack": 5,
+  "food": null,
+  "tool": null
+}

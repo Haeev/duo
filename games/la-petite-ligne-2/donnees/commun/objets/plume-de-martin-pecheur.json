@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "plume-de-martin-pecheur",
+  "name": "Plume de martin-pêcheur",
+  "family": "material",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

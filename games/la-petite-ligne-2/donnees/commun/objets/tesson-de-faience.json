@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "tesson-de-faience",
+  "name": "Tesson de faïence",
+  "family": "material",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

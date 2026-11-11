@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "laisse-de-crue",
+  "name": "Laisse de crue",
+  "model": "dead-branches-b",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "laisse-de-crue"
+    }
+  ]
+}

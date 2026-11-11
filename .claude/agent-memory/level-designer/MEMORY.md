@@ -175,3 +175,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Les tests qui déplacent un meuble pour casser l'accès (`tests/points-de-quete.test.ts`) doivent déplacer aussi ce qui est posé dessus, sinon le validateur refuse le lieu avant la casse.
 - Le contrôle « à cheval » de `controler_plan.py` et la grille ASCII des intérieurs doivent ignorer les objets posés (ils ne prennent pas de case).
 - Mesure d'une vue `ensemble-*` (lacet 0, largeur W): le sol couvre W x 0,97 W autour du centre; lacet 45: axes (x + y)/racine 2 à l'écran, (x - y)/racine 2 en profondeur. Compter la circulation (route, rue, chemin) comme pleine: on n'y pose rien.
+
+## Trouvailles à ramasser (Aubrune version 8, vérifié le 2026-11-11)
+
+- Une sorte de rive = une ressource + un meuble du même identifiant (brique `harvest`): `collections-aubrune.test.ts` ne compte le butin que des ressources dont un objet de la carte a le type égal à l'identifiant (un `resource` porté par l'objet n'y est pas vu).
+- Une ligne de butin rare dont la plage d'heures dépasse celle de la ligne commune devient certaine hors de cette plage (une seule ligne ouverte): mêmes heures pour la commune et la rare.
+- La météo se recalcule à chaque pas (`weatherAt`, `simulation/monde`): dans un test de simulation, forcer le climat du lieu par `contentWith` (poids d'un seul temps), pas `world.common.weather`. Le butin ne lit que le temps du moment (« il a plu hier » n'existe pas).
+- Les objets n'ont pas de champ de description (seules les pièces de tenue): écrire les phrases dans le document, pas dans la fiche.
+- La grève du gué: rangée 129 terre (pierres plates), eau dès 130; « au bord de l'eau » se prouve par une case d'eau voisine, pas par le sol `galets` (`controler_trouvailles.py`).
+- L'assembleur réordonne `interieurs/epicerie-rdc.json` à chaque passage (déjà le cas avant moi): `git checkout` du fichier après la chaîne si rien d'autre n'y change.
+- Dans `python3 -I -c "..."`, un texte entre accents graves est exécuté par le shell: écrire ces textes avec Edit ou dans un script.

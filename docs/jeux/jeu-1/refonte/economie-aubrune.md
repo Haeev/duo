@@ -36,6 +36,15 @@ Prix de base en euros. « Meilleur rachat » dit où porter l'objet: c'est la le
 | Bûche | 1,40 (Menuiserie) | 0,50 (Fournil), 0,40 (Forge) | |
 | Pierre | 0,60 (Forge) | | |
 | Vieille pièce | 2,00 (Mercerie) | | |
+| Coquille de rivière | 1,20 (Mercerie) | 0,60 (Café) | |
+| Coquille d'escargot d'eau | 0,40 (Mercerie) | | |
+| Galet veiné | 0,90 (Mercerie) | | |
+| Bois flotté | 0,70 (Mercerie) | 0,50 (Café) | |
+| Tesson de faïence | 1,00 (Café) | | |
+| Plume de héron | 0,80 (Mercerie) | | |
+| Plume de martin-pêcheur | 2,40 (Mercerie) | | |
+| Perle de rivière | 6,00 (Mercerie) | | |
+| Girolle | 1,60 (Café) | 1,00 (Épicerie) | |
 | Goujon | 2,90 (Café) | | |
 | Ablette | 2,40 (Café) | | |
 | Perche | 4,80 (Café) | | |
@@ -100,7 +109,8 @@ Ce qui rapporte reste ce qui se récolte, se pêche ou se pond, borné par le li
 | Pomme | Odette 0,60, Achille 0,90 | Odette la vend 0,90, Achille 0,70 | la pomme s'achète toute l'année chez Odette, sa revente doit rester sous 0,90; le pommier du verger communal n'en donne qu'en automne (2026-11-11: 3 par jour, 2,10 € au rachat, hors du revenu du script) |
 | Soupe de légumes | Colette 3,50, Odette 2,00 | 2,00 et 1,50 | les trois légumes se cultivent depuis le 2026-11-11, mais s'achètent toujours chez les Delmas (4,80 € les trois): à 3,50, deux soupes parfaites rapporteraient 7,00 € de légumes achetés 4,80 €, une boucle d'argent. Le prix reste donc à 2,00 tant que l'étal vend les légumes |
 | Planche | Basile l'achète 1,40 | il la vend 1,60 et ne la rachète pas | aucun plan ne fait de planche |
-| Ferraille, plume, coquille, girolle, insectes, fossile en double | prix prévus | absents | objets à créer, ou sans acheteur |
+| Ferraille, insectes, fossile en double | prix prévus | absents | objets à créer, ou sans acheteur |
+| Coquille de rivière, plume | Armand 0,60 et 0,40 | Café 0,60 pour la coquille; plume chez Solange seulement | l'école n'est pas un commerce (audit C.2): la colonne d'Armand passe au café pour la coquille (Colette en garnit les pots de la terrasse) |
 
 ### La tourte du quai (2026-11-11)
 
@@ -239,3 +249,4 @@ Les jours suivants, le bonjour est celui du quotidien de l'habitant, suivi du ch
 | 2026-11-11 | Rachats: bûche chez Basile 0,60 à 1,40; pierre 0,30 à 0,60; vieille pièce 1,20 à 2,00; radis croquant 1,00 à 2,00 (Café) et 0,80 à 1,40 (Épicerie); omelette 2,20 à 2,80; poissons multipliés par 2,4 (goujon 2,90, ablette 2,40, perche 4,80, tanche 6,00, truite 7,20, brochet 12,00). Plafonds: Basile 12 à 35 €, Colette 45 à 85 €. Pot-au-feu de l'acte 3 conditionné à la cuisine payée. | le client trouve la maison trop lente (cuisine au jour 10, étage au jour 82 pour un duo tranquille) et veut le pot-au-feu dans la cuisine de la maison. Cible: environ deux fois plus vite, 40 à 50 € par jour à l'acte 1. Prix des pièces inchangés (cahier). L'omelette ne peut dépasser 2,89 € sans être rachetée plus cher qu'elle ne se vend (3,50 €, amitié et repas compris), d'où 2,80 €; les œufs crus restent à 1,00 € pour que cuisiner paie toujours. |
 | 2026-11-11 | Collections d'Aubrune: 10 poissons nouveaux rachetés au café (2,00 à 9,60 €), graines de fleurs en rayon (0,30 à 0,50 €), 9 trésors « rares » ajoutés aux fouilles; fleurs, insectes, trésors et nouveaux plats sans rachat. | `collections-aubrune.md`. Le prix moyen d'une prise passe de 4,72 à 4,31 € (plus de poissons communs): duo tranquille 103,30 à 99,40 € (acte 2) et 104,90 à 101,10 € (acte 3); médian et appliqué inchangés (plafond du café). Les fouilles rendent environ 1,50 € de moins par jour en vieilles pièces (non compté par le script). |
 | 2026-11-11 | Tourte du quai: étal gratuit retiré de l'épicerie; recette à deux postes (farine, œuf; pommes de terre, poireau); en rayon chez Odette à 12,00 €, une par semaine, dès le retour du train. | audit B.11: le bonus « Mains sûres » était permanent et gratuit. Aucun effet sur le revenu (la tourte ne se revend pas). |
+| 2026-11-11 | Coquillages et rivière (cahier 4.7): 8 trouvailles de berge et la girolle, rachetées par Solange (coquille 1,20, escargot d'eau 0,40, galet veiné 0,90, bois flotté 0,70, plume de héron 0,80, plume de martin-pêcheur 2,40, perle 6,00) et le café (coquille 0,60, bois flotté 0,50, tesson 1,00, girolle 1,60); girolle 1,00 à l'épicerie. Coquille et plume de héron ajoutées aux besoins du jour de Solange. | audit B.7. Une tournée complète (19 points, 715 m, environ 9 minutes à deux) rapporte 10,80 € par temps sec en journée, 16 € à l'aube, 20 à 27 € sous la pluie, borné à 10 € par jour chez Solange (plafond): 1 à 2 € par minute, contre 5,90 € pour la pêche (11 poissons, 48,40 € en 8 minutes). Hors du script du revenu. Détail: `carte-aubrune/plan.md`, section 19. |

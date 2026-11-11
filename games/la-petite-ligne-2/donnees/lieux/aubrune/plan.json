@@ -6154,6 +6154,215 @@
       "acte": 1,
       "when": [{ "type": "event_is", "events": ["veillee-du-premier-train"], "when": "begun" }],
       "fete": "hiver"
+    },
+    {
+      "id": "berge-coquilles-gue-1",
+      "type": "coquilles-de-greve",
+      "modele": "stone-b",
+      "x": 187.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "grève du gué: le courant ralentit avant le gué et dépose les coquilles vides des mulettes sur le gravier",
+      "regarde": null,
+      "acte": 1
+    },
+    {
+      "id": "berge-coquilles-gue-2",
+      "type": "coquilles-de-greve",
+      "modele": "stone-b",
+      "x": 190.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "grève du gué, côté aval: second dépôt de coquilles, entre deux pierres plates",
+      "regarde": null,
+      "acte": 1
+    },
+    {
+      "id": "berge-galets-gue",
+      "type": "galets-veines",
+      "modele": "stone-c",
+      "x": 192.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "bout aval de la grève: les galets veinés de quartz roulés depuis la Côte s'y arrêtent, avec les pierres plates",
+      "regarde": null,
+      "acte": 1
+    },
+    {
+      "id": "berge-laisse-joncs",
+      "type": "laisse-de-crue",
+      "modele": "dead-branches-b",
+      "x": 197.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "au pied des joncs, à côté du bois flotté qui sèche: les joncs retiennent ce que la rivière charrie",
+      "regarde": null,
+      "acte": 1
+    },
+    {
+      "id": "berge-tessons-lavoir",
+      "type": "tessons-du-lavoir",
+      "modele": "stone-b",
+      "x": 225.5,
+      "y": 119.5,
+      "rotation": 0,
+      "pourquoi": "au pied du lavoir, côté bassin, sur la rive ouest de la rigole: les assiettes rincées au bassin y laissent leurs éclats",
+      "regarde": null,
+      "acte": 1
+    },
+    {
+      "id": "berge-tessons-rigole",
+      "type": "tessons-du-lavoir",
+      "modele": "stone-b",
+      "x": 226.5,
+      "y": 128.5,
+      "rotation": 0,
+      "pourquoi": "à la bouche de la rigole, où elle rend à l'Aubrune ce qu'on a lavé: les tessons roulés s'arrêtent dans l'angle, sous le saule",
+      "regarde": null,
+      "acte": 1
+    },
+    {
+      "id": "berge-plumes-aval",
+      "type": "plumes-de-heron",
+      "modele": "wild-herbs",
+      "x": 264.5,
+      "y": 130.5,
+      "rotation": 0,
+      "pourquoi": "sous le saule têtard de l'aval, au sud-est du tronc (vu de la caméra): le héron y pêche à l'aube et y laisse ses plumes",
+      "regarde": null,
+      "acte": 1
+    },
+    {
+      "id": "berge-laisse-aval",
+      "type": "laisse-de-crue",
+      "modele": "dead-branches-b",
+      "x": 272.5,
+      "y": 130.5,
+      "rotation": 0,
+      "pourquoi": "là où la rive s'avance dans le courant: la crue y dépose son bois avant le coude",
+      "regarde": null,
+      "acte": 1
+    },
+    {
+      "id": "berge-coquilles-ile",
+      "type": "coquilles-de-greve",
+      "modele": "stone-b",
+      "x": 37.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "grève de l'Île, au pied de la vanne: l'eau qui tombe du déversoir y roule les coquilles",
+      "regarde": null,
+      "acte": 2
+    },
+    {
+      "id": "berge-galets-ile",
+      "type": "galets-veines",
+      "modele": "stone-c",
+      "x": 46.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "bout est de la grève de l'Île, après les pierres plates: les galets du déversoir",
+      "regarde": null,
+      "acte": 2
+    },
+    {
+      "id": "berge-mulettes-anse-1",
+      "type": "mulettes-du-bief",
+      "modele": "stone-b",
+      "x": 48.5,
+      "y": 141.5,
+      "rotation": 0,
+      "pourquoi": "l'anse du bief, côté Île: l'eau se calme en sortant de la vanne, les mulettes vivent dans le sable clair (la perle est là)",
+      "regarde": null,
+      "acte": 2
+    },
+    {
+      "id": "berge-mulettes-anse-2",
+      "type": "mulettes-du-bief",
+      "modele": "stone-b",
+      "x": 52.5,
+      "y": 141.5,
+      "rotation": 0,
+      "pourquoi": "l'anse du bief, plus à l'est: le second lit de mulettes, au bord du sentier de l'Île sans le toucher",
+      "regarde": null,
+      "acte": 2
+    },
+    {
+      "id": "berge-plumes-anse",
+      "type": "plumes-de-heron",
+      "modele": "wild-herbs",
+      "x": 56.5,
+      "y": 141.5,
+      "rotation": 0,
+      "pourquoi": "le bout de l'anse, où l'eau est la plus basse: le héron y pêche à l'aube, le martin-pêcheur file au ras de l'eau",
+      "regarde": null,
+      "acte": 2
+    },
+    {
+      "id": "berge-laisse-ile",
+      "type": "laisse-de-crue",
+      "modele": "dead-branches-b",
+      "x": 70.5,
+      "y": 145.5,
+      "rotation": 0,
+      "pourquoi": "rive sud de l'Île, face à la rivière: la pointe que la crue recouvre et où elle laisse son bois",
+      "regarde": null,
+      "acte": 2
+    },
+    {
+      "id": "berge-limnees-etang-o",
+      "type": "limnees-de-l-etang",
+      "modele": "stone-b",
+      "x": 230.5,
+      "y": 46.5,
+      "rotation": 0,
+      "pourquoi": "bord de vase de l'étang, à l'ouest de la bonde: les escargots d'eau des roseaux y laissent leurs coquilles",
+      "regarde": null,
+      "acte": 3
+    },
+    {
+      "id": "berge-limnees-etang-e",
+      "type": "limnees-de-l-etang",
+      "modele": "stone-b",
+      "x": 242.5,
+      "y": 46.5,
+      "rotation": 0,
+      "pourquoi": "bord de vase de l'étang, à l'est, au pied du sentier de la digue",
+      "regarde": null,
+      "acte": 3
+    },
+    {
+      "id": "berge-plumes-etang",
+      "type": "plumes-de-heron",
+      "modele": "wild-herbs",
+      "x": 234.5,
+      "y": 47.5,
+      "rotation": 0,
+      "pourquoi": "la vase à l'est de la bonde, eau basse: le héron de l'étang y guette à l'aube",
+      "regarde": null,
+      "acte": 3
+    },
+    {
+      "id": "cote-girolles-1",
+      "type": "girolles",
+      "modele": "wild-herbs",
+      "x": 180.5,
+      "y": 26.5,
+      "rotation": 0,
+      "pourquoi": "sous-bois humide à l'est du chemin forestier, au carrefour du haut: les girolles de l'été et de l'automne, le matin",
+      "regarde": null,
+      "acte": 3
+    },
+    {
+      "id": "cote-girolles-2",
+      "type": "girolles",
+      "modele": "wild-herbs",
+      "x": 174.5,
+      "y": 29.5,
+      "rotation": 0,
+      "pourquoi": "sous-bois de l'autre côté du chemin, en contrebas: second rond de girolles",
+      "regarde": null,
+      "acte": 3
     }
   ],
   "vegetation": [
@@ -6460,9 +6669,9 @@
       "y": 25,
       "noeud": "c6",
       "acte": 3,
-      "saisons": ["automne"],
+      "saisons": ["été", "automne"],
       "heures": "matin",
-      "pourquoi": "sous-bois humide, le matin après la pluie"
+      "pourquoi": "girolles du sous-bois humide, le matin (plus quand il pleut), posées en version 8"
     },
     {
       "id": "myrtilles",
@@ -6515,8 +6724,8 @@
       "y": 128.6,
       "noeud": "bg",
       "acte": 1,
-      "heures": "matin",
-      "pourquoi": "la grève au pied de la berge, eaux basses du matin"
+      "heures": "toutes",
+      "pourquoi": "la grève au pied de la berge, eaux basses du matin; coquilles, galets et bois flotté (version 8): plus après la pluie"
     },
     {
       "id": "coquillages-ile",
@@ -6525,8 +6734,8 @@
       "y": 146.6,
       "noeud": "i4",
       "acte": 2,
-      "heures": "matin",
-      "pourquoi": "la grève de l'Île"
+      "heures": "toutes",
+      "pourquoi": "la grève de l'Île; coquilles, galets et bois flotté (version 8): plus après la pluie"
     },
     {
       "id": "insectes-roseaux",

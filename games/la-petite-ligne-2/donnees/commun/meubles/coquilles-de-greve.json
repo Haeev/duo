@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "coquilles-de-greve",
+  "name": "Coquilles sur la grève",
+  "model": "stone-b",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "coquilles-de-greve"
+    }
+  ]
+}

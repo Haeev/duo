@@ -158,6 +158,22 @@
     {
       "item": "pommes-sautees",
       "price": 200
+    },
+    {
+      "item": "coquille-de-riviere",
+      "price": 60
+    },
+    {
+      "item": "bois-flotte",
+      "price": 50
+    },
+    {
+      "item": "tesson-de-faience",
+      "price": 100
+    },
+    {
+      "item": "girolle",
+      "price": 160
     }
   ],
   "dailyBuyCap": 8500,

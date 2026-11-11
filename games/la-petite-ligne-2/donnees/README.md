@@ -66,6 +66,17 @@ Cinq ajouts de données, sans ligne de moteur (gabarits commentés: `_gabarits/l
 | Note de placement `pourquoi` | Texte facultatif sur le lieu (`lieu.json`), chaque meuble, chaque objet au sol et chaque intérieur: pourquoi il est là, dans ce sens, à cette taille. Le moteur l'ignore. `pnpm pourquoi [lieu]` liste ce qui n'en a pas, sans rien bloquer.                                       |
 | Sol d'un petit lieu          | Dans `carte.json` d'un lieu sans `terrain`, `floor`: `{ "nature": "vide", "areas": [{ "x", "y", "w", "h", "nature": "plancher" }] }`, peints dans l'ordre. Natures: `plancher`, `tapis-de-couloir`, `vide` (rien n'est dessiné), `herbe`... Exemple: `lieux/train-de-nuit`.        |
 
+## Ajouter une trouvaille à ramasser (berge, sous-bois)
+
+Exemple: les trouvailles de berge d'Aubrune (`coquilles-de-greve`, `plumes-de-heron`...; `docs/jeux/jeu-1/refonte/carte-aubrune/plan.md`, section 19).
+
+1. `pnpm nouveau objet <objet>`: nom, famille (`material`, `treasure` pour un trésor), pile (coquillage, plume: 10).
+2. `pnpm nouveau ressource <sorte-de-rive>`: `kind: "pick"`, verbe « Ramasser », `respawnDays`, et le butin: une ligne par condition (`hours` pour l'aube, `weathers` pour la pluie, `seasons`), `rare: true` et un petit poids pour la surprise.
+3. `pnpm nouveau meuble <sorte-de-rive>` (même identifiant): `solid: false`, brique `{ "brick": "harvest", "resource": "<sorte-de-rive>" }`, un modèle existant en attendant le sien.
+4. Une ligne `buys` chez le commerçant du métier (`lieux/<lieu>/commerces/`), au prix de l'économie.
+5. Un point de plus: une ligne dans `TROUVAILLES` de `construire_plan.py` (case au bord de l'eau, raison d'être), puis la chaîne du plan et `controler_trouvailles.py` (0 erreur).
+6. `pnpm test`; sans dessin, l'objet entre dans les exceptions provisoires de `tests/interface-plume.test.ts`.
+
 ## Une réplique qui ouvre un écran, et l'apparence révélée (la photo)
 
 Avant la photo du prologue, un joueur n'a pas de visage: son personnage est une silhouette sombre (monde, portraits, onglet Tenues fermé, miroir refusé). Gabarit commenté: `_gabarits/dialogue.jsonc`; exemple: `lieux/train-de-nuit/dialogues/controleur-papiers.json`.

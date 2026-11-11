@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "girolles",
+  "name": "Girolles",
+  "model": "wild-herbs",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "girolles"
+    }
+  ]
+}

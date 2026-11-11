@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "galets-veines",
+  "name": "Galets veinés",
+  "model": "stone-c",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "galets-veines"
+    }
+  ]
+}

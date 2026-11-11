@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "coquille-de-riviere",
+  "name": "Coquille de rivière",
+  "family": "material",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

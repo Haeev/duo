@@ -65,10 +65,38 @@
     {
       "item": "vieille-piece",
       "price": 200
+    },
+    {
+      "item": "coquille-de-riviere",
+      "price": 120
+    },
+    {
+      "item": "coquille-de-limnee",
+      "price": 40
+    },
+    {
+      "item": "galet-veine",
+      "price": 90
+    },
+    {
+      "item": "bois-flotte",
+      "price": 70
+    },
+    {
+      "item": "plume-de-heron",
+      "price": 80
+    },
+    {
+      "item": "plume-de-martin-pecheur",
+      "price": 240
+    },
+    {
+      "item": "perle-de-riviere",
+      "price": 600
     }
   ],
   "dailyBuyCap": 1000,
-  "dailyNeeds": ["coquelicot"],
+  "dailyNeeds": ["coquelicot", "coquille-de-riviere", "plume-de-heron"],
   "friendship": [
     {
       "hearts": 3,
