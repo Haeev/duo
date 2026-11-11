@@ -164,6 +164,7 @@ function satisfy(sim: Sim, conditions: readonly Condition[]): void {
       // Rien à poser: un « pas encore » est vrai dans un monde neuf, le reste ne sert à aucun souvenir.
       case 'not':
       case 'decision_is':
+      case 'event_is':
       case 'money_at_least':
       case 'place_is':
       case 'season_is':
