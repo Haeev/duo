@@ -6,9 +6,18 @@ Les changements de l'application Duo, version par version, écrits pour les deux
 
 ## [Non publié]
 
+## [0.4.0] - 2026-11-11
+
+Duo te prévient désormais quand une nouvelle version est prête, garde l'historique de tes séances dans le salon de chaque jeu, et montre la mise à jour des jeux pendant qu'elle se fait.
+
+Cette version reprend aussi tout le contenu de la 0.3.1, qui n'a jamais été publiée. Installe-la sur les deux ordinateurs: tes sauvegardes et tes jeux sont gardés.
+
 ### Ajouté
 
+- Avis de nouvelle version: au démarrage, puis toutes les 6 heures si Duo reste ouvert, Duo regarde si une version plus récente est publiée. Si oui, un bandeau en haut de la bibliothèque dit « Duo X.Y.Z est disponible », résume la nouveauté et propose « Télécharger » (le bon fichier pour ton ordinateur s'ouvre dans ton navigateur; rien ne s'installe tout seul) ou « Plus tard » (le bandeau ne revient qu'au prochain lancement de Duo ou à la version suivante). Sans Internet, rien ne s'affiche et rien n'est bloqué; jamais pendant une partie.
 - Dans le salon d'un jeu, un bloc « Dernières séances » montre les trois dernières séances jouées sur cet ordinateur: date, durée, avancement, et les nombres que le jeu donne (pour La Petite Ligne: jours vécus, étapes de quête franchies, entrées de collection ajoutées). Les mêmes nombres apparaissent à l'écran de fin quand on revient au salon depuis la pause.
+
+- Venu de la 0.3.1: la mise à jour d'un jeu se voit sur sa carte et dans son salon (progression, installation, « à jour »), le jeu attend la fin de l'installation pour se lancer, et un échec propose « Réessayer » ou de jouer quand même à la version installée. Sans Internet, rien n'est bloqué. Dans le salon, Duo dit lequel des deux ordinateurs doit mettre son jeu à jour quand les versions diffèrent.
 
 ### Modifié
 
@@ -17,6 +26,8 @@ Les changements de l'application Duo, version par version, écrits pour les deux
 ## [0.3.1] - 2026-11-04
 
 Duo montre quand il télécharge la mise à jour d'un jeu et attend qu'elle soit installée avant de le lancer.
+
+Cette version n'a jamais été publiée: tout son contenu est sorti dans la 0.4.0.
 
 ### Ajouté
 

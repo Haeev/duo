@@ -8,6 +8,7 @@ import { send } from '../bridge';
 import { durationRange, fullscreenKey, t, when } from '../textes';
 import { Icon, Logo, PlayerName, PlayerSymbol, Sky } from '../ui/components';
 import { markScreenChange, useEscape, useInitialFocus } from '../ui/keyboard';
+import { AppUpdateBanner } from '../ui/app-update-banner';
 import { UpdateBanner, gateFor, gateReason, majTextes } from '../ui/update-banner';
 
 export type Tab = 'home' | 'library' | 'settings';
@@ -208,6 +209,7 @@ function Library({ state }: { state: AppState }): JSX.Element {
     <section class="bibliotheque" data-testid="ecran-bibliotheque">
       <h1 class="titre-1">{t.bibliotheque.titre}</h1>
       <p class="corps-grand texte-second">{subtitle}</p>
+      <AppUpdateBanner update={state.appUpdate} />
       {state.games.length === 0 ? (
         <p class="carte" data-testid="bibliotheque-vide">
           {t.bibliotheque.vide}

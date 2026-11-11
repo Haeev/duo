@@ -3,6 +3,7 @@
 // jeu. Les règles du salon vivent dans la liaison (l'hôte fait autorité); ici,
 // on projette et on réconcilie.
 import type { Rectangle } from 'electron';
+import type { AppUpdateView } from '../shared/app-update';
 import type { IntentArgs, IntentChannel, IntentResult } from '../shared/ipc';
 import type {
   AppState,
@@ -86,8 +87,16 @@ export interface PlatformDeps {
   readonly onIdleChange: (idle: boolean) => void;
   /** Recherche des mises à jour; `null` sans catalogue (versions de test). */
   readonly updates: UpdateControls | null;
+  /** Avis de nouvelle version de Duo (M-35); `null` sans fichier de version (versions de test). */
+  readonly appUpdate: AppUpdateControls | null;
   /** Quitter Duo après confirmation (M-15). */
   readonly requestQuit: () => void;
+}
+
+export interface AppUpdateControls {
+  /** Ouvre le lien de l'installateur dans le navigateur par défaut. */
+  download(): void;
+  later(): void;
 }
 
 export interface UpdateControls {
@@ -142,6 +151,7 @@ export class Platform {
   private publishQueued = false;
   private lastIdle = true;
   private updates: UpdatesSnapshot = { check: { kind: 'never' }, games: new Map() };
+  private appUpdate: AppUpdateView | null = null;
   private hintTimer: ReturnType<typeof setTimeout> | null = null;
   private autosaveTimer: ReturnType<typeof setInterval> | null = null;
   /** Pastille « Nouveau » figée à l'entrée dans le salon, jusqu'à sa fermeture. */
@@ -307,6 +317,8 @@ export class Platform {
       toasts: this.toasts,
       quitConfirm: this.quitConfirm,
       updateCheck: this.updates.check,
+      // Jamais pendant une partie (ADR 0011): l'avis revient au retour au salon.
+      appUpdate: this.canUpdate() ? this.appUpdate : null,
     };
   }
 
@@ -428,6 +440,12 @@ export class Platform {
       case 'update:play-anyway':
         this.deps.updates?.playAnyway((arg as IntentArgs['update:play-anyway']).gameId);
         return { ok: true };
+      case 'app-update:download':
+        this.deps.appUpdate?.download();
+        return { ok: true };
+      case 'app-update:later':
+        this.deps.appUpdate?.later();
+        return { ok: true };
     }
   }
 
@@ -446,6 +464,12 @@ export class Platform {
   /** Pas de partie en cours ni en arrêt: les mises à jour peuvent se télécharger et s'installer. */
   canUpdate(): boolean {
     return this.running === null && this.stopping === null;
+  }
+
+  /** Avis de nouvelle version de Duo, ou `null` pour le retirer. */
+  setAppUpdate(view: AppUpdateView | null): void {
+    this.appUpdate = view;
+    this.publish();
   }
 
   /** État des mises à jour publié par la recherche. */

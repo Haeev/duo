@@ -2,6 +2,7 @@
 // l'interface en est une projection et n'envoie que des intentions.
 // Les heures (`...At`) sont en millisecondes de l'horloge `Date.now()` de cette
 // machine: principal et vue la partagent.
+import type { AppUpdateView } from './app-update';
 import type { PlayerColor } from './players';
 import type { GameUpdateView, UpdateCheckView } from './updates';
 
@@ -227,4 +228,6 @@ export interface AppState {
   readonly quitConfirm: boolean;
   /** Dernière recherche des mises à jour (patch 0.3.1). */
   readonly updateCheck: UpdateCheckView;
+  /** Nouvelle version de Duo publiée (M-35); toujours `null` pendant une partie. */
+  readonly appUpdate: AppUpdateView | null;
 }

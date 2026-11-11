@@ -30,6 +30,10 @@ export interface IntentArgs {
   'library:opened': null;
   'update:retry': null;
   'update:play-anyway': { gameId: string };
+  /** Avis de nouvelle version de Duo (M-35): ouvre le lien de l'installateur dans le navigateur. */
+  'app-update:download': null;
+  /** « Plus tard »: l'avis ne revient pas avant une version plus récente ou le prochain lancement. */
+  'app-update:later': null;
 }
 
 export type IntentChannel = keyof IntentArgs;
@@ -58,6 +62,8 @@ export const INTENT_CHANNELS = [
   'library:opened',
   'update:retry',
   'update:play-anyway',
+  'app-update:download',
+  'app-update:later',
 ] as const satisfies readonly IntentChannel[];
 
 // Garde de compilation: chaque canal de IntentArgs figure dans la liste.

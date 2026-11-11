@@ -46,6 +46,7 @@ const BASE: AppState = {
   toasts: [],
   quitConfirm: false,
   updateCheck: { kind: 'ok' },
+  appUpdate: null,
 };
 
 const SALON: SalonView = {
@@ -189,6 +190,17 @@ function scenarioState(name: string | null): AppState {
         match: { ...MATCH, phase: 'paused', pausedBy: { self: true, peer: false } },
         quitConfirm: true,
       };
+    case 'nouvelle-version':
+      return {
+        ...BASE,
+        appUpdate: {
+          kind: 'download',
+          version: '0.4.0',
+          summary:
+            'Les deux ordinateurs gardent l’historique des séances, et Duo prévient quand une nouvelle version est prête.',
+          file: 'Duo-macOS.dmg',
+        },
+      };
     case null:
     default:
       return BASE;
@@ -259,6 +271,10 @@ export function createFakeBridge(scenario: string | null): DuoApi {
         case 'library:opened':
         case 'update:retry':
         case 'update:play-anyway':
+        case 'app-update:download':
+          break;
+        case 'app-update:later':
+          update({ ...state, appUpdate: null });
           break;
       }
       return Promise.resolve(ok);
