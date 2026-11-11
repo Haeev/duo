@@ -5,7 +5,7 @@ Lu par la session principale (le manager) et par chaque membre de l'équipe (sou
 ## Le projet
 
 - **Duo** est une application de bureau pour jouer à deux en réseau local: le Mac du client (propriétaire du dépôt), à puce Apple M1, et le PC Windows 11 de sa compagne. L'un héberge la partie, l'autre la rejoint. Cibles: macOS arm64 et Windows x64.
-- **Machine de référence pour les performances**: le PC, de configuration inconnue. Hypothèse prudente validée par le client: Intel Core i3 de 2018 avec graphique intégré (Intel UHD 620), écran de portable possible (1366x768), mémoire inconnue.
+- **Machine de référence pour les performances**: le PC. Relevé en jeu du 2026-11-11 (touche F9): graphique intégré Intel UHD (identifiant 0x8A56, génération Ice Lake, Direct3D 11 par ANGLE), écran de 1920x1080 mis à l'échelle à 125 % (fenêtre de 1536x864 points), plage dynamique standard, couleurs sRGB conformes. Processeur exact et mémoire inconnus. Sur cette machine, le coût par pixel pèse plus que les triangles et les appels de dessin: tout budget de rendu se compte d'abord en pixels et en lectures de texture par pixel.
 - **Joueurs**: toujours deux, dans la même pièce, chacun sur sa machine; pas de mode solo. Clavier AZERTY et souris, pas de manette.
 - **Mémoire des parties**: sauvegardes, historique et score cumulé, demandés dès le premier jeu.
 - Elle accueille des jeux originaux créés par le studio, en 2D, 3D ou isométrique, ajoutés un par un.
