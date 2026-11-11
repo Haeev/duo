@@ -42,3 +42,11 @@
 - Familles qui tiennent à 48 px: outils dessinés tête en haut puis tournés de 38 degrés (ombre peinte à droite avant rotation); poissons de profil tête à gauche, tournés de -10 à -16; plats dans l'assiette crème à liseré de couleur, le bol de trois quarts, le moule à bord festonné.
 - Bash refuse toute commande qui mêle `git` à un `cd` calculé ou à un sous-shell: lancer `git status` seul, depuis la racine du worktree.
 
+
+## La Petite Ligne 2: portraits des habitants (2026-11-11)
+
+- Portraits composés par fiche: `assets-src/interface-encre/portraits/fiches.json` -> `generer-portraits.mjs` (sources, ne pas retoucher) -> `generer-images.mjs portraits <id>`; planche `planche-portraits.cjs <png> id,id,id`. Cinq calques (neutre, content, soucieux, surpris, fache); `moodOfEmote` (portrait.ts) traduit l'émotion des répliques; `tests/portraits-habitants.test.ts` exige portrait et expressions pour tout personnage qui parle.
+- Pas d'attribut `transform` dans les sources encrées (le moteur échantillonne les chemins sans en tenir compte): écrire les grains, rubans et anneaux en chemins déjà placés.
+- Firmin et le Contrôleur portent la même tenue en jeu: le Contrôleur se distingue par le visage long et glabre et le bonnet enfoncé sur les yeux (cahier: « on ne voit jamais ses yeux »), ses expressions passent par la bouche seule.
+- Fiches incohérentes avec l'âge (sourcils gris chez Margot): suivre les cheveux et l'écrire dans la `note`; peau sombre: garder les sourcils clairs de la fiche (bible 2.4).
+- Le cache de modules de Vitest (`node_modules/.vitest-cache`) ne voit pas un SVG ajouté ou retiré derrière `import.meta.glob`: après un portrait nouveau, `pnpm exec vitest run --clearCache` avant le test, sinon faux échec ou faux succès.

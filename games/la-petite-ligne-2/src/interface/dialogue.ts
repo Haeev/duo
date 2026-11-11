@@ -8,7 +8,7 @@ import type { TalkView } from '../simulation/dialogues/conversation';
 import type { Intent } from '../simulation/noyau/entrees';
 import { el, icon, onPointerHover, setText, show, toggle } from './dom';
 import { paginate, Typewriter } from './modeles';
-import { portraitMarkup } from './portrait';
+import { moodOfEmote, portraitMarkup } from './portrait';
 import { blockedText, TEXTS } from './textes';
 
 export interface BabbleInfo {
@@ -170,6 +170,11 @@ export function createDialogue(
         setText(name, def?.name ?? view.villager);
       }
       focus = 0;
+      // Expression du portrait: l'émotion de la réplique, quand c'est l'habitant qui parle.
+      bust.setAttribute(
+        'data-expr',
+        view.speaker === view.villager ? moodOfEmote(view.emote) : 'neutre',
+      );
       // Un choix garde la dernière réplique à l'écran: on lit la question en répondant.
       if (view.text !== null) {
         pages = paginate(view.text);

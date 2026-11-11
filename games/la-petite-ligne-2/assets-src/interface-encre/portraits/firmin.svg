@@ -2,7 +2,7 @@
   Firmin Lacombe, 64 ans, chef de halte sans trains: bourru, ponctuel jusqu'à la manie.
   Bonnet à pompon et pull chocolat, gilet perle (sa fiche), grosse moustache blanche, nez en
   patate, sourcils broussailleux qui portent l'humeur, sifflet de laiton au cou (le métier).
-  Peau miel (fiche: peau 2), ombre dorée. Calques d'expression: neutre, content, soucieux.
+  Peau miel (fiche: peau 2), ombre dorée. Calques d'expression: neutre, content, soucieux, surpris, fache.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 230" data-trait="6" data-pas="1.1" data-tremble="0.45" data-halo="4">
   <!-- Buste -->
@@ -72,5 +72,31 @@
     <path d="M138 94 Q120 92 104 76 Q98 84 108 90 Q120 96 136 100 Z" fill="#9A948C" data-w="0.55"/>
     <g class="bouche"><path data-w="0.6" fill="none" stroke="#000" d="M84 145 Q89 140 95 145 Q101 150 106 144"/></g>
     <path d="M138 92 Q144 102 140 106 Q134 104 138 92 Z" fill="#A9C7D9" data-w="0.5"/>
+  </g>
+  <!-- Surpris: yeux ronds, sourcils hauts, bouche en O -->
+  <g data-expr="surpris">
+    <ellipse cx="72" cy="103" rx="9" ry="8" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="118" cy="103" rx="9" ry="8" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="72.6" cy="103" r="3.4" fill="#6E4B33"/><circle cx="117.4" cy="103" r="3.4" fill="#6E4B33"/><circle cx="71" cy="101.2" r="1.3" fill="#F7F3EA"/><circle cx="115.8" cy="101.2" r="1.3" fill="#F7F3EA"/></g>
+    <path d="M52 86 Q58 66 72 68 Q86 68 90 80 Q74 76 54 92 Z" fill="#9A948C" data-w="0.5"/>
+    <path d="M138 86 Q132 66 118 68 Q104 68 100 80 Q116 76 136 92 Z" fill="#9A948C" data-w="0.5"/>
+    <g class="bouche">
+      <ellipse id="rond" cx="95" cy="145" rx="6.5" ry="8.5" fill="#A2473F" data-w="0.6"/>
+      <path data-clip="rond" data-w="0" d="M88 149 Q95 145 102 149 L102 155 L88 155 Z" fill="#E58E84"/>
+    </g>
+  </g>
+  <!-- Fâché: paupières en biais, sourcils froncés, plis entre les yeux, dents serrées -->
+  <g data-expr="fache">
+    <path id="colere-g" d="M63 101 L81 105 Q76 111 72 111 Q65 111 63 101 Z" fill="#F7F3EA" data-w="0.5"/>
+    <path id="colere-d" d="M127 101 L109 105 Q114 111 118 111 Q125 111 127 101 Z" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle data-clip="colere-g" cx="73.2" cy="107" r="4" fill="#6E4B33"/><circle data-clip="colere-d" cx="116.8" cy="107" r="4" fill="#6E4B33"/></g>
+    <path data-w="0.9" fill="none" stroke="#000" d="M62 100.5 L82 105 M128 100.5 L108 105"/>
+    <path d="M52 86 Q70 84 90 98 Q86 102 72 96 Q60 94 54 96 Z" fill="#9A948C" data-w="0.5"/>
+    <path d="M138 86 Q120 84 100 98 Q104 102 118 96 Q130 94 136 96 Z" fill="#9A948C" data-w="0.5"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M91 94 L93 100 M99 94 L97 100"/>
+    <g class="bouche">
+      <path id="dents" d="M81 148 Q89 140 95 140 Q101 140 109 148 Q95 146 81 148 Z" fill="#A2473F" data-w="0.6"/>
+      <path data-clip="dents" data-w="0" d="M80 139 L110 139 L110 143.5 L80 143.5 Z" fill="#F7F3EA"/>
+    </g>
   </g>
 </svg>

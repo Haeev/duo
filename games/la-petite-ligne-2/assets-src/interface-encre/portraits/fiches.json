@@ -1,0 +1,215 @@
+{
+  "_gabarit": {
+    "note": "Prénom Nom, âge, métier: ce que montre le portrait et pourquoi (pièces de sa fiche d'habitant, accessoire du métier).",
+    "tete": "rond | carre | long | enfant (pièce head-round, head-square; long: visage maigre; enfant)",
+    "corpulence": "mince | moyenne | ronde | enfant (silhouette adult-*-slim, -medium, -round, child-*)",
+    "age": "adulte | mur | age (rides)",
+    "peau": "0 à 7, `skin` de la fiche",
+    "cheveux": { "coupe": "court | raie | chignon | chignon-bas | carre | aucun", "couleur": "nom du nuancier, cheveux (pièce hair-*)" },
+    "sourcils": { "couleur": "nom du nuancier, cheveux (zone sourcils de head-*)", "epais": false },
+    "iris": "noisette | brun | gris | bleu | vert | ambre",
+    "nez": "rond | pointu | fort",
+    "haut": { "type": "pull | col-roule | tee | debardeur | robe", "couleur": "nom du nuancier, tissus", "col": "robe seulement: couleur du col" },
+    "gilet": "couleur de accessory-vest, ou null",
+    "bonnet": "null, ou { couleur, bas } (hat-beanie-pompom; bas: le bonnet cache les yeux)",
+    "bouche": "sourire | coin | plat (humeur au repos)",
+    "yeux": "ouverts | mi-clos | caches",
+    "content": "rire | clin",
+    "pilosite": "null | moustache | barbe | trois-jours",
+    "lunettes": "null | rondes",
+    "joues": false,
+    "accessoires": ["noms des accessoires de PROPS dans generer-portraits.mjs"]
+  },
+  "controleur": {
+    "note": "Le Contrôleur (Anatole), la cinquantaine, contrôleur du train de nuit: visage maigre et long, bonnet chocolat trop grand enfoncé jusqu'aux yeux (on ne voit jamais ses yeux), pull chocolat et gilet perle de sa fiche, plaque de laiton, pince à poinçonner à la main. Peau pêche. Il se distingue de Firmin (même tenue) par le visage long, glabre, et le bonnet bas.",
+    "tete": "long", "corpulence": "mince", "age": "mur", "peau": 1,
+    "cheveux": { "coupe": "aucun", "couleur": null }, "sous_bonnet": "noir",
+    "sourcils": { "couleur": "noir" }, "iris": "brun", "nez": "pointu",
+    "haut": { "type": "pull", "couleur": "chocolat" }, "gilet": "perle",
+    "bonnet": { "couleur": "chocolat", "bas": true },
+    "bouche": "plat", "yeux": "caches", "pilosite": null, "lunettes": null,
+    "accessoires": ["insigne", "pince"]
+  },
+  "anatole": { "comme": "controleur" },
+  "martial": {
+    "note": "Martial Roques, 47 ans, curé de six clochers, à vélo: col roulé noir (encre), cheveux courts poivre et sel avec une mèche que le vent relève, joues rougies par les côtes, petite croix d'acier. Peau miel.",
+    "tete": "rond", "corpulence": "moyenne", "age": "mur", "peau": 2,
+    "cheveux": { "coupe": "court", "couleur": "poivre_et_sel" },
+    "sourcils": { "couleur": "poivre_et_sel" }, "iris": "noisette", "nez": "fort",
+    "haut": { "type": "col-roule", "couleur": "encre" }, "gilet": null, "bonnet": null,
+    "bouche": "sourire", "yeux": "ouverts", "pilosite": null, "lunettes": null, "joues": true,
+    "accessoires": ["croix", "epi_vent"]
+  },
+  "achille": {
+    "note": "Achille Pradel, 38 ans, boulanger, à moitié endormi: cheveux courts auburn, tee craie, paupières lourdes, farine sur la joue et le nez, baguette sur l'épaule. Peau porcelaine.",
+    "tete": "rond", "corpulence": "mince", "age": "adulte", "peau": 0,
+    "cheveux": { "coupe": "court", "couleur": "auburn" },
+    "sourcils": { "couleur": "brun" }, "iris": "vert", "nez": "rond",
+    "haut": { "type": "tee", "couleur": "craie" }, "gilet": null, "bonnet": null,
+    "bouche": "sourire", "yeux": "mi-clos", "pilosite": null, "lunettes": null,
+    "accessoires": ["farine", "baguette"]
+  },
+  "ambroise": {
+    "note": "Ambroise Pélissier, 74 ans, ancien régleur des horloges de la Compagnie, ronchon: cheveux gris à raie, gros sourcils poivre et sel, pull moutarde et gilet noisette, loupe d'horloger relevée sur le front, chaîne de montre. Peau pêche.",
+    "tete": "rond", "corpulence": "moyenne", "age": "age", "peau": 1,
+    "cheveux": { "coupe": "raie", "couleur": "gris" },
+    "sourcils": { "couleur": "poivre_et_sel", "epais": true }, "iris": "gris", "nez": "fort",
+    "haut": { "type": "pull", "couleur": "moutarde" }, "gilet": "noisette", "bonnet": null,
+    "bouche": "plat", "yeux": "ouverts", "pilosite": null, "lunettes": null,
+    "accessoires": ["loupe", "chaine"]
+  },
+  "armand": {
+    "note": "Armand Castagné, 34 ans, instituteur, timide: cheveux noirs à raie, lunettes rondes, pull brique et gilet bouteille. Peau cannelle (lèvres claires, bible 2.4). Sourcils clairs comme sur sa fiche: sur la peau sombre, ils restent visibles (bible 2.4).",
+    "tete": "rond", "corpulence": "mince", "age": "adulte", "peau": 5,
+    "cheveux": { "coupe": "raie", "couleur": "noir" },
+    "sourcils": { "couleur": "blanc" }, "iris": "brun", "nez": "rond",
+    "haut": { "type": "pull", "couleur": "brique" }, "gilet": "bouteille", "bonnet": null,
+    "bouche": "plat", "yeux": "ouverts", "pilosite": null, "lunettes": "rondes",
+    "accessoires": []
+  },
+  "barnabe": {
+    "note": "Barnabé Tixier, 54 ans, bûcheron, colosse doux: carrure ronde, tête carrée, cheveux et barbe blond miel, débardeur coquelicot, hache sur l'épaule. Peau acajou (lèvres claires).",
+    "tete": "carre", "corpulence": "ronde", "age": "mur", "peau": 6,
+    "cheveux": { "coupe": "court", "couleur": "blond_miel" },
+    "sourcils": { "couleur": "blond_miel", "epais": true }, "iris": "noisette", "nez": "fort",
+    "haut": { "type": "debardeur", "couleur": "coquelicot" }, "gilet": null, "bonnet": null,
+    "bouche": "sourire", "yeux": "ouverts", "pilosite": "barbe", "lunettes": null,
+    "accessoires": ["hache"]
+  },
+  "basile": {
+    "note": "Basile Cornu, 72 ans, menuisier taiseux: tête carrée, cheveux courts noirs, gros sourcils gris, tee ciel et gilet prune, crayon plat derrière l'oreille. Peau noisette.",
+    "tete": "carre", "corpulence": "moyenne", "age": "age", "peau": 4,
+    "cheveux": { "coupe": "court", "couleur": "noir" },
+    "sourcils": { "couleur": "gris", "epais": true }, "iris": "brun", "nez": "fort",
+    "haut": { "type": "tee", "couleur": "ciel" }, "gilet": "prune", "bonnet": null,
+    "bouche": "plat", "yeux": "ouverts", "pilosite": null, "lunettes": null,
+    "accessoires": ["crayon"]
+  },
+  "berthe": {
+    "note": "Berthe Lavergne, 58 ans, meunière franche: chignon blanc (la farine aidant), sourcils noirs, robe lin à col craie, farine sur la joue, épi de blé piqué dans le chignon. Peau miel.",
+    "tete": "carre", "corpulence": "ronde", "age": "mur", "peau": 2,
+    "cheveux": { "coupe": "chignon", "couleur": "blanc" },
+    "sourcils": { "couleur": "noir" }, "iris": "bleu", "nez": "rond",
+    "haut": { "type": "robe", "couleur": "lin", "col": "craie" }, "gilet": null, "bonnet": null,
+    "bouche": "plat", "yeux": "ouverts", "pilosite": null, "lunettes": null,
+    "accessoires": ["epi", "farine"]
+  },
+  "colette": {
+    "note": "Colette Lafon, 44 ans, cafetière chaleureuse: cheveux courts blond paille, sourcils roux, robe ardoise à col craie, torchon rayé sur l'épaule. Peau dorée.",
+    "tete": "carre", "corpulence": "ronde", "age": "adulte", "peau": 3,
+    "cheveux": { "coupe": "court", "couleur": "blond_paille" },
+    "sourcils": { "couleur": "roux" }, "iris": "noisette", "nez": "rond",
+    "haut": { "type": "robe", "couleur": "ardoise", "col": "craie" }, "gilet": null, "bonnet": null,
+    "bouche": "sourire", "yeux": "ouverts", "pilosite": null, "lunettes": null, "joues": true,
+    "accessoires": ["torchon"]
+  },
+  "honorine": {
+    "note": "Honorine Valade, 89 ans, la doyenne, ment pour s'amuser: chignon châtain (teint), sourcils blond miel, rides, robe olive à col lin, camée au col, sourire en coin et clin d'oeil quand elle est contente. Peau miel.",
+    "tete": "rond", "corpulence": "moyenne", "age": "age", "peau": 2,
+    "cheveux": { "coupe": "chignon", "couleur": "chatain" },
+    "sourcils": { "couleur": "blond_miel" }, "iris": "vert", "nez": "rond",
+    "haut": { "type": "robe", "couleur": "olive", "col": "lin" }, "gilet": null, "bonnet": null,
+    "bouche": "coin", "yeux": "ouverts", "content": "clin", "pilosite": null, "lunettes": null,
+    "accessoires": ["camee"]
+  },
+  "jeanne": {
+    "note": "Jeanne Ribot, 10 ans, intrépide, parie sur tout: carré blond paille, tee ocre, taches de rousseur, pansement sur la pommette. Peau dorée.",
+    "tete": "enfant", "corpulence": "enfant", "age": "adulte", "peau": 3,
+    "cheveux": { "coupe": "carre", "couleur": "blond_paille" },
+    "sourcils": { "couleur": "noir" }, "iris": "brun", "nez": "rond",
+    "haut": { "type": "tee", "couleur": "ocre" }, "gilet": null, "bonnet": null,
+    "bouche": "coin", "yeux": "ouverts", "pilosite": null, "lunettes": null, "joues": true,
+    "accessoires": ["rousseur", "pansement"]
+  },
+  "leon": {
+    "note": "Léon Delmas, 11 ans, fils de fermier fanfaron: cheveux courts roux, tee marine, taches de rousseur, brin de paille derrière l'oreille. Peau dorée.",
+    "tete": "enfant", "corpulence": "enfant", "age": "adulte", "peau": 3,
+    "cheveux": { "coupe": "court", "couleur": "roux" },
+    "sourcils": { "couleur": "brun" }, "iris": "noisette", "nez": "rond",
+    "haut": { "type": "tee", "couleur": "marine" }, "gilet": null, "bonnet": null,
+    "bouche": "coin", "yeux": "ouverts", "pilosite": null, "lunettes": null, "joues": true,
+    "accessoires": ["rousseur", "paille"]
+  },
+  "lucie": {
+    "note": "Lucie Arnaud, 41 ans, factrice et photographe, pressée: carré châtain, sourcils auburn, pull canard, appareil photo en bandoulière. Peau miel.",
+    "tete": "rond", "corpulence": "mince", "age": "adulte", "peau": 2,
+    "cheveux": { "coupe": "carre", "couleur": "chatain" },
+    "sourcils": { "couleur": "auburn" }, "iris": "ambre", "nez": "pointu",
+    "haut": { "type": "pull", "couleur": "canard" }, "gilet": null, "bonnet": null,
+    "bouche": "sourire", "yeux": "ouverts", "pilosite": null, "lunettes": null,
+    "accessoires": ["photo"]
+  },
+  "mado": {
+    "note": "Mado Cazals, 50 ans, forgeronne rieuse: tête carrée, cheveux courts bruns, débardeur rose ancien, lunettes de forge relevées sur les cheveux, suie sur la joue. Peau cannelle (lèvres claires). Gilet ardoise de sa fiche omis: il cacherait le débardeur, sa pièce la plus visible.",
+    "tete": "carre", "corpulence": "ronde", "age": "mur", "peau": 5,
+    "cheveux": { "coupe": "court", "couleur": "brun" },
+    "sourcils": { "couleur": "chatain" }, "iris": "brun", "nez": "rond",
+    "haut": { "type": "debardeur", "couleur": "rose_ancien" }, "gilet": null, "bonnet": null,
+    "bouche": "sourire", "yeux": "ouverts", "pilosite": null, "lunettes": null,
+    "accessoires": ["lunettes-forge", "suie"]
+  },
+  "margot": {
+    "note": "Margot Delmas, la quarantaine, cultivatrice diplomate: chignon bas brun noué d'un ruban rouge (ceux des piquets de Paulin), débardeur ficelle. Peau dorée. Sourcils bruns comme les cheveux (la fiche les a gris).",
+    "tete": "rond", "corpulence": "moyenne", "age": "adulte", "peau": 3,
+    "cheveux": { "coupe": "chignon-bas", "couleur": "brun" },
+    "sourcils": { "couleur": "brun" }, "iris": "bleu", "nez": "rond",
+    "haut": { "type": "debardeur", "couleur": "ficelle" }, "gilet": null, "bonnet": null,
+    "bouche": "sourire", "yeux": "ouverts", "pilosite": null, "lunettes": null,
+    "accessoires": ["ruban"]
+  },
+  "marthe": {
+    "note": "Marthe Bousquet, 76 ans, sonneuse, sèche et exacte: chignon serré auburn, rides, robe anthracite et gilet encre, la corde de la cloche en rouleau sur l'épaule. Peau miel.",
+    "tete": "carre", "corpulence": "moyenne", "age": "age", "peau": 2,
+    "cheveux": { "coupe": "chignon", "couleur": "auburn" },
+    "sourcils": { "couleur": "blond_miel" }, "iris": "gris", "nez": "pointu",
+    "haut": { "type": "robe", "couleur": "anthracite", "col": "lin" }, "gilet": "encre", "bonnet": null,
+    "bouche": "plat", "yeux": "ouverts", "pilosite": null, "lunettes": null,
+    "accessoires": ["corde"]
+  },
+  "paulin": {
+    "note": "Paulin Delmas, la quarantaine, cultivateur qui dit non d'abord: tête carrée, cheveux courts châtains, gros sourcils blond paille, barbe de trois jours, tee prune et gilet ciel, un ruban rouge de piquet qui dépasse de la poche. Peau dorée.",
+    "tete": "carre", "corpulence": "ronde", "age": "mur", "peau": 3,
+    "cheveux": { "coupe": "court", "couleur": "chatain" },
+    "sourcils": { "couleur": "blond_paille", "epais": true }, "iris": "noisette", "nez": "fort",
+    "haut": { "type": "tee", "couleur": "prune" }, "gilet": "ciel", "bonnet": null,
+    "bouche": "plat", "yeux": "ouverts", "pilosite": "trois-jours", "lunettes": null,
+    "accessoires": ["ruban-poche"]
+  },
+  "rosalie": {
+    "note": "Rosalie Vasseur, mécanicienne du train du samedi, gouailleuse: chignon roux, tee bleu de travail et gilet lilas, suie sur la joue, montre de gousset (elle retarde de trois minutes, exprès). Peau noisette.",
+    "tete": "rond", "corpulence": "moyenne", "age": "adulte", "peau": 4,
+    "cheveux": { "coupe": "chignon", "couleur": "roux" },
+    "sourcils": { "couleur": "chatain" }, "iris": "ambre", "nez": "rond",
+    "haut": { "type": "tee", "couleur": "bleu_de_travail" }, "gilet": "lilas", "bonnet": null,
+    "bouche": "coin", "yeux": "ouverts", "pilosite": null, "lunettes": null,
+    "accessoires": ["suie", "gousset"]
+  },
+  "solange": {
+    "note": "Solange Mérigot, 52 ans, mercière et coiffeuse, ancienne du théâtre: carré blond miel, sourcils blond paille, débardeur sauge, créoles de laiton, mètre ruban autour du cou, sourire moqueur. Peau dorée.",
+    "tete": "rond", "corpulence": "mince", "age": "mur", "peau": 3,
+    "cheveux": { "coupe": "carre", "couleur": "blond_miel" },
+    "sourcils": { "couleur": "blond_paille" }, "iris": "vert", "nez": "pointu",
+    "haut": { "type": "debardeur", "couleur": "sauge" }, "gilet": null, "bonnet": null,
+    "bouche": "coin", "yeux": "ouverts", "pilosite": null, "lunettes": null,
+    "accessoires": ["creoles", "metre"]
+  },
+  "odilon": {
+    "note": "Odilon, l'aiguilleur (lieu d'essai essai-gare), rêveur: tête carrée, cheveux courts blond paille, pull marine et gilet bouteille, drapeau rouge roulé sur son bâton. Peau dorée.",
+    "tete": "carre", "corpulence": "moyenne", "age": "adulte", "peau": 3,
+    "cheveux": { "coupe": "court", "couleur": "blond_paille" },
+    "sourcils": { "couleur": "chatain" }, "iris": "bleu", "nez": "rond",
+    "haut": { "type": "pull", "couleur": "marine" }, "gilet": "bouteille", "bonnet": null,
+    "bouche": "sourire", "yeux": "ouverts", "pilosite": null, "lunettes": null,
+    "accessoires": ["drapeau"]
+  },
+  "prune": {
+    "note": "Prune, la jardinière (lieu d'essai essai-halte), joyeuse: bonnet moutarde sur un chignon châtain, robe sauge à col craie, joues roses, une carotte fanée à la main. Peau pêche.",
+    "tete": "rond", "corpulence": "ronde", "age": "adulte", "peau": 1,
+    "cheveux": { "coupe": "aucun", "couleur": null }, "sous_bonnet": "chatain",
+    "sourcils": { "couleur": "chatain" }, "iris": "vert", "nez": "rond",
+    "haut": { "type": "robe", "couleur": "sauge", "col": "craie" }, "gilet": null,
+    "bonnet": { "couleur": "moutarde", "bas": false },
+    "bouche": "sourire", "yeux": "ouverts", "pilosite": null, "lunettes": null, "joues": true,
+    "accessoires": ["carotte"]
+  }
+}

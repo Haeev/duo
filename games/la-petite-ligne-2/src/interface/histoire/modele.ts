@@ -10,6 +10,7 @@ import { chapterEndView } from '../../simulation/quetes/lecture';
 import { STORY } from '../../simulation/quetes/reglages';
 import { lookRevealed } from '../../simulation/regles/apparence';
 import { sceneView } from '../../simulation/scenes/lecture';
+import { moodOfEmote, type PortraitMood } from '../portrait';
 import { HISTOIRE_SETTINGS } from './reglages';
 
 function otherOf(player: PlayerIndex): PlayerIndex {
@@ -235,7 +236,7 @@ export interface SceneLineModel {
   /** Texte accordé au joueur qui lit (vide quand la réplique ne s'adresse qu'à l'autre). */
   readonly text: string;
   /** Expression du portrait, d'après l'émotion de la réplique. */
-  readonly mood: 'neutre' | 'content' | 'soucieux';
+  readonly mood: PortraitMood;
   /** Signe au-dessus du portrait (surprise, question), `null`: aucun. */
   readonly mark: '!' | '?' | null;
   /** Onomatopée affichée en bulle, `null`: aucune. */
@@ -259,12 +260,6 @@ export interface SceneScreenModel {
 }
 
 type Emote = Extract<BeatDef, { do: 'say' }>['emote'];
-
-function moodOf(emote: Emote): SceneLineModel['mood'] {
-  if (emote === 'joy') return 'content';
-  if (emote === 'anger' || emote === 'sad') return 'soucieux';
-  return 'neutre';
-}
 
 function markOf(emote: Emote): SceneLineModel['mark'] {
   if (emote === 'question') return '?';
@@ -317,7 +312,7 @@ export function sceneScreenModel(
     line = {
       speaker,
       text: beat.mine ? beat.text : '',
-      mood: moodOf(beat.emote),
+      mood: moodOfEmote(beat.emote),
       mark: markOf(beat.emote),
       sound: beat.sound,
       audience,

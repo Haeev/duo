@@ -1,0 +1,79 @@
+<!--
+  Généré par generer-portraits.mjs depuis portraits/fiches.json: ne pas retoucher ce fichier.
+  Paulin Delmas, la quarantaine, cultivateur qui dit non d'abord: tête carrée, cheveux courts châtains, gros sourcils blond paille, barbe de trois jours, tee prune et gilet ciel, un ruban rouge de piquet qui dépasse de la poche. Peau dorée.
+  Calques d'expression: neutre, content, soucieux, surpris, fache.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 230" data-trait="6" data-pas="1.1" data-tremble="0.45" data-halo="4">
+  <path id="haut" d="M2 232 Q6 180 48 164 L142 164 Q184 180 188 232 Z" fill="#7E3F55"/>
+  <path data-clip="haut" data-w="0" d="M138 154 Q196 182 162 232 L190 232 L190 154 Z" fill="#45324F"/>
+  <path data-w="0" d="M71 163 Q95 190 119 163 Z" fill="#C99368"/>
+  <path d="M18 232 Q22 182 52 166 L73 164 Q77 200 85 232 Z" fill="#A9C7D9"/>
+  <path id="gilet-d" d="M172 232 Q168 182 138 166 L117 164 Q113 200 105 232 Z" fill="#A9C7D9"/>
+  <path data-clip="gilet-d" data-w="0" d="M142 160 Q192 190 158 232 L190 232 L190 160 Z" fill="#587F8E"/>
+  <g data-w="0.45" fill="#C8A150"><circle cx="79" cy="190" r="2.8"/><circle cx="80.2" cy="208" r="2.8"/><circle cx="81.4" cy="226" r="2.8"/></g>
+  <path id="cou" d="M76 134 L114 134 L114 168 Q95 176 76 168 Z" fill="#C99368"/>
+  <path data-clip="cou" data-w="0" d="M70 130 L120 130 L120 152 Q95 158 70 150 Z" fill="#A9744D"/>
+  <path d="M71 163 Q95 190 119 163 L123 166 Q95 198 67 166 Z" fill="#7E3F55" data-w="0.5"/>
+  <ellipse cx="44" cy="104" rx="10" ry="13" fill="#C99368"/>
+  <ellipse cx="146" cy="104" rx="10" ry="13" fill="#A9744D"/>
+  <path id="tete" d="M95 46 Q140 46 146 80 L146 112 Q144 144 114 152 L76 152 Q46 144 44 112 L44 80 Q50 46 95 46 Z" fill="#C99368"/>
+  <path data-clip="tete" data-w="0" d="M128 46 Q158 96 116 160 L170 160 L170 46 Z" fill="#A9744D"/>
+  <path data-w="0.35" fill="none" stroke="#000" d="M79 122 Q73 130 76 138 M111 122 Q117 130 114 138"/>
+  <path data-w="0" d="M48 114 Q52 146 95 152 Q138 146 142 114 Q128 138 95 144 Q62 138 48 114 Z" fill="#6E4B33" fill-opacity="0.22"/>
+  <path data-w="0" d="M98.9 108 Q111.9 115.8 104.1 126.2 Q96 128.8 91.1 123.6 Z" fill="#A9744D"/>
+  <path data-w="0.55" fill="none" stroke="#000" d="M91.1 104 Q83.3 121 94 126.2 Q101.5 128.8 106.7 122.3"/>
+  <path id="cheveux" d="M44 96 Q39 42 95 39 Q151 42 146 96 Q142 72 126 64 Q107 70 97 61 Q83 71 64 65 Q48 74 44 96 Z" fill="#6E4B33"/>
+  <path data-clip="cheveux" data-w="0" d="M113 26 Q152 56 148 106 L176 106 L176 26 Z" fill="#4A3327"/>
+  <path data-clip="cheveux" data-w="0" d="M60 64 Q72 48 91 48 Q74 56 66 70 Z" fill="#8C4A2E"/>
+  <path data-w="0.4" fill="none" stroke="#000" d="M58 56 Q66 50 76 50 M115 48 Q125 50 131 58"/>
+  <path d="M55 196 L75 196 L74 216 L56 216 Z" fill="#A9C7D9" data-w="0.5"/>
+  <path d="M61 198 Q57 182 65 172 L69 175 Q62 184 66 198 Z" fill="#C5443D" data-w="0.5"/>
+  <path d="M65 198 Q69 186 79 182 L80 186 Q72 188 69 198 Z" fill="#C5443D" data-w="0.5"/>
+  <g data-expr="neutre">
+    <ellipse id="n-oeil-g" cx="72" cy="100" rx="8.5" ry="7" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0" data-clip="n-oeil-g"><circle cx="72.6" cy="101" r="4.4" fill="#6E4B33"/><circle cx="71" cy="99.2" r="1.5" fill="#F7F3EA"/></g>
+    <ellipse id="n-oeil-d" cx="118" cy="100" rx="8.5" ry="7" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0" data-clip="n-oeil-d"><circle cx="117.4" cy="101" r="4.4" fill="#6E4B33"/><circle cx="115.8" cy="99.2" r="1.5" fill="#F7F3EA"/></g>
+    <path d="M59 89 Q72 80 84 87 Q72 87.5 61 93.6 Z" fill="#E2C582" data-w="0.5"/>
+    <path d="M131 89 Q118 80 106 87 Q118 87.5 129 93.6 Z" fill="#E2C582" data-w="0.5"/>
+    <g class="bouche"><path d="M84 135 Q95 133 106 135 L105 138 Q95 136.5 85 138 Z" fill="#A2473F" data-w="0.5"/></g>
+  </g>
+  <g data-expr="content">
+    <path data-w="0.8" fill="none" stroke="#000" d="M63 103 Q72 94 81 103 M109 103 Q118 94 127 103"/>
+    <path d="M59 85 Q72 75 84 83 Q72 82.5 61 89.6 Z" fill="#E2C582" data-w="0.5"/>
+    <path d="M131 85 Q118 75 106 83 Q118 82.5 129 89.6 Z" fill="#E2C582" data-w="0.5"/>
+    <g data-w="0"><ellipse cx="62" cy="122" rx="9" ry="5.5" fill="#E58E84"/><ellipse cx="128" cy="122" rx="9" ry="5.5" fill="#E58E84"/></g>
+    <g class="bouche"><path id="c-rire" d="M77 130 Q95 134 113 129 Q109 149 95 150 Q81 149 77 130 Z" fill="#A2473F" data-w="0.6"/><path data-clip="c-rire" data-w="0" d="M75 128 L115 127 L113 135 Q95 137 77 135 Z" fill="#F7F3EA"/><path data-clip="c-rire" data-w="0" d="M85 147 Q95 140 105 147 L105 154 L85 154 Z" fill="#E58E84"/></g>
+  </g>
+  <g data-expr="soucieux">
+    <ellipse id="s-oeil-g" cx="72" cy="100" rx="8.5" ry="7.5" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0" data-clip="s-oeil-g"><circle cx="75.1" cy="102.5" r="4" fill="#6E4B33"/><circle cx="73.5" cy="100.7" r="1.5" fill="#F7F3EA"/></g>
+    <ellipse id="s-oeil-d" cx="118" cy="100" rx="8.5" ry="7.5" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0" data-clip="s-oeil-d"><circle cx="119.9" cy="102.5" r="4" fill="#6E4B33"/><circle cx="118.3" cy="100.7" r="1.5" fill="#F7F3EA"/></g>
+    <path d="M59 88 Q72 79 84 77 Q72 86.5 61 92.6 Z" fill="#E2C582" data-w="0.5"/>
+    <path d="M131 88 Q118 79 106 77 Q118 86.5 129 92.6 Z" fill="#E2C582" data-w="0.5"/>
+    <g class="bouche"><path data-w="0.6" fill="none" stroke="#000" d="M85 137 Q90 132 95 136 Q100 140 105 134"/></g>
+    <path d="M138 90 Q144 100 140 104 Q134 102 138 90 Z" fill="#A9C7D9" data-w="0.5"/>
+  </g>
+  <g data-expr="surpris">
+    <ellipse id="u-oeil-g" cx="72" cy="100" rx="9" ry="9.5" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0" data-clip="u-oeil-g"><circle cx="72.6" cy="100" r="3.4" fill="#6E4B33"/><circle cx="71" cy="98.2" r="1.5" fill="#F7F3EA"/></g>
+    <ellipse id="u-oeil-d" cx="118" cy="100" rx="9" ry="9.5" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0" data-clip="u-oeil-d"><circle cx="117.4" cy="100" r="3.4" fill="#6E4B33"/><circle cx="115.8" cy="98.2" r="1.5" fill="#F7F3EA"/></g>
+    <path d="M59 82 Q72 69 84 80 Q72 76.5 61 86.6 Z" fill="#E2C582" data-w="0.5"/>
+    <path d="M131 82 Q118 69 106 80 Q118 76.5 129 86.6 Z" fill="#E2C582" data-w="0.5"/>
+    <g class="bouche"><ellipse id="u-bouche" cx="95" cy="137" rx="6.5" ry="8.5" fill="#A2473F" data-w="0.6"/><path data-clip="u-bouche" data-w="0" d="M88 141 Q95 137 102 141 L102 147 L88 147 Z" fill="#E58E84"/></g>
+  </g>
+  <g data-expr="fache">
+    <path id="f-oeil-g" d="M63 98 L81 101.5 Q76 107 72 106.5 Q66 106.5 63 98 Z" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0" data-clip="f-oeil-g"><circle cx="73.2" cy="103" r="4.2" fill="#6E4B33"/></g>
+    <path data-w="0.9" fill="none" stroke="#000" d="M62 97.5 L82 101.5"/>
+    <path id="f-oeil-d" d="M127 98 L109 101.5 Q114 107 118 106.5 Q124 106.5 127 98 Z" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0" data-clip="f-oeil-d"><circle cx="116.8" cy="103" r="4.2" fill="#6E4B33"/></g>
+    <path data-w="0.9" fill="none" stroke="#000" d="M128 97.5 L108 101.5"/>
+    <path d="M59 92 Q72 83 84 97 Q72 90.5 61 96.6 Z" fill="#E2C582" data-w="0.5"/>
+    <path d="M131 92 Q118 83 106 97 Q118 90.5 129 96.6 Z" fill="#E2C582" data-w="0.5"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M91 92 L93 98 M99 92 L97 98"/>
+    <g class="bouche"><path id="f-bouche" d="M81 139 Q89 131 95 131 Q101 131 109 139 Q95 137 81 139 Z" fill="#A2473F" data-w="0.6"/><path data-clip="f-bouche" data-w="0" d="M81 130 L109 130 L109 134 L81 134 Z" fill="#F7F3EA"/></g>
+  </g>
+</svg>
