@@ -29,7 +29,10 @@ MATERIAUX = (
     "gazon", "moellon", "crepi", "tuile", "bardage", "metal", "vitre", "etoffe", "flamme",
     # Fenêtres des voitures de voyageurs: allumées avec les lampes (`vehicules.py`).
     "vitrage",
+    # Braises d'un feu (`feu.py`): elles rougeoient, à part des flammes que le rendu anime.
+    "braise",
 )
+
 
 
 def hexa(couleur: str) -> tuple[float, float, float]:
@@ -263,7 +266,10 @@ class Atelier:
             plan = (p0, n0)
         pts[:, 1] = np.maximum(pts[:, 1], -1 + 2 * pose)
         hull = ConvexHull(pts)
-        bas = -1 + 2 * pose
+        # Le pied du galet: son point le plus bas (sans point tiré sous la ligne de pose, il
+        # flottait au-dessus du sol).
+        bas = float(pts[:, 1].min())
+
         faces, cassure = [], []
         for simplex in hull.simplices:
             tri = pts[simplex]
@@ -276,7 +282,10 @@ class Atelier:
         decale = np.array((0, -bas, 0))
         echelle = np.array((rx, ry, rz))
         v = (pts + decale) * echelle
-        coeur = np.array((0, 1 - pose, 0)) * echelle
+        # Le coeur: la moyenne des sommets de l'enveloppe (toujours dedans). L'axe du galet n'y
+        # est pas toujours: avec peu de points, l'enveloppe peut le laisser dehors, et des faces
+        # se retournaient (vues de dos d'en haut).
+        coeur = v[np.unique(hull.simplices)].mean(0)
         n_avant = len(self.tris)
         self.morceau(v, faces, mat, couleur, matrice, tremble, coeur=coeur, dessus=dessus)
         if cassure:
@@ -295,6 +304,7 @@ class Atelier:
         rayons = [p[3] for p in points]
         n = len(pts)
         anneaux = []
+        a = None
         for i in range(n):
             if i == 0:
                 t = pts[1] - pts[0]
@@ -303,10 +313,16 @@ class Atelier:
             else:
                 t = (pts[i + 1] - pts[i]) / (np.linalg.norm(pts[i + 1] - pts[i]) + 1e-9) + (pts[i] - pts[i - 1]) / (np.linalg.norm(pts[i] - pts[i - 1]) + 1e-9)
             t = t / (np.linalg.norm(t) + 1e-9)
-            ref = np.array((1.0, 0, 0)) if abs(t[0]) < 0.9 else np.array((0, 0, 1.0))
-            a = np.cross(t, ref)
+            # Repère transporté d'un anneau au suivant: un fût qui tourne ne se vrille pas (une
+            # face vrillée se retourne et se voit de dos).
+            if a is not None and np.linalg.norm(a - t * np.dot(a, t)) > 1e-3:
+                a = a - t * np.dot(a, t)
+            else:
+                ref = np.array((1.0, 0, 0)) if abs(t[0]) < 0.9 else np.array((0, 0, 1.0))
+                a = np.cross(t, ref)
             a /= np.linalg.norm(a)
             b = np.cross(t, a)
+
             anneau = []
             for k in range(pans):
                 ang = math.tau * k / pans + tors * i
@@ -389,6 +405,10 @@ class Atelier:
             for i in range(n):
                 faces.append((haut[i], bas[i], bas[(i - 1) % n]))
                 faces.append((haut[i], haut[(i + 1) % n], bas[i]))
+        # Le dôme: chaque face tournée vers le dehors (loin du coeur).
+        coeur = np.array((0.0, 0.1, 0.0))
+        vv = np.array(v)
+        faces = [f if np.dot(np.cross(vv[f[1]] - vv[f[0]], vv[f[2]] - vv[f[0]]), vv[list(f)].mean(0) - coeur) >= 0 else (f[0], f[2], f[1]) for f in faces]
         bord = anneaux[-1]
         for i in range(n):
             a, b = np.array(v[bord[i]]), np.array(v[bord[(i + 1) % n]])
@@ -397,18 +417,22 @@ class Atelier:
             longue = 1.8 if tirage(graine * 3.3 + i * 9.1) > 0.68 else 1.0
             portee = 1 + dents * longue * (0.6 + tirage(graine * 5.7 + i * 2.3) * 0.7)
             mi = a + (b - a) * (0.3 + tirage(graine + i * 4.1) * 0.4)
-            pointe = (mi[0] * portee, mi[1] - dents * (0.18 + tirage(graine + i) * 0.34), mi[2] * portee)
-            v.append(pointe)
-            faces.append((bord[i], len(v) - 1, bord[(i + 1) % n]))
+            pointe = np.array((mi[0] * portee, mi[1] - dents * (0.18 + tirage(graine + i) * 0.34), mi[2] * portee))
+            v.append(tuple(pointe))
+            # Une dent tourne son endroit vers le ciel: vue d'en haut, jamais par l'envers (trou).
+            f = (bord[i], len(v) - 1, bord[(i + 1) % n])
+            haut = np.cross(pointe - a, b - a)[1] >= 0
+            faces.append(f if haut else (f[0], f[2], f[1]))
         m = at(x, y, z, tirage(graine * 13.1) * 6.3, penche(graine, 0.12), penche(graine + 3, 0.12))
         ecrase = 0.8 + tirage(graine * 9.7) * 0.3
         m[:3, :3] = m[:3, :3] * np.array((r, r * ecrase, r * (0.9 + tirage(graine) * 0.2)))
-        self.morceau(v, faces, mat, couleur, m, coeur=(0, 0.1, 0), rond=(0, 0.12, 0), sol=True)
-        # Feuilles détachées: de petits losanges qui flottent devant le bord, visibles des deux côtés.
+        self.morceau(v, faces, mat, couleur, m, garde=True, rond=(0, 0.12, 0), sol=True)
+        # Feuilles détachées: de petits losanges accrochés au bord (rien ne flotte), visibles des
+        # deux côtés.
         for k in range(laches):
             ang = tirage(graine * 11.3 + k * 4.9) * math.tau
-            portee = 1.2 + tirage(graine + k * 8.3) * 0.3
-            c = np.array((math.cos(ang) * portee, -0.1 + tirage(graine * 1.7 + k) * 0.5, math.sin(ang) * portee))
+            portee = 1.02 + tirage(graine + k * 8.3) * 0.1
+            c = np.array((math.cos(ang) * portee, -0.06 + tirage(graine * 1.7 + k) * 0.1, math.sin(ang) * portee))
             t = 0.1 + tirage(graine + k * 2.1) * 0.07
             le = np.array((-math.sin(ang), 0.5, math.cos(ang)))
             le /= np.linalg.norm(le)

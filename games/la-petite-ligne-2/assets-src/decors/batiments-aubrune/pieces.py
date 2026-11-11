@@ -572,10 +572,18 @@ def horloge(s: Atelier, T, diametre=0.8, graine=0, heure=None):
 
 
 def drapeau(s: Atelier, T, graine=0):
-    """Hampe scellée en biais dans la façade et son drapeau. Origine: scellement."""
-    s.box(0.045, 1.5, 0.045, at(0, 0.6, 0.42, 0, 0.6, 0), "bois", T.bois_clair[0], grain="y", tremble=0.004)
-    for i, c in enumerate(("#44618A", "#F3EDE0", "#B0604C")):
-        s.box(0.28, 0.6, 0.03, at(0.16 + i * 0.28, 0.82, 0.86 + i * 0.012), "volet", hexa(c), tremble=0.012, sans="")
+    """Hampe scellée en biais dans la façade (penchée de 34 degrés vers la rue) et son drapeau.
+    Origine: scellement. Le drapeau tient à la hampe par sa lisière (le guindant court le long de
+    la hampe, sur ses 60 cm du haut), les trois bandes s'en écartent parallèlement à la façade:
+    rien ne flotte à côté de la hampe (remarque du client du 2026-11-11)."""
+    incl = 0.6
+    with s.groupe(at(0, 0.0, 0.0, 0, incl, 0)):
+        # Dans le repère de la hampe: elle monte le long de y depuis le scellement.
+        s.box(0.045, 1.5, 0.045, at(0, 0.73, 0), "bois", T.bois_clair[0], grain="y", tremble=0.002)
+        s.box(0.07, 0.05, 0.07, at(0, 1.5, 0), "bois", T.bois_clair[1 % len(T.bois_clair)], grain="y", tremble=0.002)
+        for i, c in enumerate(("#44618A", "#F3EDE0", "#B0604C")):
+            s.box(0.28, 0.6, 0.02, at(0.02 + 0.14 + i * 0.28, 1.13, 0.0), "volet", hexa(c), tremble=0.004, sans="")
+
 
 
 def roue_de_moulin(s: Atelier, T, diametre=5.0, largeur=0.9, graine=0):

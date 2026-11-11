@@ -12,8 +12,8 @@
     },
     "crop-carotte": {
       "crop": "carotte",
-      "stages": ["crop-carotte-0", "crop-carotte-1", "crop-carotte-2", "crop-carotte-3"],
-      "thirsty": ["crop-carotte-0-thirsty", "crop-carotte-1-thirsty", "crop-carotte-2-thirsty"]
+      "stages": ["crop-carotte-0", "crop-carotte-1", "crop-carotte-2"],
+      "thirsty": ["crop-carotte-0-thirsty", "crop-carotte-1-thirsty"]
     },
     "crop-giroflee": {
       "crop": "giroflee",
@@ -47,22 +47,13 @@
     },
     "crop-poireau": {
       "crop": "poireau",
-      "stages": ["crop-poireau-0", "crop-poireau-1", "crop-poireau-2", "crop-poireau-3"],
-      "thirsty": ["crop-poireau-0-thirsty", "crop-poireau-1-thirsty", "crop-poireau-2-thirsty"]
+      "stages": ["crop-poireau-0", "crop-poireau-1", "crop-poireau-2"],
+      "thirsty": ["crop-poireau-0-thirsty", "crop-poireau-1-thirsty"]
     },
     "crop-pomme-de-terre": {
       "crop": "pomme-de-terre",
-      "stages": [
-        "crop-pomme-de-terre-0",
-        "crop-pomme-de-terre-1",
-        "crop-pomme-de-terre-2",
-        "crop-pomme-de-terre-3"
-      ],
-      "thirsty": [
-        "crop-pomme-de-terre-0-thirsty",
-        "crop-pomme-de-terre-1-thirsty",
-        "crop-pomme-de-terre-2-thirsty"
-      ]
+      "stages": ["crop-pomme-de-terre-0", "crop-pomme-de-terre-1", "crop-pomme-de-terre-2"],
+      "thirsty": ["crop-pomme-de-terre-0-thirsty", "crop-pomme-de-terre-1-thirsty"]
     },
     "crop-radis": {
       "crop": "radis",
@@ -102,6 +93,10 @@
     },
     "bois": {
       "layer": "grain"
+    },
+    "braise": {
+      "kind": "flame",
+      "layer": "plain"
     },
     "crepi": {
       "layer": "wall"
@@ -211,9 +206,9 @@
       },
       "pourquoi": "l'arbre du verger: bas, tordu, penché par le vent d'ouest, pommes à portée de main",
       "size": {
-        "d": 3.868,
+        "d": 3.808,
         "h": 2.893,
-        "w": 3.939
+        "w": 3.922
       },
       "source": "recoltables-aubrune",
       "states": {
@@ -239,9 +234,9 @@
       "family": "arbre",
       "file": "aubrune-arbres.glb",
       "size": {
-        "d": 3.868,
+        "d": 3.808,
         "h": 2.893,
-        "w": 3.939
+        "w": 3.922
       },
       "source": "recoltables-aubrune",
       "stateOf": {
@@ -313,7 +308,7 @@
       "family": "arbre",
       "file": "aubrune-arbres.glb",
       "size": {
-        "d": 0.928,
+        "d": 0.929,
         "h": 0.42,
         "w": 0.922
       },
@@ -399,9 +394,9 @@
       },
       "pourquoi": "l'arbre des haies et des bords de ruisseau: fût droit et gris, houppier haut et étroit, vert plus frais",
       "size": {
-        "d": 3.378,
+        "d": 3.233,
         "h": 5.777,
-        "w": 3.269
+        "w": 3.245
       },
       "source": "recoltables-aubrune",
       "states": {
@@ -591,7 +586,7 @@
     },
     "bandstand": {
       "bottom": 0.0,
-      "budget": 1100,
+      "budget": 1200,
       "family": "fete",
       "file": "aubrune-fetes.glb",
       "pourquoi": "estrade de la fanfare (4 x 3 cases): plancher à 60 cm, marches devant, cordon de fanions, chaises, pupitres et grosse caisse",
@@ -732,48 +727,27 @@
         "vitre": 264
       }
     },
-    "barrel": {
-      "bottom": 0.0,
-      "budget": 1200,
-      "collision": {
-        "d": 0.623,
-        "h": 0.86,
-        "shape": "box",
-        "w": 0.623
-      },
-      "family": "tonneau",
-      "file": "street.glb",
-      "nodes": ["barrel_mesh"],
-      "size": {
-        "d": 0.623,
-        "h": 0.86,
-        "w": 0.623
-      },
-      "top": 0.85,
-      "triangles": 540
-    },
     "bed-double": {
       "bed": {
         "height": 0.5,
         "places": 2
       },
       "bottom": 0.0,
-      "budget": 2500,
-      "collision": {
-        "d": 2.0,
-        "h": 0.95,
-        "shape": "box",
-        "w": 1.51
-      },
-      "family": "lit",
-      "file": "furniture.glb",
-      "nodes": ["bed-double_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "lit double (2 x 2 cases): tête au mur nord, couchage à 50 cm, édredon sur les deux tiers, deux oreillers",
       "size": {
-        "d": 2.0,
-        "h": 0.95,
-        "w": 1.51
+        "d": 2.004,
+        "h": 0.954,
+        "w": 1.506
       },
-      "triangles": 1188
+      "source": "recoltables-aubrune",
+      "triangles": 144,
+      "trianglesParMateriau": {
+        "bois": 90,
+        "etoffe": 54
+      }
     },
     "bed-single": {
       "bed": {
@@ -781,91 +755,43 @@
         "places": 1
       },
       "bottom": 0.0,
-      "budget": 2500,
-      "collision": {
-        "d": 2.0,
-        "h": 0.95,
-        "shape": "box",
-        "w": 1.01
-      },
-      "family": "lit",
-      "file": "furniture.glb",
-      "nodes": ["bed-single_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "lit d'une personne (1 x 2 cases), comme le lit double",
       "size": {
-        "d": 2.0,
-        "h": 0.95,
-        "w": 1.01
+        "d": 2.007,
+        "h": 0.954,
+        "w": 1.004
       },
-      "triangles": 1064
-    },
-    "bench-farm": {
-      "bottom": 0.0,
-      "budget": 2500,
-      "collision": {
-        "d": 0.388,
-        "h": 0.45,
-        "shape": "box",
-        "w": 1.4
-      },
-      "family": "banc",
-      "file": "furniture.glb",
-      "nodes": ["bench-farm_mesh"],
-      "seat": {
-        "front": 0.21,
-        "height": 0.45
-      },
-      "size": {
-        "d": 0.388,
-        "h": 0.45,
-        "w": 1.4
-      },
-      "triangles": 380
-    },
-    "bench-park": {
-      "bottom": 0.0,
-      "budget": 2500,
-      "collision": {
-        "d": 0.501,
-        "h": 0.869,
-        "shape": "box",
-        "w": 1.8
-      },
-      "family": "banc",
-      "file": "furniture.glb",
-      "nodes": ["bench-park_mesh"],
-      "seat": {
-        "front": 0.21,
-        "height": 0.45
-      },
-      "size": {
-        "d": 0.501,
-        "h": 0.869,
-        "w": 1.8
-      },
-      "triangles": 1372
+      "source": "recoltables-aubrune",
+      "triangles": 132,
+      "trianglesParMateriau": {
+        "bois": 90,
+        "etoffe": 42
+      }
     },
     "bench-platform": {
       "bottom": 0.0,
-      "budget": 2500,
-      "collision": {
-        "d": 0.501,
-        "h": 0.869,
-        "shape": "box",
-        "w": 1.7
-      },
-      "family": "banc",
-      "file": "furniture.glb",
-      "nodes": ["bench-platform_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "banc de quai (2 cases): pieds de fonte vert wagon, lattes; assise à 45 cm",
       "seat": {
         "front": 0.21,
         "height": 0.45
       },
       "size": {
-        "d": 0.501,
-        "h": 0.869,
+        "d": 0.532,
+        "h": 0.88,
         "w": 1.7
       },
-      "triangles": 1372
+      "source": "recoltables-aubrune",
+      "triangles": 194,
+      "trianglesParMateriau": {
+        "bois": 70,
+        "metal": 124
+      }
     },
     "berry-bush": {
       "bottom": 0.0,
@@ -877,7 +803,7 @@
         "yaw": true
       },
       "size": {
-        "d": 1.141,
+        "d": 1.039,
         "h": 0.795,
         "w": 1.005
       },
@@ -898,7 +824,7 @@
       "family": "buisson",
       "file": "aubrune-recoltes.glb",
       "size": {
-        "d": 1.141,
+        "d": 1.039,
         "h": 0.775,
         "w": 1.005
       },
@@ -1113,7 +1039,7 @@
       "family": "arbre",
       "file": "aubrune-arbres.glb",
       "size": {
-        "d": 0.759,
+        "d": 0.76,
         "h": 0.385,
         "w": 0.7
       },
@@ -1262,7 +1188,7 @@
     },
     "bramble": {
       "bottom": 0.0,
-      "budget": 300,
+      "budget": 1500,
       "family": "buisson",
       "file": "aubrune-recoltes.glb",
       "jitter": {
@@ -1270,25 +1196,25 @@
         "yaw": true
       },
       "size": {
-        "d": 1.306,
-        "h": 0.901,
-        "w": 1.436
+        "d": 1.168,
+        "h": 0.785,
+        "w": 1.296
       },
       "source": "recoltables-aubrune",
       "states": {
         "bare": "bramble-bare"
       },
-      "triangles": 279,
+      "triangles": 1375,
       "trianglesParMateriau": {
-        "feuillage": 187,
-        "fruit": 56,
-        "tige": 36
+        "feuillage": 965,
+        "fruit": 144,
+        "tige": 266
       },
       "variants": ["bramble-b"]
     },
     "bramble-b": {
       "bottom": 0.0,
-      "budget": 300,
+      "budget": 1500,
       "family": "buisson",
       "file": "aubrune-recoltes.glb",
       "jitter": {
@@ -1296,62 +1222,62 @@
         "yaw": true
       },
       "size": {
-        "d": 1.367,
-        "h": 0.829,
-        "w": 1.302
+        "d": 1.218,
+        "h": 0.776,
+        "w": 1.383
       },
       "source": "recoltables-aubrune",
       "states": {
         "bare": "bramble-b-bare"
       },
-      "triangles": 278,
+      "triangles": 1287,
       "trianglesParMateriau": {
-        "feuillage": 186,
-        "fruit": 56,
-        "tige": 36
+        "feuillage": 965,
+        "fruit": 72,
+        "tige": 250
       },
       "variants": ["bramble"]
     },
     "bramble-b-bare": {
       "bottom": 0.0,
-      "budget": 300,
+      "budget": 1500,
       "family": "buisson",
       "file": "aubrune-recoltes.glb",
       "size": {
-        "d": 1.367,
-        "h": 0.829,
-        "w": 1.302
+        "d": 1.218,
+        "h": 0.734,
+        "w": 1.383
       },
       "source": "recoltables-aubrune",
       "stateOf": {
         "model": "bramble-b",
         "state": "bare"
       },
-      "triangles": 222,
+      "triangles": 1199,
       "trianglesParMateriau": {
-        "feuillage": 186,
-        "tige": 36
+        "feuillage": 965,
+        "tige": 234
       }
     },
     "bramble-bare": {
       "bottom": 0.0,
-      "budget": 300,
+      "budget": 1500,
       "family": "buisson",
       "file": "aubrune-recoltes.glb",
       "size": {
-        "d": 1.306,
-        "h": 0.901,
-        "w": 1.436
+        "d": 1.168,
+        "h": 0.73,
+        "w": 1.296
       },
       "source": "recoltables-aubrune",
       "stateOf": {
         "model": "bramble",
         "state": "bare"
       },
-      "triangles": 223,
+      "triangles": 1199,
       "trianglesParMateriau": {
-        "feuillage": 187,
-        "tige": 36
+        "feuillage": 965,
+        "tige": 234
       }
     },
     "brazier": {
@@ -1367,15 +1293,17 @@
       },
       "pourquoi": "brasero de Mado sur le quai, la veillée d'hiver: on s'y chauffe les mains, les pommes de terre cuisent dans la braise",
       "size": {
-        "d": 0.727,
-        "h": 1.094,
-        "w": 0.742
+        "d": 0.798,
+        "h": 1.103,
+        "w": 0.786
       },
       "source": "recoltables-aubrune",
-      "triangles": 132,
+      "triangles": 447,
       "trianglesParMateriau": {
-        "flamme": 41,
-        "metal": 91
+        "bois": 80,
+        "braise": 110,
+        "flamme": 130,
+        "metal": 127
       }
     },
     "bread-basket": {
@@ -1422,7 +1350,7 @@
       "pourquoi": "seau de zinc à anse, l'eau de la pompe pour la cuisine",
       "size": {
         "d": 0.304,
-        "h": 0.406,
+        "h": 0.405,
         "w": 0.313
       },
       "source": "recoltables-aubrune",
@@ -1431,74 +1359,26 @@
         "metal": 56
       }
     },
-    "chair-bedroom": {
-      "bottom": 0.0,
-      "budget": 1500,
-      "collision": {
-        "d": 0.452,
-        "h": 0.918,
-        "shape": "box",
-        "w": 0.44
-      },
-      "family": "chaise",
-      "file": "furniture.glb",
-      "nodes": ["chair-bedroom_mesh"],
-      "seat": {
-        "front": 0.21,
-        "height": 0.45
-      },
-      "size": {
-        "d": 0.452,
-        "h": 0.918,
-        "w": 0.44
-      },
-      "triangles": 768
-    },
     "chair-farm": {
       "bottom": 0.0,
-      "budget": 1500,
-      "collision": {
-        "d": 0.452,
-        "h": 0.918,
-        "shape": "box",
-        "w": 0.44
-      },
-      "family": "chaise",
-      "file": "furniture.glb",
-      "nodes": ["chair-farm_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "chaise de ferme paillée: assise à 45 cm, bord avant à 21 cm (le personnage s'y assied), dossier à deux barreaux",
       "seat": {
         "front": 0.21,
         "height": 0.45
       },
       "size": {
-        "d": 0.452,
-        "h": 0.918,
-        "w": 0.44
+        "d": 0.417,
+        "h": 0.924,
+        "w": 0.426
       },
-      "triangles": 844
-    },
-    "chair-farm-sage": {
-      "bottom": 0.0,
-      "budget": 1500,
-      "collision": {
-        "d": 0.452,
-        "h": 0.918,
-        "shape": "box",
-        "w": 0.44
-      },
-      "family": "chaise",
-      "file": "furniture.glb",
-      "nodes": ["chair-farm-sage_mesh"],
-      "seat": {
-        "front": 0.21,
-        "height": 0.45
-      },
-      "size": {
-        "d": 0.452,
-        "h": 0.918,
-        "w": 0.44
-      },
-      "triangles": 844
+      "source": "recoltables-aubrune",
+      "triangles": 100,
+      "trianglesParMateriau": {
+        "bois": 100
+      }
     },
     "chalk-board": {
       "bottom": 0.0,
@@ -1520,22 +1400,21 @@
     },
     "chest": {
       "bottom": 0.0,
-      "budget": 1200,
-      "collision": {
-        "d": 0.485,
-        "h": 0.655,
-        "shape": "box",
-        "w": 0.82
-      },
-      "family": "coffre",
-      "file": "furniture.glb",
-      "nodes": ["chest_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "coffre à couvercle bombé cerclé de fer (le coffre commun de la halte, le coffre de la maison)",
       "size": {
-        "d": 0.485,
-        "h": 0.655,
-        "w": 0.82
+        "d": 0.483,
+        "h": 0.572,
+        "w": 0.86
       },
-      "triangles": 492
+      "source": "recoltables-aubrune",
+      "triangles": 228,
+      "trianglesParMateriau": {
+        "bois": 34,
+        "metal": 194
+      }
     },
     "coat-rack": {
       "bottom": 0.62,
@@ -1655,26 +1534,6 @@
         "bois": 62,
         "etoffe": 124
       }
-    },
-    "crate": {
-      "bottom": 0.0,
-      "budget": 1200,
-      "collision": {
-        "d": 0.61,
-        "h": 0.6,
-        "shape": "box",
-        "w": 0.6
-      },
-      "family": "caisse",
-      "file": "street.glb",
-      "nodes": ["crate_mesh"],
-      "size": {
-        "d": 0.61,
-        "h": 0.6,
-        "w": 0.6
-      },
-      "top": 0.6,
-      "triangles": 684
     },
     "crop-bleuet-0": {
       "bottom": 0.1556,
@@ -1954,9 +1813,9 @@
       "file": "aubrune-potager.glb",
       "plants": 6,
       "size": {
-        "d": 0.876,
-        "h": 0.303,
-        "w": 0.832
+        "d": 0.91,
+        "h": 0.323,
+        "w": 0.864
       },
       "source": "recoltables-aubrune",
       "stateOf": {
@@ -1976,9 +1835,9 @@
       "file": "aubrune-potager.glb",
       "plants": 6,
       "size": {
-        "d": 0.971,
-        "h": 0.222,
-        "w": 0.934
+        "d": 1.017,
+        "h": 0.232,
+        "w": 0.978
       },
       "source": "recoltables-aubrune",
       "stateOf": {
@@ -1991,50 +1850,6 @@
       }
     },
     "crop-carotte-2": {
-      "bottom": 0.1436,
-      "budget": 150,
-      "cell": true,
-      "family": "culture",
-      "file": "aubrune-potager.glb",
-      "plants": 6,
-      "size": {
-        "d": 0.958,
-        "h": 0.343,
-        "w": 0.959
-      },
-      "source": "recoltables-aubrune",
-      "stateOf": {
-        "model": "crop-carotte",
-        "state": "growing"
-      },
-      "triangles": 576,
-      "trianglesParMateriau": {
-        "tige": 576
-      }
-    },
-    "crop-carotte-2-thirsty": {
-      "bottom": 0.1436,
-      "budget": 150,
-      "cell": true,
-      "family": "culture",
-      "file": "aubrune-potager.glb",
-      "plants": 6,
-      "size": {
-        "d": 1.093,
-        "h": 0.241,
-        "w": 1.079
-      },
-      "source": "recoltables-aubrune",
-      "stateOf": {
-        "model": "crop-carotte",
-        "state": "thirsty"
-      },
-      "triangles": 576,
-      "trianglesParMateriau": {
-        "tige": 576
-      }
-    },
-    "crop-carotte-3": {
       "bottom": 0.1336,
       "budget": 150,
       "cell": true,
@@ -2787,9 +2602,9 @@
       "file": "aubrune-potager.glb",
       "plants": 6,
       "size": {
-        "d": 0.907,
-        "h": 0.368,
-        "w": 0.877
+        "d": 0.948,
+        "h": 0.401,
+        "w": 0.922
       },
       "source": "recoltables-aubrune",
       "stateOf": {
@@ -2810,9 +2625,9 @@
       "file": "aubrune-potager.glb",
       "plants": 6,
       "size": {
-        "d": 0.929,
-        "h": 0.37,
-        "w": 0.905
+        "d": 0.974,
+        "h": 0.402,
+        "w": 0.953
       },
       "source": "recoltables-aubrune",
       "stateOf": {
@@ -2826,52 +2641,6 @@
       }
     },
     "crop-poireau-2": {
-      "bottom": 0.1336,
-      "budget": 150,
-      "cell": true,
-      "family": "culture",
-      "file": "aubrune-potager.glb",
-      "plants": 6,
-      "size": {
-        "d": 0.988,
-        "h": 0.439,
-        "w": 0.982
-      },
-      "source": "recoltables-aubrune",
-      "stateOf": {
-        "model": "crop-poireau",
-        "state": "growing"
-      },
-      "triangles": 318,
-      "trianglesParMateriau": {
-        "fruit": 78,
-        "tige": 240
-      }
-    },
-    "crop-poireau-2-thirsty": {
-      "bottom": 0.1336,
-      "budget": 150,
-      "cell": true,
-      "family": "culture",
-      "file": "aubrune-potager.glb",
-      "plants": 6,
-      "size": {
-        "d": 1.024,
-        "h": 0.441,
-        "w": 1.015
-      },
-      "source": "recoltables-aubrune",
-      "stateOf": {
-        "model": "crop-poireau",
-        "state": "thirsty"
-      },
-      "triangles": 318,
-      "trianglesParMateriau": {
-        "fruit": 78,
-        "tige": 240
-      }
-    },
-    "crop-poireau-3": {
       "bottom": 0.1336,
       "budget": 150,
       "cell": true,
@@ -2941,38 +2710,39 @@
       }
     },
     "crop-pomme-de-terre-1": {
-      "bottom": 0.0851,
+      "bottom": 0.0791,
       "budget": 150,
       "cell": true,
       "family": "culture",
       "file": "aubrune-potager.glb",
       "plants": 3,
       "size": {
-        "d": 0.88,
-        "h": 0.239,
-        "w": 0.496
+        "d": 0.911,
+        "h": 0.266,
+        "w": 0.534
       },
       "source": "recoltables-aubrune",
       "stateOf": {
         "model": "crop-pomme-de-terre",
         "state": "growing"
       },
-      "triangles": 76,
+      "triangles": 328,
       "trianglesParMateriau": {
-        "feuillage": 76
+        "feuillage": 76,
+        "fleur": 252
       }
     },
     "crop-pomme-de-terre-1-thirsty": {
-      "bottom": 0.0553,
+      "bottom": 0.0463,
       "budget": 150,
       "cell": true,
       "family": "culture",
       "file": "aubrune-potager.glb",
       "plants": 3,
       "size": {
-        "d": 0.921,
-        "h": 0.169,
-        "w": 0.59
+        "d": 0.956,
+        "h": 0.172,
+        "w": 0.638
       },
       "source": "recoltables-aubrune",
       "stateOf": {
@@ -2985,51 +2755,6 @@
       }
     },
     "crop-pomme-de-terre-2": {
-      "bottom": 0.0731,
-      "budget": 150,
-      "cell": true,
-      "family": "culture",
-      "file": "aubrune-potager.glb",
-      "plants": 3,
-      "size": {
-        "d": 0.983,
-        "h": 0.275,
-        "w": 0.583
-      },
-      "source": "recoltables-aubrune",
-      "stateOf": {
-        "model": "crop-pomme-de-terre",
-        "state": "growing"
-      },
-      "triangles": 410,
-      "trianglesParMateriau": {
-        "feuillage": 158,
-        "fleur": 252
-      }
-    },
-    "crop-pomme-de-terre-2-thirsty": {
-      "bottom": 0.0373,
-      "budget": 150,
-      "cell": true,
-      "family": "culture",
-      "file": "aubrune-potager.glb",
-      "plants": 3,
-      "size": {
-        "d": 0.999,
-        "h": 0.174,
-        "w": 0.688
-      },
-      "source": "recoltables-aubrune",
-      "stateOf": {
-        "model": "crop-pomme-de-terre",
-        "state": "thirsty"
-      },
-      "triangles": 158,
-      "trianglesParMateriau": {
-        "feuillage": 158
-      }
-    },
-    "crop-pomme-de-terre-3": {
       "bottom": 0.0612,
       "budget": 150,
       "cell": true,
@@ -3833,7 +3558,7 @@
       "size": {
         "d": 0.947,
         "h": 0.257,
-        "w": 0.892
+        "w": 0.891
       },
       "source": "recoltables-aubrune",
       "triangles": 108,
@@ -3852,7 +3577,7 @@
         "yaw": true
       },
       "size": {
-        "d": 0.809,
+        "d": 0.81,
         "h": 0.259,
         "w": 0.906
       },
@@ -4028,22 +3753,20 @@
     },
     "fence": {
       "bottom": 0.0,
-      "budget": 800,
-      "collision": {
-        "d": 0.155,
-        "h": 1.116,
-        "shape": "box",
-        "w": 2.02
-      },
-      "family": "barriere",
-      "file": "street.glb",
-      "nodes": ["fence_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "module de 2 m de la barrière qui longe la voie (`decor.fenceModel`): deux poteaux, trois lisses qui rejoignent celles du module voisin",
       "size": {
-        "d": 0.155,
-        "h": 1.116,
-        "w": 2.02
+        "d": 0.139,
+        "h": 1.103,
+        "w": 2.0
       },
-      "triangles": 464
+      "source": "recoltables-aubrune",
+      "triangles": 50,
+      "trianglesParMateriau": {
+        "bois": 50
+      }
     },
     "festival-banner": {
       "bottom": 0.0,
@@ -4078,14 +3801,15 @@
       "pourquoi": "lumignon de la Nuit des lumignons: cire coulée dans une coquille d'œuf, sur une soucoupe; une lumière par âme, posée là où elle compte",
       "size": {
         "d": 0.19,
-        "h": 0.168,
+        "h": 0.157,
         "w": 0.19
       },
       "source": "recoltables-aubrune",
-      "triangles": 84,
+      "triangles": 117,
       "trianglesParMateriau": {
         "bois": 7,
-        "flamme": 8,
+        "braise": 8,
+        "flamme": 33,
         "terre": 22,
         "vitre": 47
       }
@@ -4103,20 +3827,21 @@
       },
       "pourquoi": "grand chaudron du concours de la soupe (2 x 2 cases), pendu au trépied au-dessus d'un feu cerclé de pierres",
       "size": {
-        "d": 1.613,
-        "h": 1.911,
-        "w": 1.605
+        "d": 1.657,
+        "h": 2.459,
+        "w": 1.693
       },
       "source": "recoltables-aubrune",
       "states": {
         "bare": "festival-cauldron-bare"
       },
-      "triangles": 346,
+      "triangles": 565,
       "trianglesParMateriau": {
-        "bois": 64,
-        "flamme": 20,
-        "metal": 158,
-        "pierre": 104
+        "bois": 92,
+        "braise": 57,
+        "flamme": 130,
+        "metal": 170,
+        "pierre": 116
       }
     },
     "festival-cauldron-bare": {
@@ -4131,20 +3856,20 @@
         "radius": 3.2
       },
       "size": {
-        "d": 1.613,
-        "h": 1.911,
-        "w": 1.605
+        "d": 1.657,
+        "h": 2.459,
+        "w": 1.693
       },
       "source": "recoltables-aubrune",
       "stateOf": {
         "model": "festival-cauldron",
         "state": "bare"
       },
-      "triangles": 326,
+      "triangles": 378,
       "trianglesParMateriau": {
-        "bois": 64,
-        "metal": 158,
-        "pierre": 104
+        "bois": 92,
+        "metal": 170,
+        "pierre": 116
       }
     },
     "field-row": {
@@ -4231,19 +3956,47 @@
       "budget": 600,
       "family": "meuble",
       "file": "aubrune-meubles.glb",
-      "pourquoi": "four de maçonnerie (fournil, foyer de la forge): gueule devant, conduit derrière contre le mur",
+      "pourquoi": "four de maçonnerie (fournil, foyer de la forge): gueule devant où brûle le feu, conduit derrière contre le mur",
       "size": {
-        "d": 0.951,
-        "h": 1.95,
-        "w": 0.927
+        "d": 0.943,
+        "h": 1.953,
+        "w": 0.923
       },
       "source": "recoltables-aubrune",
+      "states": {
+        "bare": "four-bare"
+      },
       "top": 0.75,
-      "triangles": 225,
+      "triangles": 509,
       "trianglesParMateriau": {
-        "crepi": 82,
-        "fruit": 24,
-        "pierre": 119
+        "bois": 80,
+        "braise": 61,
+        "crepi": 89,
+        "flamme": 130,
+        "pierre": 149
+      }
+    },
+    "four-bare": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "meuble",
+      "file": "aubrune-meubles.glb",
+      "size": {
+        "d": 0.944,
+        "h": 1.954,
+        "w": 0.923
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "four",
+        "state": "bare"
+      },
+      "top": 0.75,
+      "triangles": 318,
+      "trianglesParMateriau": {
+        "bois": 80,
+        "crepi": 89,
+        "pierre": 149
       }
     },
     "garden-bed": {
@@ -4474,35 +4227,6 @@
         "feuillage": 60
       }
     },
-    "house-town": {
-      "bottom": 0.0,
-      "budget": 9000,
-      "collision": {
-        "d": 6.0,
-        "h": 5.6,
-        "shape": "box",
-        "w": 7.0
-      },
-      "doors": [
-        {
-          "height": 2.05,
-          "side": "sud",
-          "width": 1.0,
-          "x": 0.0,
-          "y": 3.5
-        }
-      ],
-      "eaves": 5.6,
-      "family": "maison",
-      "file": "houses.glb",
-      "nodes": ["house-town_walls", "house-town_roof"],
-      "size": {
-        "d": 6.99,
-        "h": 8.617,
-        "w": 7.52
-      },
-      "triangles": 7004
-    },
     "indoor-logs": {
       "bottom": 0.0,
       "budget": 150,
@@ -4558,25 +4282,6 @@
         "etoffe": 48,
         "vitre": 48
       }
-    },
-    "lamp-floor": {
-      "bottom": 0.0,
-      "budget": 800,
-      "collision": {
-        "d": 0.432,
-        "h": 1.51,
-        "shape": "box",
-        "w": 0.432
-      },
-      "family": "lampe",
-      "file": "furniture.glb",
-      "nodes": ["lamp-floor_mesh"],
-      "size": {
-        "d": 0.432,
-        "h": 1.51,
-        "w": 0.432
-      },
-      "triangles": 504
     },
     "lampion-garland": {
       "bottom": 0.0003,
@@ -4639,25 +4344,6 @@
         "etoffe": 12
       }
     },
-    "log-pile": {
-      "bottom": 0.0101,
-      "budget": 2000,
-      "collision": {
-        "d": 0.87,
-        "h": 0.58,
-        "shape": "box",
-        "w": 0.91
-      },
-      "family": "buches",
-      "file": "street.glb",
-      "nodes": ["log-pile_mesh"],
-      "size": {
-        "d": 0.87,
-        "h": 0.58,
-        "w": 0.91
-      },
-      "triangles": 1368
-    },
     "luggage-van": {
       "bottom": 0.26,
       "budget": 2500,
@@ -4678,25 +4364,6 @@
         "vitrage": 16,
         "vitre": 4
       }
-    },
-    "mailbox": {
-      "bottom": 0.0,
-      "budget": 800,
-      "collision": {
-        "d": 0.435,
-        "h": 1.37,
-        "shape": "box",
-        "w": 0.32
-      },
-      "family": "boite-aux-lettres",
-      "file": "street.glb",
-      "nodes": ["mailbox_mesh"],
-      "size": {
-        "d": 0.435,
-        "h": 1.37,
-        "w": 0.32
-      },
-      "triangles": 468
     },
     "mantel-clock": {
       "bottom": 0.0,
@@ -4723,19 +4390,21 @@
       "file": "aubrune-meubles.glb",
       "pourquoi": "marmite de soupe sur son trépied, les braises dessous",
       "size": {
-        "d": 0.646,
-        "h": 0.869,
-        "w": 0.657
+        "d": 0.664,
+        "h": 0.87,
+        "w": 0.687
       },
       "source": "recoltables-aubrune",
       "states": {
         "bare": "marmite-bare"
       },
-      "triangles": 142,
+      "triangles": 460,
       "trianglesParMateriau": {
-        "bois": 12,
-        "fruit": 32,
-        "metal": 98
+        "bois": 92,
+        "braise": 63,
+        "flamme": 130,
+        "metal": 162,
+        "pierre": 13
       }
     },
     "marmite-bare": {
@@ -4744,20 +4413,22 @@
       "family": "meuble",
       "file": "aubrune-meubles.glb",
       "size": {
-        "d": 0.646,
-        "h": 0.869,
-        "w": 0.657
+        "d": 0.664,
+        "h": 0.87,
+        "w": 0.687
       },
       "source": "recoltables-aubrune",
       "stateOf": {
         "model": "marmite",
         "state": "bare"
       },
-      "triangles": 142,
+      "triangles": 460,
       "trianglesParMateriau": {
-        "bois": 12,
-        "fruit": 32,
-        "metal": 98
+        "bois": 92,
+        "braise": 63,
+        "flamme": 130,
+        "metal": 162,
+        "pierre": 13
       }
     },
     "meule": {
@@ -4806,15 +4477,15 @@
       "pourquoi": "psyché: on se regarde de face (+z), la glace un peu penchée",
       "size": {
         "d": 0.467,
-        "h": 1.642,
-        "w": 0.807
+        "h": 1.64,
+        "w": 0.854
       },
       "source": "recoltables-aubrune",
-      "triangles": 104,
+      "triangles": 188,
       "trianglesParMateriau": {
-        "bois": 90,
-        "metal": 12,
-        "vitre": 2
+        "bois": 122,
+        "metal": 56,
+        "vitre": 10
       }
     },
     "newspaper": {
@@ -4849,9 +4520,9 @@
       },
       "pourquoi": "l'arbre d'ombre du bocage: tronc trapu et noueux, houppier large en festons",
       "size": {
-        "d": 4.242,
+        "d": 4.188,
         "h": 5.147,
-        "w": 4.199
+        "w": 4.033
       },
       "source": "recoltables-aubrune",
       "states": {
@@ -5221,22 +4892,20 @@
     },
     "platform-sign": {
       "bottom": 0.0,
-      "budget": 800,
-      "collision": {
-        "d": 0.221,
-        "h": 2.77,
-        "shape": "box",
-        "w": 1.1
-      },
-      "family": "poteau-quai",
-      "file": "street.glb",
-      "nodes": ["platform-sign_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "poteau de quai: deux colonnettes de fonte et la plaque émaillée du nom de la halte, à 2,2 m (on la lit du train)",
       "size": {
-        "d": 0.221,
-        "h": 2.77,
-        "w": 1.1
+        "d": 0.17,
+        "h": 2.79,
+        "w": 0.98
       },
-      "triangles": 504
+      "source": "recoltables-aubrune",
+      "triangles": 122,
+      "trianglesParMateriau": {
+        "metal": 122
+      }
     },
     "poppies": {
       "bottom": 0.0,
@@ -5284,23 +4953,21 @@
     },
     "poulailler": {
       "bottom": 0.0,
-      "budget": 600,
+      "budget": 1500,
       "family": "meuble",
       "file": "aubrune-meubles.glb",
-      "pourquoi": "poulailler sur pilotis (3 x 2 cases): la rampe descend vers le parc, au sud",
+      "pourquoi": "poulailler de ferme (3 x 2 cases): cabane sur pilotis au nord-ouest, pondoir à l'ouest, rampe et parc grillagé au sud et à l'est, portillon au sud",
       "size": {
-        "d": 1.835,
-        "h": 2.036,
-        "w": 2.389
+        "d": 1.953,
+        "h": 1.521,
+        "w": 2.965
       },
       "source": "recoltables-aubrune",
-      "triangles": 156,
+      "triangles": 1376,
       "trianglesParMateriau": {
-        "bardage": 24,
-        "bois": 98,
-        "metal": 8,
-        "tige": 6,
-        "tuile": 20
+        "bardage": 116,
+        "bois": 584,
+        "metal": 676
       }
     },
     "rail-bed": {
@@ -5554,25 +5221,6 @@
         "tige": 18
       }
     },
-    "rug-oval": {
-      "bottom": 0.0,
-      "budget": 400,
-      "collision": {
-        "d": 1.0,
-        "h": 0.016,
-        "shape": "box",
-        "w": 1.6
-      },
-      "family": "tapis",
-      "file": "furniture.glb",
-      "nodes": ["rug-oval_mesh"],
-      "size": {
-        "d": 1.0,
-        "h": 0.016,
-        "w": 1.6
-      },
-      "triangles": 184
-    },
     "rug-round": {
       "bottom": 0.012,
       "budget": 150,
@@ -5633,130 +5281,6 @@
         "pierre": 10,
         "vitre": 28
       }
-    },
-    "shed": {
-      "bottom": 0.0,
-      "budget": 9000,
-      "collision": {
-        "d": 5.0,
-        "h": 3.0,
-        "shape": "box",
-        "w": 6.0
-      },
-      "doors": [
-        {
-          "height": 2.05,
-          "side": "ouest",
-          "width": 1.0,
-          "x": -3.5,
-          "y": -0.0
-        }
-      ],
-      "eaves": 3.0,
-      "family": "maison",
-      "file": "houses.glb",
-      "nodes": ["shed_walls", "shed_roof"],
-      "size": {
-        "d": 5.55,
-        "h": 4.452,
-        "w": 6.64
-      },
-      "triangles": 900
-    },
-    "shelf": {
-      "bottom": 0.0,
-      "budget": 2000,
-      "collision": {
-        "d": 0.32,
-        "h": 1.6,
-        "shape": "box",
-        "w": 0.9
-      },
-      "family": "etagere",
-      "file": "furniture.glb",
-      "nodes": ["shelf_mesh"],
-      "size": {
-        "d": 0.32,
-        "h": 1.6,
-        "w": 0.9
-      },
-      "top": 0.587,
-      "triangles": 1092
-    },
-    "shop-front": {
-      "bottom": 0.0,
-      "budget": 9000,
-      "collision": {
-        "d": 10.0,
-        "h": 5.6,
-        "shape": "box",
-        "w": 8.0
-      },
-      "doors": [
-        {
-          "height": 2.05,
-          "side": "nord",
-          "width": 1.0,
-          "x": 1.6,
-          "y": -5.5
-        },
-        {
-          "height": 2.05,
-          "side": "sud",
-          "width": 1.0,
-          "x": 0.0,
-          "y": 5.5
-        }
-      ],
-      "eaves": 5.6,
-      "family": "maison",
-      "file": "houses.glb",
-      "nodes": ["shop-front_walls", "shop-front_roof"],
-      "size": {
-        "d": 11.35,
-        "h": 8.901,
-        "w": 8.8
-      },
-      "triangles": 7860
-    },
-    "signpost": {
-      "bottom": 0.0,
-      "budget": 1000,
-      "collision": {
-        "d": 0.49,
-        "h": 2.236,
-        "shape": "box",
-        "w": 1.62
-      },
-      "family": "panneau",
-      "file": "street.glb",
-      "nodes": ["signpost_mesh"],
-      "size": {
-        "d": 0.49,
-        "h": 2.236,
-        "w": 1.62
-      },
-      "triangles": 624
-    },
-    "sink-stone": {
-      "bottom": 0.0,
-      "budget": 1500,
-      "collision": {
-        "d": 0.558,
-        "h": 1.178,
-        "shape": "box",
-        "w": 1.0
-      },
-      "family": "evier",
-      "file": "furniture.glb",
-      "nodes": ["sink-stone_mesh"],
-      "size": {
-        "d": 0.558,
-        "h": 1.178,
-        "w": 1.0
-      },
-      "top": 0.85,
-      "triangles": 664
     },
     "small-keg": {
       "bottom": 0.0,
@@ -5856,29 +5380,6 @@
         "vitre": 106
       }
     },
-    "stool": {
-      "bottom": 0.0007,
-      "budget": 800,
-      "collision": {
-        "d": 0.341,
-        "h": 0.45,
-        "shape": "box",
-        "w": 0.34
-      },
-      "family": "tabouret",
-      "file": "furniture.glb",
-      "nodes": ["stool_mesh"],
-      "seat": {
-        "front": 0.17,
-        "height": 0.45
-      },
-      "size": {
-        "d": 0.341,
-        "h": 0.45,
-        "w": 0.34
-      },
-      "triangles": 320
-    },
     "stool-farm": {
       "bottom": 0.0,
       "budget": 150,
@@ -5896,45 +5397,6 @@
       "trianglesParMateriau": {
         "bois": 46
       }
-    },
-    "stove": {
-      "bottom": 0.0,
-      "budget": 1500,
-      "collision": {
-        "d": 0.678,
-        "h": 2.2,
-        "shape": "box",
-        "w": 0.84
-      },
-      "family": "rechaud",
-      "file": "furniture.glb",
-      "nodes": ["stove_mesh"],
-      "size": {
-        "d": 0.678,
-        "h": 2.2,
-        "w": 0.84
-      },
-      "top": 0.85,
-      "triangles": 1264
-    },
-    "street-lamp": {
-      "bottom": 0.0,
-      "budget": 1000,
-      "collision": {
-        "d": 0.378,
-        "h": 3.295,
-        "shape": "box",
-        "w": 0.378
-      },
-      "family": "reverbere",
-      "file": "street.glb",
-      "nodes": ["street-lamp_mesh"],
-      "size": {
-        "d": 0.378,
-        "h": 3.295,
-        "w": 0.378
-      },
-      "triangles": 488
     },
     "street-lantern": {
       "bottom": 0.0,
@@ -5978,23 +5440,21 @@
     },
     "table-farm": {
       "bottom": 0.0,
-      "budget": 1500,
-      "collision": {
-        "d": 0.8,
-        "h": 0.75,
-        "shape": "box",
-        "w": 1.4
-      },
-      "family": "table",
-      "file": "furniture.glb",
-      "nodes": ["table-farm_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "table de ferme (2 cases), plateau à 75 cm",
       "size": {
-        "d": 0.8,
-        "h": 0.75,
-        "w": 1.4
+        "d": 0.804,
+        "h": 0.753,
+        "w": 1.407
       },
+      "source": "recoltables-aubrune",
       "top": 0.75,
-      "triangles": 616
+      "triangles": 50,
+      "trianglesParMateriau": {
+        "bois": 50
+      }
     },
     "table-lamp": {
       "bottom": 0.0,
@@ -6019,26 +5479,6 @@
         "metal": 10,
         "vitre": 47
       }
-    },
-    "table-round": {
-      "bottom": 0.0,
-      "budget": 1500,
-      "collision": {
-        "d": 0.9,
-        "h": 0.75,
-        "shape": "box",
-        "w": 0.9
-      },
-      "family": "table",
-      "file": "furniture.glb",
-      "nodes": ["table-round_mesh"],
-      "size": {
-        "d": 0.9,
-        "h": 0.75,
-        "w": 0.9
-      },
-      "top": 0.75,
-      "triangles": 532
     },
     "tank-engine": {
       "bottom": 0.26,
@@ -6103,236 +5543,222 @@
         "places": 1
       },
       "bottom": 0.0,
-      "budget": 2500,
-      "collision": {
-        "d": 2.0,
-        "h": 1.15,
-        "shape": "box",
-        "w": 1.0
-      },
-      "family": "couchette-train",
-      "file": "train.glb",
-      "nodes": ["train-berth_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "couchette (1 x 2 cases): couchage à 48 cm, oreiller, couverture pliée",
       "size": {
         "d": 2.0,
         "h": 1.15,
         "w": 1.0
       },
-      "triangles": 836
+      "source": "recoltables-aubrune",
+      "triangles": 82,
+      "trianglesParMateriau": {
+        "bois": 30,
+        "etoffe": 52
+      }
     },
     "train-door": {
       "bottom": 0.0,
-      "budget": 600,
-      "collision": {
-        "d": 0.146,
-        "h": 2.15,
-        "shape": "box",
-        "w": 1.0
-      },
-      "family": "porte-voiture",
-      "file": "train.glb",
-      "nodes": ["train-door_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "porte de voiture: battant de teck à glace, poignée de laiton",
       "size": {
-        "d": 0.146,
+        "d": 0.143,
         "h": 2.15,
         "w": 1.0
       },
-      "triangles": 372
+      "source": "recoltables-aubrune",
+      "triangles": 90,
+      "trianglesParMateriau": {
+        "bois": 60,
+        "metal": 28,
+        "vitre": 2
+      }
     },
     "train-luggage-rack": {
-      "bottom": 1.7141,
-      "budget": 2500,
-      "collision": {
-        "d": 0.392,
-        "h": 2.044,
-        "shape": "box",
-        "w": 2.6
-      },
-      "family": "porte-bagages",
-      "file": "train.glb",
-      "nodes": ["train-luggage-rack_mesh"],
+      "bottom": 1.72,
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "filet à bagages (3 cases) à 1,75 m, deux valises dessus, dos contre la paroi",
       "size": {
-        "d": 0.392,
-        "h": 2.044,
+        "d": 0.4,
+        "h": 2.02,
         "w": 2.6
       },
-      "triangles": 784
+      "source": "recoltables-aubrune",
+      "triangles": 256,
+      "trianglesParMateriau": {
+        "etoffe": 124,
+        "metal": 132
+      }
     },
     "train-luggage-rack-empty": {
-      "bottom": 1.7141,
-      "budget": 2500,
-      "collision": {
-        "d": 0.392,
-        "h": 1.98,
-        "shape": "box",
-        "w": 2.6
-      },
-      "family": "porte-bagages",
-      "file": "train.glb",
-      "nodes": ["train-luggage-rack-empty_mesh"],
+      "bottom": 1.72,
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "le même filet, vide",
       "size": {
-        "d": 0.392,
-        "h": 1.98,
+        "d": 0.4,
+        "h": 2.02,
         "w": 2.6
       },
-      "triangles": 416
+      "source": "recoltables-aubrune",
+      "triangles": 132,
+      "trianglesParMateriau": {
+        "metal": 132
+      }
     },
     "train-seat": {
       "bottom": 0.0,
-      "budget": 2500,
-      "collision": {
-        "d": 0.645,
-        "h": 1.15,
-        "shape": "box",
-        "w": 1.0
-      },
-      "family": "banquette-train",
-      "file": "train.glb",
-      "nodes": ["train-seat_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "banquette de velours: assise à 45 cm, bord avant à 32,5 cm, dossier et appui-tête",
       "seat": {
         "front": 0.325,
         "height": 0.45
       },
       "size": {
-        "d": 0.645,
-        "h": 1.15,
+        "d": 0.64,
+        "h": 1.215,
         "w": 1.0
       },
-      "triangles": 528
+      "source": "recoltables-aubrune",
+      "triangles": 80,
+      "trianglesParMateriau": {
+        "bois": 30,
+        "etoffe": 50
+      }
     },
     "train-table": {
       "bottom": 0.0,
-      "budget": 800,
-      "collision": {
-        "d": 0.55,
-        "h": 0.75,
-        "shape": "box",
-        "w": 0.45
-      },
-      "family": "tablette",
-      "file": "train.glb",
-      "nodes": ["train-table_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "tablette de compartiment: plateau à 75 cm tenu au mur et par un pied de fonte",
       "size": {
-        "d": 0.55,
-        "h": 0.75,
-        "w": 0.45
+        "d": 0.552,
+        "h": 0.751,
+        "w": 0.453
       },
+      "source": "recoltables-aubrune",
       "top": 0.75,
-      "triangles": 348
+      "triangles": 60,
+      "trianglesParMateriau": {
+        "bois": 20,
+        "metal": 40
+      }
     },
     "train-wall": {
       "bottom": 0.0,
-      "budget": 600,
-      "collision": {
-        "d": 0.14,
-        "h": 2.15,
-        "shape": "box",
-        "w": 1.0
-      },
-      "family": "paroi-voiture",
-      "file": "train.glb",
-      "nodes": ["train-wall_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "paroi de la voiture du train de nuit (1 m): soubassement de teck, haut crème, face intérieure vers +z",
       "size": {
-        "d": 0.14,
+        "d": 0.135,
         "h": 2.15,
         "w": 1.0
       },
-      "triangles": 144
+      "source": "recoltables-aubrune",
+      "triangles": 60,
+      "trianglesParMateriau": {
+        "bois": 60
+      }
     },
     "train-wall-corner": {
       "bottom": 0.0,
-      "budget": 60,
-      "collision": {
-        "d": 0.14,
-        "h": 2.15,
-        "shape": "box",
-        "w": 0.14
-      },
-      "family": "angle-caisse",
-      "file": "train.glb",
-      "nodes": ["train-wall-corner_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "angle de caisse: le poteau qui raccorde deux parois",
       "size": {
-        "d": 0.14,
+        "d": 0.145,
         "h": 2.15,
-        "w": 0.14
+        "w": 0.145
       },
-      "triangles": 36
+      "source": "recoltables-aubrune",
+      "triangles": 20,
+      "trianglesParMateriau": {
+        "bois": 20
+      }
     },
     "train-wall-lamp": {
-      "bottom": 1.45,
-      "budget": 600,
-      "collision": {
-        "d": 0.178,
-        "h": 1.682,
-        "shape": "box",
-        "w": 0.142
-      },
-      "family": "applique",
-      "file": "train.glb",
-      "nodes": ["train-wall-lamp_mesh"],
+      "bottom": 1.46,
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "applique de laiton à tulipe de verre (elle luit le soir), dos contre la paroi",
       "size": {
-        "d": 0.178,
-        "h": 1.682,
-        "w": 0.142
+        "d": 0.169,
+        "h": 1.66,
+        "w": 0.14
       },
-      "triangles": 328
+      "source": "recoltables-aubrune",
+      "triangles": 112,
+      "trianglesParMateriau": {
+        "flamme": 60,
+        "metal": 52
+      }
     },
     "train-wall-map": {
       "bottom": 0.0,
-      "budget": 600,
-      "collision": {
-        "d": 0.164,
-        "h": 2.15,
-        "shape": "box",
-        "w": 1.0
-      },
-      "family": "paroi-voiture",
-      "file": "train.glb",
-      "nodes": ["train-wall-map_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "paroi au plan de la ligne: le tracé rouge et ses haltes, sous cadre",
       "size": {
-        "d": 0.164,
+        "d": 0.138,
         "h": 2.15,
         "w": 1.0
       },
-      "triangles": 204
+      "source": "recoltables-aubrune",
+      "triangles": 162,
+      "trianglesParMateriau": {
+        "bois": 70,
+        "etoffe": 92
+      }
     },
     "train-wall-window": {
       "bottom": 0.0,
-      "budget": 600,
-      "collision": {
-        "d": 0.165,
-        "h": 2.15,
-        "shape": "box",
-        "w": 1.0
-      },
-      "family": "paroi-voiture",
-      "file": "train.glb",
-      "nodes": ["train-wall-window_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "paroi à fenêtre: la nuit dehors, deux reflets sur la glace, rideaux de velours retenus",
       "size": {
-        "d": 0.165,
+        "d": 0.138,
         "h": 2.15,
         "w": 1.0
       },
-      "triangles": 360
+      "source": "recoltables-aubrune",
+      "triangles": 168,
+      "trianglesParMateriau": {
+        "bois": 100,
+        "etoffe": 64,
+        "vitre": 4
+      }
     },
     "tub": {
       "bottom": 0.0,
-      "budget": 1500,
-      "collision": {
-        "d": 0.72,
-        "h": 0.58,
-        "shape": "box",
-        "w": 1.5
-      },
-      "family": "baignoire",
-      "file": "furniture.glb",
-      "nodes": ["tub_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "baignoire sur pieds de fonte: robinet en col de cygne et ses deux croisillons, bonde sous le bec (aucune fiche ne la pose encore)",
       "size": {
         "d": 0.72,
-        "h": 0.58,
+        "h": 0.805,
         "w": 1.5
       },
-      "triangles": 712
+      "source": "recoltables-aubrune",
+      "triangles": 538,
+      "trianglesParMateriau": {
+        "metal": 538
+      }
     },
     "tunnel-portal": {
       "bottom": 0.0,
@@ -6342,17 +5768,18 @@
       "pourquoi": "tête du tunnel (8 m): la voie entre par l'arc dans l'axe z, le coteau au-dessus",
       "size": {
         "d": 18.7,
-        "h": 10.734,
+        "h": 10.853,
         "w": 30.0
       },
       "source": "recoltables-aubrune",
-      "triangles": 2217,
+      "triangles": 2028,
       "trianglesParMateriau": {
         "ecorce": 26,
-        "feuillage": 813,
+        "feuillage": 663,
         "gazon": 348,
-        "moellon": 120,
-        "pierre": 910
+        "moellon": 124,
+        "pierre": 861,
+        "terre": 6
       }
     },
     "vegetable-crate": {
@@ -6436,22 +5863,21 @@
     },
     "wardrobe": {
       "bottom": 0.0,
-      "budget": 1500,
-      "collision": {
-        "d": 0.627,
-        "h": 1.95,
-        "shape": "box",
-        "w": 1.06
-      },
-      "family": "armoire",
-      "file": "furniture.glb",
-      "nodes": ["wardrobe_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "armoire à deux portes à panneaux (1,95 m), dos au mur, corniche",
       "size": {
-        "d": 0.627,
-        "h": 1.95,
-        "w": 1.06
+        "d": 0.612,
+        "h": 1.953,
+        "w": 0.985
       },
-      "triangles": 540
+      "source": "recoltables-aubrune",
+      "triangles": 146,
+      "trianglesParMateriau": {
+        "bois": 130,
+        "metal": 16
+      }
     },
     "water-crane": {
       "bottom": 0.0,
@@ -6460,37 +5886,37 @@
       "file": "aubrune-ouvrages.glb",
       "pourquoi": "grue à eau au bord de la voie: le bras pivote au-dessus de la locomotive (+z)",
       "size": {
-        "d": 2.66,
-        "h": 3.57,
+        "d": 2.685,
+        "h": 3.44,
         "w": 0.84
       },
       "source": "recoltables-aubrune",
-      "triangles": 283,
+      "triangles": 399,
       "trianglesParMateriau": {
-        "etoffe": 33,
-        "metal": 228,
+        "etoffe": 47,
+        "metal": 330,
         "pierre": 22
       }
     },
     "water-pump": {
       "bottom": 0.0,
-      "budget": 1500,
-      "collision": {
-        "d": 0.947,
-        "h": 1.35,
-        "shape": "box",
-        "w": 0.8
-      },
-      "family": "pompe",
-      "file": "street.glb",
-      "nodes": ["water-pump_mesh"],
+      "budget": 900,
+      "family": "mobilier",
+      "file": "aubrune-mobilier.glb",
+      "pourquoi": "pompe à eau de fonte: le bec verse vers le bas dans l'auge de pierre, le bras de levier derrière",
       "size": {
-        "d": 0.947,
-        "h": 1.35,
-        "w": 0.8
+        "d": 0.951,
+        "h": 1.25,
+        "w": 0.805
       },
-      "top": 0.28,
-      "triangles": 908
+      "source": "recoltables-aubrune",
+      "top": 0.34,
+      "triangles": 332,
+      "trianglesParMateriau": {
+        "bois": 20,
+        "metal": 252,
+        "pierre": 60
+      }
     },
     "water-tower": {
       "bottom": 0.0,
@@ -6511,25 +5937,6 @@
         "moellon": 192,
         "pierre": 122
       }
-    },
-    "well": {
-      "bottom": 0.0,
-      "budget": 2500,
-      "collision": {
-        "d": 1.8,
-        "h": 2.612,
-        "shape": "box",
-        "w": 2.104
-      },
-      "family": "puits",
-      "file": "street.glb",
-      "nodes": ["well_mesh"],
-      "size": {
-        "d": 1.8,
-        "h": 2.612,
-        "w": 2.104
-      },
-      "triangles": 1108
     },
     "wild-herbs": {
       "bottom": 0.0,
@@ -6565,16 +5972,17 @@
       },
       "pourquoi": "poêle à bois: le feu se voit par la porte, le tuyau monte et rentre dans le mur (le conduit)",
       "size": {
-        "d": 0.767,
-        "h": 2.423,
+        "d": 0.768,
+        "h": 2.422,
         "w": 0.563
       },
       "source": "recoltables-aubrune",
       "top": 0.7,
-      "triangles": 157,
+      "triangles": 299,
       "trianglesParMateriau": {
-        "flamme": 2,
-        "metal": 155
+        "braise": 32,
+        "flamme": 78,
+        "metal": 189
       }
     },
     "woodpile": {

@@ -300,34 +300,164 @@ def arbre(entree: dict, ctx: Contexte) -> list[dict]:
 
 
 # ====================================================================== buissons et ronces
+def _foliole(s: Atelier, base, direction, longueur, largeur, couleur, envers):
+    """Foliole de ronce: ovale pointu à bord denté (une dent de chaque côté), pliée le long de
+    la nervure, l'endroit vers le ciel, vue des deux côtés."""
+    p0 = np.array(base, dtype=float)
+    d = np.array(direction, dtype=float)
+    d /= np.linalg.norm(d)
+    cote = np.cross(d, (0.0, 1.0, 0.0))
+    cote /= np.linalg.norm(cote) + 1e-12
+    haut = np.cross(cote, d)
+    if haut[1] < 0:
+        haut, cote = -haut, -cote
+    contour = [(0.0, 0.0), (0.35, 0.48), (0.6, 0.3), (1.0, 0.0), (0.6, -0.3), (0.35, -0.48)]
+    v = [p0 + d * longueur * u + cote * largeur * w - haut * largeur * 0.14 * abs(w) for u, w in contour]
+    v.append(p0 + d * longueur * 0.42 + haut * largeur * 0.06)
+    n = len(contour)
+    faces = [(i, (i + 1) % n, n) for i in range(n)]
+    s.morceau(v, faces, "feuillage", couleur, coeur=p0 + d * longueur * 0.45 - haut * 1.0, double=True, envers=envers)
+
+
+def _ronce(s: Atelier, ctx: Contexte, entree: dict, graine: float, taille: float, fruits: bool):
+    """Ronce (refaite le 2026-11-11: « on ne reconnaît pas des ronces »). Ni une boule ni une
+    araignée: un fourré bas de feuilles, d'où sortent de longues tiges arquées rouge violacé,
+    chargées de feuilles à trois folioles dentées tout le long de l'arc (l'endroit vers le ciel);
+    chaque tige part d'un côté du fourré, passe par-dessus et retombe au sol de l'autre côté, loin
+    du pied: elles se croisent et s'emmêlent. Épines le long des tiges. Les mûres en grappes
+    serrées sur le haut des arcs, là où la caméra les voit: noires (mûres) et rouges (pas encore)."""
+    tons = ctx.tons(entree["feuillage"])
+    R, H = entree["rayon"] * taille, entree["hauteur"] * taille
+    sombre = [ton(c, 0.8) for c in tons]
+    # Fourré bas: trois masses de feuilles aplaties, décalées (pas un dôme rond).
+    for i in range(3):
+        a = graine + i * 2.2
+        d = R * (0.12 if i == 0 else 0.42)
+        s.calotte(math.cos(a) * d, 0.0, math.sin(a) * d, R * entre(0.42, 0.55, graine + i), graine + i * 2.1, sombre[i % len(sombre)], segments=7, dome=0.75, dents=0.3, laches=0, rangs=2)
+    tige = ctx.tons("tige_ronce")
+    epine = ctx.un("epine")
+    grappes = []
+    lignes = []
+    feuilles = []
+    n = entree.get("tiges", 6)
+    for i in range(n):
+        a = graine * 1.9 + i / n * math.tau + penche(graine + i, 0.35)
+        # Elle part d'un côté du fourré et retombe de l'autre côté (on passe au-dessus du coeur).
+        b = a + math.pi * entre(0.55, 0.95, graine + i * 5)
+        p0 = np.array((math.cos(a) * R * 0.32, H * 0.32, math.sin(a) * R * 0.32))
+        p2 = np.array((math.cos(b) * R * entre(1.05, 1.3, graine + i * 4.3), 0.004, math.sin(b) * R * entre(1.05, 1.3, graine + i * 4.3)))
+        milieu = (p0 + p2) / 2
+        sommet = np.array((milieu[0] * 0.5, H * entre(0.85, 1.1, graine + i * 3.1), milieu[2] * 0.5))
+        c = sommet * 2 - (p0 + p2) / 2
+
+        def arc(t, p0=p0, c=c, p2=p2):
+            return (1 - t) ** 2 * p0 + 2 * (1 - t) * t * c + t * t * p2
+
+        ts = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+        pts = [arc(t) for t in ts]
+
+        # Ce qui pousse sur la tige s'accroche à la ligne brisée du tube (pas à l'arc exact, dont
+        # elle s'écarte de 2 cm au sommet): rien ne flotte à côté de la tige.
+        def courbe(t, ts=ts, pts=pts):
+            t = min(max(t, 0.0), 1.0)
+            k = min(len(ts) - 2, max(0, sum(1 for u in ts if u <= t) - 1))
+            f = (t - ts[k]) / (ts[k + 1] - ts[k])
+            return pts[k] * (1 - f) + pts[k + 1] * f
+
+        s.tube([(*p, 0.0085 - 0.003 * t) for p, t in zip(pts, ts)], 3, "tige", tige[i % len(tige)])
+        for k, t in enumerate((0.3, 0.55, 0.82)):
+            p = courbe(t)
+            tg = courbe(t + 0.01) - courbe(t - 0.01)
+            tg /= np.linalg.norm(tg)
+            cote = np.cross(tg, (0.0, 1.0, 0.0))
+            cote /= np.linalg.norm(cote) + 1e-12
+            dehors = cote * (1 if k % 2 else -1) * 0.8 + np.array((0.0, 0.6, 0.0))
+            dehors /= np.linalg.norm(dehors)
+            r = 0.007
+            pied = [p + dehors * 0.002 + cote * r * 0.6, p + dehors * 0.002 - cote * r * 0.6, p + dehors * 0.002 - tg * r * 1.4]
+            pointe = p + dehors * 0.022 - tg * 0.011
+            s.morceau(pied + [pointe], [(0, 1, 3), (1, 2, 3), (2, 0, 3)], "tige", epine, coeur=p)
+        # Feuilles tout le long de l'arc, alternées, trois folioles (cinq sur la première tige).
+        # La grappe de mûres est au milieu de l'arc (t = 0,53): les feuilles s'écartent d'elle.
+        for k, t in enumerate((0.2, 0.37, 0.69, 0.86)):
+            p = courbe(t)
+            tg = courbe(t + 0.01) - courbe(t - 0.01)
+            tg[1] = 0.0
+            tg /= np.linalg.norm(tg) + 1e-12
+            cote = np.cross(tg, (0.0, 1.0, 0.0)) * (1 if (i + k) % 2 else -1)
+            d = cote * 0.8 + tg * 0.4 + np.array((0.0, 0.3, 0.0))
+            d /= np.linalg.norm(d)
+            base = p + d * 0.01
+            lg = 0.11 * taille * (1.0 if 0 < k < 3 else 0.85)
+
+            angles = (0.0, -0.75, 0.75, -1.45, 1.45) if (i == 0 and k == 2) else (0.0, -0.85, 0.85)
+            axe = np.cross(d, cote)
+            axe /= np.linalg.norm(axe) + 1e-12
+            feuilles.append((base, lg, i))
+            for j, ang in enumerate(angles):
+                dj = d * math.cos(ang) + np.cross(axe, d) * math.sin(ang)
+                dj[1] = max(dj[1], 0.08)
+                f = 1.0 if j == 0 else (0.8 if j < 3 else 0.6)
+                _foliole(s, base, dj, lg * f, lg * 0.62 * f, tons[(i + j + k) % len(tons)], ton(tons[0], 0.72))
+        lignes.append(pts)
+        grappes.append(([courbe(t) for t in (0.53, 0.49, 0.57, 0.45, 0.61)], i))
+
+    def loin_des_autres(p, i, marge):
+        """La grappe est-elle à `marge` au moins des autres tiges (aucune ne la traverse) ?"""
+        for j, pts in enumerate(lignes):
+            if j == i:
+                continue
+            for a, b in zip(pts, pts[1:]):
+                ab = b - a
+                t = max(0.0, min(1.0, float(np.dot(p - a, ab) / (np.dot(ab, ab) + 1e-12))))
+                if np.linalg.norm(p - (a + ab * t)) < marge:
+                    return False
+        return True
+
+    # Une grappe ne se met ni sur une autre tige ni dans une feuille (rien ne la traverse).
+    rf = entree["fruits"]["rayon"] * taille if entree.get("fruits") else 0.03
+
+    def libre(p, i):
+        c = p + np.array((0.0, 0.008 + rf * 1.75, 0.0))
+        return loin_des_autres(c, i, rf * 2.8 + 0.01) and all(np.linalg.norm(c - b) > lg * 1.05 + rf * 1.6 for b, lg, j in feuilles if j != i)
+
+
+    choisies = []
+    for essais, i in grappes:
+        place = next((p for p in essais if libre(p, i)), None)
+        if place is not None:
+            choisies.append((place, i))
+    grappes = choisies
+
+
+    # Mûres: des grappes de quatre ou cinq, posées sur le dessus de l'arc.
+    if fruits:
+        f = entree["fruits"]
+        noire, rouge = ctx.tons(f["teinte"])[0], ctx.tons(f["teinte"])[1]
+        rf = f["rayon"] * taille
+        for g, (p, i) in enumerate(grappes[: f["nombre"]]):
+            places = ((0.0, 0.0, 0.0), (0.9, -0.35, 0.3), (-0.8, -0.3, 0.45), (0.2, -0.4, -0.9), (-0.3, 0.55, -0.35))
+            # Le pédoncule: de la tige au coeur de la grappe (la grappe tient à la tige).
+            s.tube([(p[0], p[1], p[2], 0.004), (p[0], p[1] + 0.008 + rf * 1.75, p[2], 0.004)], 3, "tige", ctx.tons("tige_ronce")[i % 3], bouts=(True, True))
+
+            for k, (dx, dy, dz) in enumerate(places[: 4 + (g % 3 == 0)]):
+                c = noire if (k + g) % 3 else rouge
+                # La grappe pend sur la tige (posée dessus, la tige ne la traverse pas).
+                s.octa(rf, rf * 1.15, rf, at(p[0] + dx * rf * 1.5, p[1] + 0.008 + rf * 1.75 + dy * rf * 1.5, p[2] + dz * rf * 1.5, k + g), "fruit", c, dessus=ton(c, 1.25))
+
+
+
+
 def _un_buisson(entree: dict, ctx: Contexte, graine: float, taille: float, fruits: bool) -> Atelier:
+
     s = Atelier(graine)
     tons = ctx.tons(entree["feuillage"])
     R, H = entree["rayon"] * taille, entree["hauteur"] * taille
     forme = entree["forme"]
     sommets = []
     if forme == "fourre":
-        # Ronce: un fourré bas et large, puis des arceaux qui montent et retombent dessus.
-        masses = [(penche(graine, 0.05), H * 0.12, penche(graine + 1, 0.05), R * 0.98)]
-        for i in range(3):
-            a = graine + i / 3 * math.tau
-            masses.append((math.cos(a) * R * 0.6, H * entre(0.02, 0.1, graine + i), math.sin(a) * R * 0.6, R * entre(0.5, 0.6, graine + i * 3.3)))
-        for i, (x, y, z, r) in enumerate(masses):
-            s.calotte(x, y, z, r, graine + i * 2.1, ton(tons[i % len(tons)], 0.8 if i == 0 else 1.0), segments=9 if i == 0 else 6, dome=0.7, dents=0.3, laches=1 if i else 2, rangs=3 if i == 0 else 2)
-            sommets.append((x, y, z, r, 0.7))
-        tige = ton(ctx.un("mure", 0.0), 1.25, tons[0], 0.35)
-        for i in range(3):
-            a = graine * 1.9 + i * 2.2
-            pied = (math.cos(a) * R * 0.2, H * 0.4, math.sin(a) * R * 0.2)
-            haut = (math.cos(a) * R * 0.7, H * 1.08, math.sin(a) * R * 0.7)
-            fin = (math.cos(a + 0.5) * R * 1.22, H * 0.22, math.sin(a + 0.5) * R * 1.22)
-            s.tube([(*pied, 0.026), (*haut, 0.022), (*fin, 0.012)], 3, "tige", tige)
-            for k in range(2):
-                t = 0.3 + k * 0.35
-                p = np.array(haut) * (1 - t) + np.array(fin) * t if k > 1 else np.array(pied) * (1 - t * 2) + np.array(haut) * t * 2
-                cote = 1 if k % 2 else -1
-                d = (math.cos(a + cote * 1.4), 0.25, math.sin(a + cote * 1.4))
-                s.feuille(p, d, 0.2 * taille, 0.12 * taille, "feuillage", tons[(i + k) % len(tons)], envers=ton(tons[0], 0.7), cambre=0.3)
+        _ronce(s, ctx, entree, graine, taille, fruits)
+        return s
     elif forme == "boule":
         # Buisson à baies: des rejets droits, une masse ronde et deux épaules.
         bois = ctx.tons("ecorce_pommier")
@@ -922,8 +1052,12 @@ from vehicules import FAMILLES_VEHICULES  # noqa: E402
 # `fetes.py`.
 from plantes import PORTS  # noqa: E402
 from fetes import FAMILLES_FETES  # noqa: E402
+# Mobilier repris de l'ancienne chaîne (lits, armoire, voiture du train): `mobilier.py`.
+from mobilier import FAMILLES_MOBILIER  # noqa: E402
 
+FAMILLES.update(FAMILLES_MOBILIER)
 FAMILLES.update(FAMILLES_AMENAGEMENTS)
+
 FAMILLES.update(FAMILLES_INTERIEURS)
 FAMILLES.update(FAMILLES_VEHICULES)
 FAMILLES.update(FAMILLES_FETES)

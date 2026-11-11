@@ -40,6 +40,10 @@ Sorties, dans `assets/commun/decors/` (les fiches de meubles de `donnees/commun/
 | `tige`      | tiges, herbes, feuilles des plants     | `plain` | plie                  |
 | `fruit`     | pommes, mûres, radis, tomates          | `plain` | plie                  |
 | `fleur`     | corolles, ombelles, massettes, bouchon | `plain` | plie                  |
+| `flamme`    | langues de flamme, verre des lampes    | `plain` | luit (`flame`)        |
+| `braise`    | braises et lit de braise d'un feu      | `plain` | luit (`flame`)        |
+
+Feux (`feu.py`, remarques du client du 2026-11-11: « le feu est mal fait, il doit être animé »): marmite, four, grand chaudron, brasero, poêle et lumignon brûlent d'un même foyer: bûches croisées (`bois`) qui reposent les unes sur les autres, lit de cendre, braises (`braise`), et des langues de flamme (`flamme`) de taille inégale, chacune une pièce à part (un morceau d'un seul tenant, pied enfoncé de 1 cm dans la braise ou dans le bois), la plus haute au milieu, jamais au-dessus du plafond (cul de la marmite, linteau du four). Rien n'est animé ici: le nuanceur du jeu peut animer les morceaux de `flamme`. Attention: `mergeNamed` fusionne le modèle et ne garde que la nature (`flame`) du matériau, commune à `flamme` et `braise`; pour animer les seules flammes, le rendu devra garder le nom (ou une nature à part). Un feu éteint (`vif = False`: four `bare`, grand chaudron `bare`) garde ses bûches noircies sur la cendre, sans braise ni flamme.
 
 - **Vent**: le nuanceur du jeu plie ce qui est souple selon la hauteur au-dessus de l'origine du modèle (le pied). Il n'y a donc pas d'attribut de poids dans les GLB: l'origine au pied suffit.
 - **Normales**: imposées. À plat pour la pierre et le bois; rayonnant du coeur de chaque touffe pour le feuillage (l'ombre dessine une masse); lissées pour la terre (pas d'arête tracée entre deux billons).
@@ -55,17 +59,37 @@ Sorties, dans `assets/commun/decors/` (les fiches de meubles de `donnees/commun/
 
 ## Fichiers
 
-| Fichier                          | Rôle                                                                       |
-| -------------------------------- | -------------------------------------------------------------------------- |
-| `recoltables.toml`               | budgets, matériaux, nuancier, essences, modèles: la seule chose à modifier |
-| `formes.py`                      | atelier des formes (touffe, fût, galet, feuille), numpy et scipy           |
-| `familles.py`                    | une fonction par famille, variantes et états                               |
-| `amenagements.py`                | haies, talus, rangs du labour, voie, meubles, ouvrages (repères)           |
-| `plantes.py`                     | ports des cultures: carotte, poireau, pomme de terre, fleurs               |
-| `fetes.py`                       | décor des fêtes (meubles du dehors, lumières)                              |
-| `construire.py`, `construire.sh` | écriture des GLB par Blender, manifeste, puis contrôle                     |
-| `verifier.py`                    | contrôle sans Blender (GLB, budgets, sol, fiches du jeu)                   |
-| `planche/`                       | page de contrôle sur le rendu encré du jeu, captures, montage              |
+| Fichier                          | Rôle                                                                          |
+| -------------------------------- | ----------------------------------------------------------------------------- |
+| `recoltables.toml`               | budgets, matériaux, nuancier, essences, modèles: la seule chose à modifier    |
+| `formes.py`                      | atelier des formes (touffe, fût, galet, feuille), numpy et scipy              |
+| `familles.py`                    | une fonction par famille, variantes et états                                  |
+| `amenagements.py`                | haies, talus, rangs du labour, voie, meubles, ouvrages (repères)              |
+| `plantes.py`                     | ports des cultures: carotte, poireau, pomme de terre, fleurs                  |
+| `fetes.py`                       | décor des fêtes (meubles du dehors, lumières)                                 |
+| `construire.py`, `construire.sh` | écriture des GLB par Blender, manifeste, puis contrôle                        |
+| `verifier.py`                    | contrôle sans Blender (GLB, budgets, sol, fiches du jeu, volumes)             |
+| `controle_volumes.py`            | trous vus de dos, pièces qui flottent, pièces qui en traversent une autre     |
+| `feu.py`                         | foyer commun: bûches, braises, langues de flamme                              |
+| `mobilier.py`                    | mobilier repris de l'ancienne chaîne (lits, armoire, pompe, voiture du train) |
+
+## Contrôle des volumes (ce que le client voit en tournant autour)
+
+Le client regarde chaque modèle dans une visionneuse, de tous les côtés et de près. `verifier.py` lit chaque GLB et cherche (`controle_volumes.py`, numpy seul, deux processus):
+
+- **trou**: d'un point de vue de côté (8 degrés) jusqu'à l'aplomb, le premier triangle touché est vu de dos (face manquante, plaque à simple face vue de derrière, bout de tube ouvert, dedans d'un volume ouvert). Pas compté: ce qui touche le sol (2 cm), les bouts d'un module de file, le dos d'un objet contre le mur (`appui = "mur"` dans l'entrée, ou couche `wall` de la fiche).
+- **flotte**: une pièce (morceau d'un seul tenant) reliée au sol (au billon pour une culture, au mur pour un objet mural) par aucune chaîne de pièces distantes de moins d'un centimètre. Les bords libres sont refermés pour juger l'appui (un plateau sans dessous repose sur ses pieds).
+- **traverse**: une pièce en perce une autre de part en part (une même arête entre et ressort, et passe à 5 mm au moins de sa surface): pied qui ressort d'un plateau, jambe de trépied à travers un chaudron. Une pièce posée, enfoncée ou accrochée par ses deux bouts (anse) ne compte pas.
+
+Pièges vus: deux boîtes jointives au même plan (faces confondues) et le tremblé font de fausses percées; décaler de 1 à 2 mm (joint) ou enfoncer franchement. Un tube ouvert (`bouts`) se voit par son bout. Une boîte penchée sans dessous (`sans="y-"` par défaut de `s.box`) montre son dedans: `sans=""`.
+
+`[volumes] a_reprendre` (dans `recoltables.toml`) liste les modèles dont les défauts sont connus et pas encore repris: leurs défauts s'affichent en `A REPRENDRE` sans faire échouer la construction; tout autre modèle doit être net. La liste ne fait que rétrécir.
+
+## Mobilier repris de l'ancienne chaîne (`mobilier.py`, `aubrune-mobilier.glb`)
+
+Famille `mobilier`: les meubles que des fiches posent encore et qui venaient de l'ancienne chaîne arrondie (retirée, voir `../README.md`), refaits en style encré sous leurs identifiants: `bed-double`, `bed-single`, `chair-farm`, `table-farm`, `wardrobe`, `chest`, `bench-platform`, `tub`, `fence`, `platform-sign`, `water-pump`, et la voiture du train de nuit (`train-*`). Le manifeste reçoit `seat` (assise: hauteur, bord avant), `bed` (couchage) et `top` (plateau). Ajouter: copier l'entrée de la même `sorte`, changer `id` et `graine`; une forme nouvelle est une branche de `_un_meuble`.
+
+| `planche/` | page de contrôle sur le rendu encré du jeu, captures, montage |
 
 ## Aménagements: haies, berges, labour, meubles, repères (`amenagements.py`)
 

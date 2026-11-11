@@ -22,7 +22,11 @@ from __future__ import annotations
 
 import math
 
-from amenagements import _lumiere, _pot, _table, barre, boite, colonne
+import numpy as np
+
+from amenagements import _lumiere, _pot, _table, barre, boite, colonne, orientees
+from feu import flamme_de_bougie
+from feu import foyer as foyer_bois
 from formes import Atelier, at, entre, penche, ton
 
 
@@ -62,25 +66,31 @@ def _lampion(s, ctx, x, y, z, couleur, r=0.1, h=0.22):
     boite(s, x - 0.02, x + 0.02, y - 0.03, y, z - 0.02, z + 0.02, "metal", ctx.un("fer"), tremble=0.0)
 
 
-def _flammes(s, ctx, x, y, z, rayon, n, graine, haut=0.3):
-    """Feu de bois: des langues de flamme (`flamme`), braises au pied."""
-    braise = ctx.tons("braise")
-    for k in range(n):
-        a = graine + k / n * math.tau
-        d = 0.0 if k == 0 else rayon * entre(0.3, 0.7, graine + k)
-        h = haut * entre(0.6, 1.1, graine + k * 1.7) * (1.25 if k == 0 else 1.0)
-        px, pz = x + math.cos(a) * d, z + math.sin(a) * d
-        s.morceau([(px - 0.05, y, pz - 0.03), (px + 0.05, y, pz - 0.03), (px + 0.035, y, pz + 0.05), (px - 0.04, y, pz + 0.045), (px + penche(graine + k, 0.04), y + h, pz + penche(graine + k + 2, 0.04))],
-                  [(0, 1, 4), (1, 2, 4), (2, 3, 4), (3, 0, 4)], "flamme", braise[k % len(braise)], coeur=(px, y + h * 0.3, pz))
+def _paroi_dedans(s, y0, r0, y1, r1, pans, mat, couleur):
+    """Paroi intérieure d'une cuve ouverte (faces tournées vers l'axe): vue d'en haut, on voit le
+    dedans de la cuve et non à travers."""
+    v, faces, vers = [], [], []
+    for i in range(pans):
+        a = i / pans * math.tau
+        v += [(math.cos(a) * r0, y0, math.sin(a) * r0), (math.cos(a) * r1, y1, math.sin(a) * r1)]
+    for i in range(pans):
+        j = (i + 1) % pans
+        a = (i + 0.5) / pans * math.tau
+        faces.append((2 * i, 2 * j, 2 * j + 1, 2 * i + 1))
+        vers.append(np.array((-math.cos(a), 0.0, -math.sin(a))))
+    s.morceau(v, orientees(v, faces, vers), mat, couleur, garde=True)
 
 
-def _buches_croisees(s, ctx, x, z, rayon, graine, y=0.0):
-    ecorce = ctx.tons("ecorce_chene")
-    coupe = ctx.un("bois_coupe")
-    for k in range(4):
-        a = graine + k * math.pi / 2 + 0.3
-        dx, dz = math.cos(a) * rayon, math.sin(a) * rayon
-        s.tube([(x + dx, y + 0.05, z + dz, 0.05), (x + dx * 0.15, y + 0.13, z + dz * 0.15, 0.045)], 5, "bois", ecorce[k % len(ecorce)], bouts=(True, False), coupe=coupe)
+def _couronne(s, y, r_in, r_out, pans, mat, couleur):
+    """Lèvre plate d'une cuve, tournée vers le ciel."""
+    v, faces = [], []
+    for i in range(pans):
+        a = i / pans * math.tau
+        v += [(math.cos(a) * r_in, y, math.sin(a) * r_in), (math.cos(a) * r_out, y, math.sin(a) * r_out)]
+    for i in range(pans):
+        j = (i + 1) % pans
+        faces.append((2 * i, 2 * j, 2 * j + 1, 2 * i + 1))
+    s.morceau(v, orientees(v, faces, [np.array((0.0, 1.0, 0.0))] * pans), mat, couleur, garde=True)
 
 
 def _chaise(s, ctx, x, z, cap):
@@ -104,8 +114,8 @@ def _une_fete(sorte: str, entree: dict, ctx, graine: float, vide: bool):
         # Soucoupe de terre cuite, coquille d'œuf coulée de cire, mèche et flamme.
         colonne(s, 0, 0, 0, 0.022, 0.085, 8, "terre", ctx.un("terre_cuite"), r1=0.095, dessus=ctx.un("terre_cuite", 1))
         s.tube([(0, 0.022, 0, 0.03), (0, 0.04, 0, 0.046), (0, 0.068, 0, 0.05), (0, 0.088, 0, 0.044)], 7, "vitre", ctx.un("coquille"), bouts=(False, True), coupe=ctx.un("cire"))
-        barre(s, (0, 0.088, 0), (0, 0.1, 0), 0.004, 3, "bois", ctx.un("noir"), bouts=(False, True))
-        s.octa(0.016, 0.036, 0.016, at(0, 0.132, 0), "flamme", ctx.un("braise", 1))
+        barre(s, (0, 0.08, 0), (0, 0.1, 0), 0.004, 3, "bois", ctx.un("noir"), bouts=(False, True))
+        flamme_de_bougie(s, ctx, 0.0, 0.1, 0.0, 0.055, graine)
         foyer = [0.0, 0.13, 0.0]
     elif sorte == "guirlande":
         # Un poteau à l'ouest, la guirlande pendue jusqu'au poteau suivant (4 m plus à l'est).
@@ -164,35 +174,49 @@ def _une_fete(sorte: str, entree: dict, ctx, graine: float, vide: bool):
                 barre(s, (0, 0, sz * 0.18), (0, 0.06, sz * 0.12), 0.02, 3, "bois", bois[1])
         notice["top"] = h
     elif sorte == "grande-marmite":
-        # Grand chaudron du concours (2 x 2 cases) pendu à un trépied au-dessus d'un feu de bois.
+        # Grand chaudron du concours (2 x 2 cases) pendu à un trépied au-dessus d'un feu de bois
+        # cerclé de pierres (`feu.py`: bûches croisées, braises, flammes, 25 cm d'air sous le cul).
+        # La soupe mangée (`bare`), le feu est éteint: bûches noircies sur la cendre.
         pierre = ctx.tons("pierre")
         for k in range(9):
             a = k / 9 * math.tau + graine
             s.galet(0.1, 0.09, 0.09, at(math.cos(a) * 0.62, 0, math.sin(a) * 0.62, a), "pierre", pierre[k % len(pierre)], graine + k, points=8, dessus=ctx.un("fond") if k % 3 == 0 else None)
-        _buches_croisees(s, ctx, 0, 0, 0.42, graine)
-        if not vide:
-            _flammes(s, ctx, 0, 0.08, 0, 0.3, 5, graine, haut=0.32)
-        # Trépied: trois jambes de fer jointes au sommet, la chaîne, le chaudron.
-        sommet = (0, 1.9, 0)
+        foyer_bois(s, ctx, 0.0, 0.0, 0.0, 0.4, graine, vif=not vide, plafond=0.66 - 0.23, cap=0.3)
+        # Trépied: trois jambes de fer jointes au sommet (2,45 m: assez haut pour qu'elles passent
+        # à 3 cm au moins du ventre du chaudron), la chaîne, l'anse, le chaudron.
+        sommet = (0, 2.45, 0)
         for k in range(3):
-            a = k / 3 * math.tau + 0.5
-            barre(s, (math.cos(a) * 0.9, 0, math.sin(a) * 0.9), sommet, 0.025, 4, "metal", fer[0], bouts=(False, False))
-        barre(s, sommet, (0, 1.27, 0), 0.012, 3, "metal", fer[1], bouts=(False, False))
-        barre(s, (-0.44, 1.18, 0), (0, 1.27, 0), 0.01, 3, "metal", fer[1], bouts=(False, False))
-        barre(s, (0.44, 1.18, 0), (0, 1.27, 0), 0.01, 3, "metal", fer[1], bouts=(False, False))
+            a = k / 3 * math.tau + math.pi / 2
+            barre(s, (math.cos(a) * 0.95, 0, math.sin(a) * 0.95), sommet, 0.025, 4, "metal", fer[0], bouts=(False, True))
+        barre(s, (0, 2.42, 0), (0, 1.27, 0), 0.012, 3, "metal", fer[1], bouts=(True, True))
+        barre(s, (-0.44, 1.18, 0), (0, 1.27, 0), 0.01, 3, "metal", fer[1], bouts=(True, True))
+        barre(s, (0.44, 1.18, 0), (0, 1.27, 0), 0.01, 3, "metal", fer[1], bouts=(True, True))
+
         s.tube([(0, 0.66, 0, 0.18), (0, 0.72, 0, 0.36), (0, 0.9, 0, 0.45), (0, 1.12, 0, 0.44), (0, 1.17, 0, 0.46)], 12, "metal", fer[0], bouts=(True, True), coupe=ctx.un("soupe") if not vide else ctx.un("fond"))
         barre(s, (0.1, 1.1, 0.05), (0.42, 1.48, 0.2), 0.016, 4, "bois", ctx.un("bois_clair"))
         foyer = [0.0, 0.25, 0.0]
     elif sorte == "brasero":
-        # Brasero de la veillée: corbeille de fer sur trois pieds, braises qui rougeoient.
+        # Brasero de la veillée: corbeille de fer sur trois pieds, pleine de braise jusqu'à 9 cm
+        # sous la lèvre; deux bûches croisées dessus, et les langues de flamme qui en montent.
+        # La corbeille a un dedans (paroi et lèvre): vue d'en haut, on ne voit pas à travers.
         for k in range(3):
             a = k / 3 * math.tau + 0.2
             barre(s, (math.cos(a) * 0.36, 0, math.sin(a) * 0.36), (math.cos(a) * 0.24, 0.6, math.sin(a) * 0.24), 0.02, 4, "metal", fer[0], bouts=(False, True))
-        s.tube([(0, 0.55, 0, 0.2), (0, 0.66, 0, 0.3), (0, 0.84, 0, 0.36)], 9, "metal", fer[0], bouts=(True, False))
-        s.tube([(0, 0.84, 0, 0.36), (0, 0.87, 0, 0.375)], 9, "metal", fer[1], bouts=(False, False))
-        colonne(s, 0, 0, 0.6, 0.8, 0.33, 9, "flamme", ctx.un("braise", 2), dessus=ctx.un("braise"))
-        _flammes(s, ctx, 0, 0.8, 0, 0.22, 4, graine, haut=0.24)
+        s.tube([(0, 0.55, 0, 0.2), (0, 0.66, 0, 0.3), (0, 0.84, 0, 0.36), (0, 0.87, 0, 0.375)], 9, "metal", fer[0], bouts=(True, False))
+        _couronne(s, 0.87, 0.345, 0.405, 9, "metal", fer[1])
+        _paroi_dedans(s, 0.775, 0.322, 0.87, 0.345, 9, "metal", ton(fer[0], 0.7))
+        braise = ctx.tons("braise")
+        # Le lit de braise ferme la corbeille: son bord est le bas de la paroi intérieure.
+        v = [(math.cos(i / 9 * math.tau) * 0.322, 0.775, math.sin(i / 9 * math.tau) * 0.322) for i in range(9)] + [(0.0, 0.8, 0.0)]
+
+        s.morceau(v, [(i, (i + 1) % 9, 9) for i in range(9)], "braise", [braise[i % 3] for i in range(9)], coeur=(0, 0.0, 0))
+        for k in range(5):
+            a = graine + k * 1.3
+            d = entre(0.08, 0.24, graine + k)
+            s.octa(0.04, 0.025, 0.04, at(math.cos(a) * d, 0.79, math.sin(a) * d, a), "braise", braise[(k + 1) % 3])
+        foyer_bois(s, ctx, 0.0, 0.775, 0.0, 0.22, graine, vif=True, cap=0.6, cendre=False)
         foyer = [0.0, 0.95, 0.0]
+
     elif sorte == "lisse-fleurie":
         # Lisse du passage à niveau, baissée en travers de la route: poteau et contrepoids à
         # l'ouest, bras rouge et blanc de 4,5 m, fourche au bout; une guirlande de fleurs l'enroule.

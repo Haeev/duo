@@ -52,15 +52,12 @@ describe('décors livrés', () => {
       'aubrune-lisieres.glb',
       'aubrune-luminaires.glb',
       'aubrune-meubles.glb',
+      'aubrune-mobilier.glb',
       'aubrune-objets.glb',
       'aubrune-ouvrages.glb',
       'aubrune-potager.glb',
       'aubrune-recoltes.glb',
       'aubrune-trains.glb',
-      'furniture.glb',
-      'houses.glb',
-      'street.glb',
-      'train.glb',
     ]);
   });
 
@@ -86,21 +83,14 @@ describe('décors livrés', () => {
     }
   });
 
-  it('sépare murs et toit des maisons pour le fondu', () => {
-    const house = models.instantiate('house-town');
-    expect(house?.children.map((c) => c.name).sort()).toEqual([
-      'house-town_roof',
-      'house-town_walls',
-    ]);
-    const door = DECOR_MANIFEST.models['house-town']?.doors?.[0];
-    expect(door?.height).toBeGreaterThanOrEqual(2);
-  });
 
   it('partage géométrie et matériau entre deux copies', () => {
+    // Un modèle encré est fusionné au chargement en un seul maillage: la copie est ce maillage.
     const a = models.instantiate('chair-farm');
     const b = models.instantiate('chair-farm');
-    const meshA = a?.children[0];
-    const meshB = b?.children[0];
+    const meshA = a instanceof Mesh ? a : a?.children[0];
+    const meshB = b instanceof Mesh ? b : b?.children[0];
+
     expect(meshA instanceof Mesh && meshB instanceof Mesh).toBe(true);
     if (meshA instanceof Mesh && meshB instanceof Mesh) {
       expect(meshA.geometry).toBe(meshB.geometry);
