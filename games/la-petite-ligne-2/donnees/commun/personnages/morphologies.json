@@ -107,7 +107,7 @@
     "top-tee": [3],
     "top-sweater": [12],
     "top-tank": [0],
-    "accessory-vest": [17],
+    "accessory-vest": [17, 0, 0],
     "bottom-trousers": [14],
     "bottom-shorts": [18],
     "bottom-skirt": [9],
@@ -120,17 +120,29 @@
     "hair-side-part": [5],
     "hair-bun": [4],
     "hair-bob": [0],
-    "hat-beanie-pompom": [7]
+    "hat-beanie-pompom": [7],
+    "top-cardigan": [0, 0],
+    "top-work-jacket": [0, 0],
+    "bottom-corduroy": [0],
+    "bottom-long-skirt": [0],
+    "bottom-overalls": [0, 0],
+    "dress-sunday": [0, 0],
+    "shoes-clogs": [0, 0],
+    "hat-cap": [0],
+    "hat-straw": [0, 0],
+    "accessory-scarf": [0, 0],
+    "accessory-neckerchief": [0],
+    "accessory-apron": [0, 0]
   },
   "files": {
     "body": 285328,
-    "top": 157024,
-    "accessory": 37976,
-    "bottom": 135596,
-    "dress": 76428,
-    "shoes": 92820,
+    "top": 436836,
+    "accessory": 223428,
+    "bottom": 375752,
+    "dress": 184188,
+    "shoes": 140380,
     "head": 216052,
     "hair": 217432,
-    "hat": 38796
+    "hat": 73844
   }
 }

@@ -90,6 +90,56 @@ class Builder:
                     self.faces.append((i, ring[k], ring[j]) if flip else (i, ring[j], ring[k]))
                     self.tags.append(tg(st[0]) if callable(tg) else tg)
 
+    def grid(self, rows, tg, wfn, closed=False):
+        """Nappe de quadrilatères entre rangées de points de même longueur (bas vers haut, sens des angles croissants)."""
+        idx = []
+        for row in rows:
+            r = []
+            for p in row:
+                r.append(len(self.verts))
+                self.verts.append(p)
+                self.weights.append(wfn(p))
+            idx.append(r)
+        for r0, r1 in zip(idx, idx[1:]):
+            n = len(r0)
+            for j in range(n if closed else n - 1):
+                k = (j + 1) % n
+                f = (r0[j], r0[k], r1[k], r1[j])
+                centre = sum((self.verts[i] for i in f), Vector()) / 4
+                self.faces.append(f)
+                self.tags.append(tg(centre) if callable(tg) else tg)
+        return idx
+
+    def quad(self, a, b, c, d, tg):
+        """Ajoute un quadrilatère sur des sommets existants (indices)."""
+        centre = (self.verts[a] + self.verts[b] + self.verts[c] + self.verts[d]) / 4
+        self.faces.append((a, b, c, d))
+        self.tags.append(tg(centre) if callable(tg) else tg)
+
+    def weld(self, digits=7):
+        """Soude les sommets confondus (bords d'arcs qui se rejoignent). Les coïncidences viennent des formules,
+        donc valent pour toutes les corpulences: la topologie reste la même pour les cibles de morphose."""
+        keep, remap, seen = [], {}, {}
+        for i, p in enumerate(self.verts):
+            key = (round(p.x, digits), round(p.y, digits), round(p.z, digits))
+            if key not in seen:
+                seen[key] = len(keep)
+                keep.append(i)
+            remap[i] = seen[key]
+        faces, tags, known = [], [], set()
+        for f, t in zip(self.faces, self.tags):
+            g = []
+            for i in f:
+                if remap[i] not in g:
+                    g.append(remap[i])
+            if len(g) >= 3 and frozenset(g) not in known:
+                known.add(frozenset(g))
+                faces.append(tuple(g))
+                tags.append(t)
+        self.verts = [self.verts[i] for i in keep]
+        self.weights = [self.weights[i] for i in keep]
+        self.faces, self.tags = faces, tags
+
     def ellipsoid(self, centre, radii, tg, wfn, n=14, m=9, rot=None, off=0.0, keep=None):
         """Ellipsoïde (lobe); rot: angles d'Euler en degrés autour de son centre."""
         start = len(self.verts)

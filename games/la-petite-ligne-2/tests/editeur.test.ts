@@ -20,6 +20,7 @@ import { EDITOR_SETTINGS } from '../src/interface/editeur/reglages';
 import { WorldSchema } from '../src/etat/monde';
 import { aimOf } from '../src/simulation/briques/visee';
 import { lookRevealedKey } from '../src/simulation/regles/apparence';
+import { wardrobeOf } from '../src/simulation/regles/recompenses';
 import { dataFiles, gameContent, newSim } from './aides';
 import { contentWith, NORTH, put, send } from './aides-noyau';
 
@@ -138,8 +139,9 @@ describe('éditeur de personnage: modèle', () => {
       .flatMap((t) => (t.kind === 'color' ? [t.hex] : []));
     expect(swatches.slice(-3)).toEqual([...EDITOR_SETTINGS.playerOnlyColors]);
     const accessoire = editorCategories(more.catalogue).find((c) => c.id === 'accessoire');
+    // Rangée des accessoires: « aucun », ceux du catalogue, et la montre factice ajoutée ici.
     expect(accessoire !== undefined && rowsFor(accessoire, worn, moreData)[0]?.tiles.length).toBe(
-      3,
+      piecesFor(content.catalogue, 'accessory').length + 2,
     );
   });
 
@@ -158,7 +160,9 @@ describe('éditeur de personnage: simulation', () => {
   it('set_look règle l’apparence, le prénom et le genre, et les synchronise', () => {
     const sim = newSim(content);
     const before = sim.revisions.players;
-    const look = randomDraft(draft(), 'sim', data).look;
+    // Comme l'éditeur du jeu: le hasard ne tire que dans la garde-robe du duo (pas de pièce à gagner).
+    const owned = { ...data, catalogue: wardrobeOf(content.catalogue, sim.world) };
+    const look = randomDraft(draft(), 'sim', owned).look;
     send(sim, 1, { type: 'set_look', name: 'Lou', look, gender: 'f' });
     const player = sim.world.players[1];
     expect(player).toMatchObject({ name: 'Lou', look, gender: 'f' });

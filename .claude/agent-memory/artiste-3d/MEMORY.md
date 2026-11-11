@@ -353,3 +353,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Vitre de décor opaque (couche `plain`): une vitrine se dit par son cadre et deux reflets obliques en `vitre`, dessus ouvert, sinon elle cache ce qu'elle montre.
 - Planche: un point haut apparaît plus au nord à l'écran (h / tan 50 degrés): pour voir un coteau de 9 m derrière un portail, centrer la vue 8 à 10 m plus au nord que le portail. Modules de voie: `fusion` par sorte dans les objets de la vue.
 - Patchs: `python3 - fichier <<'EOF'` passe s'il est seul dans la commande; tout enchaînement (`&&`, `;`) avec un heredoc ou une boucle complexe est refusé dans un arbre isolé: script dans le scratchpad, puis appel simple.
+
+## Tenues de La Petite Ligne 2 (vérifié le 2026-11-11)
+
+- Chaîne `assets-src/personnages/` (gabarits.toml + construire.sh, 4 s, rejouable, GLB identiques d'un tour à l'autre). Planche dans le vrai aperçu encré: `planche-encre/planche.sh planche|controle <png> [ids]` (Vite sur 5961, 1 s par vue); `ECHELLE=2.5` pour regarder de près.
+- Aperçu encré piloté par page: `createCharacterPreview(canvas, content, library, {style:'encre', renderer})`; pose de clip figée par un `AnimationMixer` à moi posé dans `scene.onBeforeRender` (+ `updateMatrixWorld`); l'encre saute des images: `renderer.info.autoReset=false`, redessiner jusqu'à `info.render.calls > 0`, sinon on capture la vue précédente.
+- Coque ouverte (`Body.coque`): arcs par rangée à nombre de points fixe, soudure (`Builder.weld`) des bords confondus. Toute décision ouvert/fermé doit se prendre sur le corps moyen (`MEDIUM`), sinon les corpulences n'ont plus la même topologie (cibles de morphose refusées).
+- Jupe sous le genou: poids des jambes dès le haut des cuisses, partagés sur toute la largeur (les deux élans se compensent en marche, s'ajoutent assis), dos moins suivi; un peu de tibia sous le genou. Reste un défaut en course (mollet qui ressort derrière): le dire. Tablier: largeur de partage énorme (moyenne des deux jambes), ourlet à 0,60 et évasé.
+- Nuancier: un même nom dans plusieurs familles (« noisette »: peau, tissu, iris); résoudre un nom contre les couleurs de la zone, pas par le premier trouvé.
+- Pièce `a-gagner` dans le catalogue: `defaultPlayerLook` ne doit pas la tirer (sinon `set_look` refusé, tests de la photo du prologue rouges).

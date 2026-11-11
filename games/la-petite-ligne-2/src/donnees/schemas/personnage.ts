@@ -56,6 +56,8 @@ export const PieceSchema = v.strictObject({
   id: IdSchema,
   /** Nom français court affiché dans l'éditeur et les boutiques (« Pull col roulé »). */
   name: v.optional(v.pipe(v.string(), v.minLength(1), v.maxLength(40))),
+  /** Une ligne pour la boutique, le don et la collection (« Un gilet tricoté à côtes... »). */
+  description: v.exactOptional(v.pipe(v.string(), v.minLength(1), v.maxLength(120))),
   slot: SlotSchema,
   /** Fichier GLB de l'emplacement (relatif à `assets/commun/personnages/`) et nœud dans ce fichier. */
   file: v.pipe(v.string(), v.regex(/^[a-z0-9-]+\.glb$/)),

@@ -5,6 +5,7 @@
  */
 import type { Catalogue, Gender, Look, PieceDef, Slot } from '../../donnees/schemas/personnage';
 import type { Morphologies } from '../../donnees/schemas/personnage';
+import { WARDROBE } from '../../simulation/regles/recompenses';
 import { CHARACTER_SETTINGS, type CharacterSettings } from './reglages';
 
 /** Une pièce à fusionner: nœud à prendre dans son fichier, couleurs des zones (hexadécimal). */
@@ -224,8 +225,14 @@ export function defaultPlayerLook(
   settings: CharacterSettings = CHARACTER_SETTINGS,
 ): Look {
   const chosen = gender ?? settings.defaultGenders[index];
-  return composeLook(`joueur-${String(index)}`, catalogue, {
-    shapes: [startShapes[chosen]],
-    accent,
-  });
+  // Jamais une pièce à gagner: le joueur doit pouvoir valider ce look sans rien changer.
+  const owned = catalogue.pieces.filter((piece) => !piece.tags.includes(WARDROBE.lockedTag));
+  return composeLook(
+    `joueur-${String(index)}`,
+    { ...catalogue, pieces: owned },
+    {
+      shapes: [startShapes[chosen]],
+      accent,
+    },
+  );
 }
