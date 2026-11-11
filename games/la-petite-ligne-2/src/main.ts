@@ -10,6 +10,7 @@ import { loadContent } from './donnees/charger';
 import { DATA_FILES } from './donnees/fichiers';
 import { createControls } from './entrees/commandes';
 import { drawTestMarkers } from './entrees/repere-essai';
+import { showNetAlert } from './plateforme/alerte-reseau';
 import { drawBaseScreen } from './plateforme/ecran-socle';
 import { createInterface } from './interface/index';
 import { createRenderer, gameDecorModels } from './rendu/index';
@@ -36,11 +37,15 @@ const duo = await connect<GameAction>({ manifest });
 duo.reportLoading(0.2);
 const content = loadContent(DATA_FILES);
 const session = createSession({ duo, content });
+// Jeux incompatibles ou message refusé: dit au joueur, au-dessus de tout (ADR 0006).
+const offNetAlert = session.onAlert((alert) => {
+  showNetAlert(document.body, alert);
+});
 duo.reportLoading(0.9);
 
 if (duo.role === 'guest') {
   const deadline = performance.now() + GUEST_WORLD_WAIT_MS;
-  while (!session.ready() && performance.now() < deadline)
+  while (!session.ready() && !session.blocked() && performance.now() < deadline)
     await new Promise((resolve) => setTimeout(resolve, POLL_MS));
 }
 duo.reportLoading(1);
@@ -177,6 +182,7 @@ duo.loop.start({
 });
 
 duo.on('stop', () => {
+  offNetAlert();
   ui?.dispose();
   music.dispose();
   sound.dispose();
