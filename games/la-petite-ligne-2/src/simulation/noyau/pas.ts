@@ -15,10 +15,10 @@ import { freePlayer } from './deblocage';
 import { movePlayers, stopPlayer } from './deplacement';
 import { revealLook } from '../regles/apparence';
 import { lockedPieceOf } from '../regles/recompenses';
-import type { Intent, StepInput } from './entrees';
+import { idleInput, type Intent, type StepInput } from './entrees';
 import type { GameEvent } from './evenements';
 import { advanceClock } from './horloge';
-import { SYSTEMS, type SimContext } from './systemes';
+import { interruptPlayers, SYSTEMS, type SimContext } from './systemes';
 
 export interface AuthoredIntent {
   readonly player: PlayerIndex;
@@ -78,6 +78,39 @@ function coreIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void 
   }
 }
 
+/** Ce que reçoivent les systèmes: `events` recueille ce qui naît (ceux du pas par défaut). */
+function contextOf(
+  sim: Sim,
+  inputs: readonly [StepInput, StepInput],
+  events: GameEvent[] = sim.events,
+): SimContext {
+  return {
+    world: sim.world,
+    content: sim.content,
+    dt: SIM_DT,
+    random: sim.random,
+    inputs,
+    events,
+    emit(event) {
+      events.push(event);
+    },
+    touch(slice) {
+      sim.revisions[slice] += 1;
+    },
+  };
+}
+
+/**
+ * Pause de la plateforme, hors d'un pas: chaque système annule ce qui ne peut pas attendre
+ * (`GameSystem.interrupt`). Rend les événements nés, à envoyer comme ceux d'un pas.
+ */
+export function interruptForPause(sim: Sim): GameEvent[] {
+  const events: GameEvent[] = [];
+  const idle = idleInput(0);
+  interruptPlayers(contextOf(sim, [idle, idle], events), 'pause');
+  return events;
+}
+
 export function step(
   sim: Sim,
   inputs: readonly [StepInput, StepInput],
@@ -86,20 +119,7 @@ export function step(
   const { world } = sim;
   world.tick += 1;
   sim.events.length = 0;
-  const context: SimContext = {
-    world,
-    content: sim.content,
-    dt: SIM_DT,
-    random: sim.random,
-    inputs,
-    events: sim.events,
-    emit(event) {
-      sim.events.push(event);
-    },
-    touch(slice) {
-      sim.revisions[slice] += 1;
-    },
-  };
+  const context = contextOf(sim, inputs);
   for (const { player, intent } of intents) {
     // Faim ou sommeil à 0: les intentions de travail sont refusées, avec ce qu'il faut faire.
     const exhausted = exhaustedIntentRefusal(context, player, intent.type);

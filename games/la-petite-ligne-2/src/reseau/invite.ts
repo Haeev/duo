@@ -6,7 +6,7 @@
  * Deux vues de l'état: `world()`, la dernière connue de l'hôte (tests, logique), et
  * `render(now, alpha)`, celle à afficher (autres interpolés, soi-même prédit, geste prédit).
  */
-import type { Net } from '@duo/sdk';
+import type { Net, PauseReason } from '@duo/sdk';
 import type { Content } from '../donnees/charger';
 import type { PlayerIndex } from '../donnees/schemas/communs';
 import type { PlayerSlow } from '../etat/joueur';
@@ -70,7 +70,15 @@ export interface Guest {
   placeStatus(): PlaceStatus;
   /** Le lieu courant change: le jeu montre l'attente et charge le lieu (puis `place_loaded`). */
   onPlaceSwitch(listener: (change: { from: string; to: string }) => void): () => void;
-  /** Reprise de la liaison (`resume` de la plateforme): oublie instantanés et prédiction. */
+  /**
+   * Pause de la plateforme: l'interface de cette machine l'apprend par `session_paused`, sans
+   * attendre l'hôte (pendant une coupure, ses annulations n'arrivent qu'au retour de la liaison).
+   */
+  pause(reason: PauseReason): void;
+  /**
+   * Reprise (`resume` de la plateforme): oublie instantanés et prédiction. L'état assemblé reste:
+   * l'envoi complet de l'hôte peut arriver avant ce signal comme après.
+   */
   resume(): void;
   stats(): GuestStats;
   dispose(): void;
@@ -405,11 +413,12 @@ export function createGuest(
         switchListeners.delete(listener);
       };
     },
+    pause(reason) {
+      emit({ type: 'session_paused', reason });
+    },
     resume() {
       snapshots.clear();
       walk.reset();
-      progress.reset();
-      placeParts.reset();
       gesture = null;
       lastRender = null;
     },

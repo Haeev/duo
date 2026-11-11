@@ -13,7 +13,7 @@ import type { PlaceState } from '../../etat/lieu';
 import { postureOf } from '../briques/postures';
 import type { Intent } from '../noyau/entrees';
 import { findProp } from '../noyau/obstacles';
-import type { GameSystem, SimContext } from '../noyau/systemes';
+import type { GameSystem, Interruption, SimContext } from '../noyau/systemes';
 import { remember } from '../regles/memoire';
 import type { SlotRef } from '../sac/cases';
 import { areaSlots, countItem, removeItem, setStack, stackAt } from '../sac/inventaire';
@@ -646,4 +646,30 @@ function onStep(sim: SimContext): void {
   }
 }
 
-export const housingSystem: GameSystem = { id: 'logement', step: onStep, intent: onIntent };
+/**
+ * Règle des coupures. En pause, rien à faire: le meuble tenu et le mode déco sont dans l'état du
+ * lieu. À la reprise d'une sauvegarde, l'écran du mode déco n'est plus ouvert: le meuble tenu
+ * retourne d'où il vient (sa place, ou l'inventaire) et le verrou tombe.
+ */
+function onInterrupt(sim: SimContext, player: PlayerIndex, why: Interruption): void {
+  if (why !== 'reload') return;
+  const id = sim.world.common.place;
+  const place = sim.content.places[id];
+  const pstate = sim.world.places[id];
+  if (place === undefined || pstate === undefined) return;
+  for (const def of Object.values(place.housings)) {
+    const state = pstate.housing?.[def.id];
+    if (state === undefined) continue;
+    release(sim, player, { place, pstate, def, state });
+    if (!state.decorating[player]) continue;
+    state.decorating[player] = false;
+    sim.touch('place');
+  }
+}
+
+export const housingSystem: GameSystem = {
+  id: 'logement',
+  step: onStep,
+  intent: onIntent,
+  interrupt: onInterrupt,
+};

@@ -222,7 +222,9 @@ duo.loop.start({
       sound.frame(frame.dt);
       music.frame(frame.dt);
       // Après le rendu: la projection lit la caméra de l'image qui vient d'être dessinée.
-      ui?.frame(frame.dt);
+      // En pause, les pas sont arrêtés: l'interface arrête ses horloges avec eux (un combat de
+      // pêche ou une cuisson joués ici continueraient seuls, et l'hôte refuserait le résultat).
+      ui?.frame(session.paused() ? 0 : frame.dt);
       return;
     }
     // L'image lit l'état à afficher (interpolé et prédit chez l'invité), pas l'état logique.

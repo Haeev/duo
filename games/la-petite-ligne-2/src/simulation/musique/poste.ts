@@ -477,6 +477,11 @@ export function createDesk(options: DeskOptions): Desk {
         else if ((state.kind === 'book' || state.kind === 'tune') && state.target === event.target)
           state.partner = false;
         break;
+      case 'session_paused':
+        // Les pas s'arrêtent, pas l'accompagnement: l'air est abandonné ici même, sans attendre
+        // l'hôte (il l'annule de son côté, `interrupt` du système).
+        if (state.kind === 'play' || state.kind === 'listen') close();
+        break;
       case 'refused':
         // L'instrument de l'un ne sait pas cet air, l'air n'est pas prêt: le cahier reste ouvert.
         break;

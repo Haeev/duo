@@ -209,8 +209,6 @@ export interface KeyedAssembler<T> {
     part: KeyedPart,
   ): { readonly target: string; readonly tick: number; readonly state: T } | null;
   current(): { readonly target: string; readonly tick: number; readonly state: T } | null;
-  /** Reprise de la liaison: les différences attendent la prochaine révision complète. */
-  reset(): void;
 }
 
 export function createKeyedAssembler<TSchema extends v.GenericSchema>(
@@ -252,12 +250,6 @@ export function createKeyedAssembler<TSchema extends v.GenericSchema>(
     },
     current() {
       return current;
-    },
-    reset() {
-      // L'état affiché reste; seules les différences attendent la prochaine complète.
-      applied = -1;
-      staging = null;
-      stagingRev = -1;
     },
   };
 }

@@ -542,6 +542,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'train_arrived':
       case 'train_departed':
       case 'unstuck':
+      case 'session_paused':
       case 'work_hit':
       case 'harvested':
       case 'plot_changed':

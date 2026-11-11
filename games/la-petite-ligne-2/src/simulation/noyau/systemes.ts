@@ -52,12 +52,28 @@ export interface SimContext {
   touch(slice: Slice): void;
 }
 
+/**
+ * Pourquoi l'activité d'un joueur ne peut pas continuer telle quelle:
+ * - `pause`: la plateforme arrête les pas (Échap, liaison perdue), mais pas les horloges des
+ *   machines (heure de session, son);
+ * - `reload`: la partie repart d'une sauvegarde, aucune interface n'est ouverte chez personne.
+ */
+export type Interruption = 'pause' | 'reload';
+
 export interface GameSystem {
   readonly id: string;
   /** Un pas de simulation, après les intentions du pas. */
   step?(sim: SimContext): void;
   /** Intention reçue: le système traite les siennes et ignore les autres. */
   intent?(sim: SimContext, player: PlayerIndex, intent: Intent): void;
+  /**
+   * Règle des coupures: le système dit ici comment l'activité de `player` s'annule quand elle ne
+   * peut pas se suspendre, sans rien lui coûter (ce qu'elle avait pris est rendu). Sans cette
+   * fonction, l'activité tient tout entière dans l'état du monde et sur l'horloge des pas: la
+   * pause la suspend d'elle-même, et l'hôte la renvoie complète à l'invité à la reprise.
+   * Tableau des activités: `docs/jeux/jeu-1/refonte/reconnexion-activites.md`.
+   */
+  interrupt?(sim: SimContext, player: PlayerIndex, why: Interruption): void;
 }
 
 /** Ordre d'exécution à chaque pas. */
@@ -88,3 +104,9 @@ export const SYSTEMS: readonly GameSystem[] = [
   // Après tous les autres: il lit les objets reçus pendant le pas (`item_gained`).
   orderSystem,
 ];
+
+/** Applique la règle des coupures aux deux joueurs (`GameSystem.interrupt`). */
+export function interruptPlayers(sim: SimContext, why: Interruption): void {
+  for (const player of [0, 1] as const)
+    for (const system of SYSTEMS) system.interrupt?.(sim, player, why);
+}

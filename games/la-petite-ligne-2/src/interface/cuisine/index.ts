@@ -439,6 +439,7 @@ export function createKitchen(
       case 'music_note':
       case 'music_finished':
       case 'music_closed':
+      case 'session_paused':
       case 'shelter_collected':
       case 'shelter_filled':
       case 'shelter_opened':
