@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | lot L9 (moteur, babil, sons de base, ambiances jour et nuit) et lot musique d'Aubrune (10 morceaux, 7 jingles, régie par table); reste à livrer: sons de pêche, de cuisine et de déco, cloche de Marthe, passage à niveau, deux coups du 5 h 12 |
+| Statut | lot L9 (moteur, babil, sons de base, ambiances jour et nuit), lot musique d'Aubrune (10 morceaux, 7 jingles, régie par table) et deuxième lot d'effets (2026-11-11: pêche, cuisine, déco, cloches, passage à niveau, 5 h 12, porte, boutique, pièces, décision à deux, photo, pas sur bois, eau, gravier, tapis); reste: les points d'accroche listés en fin de document, les 8 airs de la collection |
 | Rédaction | sound-designer, 2026-11-10 |
 | Fichiers | sons: `games/la-petite-ligne-2/assets/commun/son/`; sources: `games/la-petite-ligne-2/assets-src/son/`; tables et moteur: `games/la-petite-ligne-2/src/audio/` (README) |
 
@@ -27,7 +27,8 @@
 | ouvrir un rangement | `rangement-ouvre` | -8 | 2 | hauteur 4 % | les deux |
 | fermer un rangement (signal `rangement-ferme`) | `rangement-ferme` | -8 | 2 | hauteur 4 % | soi |
 | sac plein, outil émoussé | `sac-plein`, `refus` | -8 | 2 | | soi |
-| gain ou dépense d'argent | `monnaie` | -11 | 2 | niveau 0,5 dB | soi |
+| gain d'argent (vente, récompense) | `pieces-vente` (pièces qui tintent et tombent dans la bourse) | -11 | 2 | hauteur 4 %, niveau 0,5 dB | soi |
+| dépense (achat, loyer) | `pieces-achat` (trois pièces posées sur le comptoir de bois) | -11 | 2 | hauteur 4 %, niveau 0,5 dB | soi |
 | ouvrir, fermer le carnet (signaux) | `carnet-ouvre`, `carnet-ferme` | -9 | 2 | hauteur 3 % | soi |
 | page de dialogue | `page` | -10 | 3 | hauteur 6 % | soi |
 | choix (signal `choix`) | `choix` | -6 | 3 | aucune | soi |
@@ -37,6 +38,50 @@
 | montée à bord | `embarquement` | -9 | 1 | aucune | les deux |
 | train qui arrive | `train-arrive` | -8 | 1 | aucune | les deux |
 | trajet (phase de voyage) | `ambiances/trajet` (boucle 8 s) | -16 | | | les deux |
+
+### Deuxième lot (2026-11-11)
+
+Sources: `assets-src/son/sons_aubrune.py` (une fabrique par son, table `SONS` avec le nombre de variantes), rendu et mesure par `duo-python assets-src/son/mesurer_lot.py`, contrôle par `controler.py`. Les cloches et sonneries ne sont pas placées: elles s'entendent dans tout le lieu, de loin (réverbération de plein air, aigus adoucis).
+
+| Événement | Son | Niveau (dB) | Priorité | Variations | Qui l'entend |
+|---|---|---|---|---|---|
+| `fish_cast` | `peche-lancer`: fouet de la canne, fil qui file, bouchon posé à 0,62 s | -9 | 2 | hauteur 4 % | les deux, placé |
+| `fish_hooked` | `peche-touche`: le bouchon plonge, deux tintements (sol 6, ré 7) | -6 | 1 | hauteur 2 % | les deux, placé |
+| `fish_lost` raté au ferrage (`missed`) | `peche-bouchon`: « bloup » du bouchon qui remonte | -10 | 3 | hauteur 6 % | les deux, placé |
+| `fish_lost` décroché (`escaped`) | `peche-casse`: claquement, corde qui vibre en descendant, sans drame | -10 | 2 | hauteur 4 % | les deux, placé |
+| `fish_lost` ligne rangée (`cancelled`), signal `peche-moulinet` | `peche-moulinet`: cliquet qui accélère | -8 | 3 | hauteur 5 % | les deux, placé |
+| `fish_caught` | `peche-prise`: gerbe et gouttes | -8 | 2 | hauteur 4 % | les deux, placé |
+| signaux `cuisine-chop`, `cuisine-stir`, `cuisine-heat` | `cuisine-decoupe` (3 variantes), `cuisine-mijote`, `cuisine-friture` | -10, -12, -13 | 3 | hauteur 4 à 6 % | soi |
+| `dish_cooked` qualité 2 ou 3 | `plat-reussi`: assiette qui tinte, ré, sol, si qui montent | -8 | 2 | niveau 0,5 dB | les deux, placé |
+| `dish_cooked` qualité 1 | `plat-rate`: deux notes de bois qui descendent (ré, si), « plof » | -9 | 2 | hauteur 2 % | les deux, placé |
+| `deco_changed` `drop` ou `cancel` | `meuble-poser` (2 variantes): deux appuis de bois | -8 | 2 | hauteur 5 % | les deux, placé |
+| `deco_changed` `grab` ou `take` | `meuble-soulever` | -9 | 2 | hauteur 5 % | les deux, placé |
+| `deco_changed` `store` | `meuble-ranger`: froissement, couvercle, note de verre | -9 | 2 | hauteur 4 % | les deux, placé |
+| signal `meuble-tourner` | `meuble-tourner`: pied qui frotte puis se cale | -10 | 3 | hauteur 5 % | soi |
+| `door_passed` | `porte`: loquet, grincement léger, porte refermée à 0,78 s (couvre le fondu d'entrée) | -10 | 2 | hauteur 4 % | les deux, placé |
+| `shop_opened` | `clochette-boutique`: clochette de laiton sur ressort (si 6, ré 7) | -12 | 2 | hauteur 1 % | les deux, placé |
+| `decision_changed` `agreed` | `decision-accord`: ré et sol ensemble, puis si (accord de sol) | -7 | 1 | aucune | les deux (l'autre 3 dB plus bas) |
+| `decision_changed` `split` | `decision-desaccord`: do puis la, en suspens, sans reproche | -9 | 2 | aucune | les deux |
+| `photo_taken` | `photo-declic`: déclencheur, rideau, ressort | -8 | 2 | hauteur 3 % | les deux, placé |
+| scène `en-voiture` temps 1, `l-autorail-creme` temps 1 | `cloche-marthe`: trois coups de la grande cloche, juste (sol, tierce majeure), 8,5 s | -10 | 1 | aucune | les deux, dans tout le lieu |
+| (heures sonnées: point d'accroche à venir) | `cloche-marthe-coup`: un coup, 5,5 s | -10 | 1 | aucune | les deux |
+| scène `la-felee-sonne` temps 0 | `cloche-felee`: la petite cloche fendue, partiels désaccordés qui battent, un peu de râpe; drôle, pas inquiétante | -11 | 1 | aucune | les deux |
+| (train qui passe la barrière: point d'accroche à venir) | `passage-a-niveau`: timbre électrique (si 5) frappé 9 fois par seconde, 3,5 s | -13 | 2 | aucune | les deux |
+| scène `la-sonnerie-de-5h12` temps 1, `la-pose-longue` temps 2 | `cinq-douze`: deux coups isolés du même timbre, de loin, puis un roulement grave qu'on peut prendre pour le vent | -8 | 1 | aucune | les deux |
+| pas sur `bois` (plancher), `eau` (gué), `gravier` (galets, ballast), `tapis`; `sable` joue `pas-terre` | `pas-bois`, `pas-eau`, `pas-gravier`, `pas-tapis` (3 variantes chacun) | -10, -15, -12, -15 | 3 | hauteur 5 à 6 %, niveau 1,5 dB | les deux, l'autre placé |
+
+`monnaie` reste dans la table, sans règle (remplacé par `pieces-vente` et `pieces-achat`). Le joueur qui cuisine entend aussi `poser` (signal `dish` de l'interface) avec `plat-reussi`: l'assiette posée sous le tintement, voulu.
+
+**Mesures** (ffmpeg `ebur128`, fichiers décodés; `assets-src/son/mesures.csv`): sonie momentanée maximale de -16,0 à -19,4 LUFS pour les sons de plus de 0,4 s (sauf `peche-moulinet`, -22,9, limité par la crête de ses cliquets: niveau de jeu -8 dB au lieu de -10), crêtes de -1,2 à -6,9 dBFS; les sons de moins de 0,4 s (pas, découpe, meuble posé, déclic) sont limités par leur crête (-1,3 à -2,4 dBFS), mesurés de -20 à -29 LUFS par une fenêtre plus longue qu'eux, comme les pas du lot L9. Part de l'énergie sous 300 Hz: 0 à 14 % partout, sauf `meuble-poser` (49 à 52 %, sous le plafond de 60 %). Poids: 44 fichiers, 382 Ko. Mémoire décodée: environ 50 s de son mono, soit 9,6 Mo à 48 kHz, dont 30 s pour les cinq cloches et sonneries (candidates à un décodage à la demande si le plafond l'exige).
+
+### Points d'accroche manquants (aucune ligne de code touchée par le son)
+
+1. **Surface sous les pas**: `src/main.ts` ne passe pas `surfaceAt` à `createGameAudio`; tous les pas jouent `steps.default` (herbe). À ajouter: `surfaceAt: (x, y) => renderer?.surfaceAt(x, y) ?? null`. La table connaît déjà les noms du rendu (`herbe`, `terre`, `pave`, `sable`, `gravier`, `bois`, `tapis`, `eau`). `vase` et `potager` rendent `terre` (`reglages-tuiles.ts`): un son de vase propre demanderait une surface `vase` dans `SurfaceKind`.
+2. **Gestes de cuisine**: `cook_step_done` ne dit pas la nature de l'étape. L'interface la connaît (`onCue({ type: 'mark', kind })` dans `interface/cuisine/index.ts`) mais `interface/index.ts` (ligne 478) envoie toujours `choix`: y envoyer `cuisine-${kind}` (signaux `cuisine-chop`, `cuisine-stir`, `cuisine-heat` prêts; `season` et `plate` peuvent garder `choix`). Pour que l'autre joueur les entende, ajouter `kind` à `cook_step_done` et une règle par nature.
+3. **Moulinet pendant le combat**: le mini-jeu de pêche est local, aucun événement pendant la tirée: appeler le signal `peche-moulinet` à chaque tour de moulinet (le délai minimal de 200 ms évite l'empilement).
+4. **Tourner un meuble**: `deco_changed` n'a pas d'action de rotation: ajouter `rotate` à la liste (puis une règle vers `meuble-tourner`) ou appeler le signal `meuble-tourner`.
+5. **Cloche des heures**: aucun événement d'heure ronde; un `clock_struck` (heure, nombre de coups) de l'hôte permettrait de jouer `cloche-marthe-coup` coup par coup (la cloche retarde de quatre minutes jusqu'au fait `aubrune.cloche.juste`).
+6. **Passage à niveau**: aucun événement pour un train qui franchit la barrière (visiteur du samedi, autorail): un `crossing_rang` de l'hôte jouerait `passage-a-niveau`.
 
 ## Babil
 

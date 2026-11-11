@@ -228,5 +228,319 @@
     "priority": 1,
     "maxVoices": 2,
     "minIntervalMs": 300
+  },
+  "peche-lancer": {
+    "files": ["effets/peche-lancer.ogg"],
+    "category": "effects",
+    "volumeDb": -9,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 200
+  },
+  "peche-bouchon": {
+    "files": ["effets/peche-bouchon.ogg"],
+    "category": "effects",
+    "volumeDb": -10,
+    "pitchVariation": 0.06,
+    "gainVariationDb": 1,
+    "priority": 3,
+    "maxVoices": 2,
+    "minIntervalMs": 150
+  },
+  "peche-touche": {
+    "files": ["effets/peche-touche.ogg"],
+    "category": "effects",
+    "volumeDb": -6,
+    "pitchVariation": 0.02,
+    "gainVariationDb": 0,
+    "priority": 1,
+    "maxVoices": 2,
+    "minIntervalMs": 300
+  },
+  "peche-moulinet": {
+    "files": ["effets/peche-moulinet.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1,
+    "priority": 3,
+    "maxVoices": 2,
+    "minIntervalMs": 200
+  },
+  "peche-prise": {
+    "files": ["effets/peche-prise.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 300
+  },
+  "peche-casse": {
+    "files": ["effets/peche-casse.ogg"],
+    "category": "effects",
+    "volumeDb": -10,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 300
+  },
+  "cuisine-decoupe": {
+    "files": [
+      "effets/cuisine-decoupe-1.ogg",
+      "effets/cuisine-decoupe-2.ogg",
+      "effets/cuisine-decoupe-3.ogg"
+    ],
+    "category": "effects",
+    "volumeDb": -10,
+    "pitchVariation": 0.06,
+    "gainVariationDb": 1.5,
+    "priority": 3,
+    "maxVoices": 3,
+    "minIntervalMs": 90
+  },
+  "cuisine-mijote": {
+    "files": ["effets/cuisine-mijote.ogg"],
+    "category": "effects",
+    "volumeDb": -12,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 1,
+    "priority": 3,
+    "maxVoices": 2,
+    "minIntervalMs": 400
+  },
+  "cuisine-friture": {
+    "files": ["effets/cuisine-friture.ogg"],
+    "category": "effects",
+    "volumeDb": -13,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 1,
+    "priority": 3,
+    "maxVoices": 2,
+    "minIntervalMs": 400
+  },
+  "plat-reussi": {
+    "files": ["effets/plat-reussi.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 400
+  },
+  "plat-rate": {
+    "files": ["effets/plat-rate.ogg"],
+    "category": "effects",
+    "volumeDb": -9,
+    "pitchVariation": 0.02,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 400
+  },
+  "meuble-poser": {
+    "files": ["effets/meuble-poser-1.ogg", "effets/meuble-poser-2.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 150
+  },
+  "meuble-tourner": {
+    "files": ["effets/meuble-tourner.ogg"],
+    "category": "effects",
+    "volumeDb": -10,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1,
+    "priority": 3,
+    "maxVoices": 2,
+    "minIntervalMs": 150
+  },
+  "meuble-soulever": {
+    "files": ["effets/meuble-soulever.ogg"],
+    "category": "effects",
+    "volumeDb": -9,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 150
+  },
+  "meuble-ranger": {
+    "files": ["effets/meuble-ranger.ogg"],
+    "category": "effects",
+    "volumeDb": -9,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 200
+  },
+  "porte": {
+    "files": ["effets/porte.ogg"],
+    "category": "effects",
+    "volumeDb": -10,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 1,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 600
+  },
+  "clochette-boutique": {
+    "files": ["effets/clochette-boutique.ogg"],
+    "category": "effects",
+    "volumeDb": -12,
+    "pitchVariation": 0.01,
+    "gainVariationDb": 1,
+    "priority": 2,
+    "maxVoices": 1,
+    "minIntervalMs": 1500
+  },
+  "pieces-achat": {
+    "files": ["effets/pieces-achat.ogg"],
+    "category": "effects",
+    "volumeDb": -11,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 200
+  },
+  "pieces-vente": {
+    "files": ["effets/pieces-vente.ogg"],
+    "category": "effects",
+    "volumeDb": -11,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 200
+  },
+  "decision-accord": {
+    "files": ["effets/decision-accord.ogg"],
+    "category": "interface",
+    "volumeDb": -7,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 1,
+    "maxVoices": 1,
+    "minIntervalMs": 500
+  },
+  "decision-desaccord": {
+    "files": ["effets/decision-desaccord.ogg"],
+    "category": "interface",
+    "volumeDb": -9,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 2,
+    "maxVoices": 1,
+    "minIntervalMs": 500
+  },
+  "photo-declic": {
+    "files": ["effets/photo-declic.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0.03,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 300
+  },
+  "cloche-marthe": {
+    "files": ["effets/cloche-marthe.ogg"],
+    "category": "effects",
+    "volumeDb": -10,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 1,
+    "maxVoices": 1,
+    "minIntervalMs": 2000
+  },
+  "cloche-marthe-coup": {
+    "files": ["effets/cloche-marthe-coup.ogg"],
+    "category": "effects",
+    "volumeDb": -10,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 1,
+    "maxVoices": 1,
+    "minIntervalMs": 1000
+  },
+  "cloche-felee": {
+    "files": ["effets/cloche-felee.ogg"],
+    "category": "effects",
+    "volumeDb": -11,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 1,
+    "maxVoices": 1,
+    "minIntervalMs": 2000
+  },
+  "passage-a-niveau": {
+    "files": ["effets/passage-a-niveau.ogg"],
+    "category": "effects",
+    "volumeDb": -13,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 2,
+    "maxVoices": 1,
+    "minIntervalMs": 2000
+  },
+  "cinq-douze": {
+    "files": ["effets/cinq-douze.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 1,
+    "maxVoices": 1,
+    "minIntervalMs": 2000
+  },
+  "pas-bois": {
+    "files": ["effets/pas-bois-1.ogg", "effets/pas-bois-2.ogg", "effets/pas-bois-3.ogg"],
+    "category": "effects",
+    "volumeDb": -10,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1.5,
+    "priority": 3,
+    "maxVoices": 3,
+    "minIntervalMs": 120
+  },
+  "pas-eau": {
+    "files": ["effets/pas-eau-1.ogg", "effets/pas-eau-2.ogg", "effets/pas-eau-3.ogg"],
+    "category": "effects",
+    "volumeDb": -15,
+    "pitchVariation": 0.06,
+    "gainVariationDb": 1.5,
+    "priority": 3,
+    "maxVoices": 3,
+    "minIntervalMs": 120
+  },
+  "pas-gravier": {
+    "files": ["effets/pas-gravier-1.ogg", "effets/pas-gravier-2.ogg", "effets/pas-gravier-3.ogg"],
+    "category": "effects",
+    "volumeDb": -12,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1.5,
+    "priority": 3,
+    "maxVoices": 3,
+    "minIntervalMs": 120
+  },
+  "pas-tapis": {
+    "files": ["effets/pas-tapis-1.ogg", "effets/pas-tapis-2.ogg", "effets/pas-tapis-3.ogg"],
+    "category": "effects",
+    "volumeDb": -15,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1.5,
+    "priority": 3,
+    "maxVoices": 3,
+    "minIntervalMs": 120
   }
 }

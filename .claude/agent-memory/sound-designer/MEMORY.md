@@ -151,3 +151,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Les copies d'écoute M4A (AAC 56 kbit/s mono, 5 Mo pour 17 fichiers) restent à côté des sources, hors du jeu.
 - Aucun contrôle de Chromium sur le raccord Opus de cette chaîne n'a été fait (seulement le décodage ffmpeg): à faire avec `verifier-chromium.cjs` si un raccord s'entend.
 - L'outil du worktree refuse les heredocs combinés à `cd`: écrire les fichiers avec Write, lancer les scripts en commandes simples.
+
+## La Petite Ligne (refonte): deuxième lot d'effets (vérifié le 2026-11-11)
+
+- Les sons d'histoire se branchent sans code par `scene_beat` (`where: { scene, beat }`): l'indice du temps est celui du tableau `beats` de la scène; le champ `sound` d'un temps n'est qu'une onomatopée affichée, pas un son.
+- Les surfaces du rendu (`SurfaceKind` de `rendu/lieu/reglages-tuiles.ts`) sont en français (`herbe`, `bois`, `eau`...), pas `grass`: la table des pas doit porter ces clés. Vérifier aussi que `main.ts` passe `surfaceAt` (absent le 2026-11-11).
+- Un `toile(d)` trop courte tronque net le dernier coup posé (cloche coupée visible au spectrogramme comme un bord vertical): dimensionner la toile sur le dernier départ plus la durée du coup, puis `fondu` en fin.
+- Test de décodage rapide: un seul processus ffmpeg avec toutes les entrées et une sortie `-f null` par entrée (`-map i:a`), 1,4 s pour 80 fichiers; un ffmpeg par fichier dépasse 20 s sous charge.
+- `money_changed` part aussi pour les achats en boutique: un son de boutique sur `shop_bought` doublerait celui de l'argent; brancher l'argent par le signe de `delta`.

@@ -11,7 +11,19 @@
     "strideMeters": 0.85,
     "minSpeed": 0.4,
     "default": "grass",
-    "surfaces": { "grass": "pas-herbe", "dirt": "pas-terre", "paved": "pas-pave" }
+    "surfaces": {
+      "grass": "pas-herbe",
+      "dirt": "pas-terre",
+      "paved": "pas-pave",
+      "herbe": "pas-herbe",
+      "terre": "pas-terre",
+      "pave": "pas-pave",
+      "sable": "pas-terre",
+      "gravier": "pas-gravier",
+      "bois": "pas-bois",
+      "tapis": "pas-tapis",
+      "eau": "pas-eau"
+    }
   },
   "maxVoices": 24,
   "defaults": { "master": 0.8, "effects": 1, "interface": 0.9, "babble": 0.8, "ambience": 0.8 },
