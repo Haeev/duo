@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "autorail-de-la-veillee",
+  "name": "Autorail de la veillée",
+  "kind": "other",
+  "when": {
+    "type": "weekly",
+    "weekday": "monday",
+    "seasons": []
+  },
+  "days": 7,
+  "hours": {
+    "from": 312,
+    "to": 345
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.veillee",
+      "equals": "ouvert"
+    }
+  ],
+  "announce": false,
+  "activates": {
+    "facts": [],
+    "shop": null,
+    "tune": null
+  },
+  "train": {
+    "pourquoi": "La nuit de la scène « L'autorail crème » (acte 3), l'autorail se montre pour de vrai, à l'heure: la scène écrit elle-même ses faits, l'événement n'amène que la rame.",
+    "consist": [
+      {
+        "model": "railcar",
+        "front": 7.26,
+        "back": 7.26
+      }
+    ],
+    "track": "ligne",
+    "comesFrom": "start",
+    "leavesTo": "start",
+    "stop": {
+      "point": "quai",
+      "vehicle": 0,
+      "shift": 0
+    },
+    "arrival": {
+      "minutes": 8,
+      "distance": 100
+    },
+    "departure": {
+      "minutes": 8,
+      "distance": 100
+    }
+  }
+}

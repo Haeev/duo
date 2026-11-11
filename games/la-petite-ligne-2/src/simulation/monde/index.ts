@@ -11,8 +11,32 @@ import { remember } from '../regles/memoire';
 import { noteMemories } from '../regles/souvenirs';
 import { activeEvents, announcedFor } from './agenda';
 import { eventDayKey } from './calendrier';
+import { freePlayer } from '../noyau/deblocage';
+import { stopPlayer } from '../noyau/deplacement';
 import { stepBell } from './cloche';
 import { morningWeather, weatherAt } from './meteo';
+import { touchesTrain, trainsPresent } from './trains';
+
+const PLAYERS = [0, 1] as const;
+
+/**
+ * Un joueur surpris sur la voie quand un train d'événement arrive (ou chargé là en plein
+ * événement): il est posé sur la case libre la plus proche, sans dommage ni arrêt de la partie.
+ */
+function clearTrainPath(sim: SimContext): void {
+  const { world, content } = sim;
+  const place = content.places[world.common.place];
+  if (place === undefined || !trainsPresent(sim, place)) return;
+  const radius = content.settings.movement.radius;
+  for (const player of PLAYERS) {
+    const body = world.players[player].body;
+    if (!touchesTrain(sim, place, body.x, body.y, radius)) continue;
+    if (!freePlayer(content, world, player)) continue;
+    stopPlayer(sim, player);
+    sim.touch('players');
+    sim.emit({ type: 'unstuck', player });
+  }
+}
 
 /**
  * Ce que le système a vu au pas précédent. Non sauvegardé: après une reprise, les événements en
@@ -92,6 +116,7 @@ function step(sim: SimContext): void {
     sim.emit({ type: 'calendar_started', place, event: event.id });
   }
   memo.active = now;
+  clearTrainPath(sim);
   noteMemories(sim);
   stepBell(sim);
 }

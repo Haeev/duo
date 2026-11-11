@@ -2,7 +2,7 @@
  * Obstacles du lieu courant: la carte, plus l'emprise des meubles solides (ceux de la carte et
  * ceux posés par les joueurs) et les verrous d'histoire fermés (`lieux/verrous.ts`). Pur et gardé
  * d'un pas à l'autre: la couche mobile n'est refaite que si un meuble a changé ou si un verrou
- * s'est ouvert ou fermé. Sert à l'hôte et à la prédiction de l'invité, qui lit la même progression.
+ * s'est ouvert ou fermé, ou si un train d'événement a bougé (`monde/trains.ts`). Sert à l'hôte et à la prédiction de l'invité, qui lit la même progression.
  */
 import type { Content, PlaceContent } from '../../donnees/charger';
 import type { PropDef } from '../../donnees/schemas/meuble';
@@ -12,6 +12,7 @@ import { isPosed } from '../../donnees/poses';
 import type { Blockers } from './grille';
 import { conditionalObjects, refreshPresence } from '../lieux/presents';
 import { lockCount, markClosedLocks, refreshLockStates } from '../lieux/verrous';
+import { markTrainCells, trainSignature } from '../monde/trains';
 
 /** Un meuble en place, qu'il vienne de la carte ou d'un joueur. */
 export interface PropInstance {
@@ -35,6 +36,8 @@ interface Cached {
   readonly present: Uint8Array;
   /** Meubles conditionnés de la carte, et leur index dans `present`. */
   readonly conditional: ReadonlyMap<string, number>;
+  /** Empreinte des trains présents à la dernière construction (`trainSignature`). */
+  trains: number;
 }
 
 const cache = new WeakMap<PlaceContent, Cached>();
@@ -123,20 +126,30 @@ export function placeBlockers(
       lockObjects,
       present: new Uint8Array(conditionalObjects(place).length).fill(2),
       conditional: new Map(conditionalObjects(place).map((o, i) => [o.id, i])),
+      trains: Number.NaN,
     };
     cache.set(place, cached);
   }
   const locksChanged = refreshLockStates({ content, world }, place, cached.locks);
   const presenceChanged = refreshPresence({ content, world }, place, cached.present);
   const signature = signatureOf(place, state);
-  if (signature !== cached.signature || locksChanged || presenceChanged) {
+  const trains = trainSignature({ content, world }, place);
+  if (
+    signature !== cached.signature ||
+    locksChanged ||
+    presenceChanged ||
+    trains !== cached.trains
+  ) {
     cached.signature = signature;
+    cached.trains = trains;
     cached.blockers.props.fill(0);
     markClosedLocks(place, cached.locks, cached.blockers.props, place.map.width, place.map.height);
     // Un objet posé sur un meuble (champ `on`) ne bloque jamais: il n'occupe pas le sol.
     for (const object of place.map.objects)
       if (!isPosed(object)) mark(content, cached, state, object);
     for (const placed of state.placed) mark(content, cached, state, placed);
+    // Un train d'événement à quai ou qui passe: sa caisse barre la voie (règle des données).
+    markTrainCells({ content, world }, place, cached.blockers.props);
   }
   return cached.blockers;
 }

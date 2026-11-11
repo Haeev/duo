@@ -34,6 +34,8 @@ export interface TestProbe {
   setNeed(player: number, need: NeedId, value: number): boolean;
   /** Hôte seulement: fixe l'heure (minutes depuis minuit). */
   setMinutes(minutes: number): boolean;
+  /** Hôte seulement: fixe le jour de jeu (à partir de 1), sans rien déclencher de l'aube. */
+  setDay(day: number): boolean;
   /** Hôte seulement: fixe la bourse d'un joueur (centimes). */
   setMoney(player: number, cents: number): boolean;
   /**
@@ -105,6 +107,13 @@ export function installTestProbe(options: ProbeOptions): TestProbe {
       const s = sim();
       if (s === null) return false;
       s.world.minutes = minutes;
+      return true;
+    },
+    setDay(day) {
+      const s = sim();
+      if (s === null || !Number.isInteger(day) || day < 1) return false;
+      s.world.common.day = day;
+      s.revisions.common += 1;
       return true;
     },
     setMoney(player, cents) {

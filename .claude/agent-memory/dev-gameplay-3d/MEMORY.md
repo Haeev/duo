@@ -757,3 +757,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Pose de liaison: `blendWeights` part de zéro pour un personnage neuf; avec `dt` petit ou nul il paraît quelques images bras écartés. Poids posés d'un coup à la création et après `placed = false`. `AnimationAction.isRunning()` est faux pour marche et course (`timeScale` 0): compter `enabled && isScheduled()`.
 - Caméra encrée: plongée de 35 degrés (6 m) à 50 degrés (18 m et plus), jamais zénithale. Une vue de face (lacet 0 ou 180) rapprochée se lit pourtant comme une vue de dessus: dans les bancs, lacet sur une diagonale et 18 m.
 - La fabrique des sauvegardes lancée par `--config <chemin absolu>` rejoue encore toute la suite (104 fichiers, 4 min 30 sous charge). Ensuite, configuration Playwright jetable sans `globalSetup`.
+
+## Trains des événements (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Fabrique des sauvegardes seule, en 11 s: `pnpm exec vitest run --config <chemin absolu>/tests/aides-e2e/vitest.prep.config.ts tests/aides-e2e/fabrique-sauvegardes.prep.ts` (le fichier en filtre évite de rejouer toute la suite).
+- Une lampe sans `phase` est allumée en plein dès que l'ambiance a des lampes, même à 10 h: un verre du dehors qui doit attendre la nuit prend `phase: 0`.
+- La condition `remembered` sans `equals` teste l'existence du fait: le réécrire à `false` (sonde `remember`) ne l'éteint pas.
+- À Aubrune les ombres du soleil partent vers le nord: ce qui est au nord du quai (le train) ne l'ombre jamais; contrôler l'ombre par un lacet de 200 degrés (vue du nord).
+- Les appels d'une même vue varient d'une vingtaine selon l'heure (habitants, lampes, passes): un coût de quelques appels ne se mesure pas par différence entre deux heures; le compter (un appel par véhicule et par passe).
+- Résultats de la dernière suite Vitest: `node_modules/.vite/vitest/<empreinte>/results.json` (`failed` par fichier), utile quand la sortie est tronquée.

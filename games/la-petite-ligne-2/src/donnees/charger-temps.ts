@@ -204,6 +204,19 @@ export function validateTimeAndBook(content: Content): string[] {
         for (const id of closed)
           if (!(id in place.shops)) problems.push(`${at}: commerce à fermer inconnu « ${id} »`);
       if (event.activates.tune !== null) entryOf(at, event.activates.tune, 'tune');
+      const train = event.train;
+      if (train !== undefined && place !== undefined) {
+        if (place.map.rails?.some((rail) => rail.id === train.track) !== true)
+          problems.push(`${at}: voie inconnue « ${train.track} »`);
+        if (!(train.stop.point in place.map.points))
+          problems.push(`${at}: point d'arrêt inconnu « ${train.stop.point} »`);
+        if (train.stop.vehicle >= train.consist.length)
+          problems.push(`${at}: véhicule d'arrêt ${String(train.stop.vehicle)} hors de la rame`);
+        const dwell = (event.hours.to - event.hours.from + 1440) % 1440;
+        if (dwell === 0) problems.push(`${at}: un train arrive à « from » et repart à « to »`);
+        if (dwell + train.arrival.minutes + train.departure.minutes >= 1440)
+          problems.push(`${at}: arrivée, quai et départ dépassent la journée`);
+      }
     }
   }
   const slots = time.file.weatherSlots;
