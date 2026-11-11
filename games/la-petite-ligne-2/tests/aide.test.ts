@@ -186,7 +186,8 @@ describe('aide réglable: filet à insectes', () => {
   }
 
   it('allonge la portée du filet du joueur aidé seul', () => {
-    const reach = content.time.file.insects.netReach;
+    // La portée se lit dans la fiche du filet tenu (1 m pour le filet de base), puis l'aide l'allonge.
+    const reach = content.items['filet']?.tool?.reach ?? content.time.file.insects.netReach;
     for (const level of ASSIST_LEVELS) {
       const f = ASSIST.factor[level];
       // Juste au-delà de la portée normale, en deçà de la portée aidée (et l'inverse).
