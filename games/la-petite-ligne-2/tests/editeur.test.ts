@@ -52,9 +52,21 @@ describe('éditeur de personnage: modèle', () => {
     expect(genderOfShape(asMan.look.shape, content.morphologies)).toBe('m');
     expect(content.catalogue.shapes.find((s) => s.id === asMan.look.shape)?.build).toBe('medium');
     expect(rowsFor(category('haut'), asMan, data)).toEqual(rows);
-    // Les six silhouettes adultes restent proposées à tous (corpulences portables par tous).
+    // Les six silhouettes adultes restent proposées à tous (corpulences portables par tous), en
+    // une rangée en deux groupes légendés, femme puis homme, dans l'ordre des cases du genre.
     const shapes = rowsFor(category('corps'), asMan, data).find((r) => r.title === 'shape');
     expect(shapes?.tiles).toHaveLength(6);
+    expect(shapes?.groups).toEqual([
+      { title: 'shape:f', count: 3 },
+      { title: 'shape:m', count: 3 },
+    ]);
+    const genders = shapes?.tiles.map(
+      (t) => t.kind === 'shape' && genderOfShape(t.shape, content.morphologies),
+    );
+    expect(genders).toEqual(['f', 'f', 'f', 'm', 'm', 'm']);
+    // La silhouette cochée est celle du groupe du genre choisi.
+    const chosen = shapes?.tiles.findIndex((t) => isSelected(asMan, t, data)) ?? -1;
+    expect(chosen).toBeGreaterThanOrEqual(3);
   });
 
   it('robe contre haut et bas, couleurs gardées, taille dans la fourchette', () => {

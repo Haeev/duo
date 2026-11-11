@@ -46,6 +46,8 @@ export interface Row {
   readonly title: string | null;
   readonly kind: 'tiles' | 'swatches';
   readonly tiles: readonly Tile[];
+  /** Groupes légendés de la rangée, dans l'ordre des cases (clé de légende, nombre de cases). */
+  readonly groups?: readonly { readonly title: string; readonly count: number }[];
 }
 
 /** Pièces d'un emplacement proposées aux joueurs: celles réservées aux habitants sont masquées. */
@@ -151,14 +153,35 @@ export function rowsFor(
           columns,
         );
         break;
-      case 'shape':
-        add(
-          'shape',
-          'tiles',
-          playerShapes(data.catalogue, settings).map((s) => ({ kind: 'shape', shape: s.id })),
-          columns,
+      case 'shape': {
+        // Les six silhouettes restent à tous, rangées par genre dans l'ordre des cases « Femme ou
+        // homme », chaque groupe sous sa légende (`shape:f`, `shape:m`): on sait laquelle est
+        // laquelle, et la rangée reste une seule ligne au clavier.
+        const shapes = playerShapes(data.catalogue, settings);
+        const keyOf = (id: string): string => {
+          const g = genderOfShape(id, data.morphologies, settings);
+          return g === null ? 'shape' : `shape:${g}`;
+        };
+        const order = [...GENDERS.map((g) => `shape:${g}`), 'shape'];
+        const sorted = [...shapes].sort(
+          (a, b) => order.indexOf(keyOf(a.id)) - order.indexOf(keyOf(b.id)),
         );
+        chunk(sorted, columns).forEach((part, i) => {
+          const groups: { title: string; count: number }[] = [];
+          for (const s of part) {
+            const last = groups.at(-1);
+            if (last?.title === keyOf(s.id)) last.count += 1;
+            else groups.push({ title: keyOf(s.id), count: 1 });
+          }
+          rows.push({
+            title: i === 0 ? 'shape' : null,
+            kind: 'tiles',
+            tiles: part.map((s) => ({ kind: 'shape', shape: s.id })),
+            groups,
+          });
+        });
         break;
+      }
       case 'height':
         add(
           'height',

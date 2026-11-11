@@ -141,6 +141,7 @@ if (screen === 'planche') {
     me.body.y = 104;
   }
   if (shopping) {
+    world.common.place = 'aubrune';
     me.money = 2140;
     me.body.x = 21.8;
     me.body.y = 15.2;
@@ -225,10 +226,11 @@ if (screen === 'planche') {
   }
   if (screen === 'carnet') play(['KeyC', 'KeyE'], 300, 500);
   if (shopping) {
-    queue.push({
-      player: 0,
-      intent: { type: 'use_brick', target: 'comptoir-buvette', brick: 'shop' },
-    });
+    // L'épicerie d'Odette, à Aubrune: le comptoir ouvre l'écran par l'événement de la simulation.
+    setTimeout(() => {
+      for (const listener of listeners)
+        listener({ type: 'shop_opened', player: 0, shop: 'epicerie-ferrand' });
+    }, 500);
     play(
       screen === 'boutique'
         ? ['ArrowRight', 'KeyD']

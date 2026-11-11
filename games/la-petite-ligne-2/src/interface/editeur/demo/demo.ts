@@ -10,6 +10,7 @@ import type { PlayerIndex } from '../../../donnees/schemas/communs';
 import type { WorldState } from '../../../etat/monde';
 import type { GameEvent } from '../../../simulation/noyau/evenements';
 import { createWorld } from '../../../simulation/noyau/monde';
+import { lookRevealedKey } from '../../../simulation/regles/apparence';
 import { createCharacterPreview } from '../../../rendu/personnages/apercu';
 import { composeLook } from '../../../rendu/personnages/apparence';
 import { createInterface } from '../../index';
@@ -36,6 +37,9 @@ if (mirror) {
     shapes: ['adult-m-round'],
   });
   world.players[0].gender = 'm';
+} else {
+  // L'éditeur ne s'ouvre seul qu'une fois la photo d'identité demandée (prologue): on y est.
+  world.progress.memory[lookRevealedKey(0)] = { v: true, by: 0, day: world.common.day };
 }
 const listeners = new Set<(event: GameEvent) => void>();
 const root = document.getElementById('ui');

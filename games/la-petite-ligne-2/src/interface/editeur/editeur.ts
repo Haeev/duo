@@ -124,6 +124,9 @@ export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): Cha
   let draft: EditorDraft | null = null;
   let player: PlayerIndex = 0;
   let touched = false;
+  /** Première photo: femme ou homme pas encore choisi (aucune case cochée), et rappel demandé. */
+  let genderPending = false;
+  let genderAlert = false;
   let category = 0;
   let focus: Focus = { row: 0, col: 0 };
   let rows: Row[] = [];
@@ -253,6 +256,21 @@ export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): Cha
     return key;
   }
 
+  /**
+   * Fenêtre basse: les rangées défilent dans leur cadre; la case au focus y reste en vue, avec le
+   * titre de sa section au-dessus. Le cadre seul défile (pas `scrollIntoView`, qui déplacerait
+   * aussi la couche de l'interface).
+   */
+  function keepFocusInView(): void {
+    const node = grid.querySelector('.focus');
+    if (node === null) return;
+    const box = grid.getBoundingClientRect();
+    const at = node.getBoundingClientRect();
+    const above = 2.25 * parseFloat(getComputedStyle(grid).fontSize);
+    if (at.top - above < box.top) grid.scrollTop -= box.top - (at.top - above);
+    else if (at.bottom > box.bottom) grid.scrollTop += at.bottom - box.bottom + 8;
+  }
+
   function render(): void {
     if (draft === null) return;
     const d = draft;
@@ -288,12 +306,18 @@ export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): Cha
       if (row.title !== null) {
         parts.push(el('h3', { class: 'lpl-ed__section', text: sectionTitle(row.title) }));
         if (row.title === 'gender')
-          parts.push(el('p', { class: 'lpl-ed__note', text: T.genderNote }));
+          parts.push(
+            el('p', {
+              class: `lpl-ed__note${genderAlert ? ' lpl-ed__note--alert' : ''}`,
+              role: genderAlert ? 'alert' : null,
+              text: genderAlert ? T.genderMissing : genderPending ? T.genderAsk : T.genderNote,
+            }),
+          );
       }
       const line = el('div', { class: `lpl-ed__row lpl-ed__row--${row.kind}` });
       row.tiles.forEach((tile, c) => {
         const label = tileLabel(tile);
-        const chosen = isSelected(d, tile, data);
+        const chosen = tile.kind === 'gender' && genderPending ? false : isSelected(d, tile, data);
         const key = tileKey(tile);
         const isSwatch = row.kind === 'swatches';
         const hex =
@@ -333,9 +357,26 @@ export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): Cha
         });
         line.append(button);
       });
+      if (row.groups !== undefined && row.groups.length > 1) {
+        // Les cases de chaque groupe sous leur légende (« de femme », « d'homme »).
+        const buttons = [...line.children];
+        let from = 0;
+        line.replaceChildren(
+          ...row.groups.map((group) => {
+            const caption = sectionTitle(group.title);
+            const tiles = buttons.slice(from, from + group.count);
+            from += group.count;
+            return el('div', { class: 'lpl-ed__group', role: 'group', 'aria-label': caption }, [
+              el('span', { class: 'lpl-ed__group-title', 'aria-hidden': 'true', text: caption }),
+              el('div', { class: 'lpl-ed__group-tiles' }, tiles),
+            ]);
+          }),
+        );
+      }
       parts.push(line);
     });
     grid.replaceChildren(...parts);
+    keepFocusInView();
     const barRow = rows.length;
     BAR.forEach((item, c) => {
       const node = item === 'name' ? nameInput : item === 'random' ? randomButton : doneButton;
@@ -391,6 +432,7 @@ export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): Cha
       mode === 'create' && !touched ? (g: Gender): Look => deps.starter(player, g) : null;
     const next = choose(draft, tile, data, starter, S);
     if (tile.kind !== 'gender') touched = true;
+    else genderPending = genderAlert = false;
     popTile = tileKey(tile);
     setLook(next, true);
     render();
@@ -418,6 +460,21 @@ export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): Cha
     if (name === '') {
       setText(nameError, T.nameEmpty);
       nameInput.focus();
+      return;
+    }
+    if (genderPending) {
+      // Retour au rayon Corps, focus sur « Femme », et la note devient le rappel.
+      category = 0;
+      genderAlert = true;
+      render();
+      focus = {
+        row: Math.max(
+          0,
+          rows.findIndex((row) => row.title === 'gender'),
+        ),
+        col: 0,
+      };
+      render();
       return;
     }
     deps.send({ type: 'set_look', name, look: draft.look, gender: draft.gender });
@@ -510,6 +567,8 @@ export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): Cha
       nameInput.value = state.name;
       setText(nameError, '');
       touched = state.look !== null;
+      genderPending = nextMode === 'create' && state.gender === null;
+      genderAlert = false;
       category = 0;
       focus = { row: 0, col: 0 };
       open = true;

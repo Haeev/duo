@@ -44,6 +44,8 @@
   --focus: #ffc83d;
   --focus-halo: #ffc83d;
   --dark-shadow: #0b0908;
+  /* Case choisie (éditeur): un fond d'accent éteint sous le liseré d'accent (texte 9,9 pour 1). */
+  --chosen-bg: #3d3220;
   --font-display: 'Grandstander Variable', 'Fraunces Variable', Georgia, serif;
   --shadow-1: 0.125rem 0.125rem 0 0 rgb(0 0 0 / 0.5);
   --shadow-2: 0.1875rem 0.1875rem 0 0 rgb(0 0 0 / 0.5);
@@ -63,6 +65,41 @@
   --lpl-ic-cap: square;
   --lpl-ic-join: bevel;
   font-variation-settings: 'SOFT' 100;
+}
+
+/*
+ * Papier: les objets de papier posés sur le thème sombre (pages et signets du carnet, photo de
+ * l'éditeur) retrouvent l'encre sur papier, un papier un peu éteint pour ne pas éblouir à côté
+ * des panneaux sombres. Mêmes noms de variables: tout composant posé sur une page s'y accorde, et
+ * `cadres.css` y redéfinit les cadres (palette « papier »). Teintes du nuancier v0.2 (encre,
+ * crépi, lin, bouteille). Contrastes: encre 13,3 sur la page, 11,2 sur le creux; encre atténuée
+ * 6,6 et 5,6; rouge de tampon 5,2 sur le creux.
+ */
+[data-lpl-style='encre'] .lpl-ui :is(.carnet .page, .carnet .signet, .lpl-ed__stage) {
+  --paper: #efe2c4;
+  --paper-raised: #f7edd6;
+  --paper-sunken: #e2d0aa;
+  --paper-shade: #cfb98f;
+  --ink: #231a17;
+  --ink-muted: #5a4a3c;
+  --line: #6e5a45;
+  --stamp: #962b1b;
+  --primary: #3f6453;
+  --on-primary: #f3ede0;
+  --soft-green: #c9d3a8;
+  --soft-sky: #cfe0df;
+  --soft-ochre: #e7c897;
+  --soft-rose: #ecc4b8;
+  --night: #2c3b57;
+  --focus: #231a17;
+  --focus-halo: #f7edd6;
+  --dark-shadow: #3a2c24;
+  --chosen-bg: #f3dc9c;
+  color: var(--ink);
+}
+/* Sur le papier, l'anneau de focus est à l'encre: l'accent n'a que 1,4 pour 1 sur la page. */
+[data-lpl-style='encre'] .lpl-ui :is(.carnet .page, .lpl-ed__stage) .focus {
+  outline-color: var(--focus);
 }
 
 /* Voile des menus: un aplat d'encre, le décor reste lisible derrière. */
@@ -129,6 +166,7 @@
 /* Petit cadre de papier avec ombre en hachures */
 [data-lpl-style='encre'] .lpl-ui .btn,
 [data-lpl-style='encre'] .lpl-ui .slot,
+[data-lpl-style='encre'] .lpl-ui .shop-talk,
 [data-lpl-style='encre'] .lpl-ui .shop-stepper button {
   background: none;
   border-color: transparent;
@@ -274,6 +312,7 @@
 [data-lpl-style='encre'] .lpl-ui .btn:is(:hover, .survol),
 [data-lpl-style='encre'] .lpl-ui .shop-btn:not(.shop-btn--off):is(:hover, .survol),
 [data-lpl-style='encre'] .lpl-ui .shop-stepper button:is(:hover, .survol),
+[data-lpl-style='encre'] .lpl-ui .shop-talk:is(:hover, .survol),
 [data-lpl-style='encre'] .lpl-ui .tile:not(.tile--empty):is(:hover, .survol),
 [data-lpl-style='encre'] .lpl-ui .shop-tile:is(:hover, .survol),
 [data-lpl-style='encre'] .lpl-ui .quete:is(:hover, .survol),
@@ -501,17 +540,14 @@
   border: 0.125rem solid var(--line);
   border-radius: 0;
 }
+/* Le pli: le papier se creuse vers la reliure (un ton d'ombre, pas de flou). */
 [data-lpl-style='encre'] .lpl-ui .page--g {
   border-right-width: 0.09375rem;
-  background:
-    var(--hachures) right / 1.75rem 100% no-repeat,
-    var(--paper);
+  background: linear-gradient(90deg, var(--paper) 94%, var(--paper-sunken) 94%);
 }
 [data-lpl-style='encre'] .lpl-ui .page--d {
   border-left-width: 0.09375rem;
-  background:
-    var(--hachures) left / 1.25rem 100% no-repeat,
-    var(--paper);
+  background: linear-gradient(270deg, var(--paper) 95%, var(--paper-sunken) 95%);
 }
 [data-lpl-style='encre'] .lpl-ui .page--pleine {
   background: var(--paper);
@@ -544,9 +580,14 @@
   gap: 0.625rem;
   margin-left: 0.25rem;
 }
+/*
+ * Signets: des onglets de papier qui sortent de la couverture sombre (palette « papier »): creux
+ * au repos, en accent pour la page ouverte. Ils se lisent sur le voile comme sur le décor.
+ */
 [data-lpl-style='encre'] .lpl-ui .signet {
   border-left: 0.125rem solid transparent;
   font-weight: 850;
+  color: var(--ink);
 }
 [data-lpl-style='encre'] .lpl-ui .signet:nth-child(odd) {
   rotate: 1.2deg;
@@ -781,4 +822,78 @@
 [data-lpl-style='encre'] .lpl-ui .slot img.obj {
   width: 2.75rem;
   height: 2.75rem;
+}
+/* Pastille d'encre pleine posée sur le papier: texte de papier. */
+[data-lpl-style='encre'] .lpl-ui .carnet .page .pastille--full {
+  color: var(--paper-raised);
+}
+/* Vignette au focus (fond d'accent): ses compteurs passent à l'encre. */
+[data-lpl-style='encre'] .lpl-ui .shop-tile.focus :is(.shop-tile__own, .shop-tile__stock) {
+  color: var(--on-accent);
+}
+
+/* ---------- Éditeur de personnage ---------- */
+/*
+ * Le studio photo: panneaux sombres et liseré fin comme le reste, et au milieu la photo
+ * d'identité, un tirage de papier à bord blanc, posé un peu de travers (palette « papier »).
+ */
+[data-lpl-style='encre'] .lpl-ui .lpl-ed {
+  background: radial-gradient(ellipse at 30% 40%, var(--paper-raised), var(--paper-sunken) 75%);
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__stage {
+  border: 0.625rem solid var(--paper-raised);
+  border-bottom-width: 1.75rem;
+  border-radius: 0;
+  background: var(--paper);
+  box-shadow: 0.375rem 0.375rem 0 0 rgb(0 0 0 / 0.5);
+  outline: 0.0625rem solid var(--line);
+  rotate: -0.8deg;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__hint {
+  border-radius: 0;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__tab,
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__tile,
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__grid,
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__name,
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__button,
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__other {
+  border-color: var(--line);
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__tab[aria-selected='true'] {
+  border-color: var(--accent);
+  border-width: 0.1875rem;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__tile:hover,
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__tab:hover,
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__button:hover {
+  border-color: var(--ink);
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__tile.is-chosen {
+  border-color: var(--accent);
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__tile.is-chosen::after {
+  color: var(--accent);
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__swatch.is-chosen {
+  box-shadow:
+    0 0 0 0.1875rem var(--paper-raised),
+    0 0 0 0.375rem var(--accent);
+}
+/* Focus du clavier: anneau d'accent serré (les cases se touchent presque), tremblé d'encre. */
+[data-lpl-style='encre'] .lpl-ui .lpl-ed :is(.lpl-ed__tile, .lpl-ed__swatch, .lpl-ed__button).focus,
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__name:focus {
+  outline: 0.1875rem solid var(--accent);
+  outline-offset: 0.1875rem;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__button--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-ed__section {
+  font-family: var(--font-display);
+  font-weight: 800;
 }

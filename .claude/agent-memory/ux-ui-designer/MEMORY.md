@@ -147,6 +147,11 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 - `pnpm verifier-carnet` lancé pendant d'autres commandes lourdes donne de faux échecs (8 au lieu de 0): le relancer seul, en arrière-plan (plus de 2 min).
 - Le Vite d'un autre arbre occupe 5391: `--port 5477 --strictPort`. Captures encrées: poser `data-lpl-style="encre"` sur `#ui` après le chargement.
 
+- Thème sombre activé dans le jeu par `main.ts` (`<html data-lpl-style="encre">`, `?interface=ancien` pour comparer). Objets de papier (pages et signets du carnet, photo de l'éditeur): palette « papier » qui redéfinit les mêmes variables et les mêmes `--cadre-*` sous leur sélecteur (`generer-cadres.mjs`, `PALETTES`): un composant posé sur une page s'y accorde sans rien changer.
+- Mise à l'échelle d'un panneau à taille fixe sans JavaScript: `--k: min(1, tan(atan2(100vw - 1rem, 77.5rem)), tan(atan2(100vh - 1rem, 38rem)))` puis `scale: var(--k)` et `transform-origin: 0 0`, positions en `calc(... * var(--k))` (carnet, boutique). Ne pas mêler avec un `transform: translateX(-50%)` (les images clés le portaient aussi).
+- Captures encrées des démos: `addInitScript` avec un `MutationObserver` qui pose `data-lpl-style` dès que `document.documentElement` existe (au tout début, il est nul). La démo encrée ouvre la boutique par l'événement `shop_opened` (épicerie d'Odette, place `aubrune`); celle de l'éditeur pose `lookRevealedKey(0)`.
+- Machine chargée: `verifier.cjs` de l'interface encrée meurt en « ERR_INSUFFICIENT_RESOURCES »; se rabattre sur des scripts courts, une capture à la fois.
+
 ## Page Artifact du tableau de bord (`outils/tableau-de-bord/`)
 
 - Banc: `node outils/tableau-de-bord/essai/capturer.cjs <sortie>` (fausse base `db` en mémoire injectée par `addInitScript`, 61 captures en 90 s, contrôles console, débordement, clavier, contrastes).

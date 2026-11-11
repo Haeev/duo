@@ -7,14 +7,20 @@
   animation: none;
 }
 /*
- * Le carnet reste entier à l'écran: il remonte si la fenêtre est basse et se décale vers la gauche
- * si la fenêtre est étroite, pour que le signet ouvert (son nom compris, 11 rem au plus) reste
- * visible. Largeur du livre 66,5 rem; décalage habituel: 2 rem vers la gauche du centre.
+ * Le carnet reste entier à l'écran, de 960 x 540 à 2560 x 1440 (défaut B3): l'ensemble du livre
+ * (66,5 x 38 rem) et du signet ouvert (son nom compris, 11 rem au plus), soit 77,5 x 38 rem plus
+ * une marge, rapetisse d'un même facteur `--carnet-k` quand la fenêtre est plus petite, sans
+ * jamais grandir (la taille d'interface de Duo reste le réglage). `tan(atan2(a, b))` donne le
+ * rapport a / b de deux longueurs en nombre. Ensuite, comme avant: 2 rem à gauche du centre, et
+ * 6,75 rem sous le haut (l'horloge reste visible) si la hauteur le permet.
  */
 .lpl-ui .carnet {
-  top: min(6.75rem, calc(100% - 38.5rem));
-  left: max(0.5rem, min(calc(50% - 35rem), calc(100% - 77.5rem)));
+  --carnet-k: min(1, tan(atan2(100vw - 1rem, 77.5rem)), tan(atan2(100vh - 1rem, 38rem)));
+  top: max(0.5rem, min(6.75rem, calc(100% - 38.5rem * var(--carnet-k))));
+  left: max(0.5rem, min(calc(50% - 35rem * var(--carnet-k)), calc(100% - 78rem * var(--carnet-k))));
   margin-left: 0;
+  transform-origin: 0 0;
+  scale: var(--carnet-k);
 }
 .lpl-ui .carnet--entre {
   animation: leve var(--d-scene) var(--ease) both;

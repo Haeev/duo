@@ -9,7 +9,7 @@
   z-index: 100;
   pointer-events: auto;
   display: grid;
-  grid-template-columns: minmax(18rem, 27rem) minmax(0, 36rem);
+  grid-template-columns: minmax(14rem, 27rem) minmax(28rem, 36rem);
   justify-content: center;
   gap: 1.5rem;
   padding: 1.25rem 1.5rem;
@@ -22,7 +22,7 @@
   border: 0.1875rem solid var(--ink);
   border-radius: 0.75rem;
   overflow: hidden;
-  background: #efe6d2;
+  background: var(--paper);
   box-shadow: var(--shadow-2);
 }
 .lpl-ui .lpl-ed__canvas {
@@ -50,7 +50,8 @@
   margin: 0;
   padding: 0.125rem 0.5rem;
   border-radius: 0.375rem;
-  background: rgb(251 246 233 / 0.85);
+  background: color-mix(in srgb, var(--paper-raised) 85%, transparent);
+  color: var(--ink);
   font-size: 0.8125rem;
   font-weight: 750;
 }
@@ -118,7 +119,11 @@
   border-radius: 0.5rem;
   background: var(--paper-raised);
   box-shadow: var(--shadow-1);
-  overflow: hidden;
+  /* Fenêtre basse (960 x 540): les rangées défilent ici, la case au focus reste en vue. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
 }
 .lpl-ui .lpl-ed__section {
   margin: 0.375rem 0 0.25rem;
@@ -130,11 +135,39 @@
   font-size: 0.75rem;
   color: var(--ink-muted);
 }
+.lpl-ui .lpl-ed__note--alert {
+  font-weight: 800;
+  color: var(--stamp);
+}
 .lpl-ui .lpl-ed__row {
   display: flex;
   flex-wrap: nowrap;
   gap: 0.25rem;
   margin-bottom: 0.25rem;
+}
+/* Rangée en groupes légendés: le second groupe passe dessous si la place manque. */
+.lpl-ui .lpl-ed__row:has(> .lpl-ed__group) {
+  flex-wrap: wrap;
+  row-gap: 0.375rem;
+}
+.lpl-ui .lpl-ed__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+.lpl-ui .lpl-ed__group + .lpl-ed__group {
+  margin-left: 0.5rem;
+  padding-left: 0.5rem;
+  border-left: 0.125rem dashed var(--line);
+}
+.lpl-ui .lpl-ed__group-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
+.lpl-ui .lpl-ed__group-tiles {
+  display: flex;
+  gap: 0.25rem;
 }
 .lpl-ui .lpl-ed__tile {
   position: relative;
@@ -169,7 +202,7 @@
 .lpl-ui .lpl-ed__tile.is-chosen {
   border-color: var(--primary);
   border-width: 0.1875rem;
-  background: #e3ecdf;
+  background: var(--chosen-bg);
 }
 .lpl-ui .lpl-ed__tile.is-chosen::after {
   content: '✓';
@@ -199,7 +232,7 @@
   height: 3.75rem;
   margin-bottom: 0.75rem;
   border-radius: 0.25rem 0.25rem 0 0;
-  background: var(--wood);
+  background: var(--ink-muted);
   transform-origin: bottom;
   transform: scaleY(calc(0.4 + var(--h) * 0.6));
 }
@@ -277,6 +310,7 @@
   border-radius: 0.5rem;
   background: var(--paper-raised);
   font-weight: 800;
+  white-space: nowrap;
   box-shadow: var(--shadow-1);
 }
 .lpl-ui .lpl-ed__button--primary {
@@ -305,5 +339,5 @@
   font-weight: 800;
 }
 .lpl-ui .lpl-ed__other.is-ready {
-  background: #e3ecdf;
+  background: var(--chosen-bg);
 }
