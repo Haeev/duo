@@ -37,13 +37,14 @@
   "stands": "pl-o",
   "voice": "bouncy",
   "life": {
-    "home": "pl-o",
+    "home": "odette-lit-p",
     "schedule": [
       {
         "from": 420,
         "to": 1260,
         "at": {
-          "point": "pl-o"
+          "object": "epicerie-comptoir",
+          "side": "behind"
         },
         "activity": "tenir-l-epicerie",
         "gesture": null,
@@ -53,7 +54,7 @@
         "from": 1260,
         "to": 420,
         "at": {
-          "point": "pl-o"
+          "bed": "odette-lit"
         },
         "activity": "dormir",
         "gesture": null

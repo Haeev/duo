@@ -187,11 +187,20 @@
           },
           "done": [
             {
+              "type": "decision_is",
+              "decision": "baronne",
+              "state": "agreed"
+            },
+            {
               "type": "talked",
               "dialogue": "achille-decision",
               "node": "fin"
             }
           ],
+          "decision": {
+            "id": "baronne",
+            "options": ["relachee", "friture"]
+          },
           "together": false,
           "onStart": [
             {

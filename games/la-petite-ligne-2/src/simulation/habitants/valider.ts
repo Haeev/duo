@@ -7,7 +7,8 @@ import type { Content, PlaceContent } from '../../donnees/charger';
 import type { VillagerDef } from '../../donnees/schemas/habitant';
 import type { Condition } from '../../donnees/schemas/regles';
 import type { Spot } from '../../donnees/schemas/vie-habitant';
-import { findObject, inRange, isUnconditional } from './planning';
+import { areaAt } from '../lieux/traversee';
+import { findObject, inRange, isUnconditional, placesOf, spotObject } from './planning';
 import { VILLAGERS } from './reglages';
 
 const DAY = 1440;
@@ -17,13 +18,27 @@ function checkSpot(content: Content, place: PlaceContent, spot: Spot, at: string
     return spot.point in place.map.points
       ? null
       : `${at}: point « ${spot.point} » absent de la carte`;
-  const id = 'seat' in spot ? spot.seat : spot.object;
+  const id = spotObject(spot) ?? '';
   const object = findObject(place, id);
   if (object === null) return `${at}: meuble « ${id} » absent de la carte`;
   const def = content.props[object.type];
-  if ('seat' in spot && def?.bricks.some((b) => b.brick === 'sit') !== true)
+  if ('seat' in spot && (def === undefined || placesOf(def, 'sit') === 0))
     return `${at}: « ${id} » n'est pas un siège (brique sit)`;
+  if ('bed' in spot && (def === undefined || placesOf(def, 'lie') === 0))
+    return `${at}: « ${id} » n'est pas un lit (brique sleep)`;
   return null;
+}
+
+/**
+ * Où la ligne de nuit le met: le point lui-même, ou `home` s'il est couché dans la même pièce que
+ * ce point (son lit est chez lui); `''` ailleurs.
+ */
+function nightSpot(place: PlaceContent, spot: Spot, home: string): string {
+  if ('point' in spot) return spot.point;
+  const bed = 'bed' in spot ? findObject(place, spot.bed) : null;
+  const at = place.map.points[home];
+  if (bed === null || at === undefined) return '';
+  return areaAt(place, bed.x, bed.y) === areaAt(place, at.x, at.y) ? home : '';
 }
 
 function clock(minute: number): string {
@@ -86,7 +101,7 @@ function checkVillager(
       if (!inRange(m, entry.from, entry.to)) continue;
       // La première ligne sans condition qui couvre l'heure du contrôle est celle qui s'applique.
       if (m === VILLAGERS.homeCheckMinute && covered[m] === 0)
-        night.point = 'point' in entry.at ? entry.at.point : '';
+        night.point = nightSpot(place, entry.at, life.home);
       covered[m] = 1;
     }
   });

@@ -9,6 +9,12 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../../etat/monde';
 import type { Intent } from '../../simulation/noyau/entrees';
 import type { GameEvent } from '../../simulation/noyau/evenements';
+import {
+  allShops,
+  shopSays,
+  shopSaysRefusal,
+  type ShopMoment,
+} from '../../simulation/commerces/prix';
 import { formatEuros } from '../../simulation/sac/argent';
 import { el, icon } from '../dom';
 import { itemThumb } from '../pictos';
@@ -70,6 +76,19 @@ export function createShopScreen(
   let message: { text: string; until: number; mood: 'yes' | 'no' | 'joy' } | null = null;
   let last: { world: ReadonlyWorld; me: PlayerIndex } | null = null;
 
+  const shops = allShops(content);
+  /** La réplique du commerçant de la boutique ouverte (sa fiche), à défaut le texte commun. */
+  function keeperSays(moment: ShopMoment, common: string): string {
+    const shop = ui === null ? undefined : shops.get(ui.shop);
+    return (shop === undefined ? null : shopSays(shop, moment)) ?? common;
+  }
+  function keeperRefuses(reason: string): string {
+    const shop = ui === null ? undefined : shops.get(ui.shop);
+    return (
+      (shop === undefined ? null : shopSaysRefusal(shop, reason)) ?? shopRefusalText(reason) ?? ''
+    );
+  }
+
   function setUi(patch: Partial<ShopUiState>): void {
     if (ui === null) return;
     ui = { ...ui, ...patch };
@@ -88,7 +107,7 @@ export function createShopScreen(
             : ui.tab === 'buy'
               ? 'not-enough-money'
               : 'shop-cap-reached';
-      say(shopRefusalText(reason) ?? '', 'no', performance.now());
+      say(keeperRefuses(reason), 'no', performance.now());
       return;
     }
     if (ui.tab === 'buy')
@@ -519,20 +538,20 @@ export function createShopScreen(
           return;
         case 'shop_bought':
           if (event.player === me && ui?.shop === event.shop) {
-            say(SHOP_TEXTS.bought, 'yes', performance.now());
+            say(keeperSays('bought', SHOP_TEXTS.bought), 'yes', performance.now());
             flyCoins(event.count, false);
           }
           return;
         case 'shop_sold':
           if (event.player === me && ui?.shop === event.shop) {
-            say(SHOP_TEXTS.sold, event.need ? 'joy' : 'yes', performance.now());
+            say(keeperSays('sold', SHOP_TEXTS.sold), event.need ? 'joy' : 'yes', performance.now());
             flyCoins(event.count, true);
             setUi({ quantity: 1 });
           }
           return;
         case 'refused':
           if (event.player === me && ui !== null && event.target === ui.shop)
-            say(shopRefusalText(event.reason) ?? '', 'no', performance.now());
+            say(keeperRefuses(event.reason), 'no', performance.now());
           return;
         default:
           return;

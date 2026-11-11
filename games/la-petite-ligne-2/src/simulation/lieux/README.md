@@ -23,3 +23,14 @@ Tout se lit dans la carte (`src/donnees/schemas/lieu.ts`) et la progression: auc
 ## Ajouter un verrou, une porte, un intérieur
 
 Rien ici. Verrou: une entrée `locks` dans `carte.json` (produite par `outils/plan-vers-lieu.ts`; `object` et `says` à poser), plus le meuble de l'obstacle (gabarit `meuble`, brique `{ "brick": "passage" }`). Porte et intérieur: gabarit `interieur` (`pnpm nouveau interieur <id> <lieu>`), et la porte du dehors dans `carte.json`. Exemplaire factice: `tests/lieux-portes.test.ts`.
+
+## Meuble, porte ou escalier conditionné (recette)
+
+1. Meuble: ajouter `"when": [conditions]` à l'objet de `carte.json` ou de l'intérieur (gabarit `interieur`). Tant qu'une condition est fausse, il n'existe pas: ni obstacle, ni cible, ni usage (`presents.ts`).
+2. Porte ou escalier: `"opens": [conditions]` et `"says": "phrase"` sur la porte du côté d'où l'on entre (on ressort toujours).
+3. Condition courante: une pièce de logement restaurée, `{ "type": "remembered", "key": "<lieu>.<logement>.<pièce>" }`, ou un fait d'histoire.
+4. Aucun état: tout se déduit de la progression, chez l'hôte comme chez l'invité. Événement `map_object_changed` quand un meuble paraît ou disparaît; un joueur qui se tenait là est dégagé (`unstuck`).
+5. Rendu: ne pas dessiner `absentObjects(look)` (exporté par `lieux/index.ts`).
+6. `assembler_lieu.py` conserve ces champs d'une passe à l'autre. Test court: `tests/meubles-conditionnes.test.ts`.
+
+`traversee.ts`: `doorChain(place, fx, fy, tx, ty)`, les portes à franchir d'une pièce à l'autre (habitants, scènes, coup d'œil).

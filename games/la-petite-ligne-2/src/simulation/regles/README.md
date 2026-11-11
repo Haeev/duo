@@ -6,3 +6,15 @@
 - `effets.ts`: `applyEffect`, `applyEffects`; chaque effet passe par le système qui possède ce qu'il touche.
 - `memoire.ts`: faits retenus (`remember`, `recall`, compteurs `bump`), garde de taille `maxFacts`.
 - `reglages.ts`: réglages du lot L3 que les fichiers de données n'ont pas encore (à migrer dans `reglages.json`).
+- `recompenses.ts`: récompenses qui ne sont pas des objets (recette, plan, entrée de collection, pièce de tenue), garde-robe gagnée (`isPieceOwned`, `wardrobeOf`).
+
+## Donner une récompense (recette)
+
+1. Dans `onDone` d'une étape (ou une option de dialogue, un temps de scène): `{ "type": "give_recipe", "recipe": "<id>" }`, `give_plan` (`plan`), `give_entry` (`entry`) ou `give_piece` (`piece`).
+2. La recette est `known: "learned"`, le plan a une `source` autre que `start`, l'entrée existe au carnet, la pièce porte l'étiquette `a-gagner` du catalogue: le chargement refuse le reste.
+3. Tout s'écrit dans la mémoire commune (`cuisine.recette.<id>`, `fabrication.plan.<id>`, `garde-robe.piece.<id>`) ou l'album: sauvegarde et réseau sans changement.
+4. Annonce aux deux joueurs: événement `reward_given` (`kind`, `id`), ou `collection_found` pour une entrée. Déjà acquise: sans effet.
+5. Une pièce à gagner reste hors de l'éditeur et refusée par `set_look` (`piece-locked`) tant qu'elle n'est pas donnée.
+6. Test court: `tests/recompenses.test.ts`.
+
+Condition `money_at_least` (`amount` en centimes): la bourse de celui qui agit (dialogue, article, étape). Condition `decision_is` et effet `choose`: `quetes/README.md`.

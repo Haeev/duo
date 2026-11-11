@@ -326,6 +326,26 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'store_opened':
         if (event.player === me) notebook.openStore(event.target, now);
         break;
+      case 'decision_changed':
+        // Celui qui vient de choisir seul lit la suite dans son dialogue: l'annonce est pour l'autre.
+        if (event.state !== 'waiting' || event.player === other)
+          hud.notice(
+            now,
+            'info',
+            fill(TEXTS.notices.decision[event.state], { nom: nameOf(other) }),
+          );
+        break;
+      case 'reward_given': {
+        const c = view.content;
+        const name =
+          event.kind === 'recipe'
+            ? c.recipes[event.id]?.name
+            : event.kind === 'plan'
+              ? c.plans[event.id]?.name
+              : c.pieces[event.id]?.name;
+        hud.notice(now, 'info', fill(TEXTS.notices.reward[event.kind], { nom: name ?? event.id }));
+        break;
+      }
       case 'mirror_opened': {
         const world = view.world();
         if (event.player === me && world !== null) editor.open('mirror', world, me);
@@ -415,6 +435,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'tool_ordered':
       case 'tool_mended':
       case 'tool_sharpened':
+      case 'map_object_changed':
         break;
     }
   }

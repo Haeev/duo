@@ -125,6 +125,7 @@ export const TEXTS = {
     'other-missing-item': 'L’autre n’a pas l’objet',
     'other-not-enough-money': 'L’autre n’a pas assez',
     'other-pockets-full': 'Ses poches sont pleines',
+    'piece-locked': 'Tenue pas encore gagnée',
     'plot-taken': 'Déjà semé',
     'pockets-full': 'Poches pleines',
     'purse-full': 'Bourse pleine',
@@ -163,6 +164,18 @@ export const TEXTS = {
     otherLeftTrain: '{nom} est descendu·e',
     given: '{nom} te donne {objet}',
     toolBlunt: 'Outil émoussé',
+    /** Décision à deux (`decision_changed`): l'autre a choisi, deux avis, décision prise. */
+    decision: {
+      waiting: '{nom} a choisi : à toi de dire',
+      split: 'Deux avis : mettez-vous d’accord',
+      agreed: 'Décision prise à deux',
+    },
+    /** Récompense qui n'est pas un objet (`reward_given`), par nature. */
+    reward: {
+      recipe: 'Recette apprise : {nom}',
+      plan: 'Plan appris : {nom}',
+      piece: 'Nouvelle tenue au miroir : {nom}',
+    },
     /** Rappel de la course, une fois (`astuce-course.ts`); `{touche}` selon le clavier réel. */
     runHint: 'Maintiens {touche} pour courir (ça creuse un peu l’appétit)',
   },

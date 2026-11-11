@@ -16,7 +16,9 @@
   "hair": null,
   // Zones teintables (3 au plus) et couleurs permises, en #rrggbb du nuancier.
   "zones": [{ "id": "tissu", "colors": ["#5b6f8a", "#b6553c", "#e9c38a"] }],
-  // Étiquettes: elles servent à composer un habitant (lieu, saison, métier).
+  // Étiquettes: elles servent à composer un habitant (lieu, saison, métier). "habitants": réservée
+  // aux habitants. "a-gagner": pièce de récompense, absente de l'éditeur et du miroir tant qu'une
+  // quête ne l'a pas donnée (effet { "type": "give_piece", "piece": "<id>" }).
   "tags": ["campagne"],
   // Triangles du maillage (budget: 6 000 pour un personnage entier).
   "triangles": 900,

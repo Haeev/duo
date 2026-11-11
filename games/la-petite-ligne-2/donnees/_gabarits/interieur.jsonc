@@ -21,6 +21,12 @@
   "points": {
     "piece-milieu": { "x": 4, "y": 3 },
   },
+  // Meubles: { "id", "type", "x", "y", "rotation" }. Meuble conditionné (facultatif): il n'existe
+  // (obstacle, cible, usage, dessin) que si toutes les conditions de "when" sont vraies, par
+  // exemple une pièce de logement restaurée (fait `<lieu>.<logement>.<pièce>`):
+  //   { "id": "piece-cuisiniere", "type": "cuisiniere", "x": 0.5, "y": 0.5, "rotation": 0,
+  //     "when": [{ "type": "remembered", "key": "aubrune.maison-du-garde.cuisine" }] }
+  // Un escalier ou une porte conditionné: "opens" et "says" de la porte (plus bas).
   "objects": [],
   // Chaque porte mène à une autre (« to »), qui ramène ici: écrire la porte du dehors dans
   // carte.json, au pied de la porte du bâtiment, avec "to" = l'identifiant de celle-ci.

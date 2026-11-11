@@ -3,17 +3,29 @@
  * tiré du plan: nœuds et arêtes), sinon sur la grille. Les portes (brique `open`) se franchissent
  * toujours: l'habitant les ouvre; le passage part en événement pour le rendu et le son. Appelé
  * au changement de ligne du planning, jamais à chaque pas.
+ *
+ * D'une pièce à l'autre (le dehors, un intérieur, un étage), le trajet se fait pièce par pièce: à
+ * pied jusque devant la porte, puis de l'autre côté de la paire (`lieux/traversee.ts`, même règle
+ * du seuil que pour les joueurs), marqué `jump` sur le point d'arrivée.
  */
 import type { Content, PlaceContent } from '../../donnees/charger';
 import type { ReadPlace } from '../noyau/obstacles';
 import { footprintOf } from '../noyau/obstacles';
 import { edgePassable } from '../lieux/chemins';
+import { areaAt, doorChain } from '../lieux/traversee';
 
 const NONE: ReadonlySet<string> = new Set();
 
+/** Un point de trajet (m). `jump`: on y arrive en franchissant une porte, pas en marchant. */
+export interface RoutePoint {
+  readonly x: number;
+  readonly y: number;
+  readonly jump?: true;
+}
+
 /** Un trajet: suite de points (m), et les portes franchies avec l'index du point qui les passe. */
 export interface Route {
-  readonly points: readonly { readonly x: number; readonly y: number }[];
+  readonly points: readonly RoutePoint[];
   readonly doors: readonly { readonly at: number; readonly id: string }[];
 }
 
@@ -236,7 +248,13 @@ function graphRoute(
 ): Route | null {
   const paths = place.map.graph;
   if (paths === undefined) return null;
-  const ids = Object.keys(paths.nodes).sort();
+  // Les nœuds du dehors seulement: ceux des intérieurs se rejoignent par les portes.
+  const ids = Object.keys(paths.nodes)
+    .sort()
+    .filter((id) => {
+      const p = paths.nodes[id];
+      return p !== undefined && areaAt(place, p.x, p.y) === '';
+    });
   if (ids.length === 0) return null;
   const nearest = (x: number, y: number): string => {
     let best = ids[0] ?? '';
@@ -266,7 +284,8 @@ function graphRoute(
     const p = paths.nodes[cur];
     if (p === undefined) continue;
     for (const edge of paths.edges) {
-      if (!edgePassable(edge, closed)) continue;
+      if (edge.kind === 'porte' || edge.kind === 'interieur' || !edgePassable(edge, closed))
+        continue;
       const other = edge.a === cur ? edge.b : edge.b === cur ? edge.a : null;
       const q = other === null ? undefined : paths.nodes[other];
       if (other === null || q === undefined || done.has(other)) continue;
@@ -289,9 +308,32 @@ function graphRoute(
   return { points, doors: [] };
 }
 
+/** Trajet dans une seule pièce: dehors, le graphe d'abord; dans un intérieur, la grille. */
+function legRoute(
+  content: Content,
+  place: PlaceContent,
+  state: ReadPlace,
+  outside: boolean,
+  fx: number,
+  fy: number,
+  tx: number,
+  ty: number,
+  closed: ReadonlySet<string>,
+): Route {
+  return (
+    (outside ? graphRoute(place, fx, fy, tx, ty, closed) : null) ??
+    gridRoute(gridOf(content, place, state, closed), fx, fy, tx, ty) ?? {
+      points: [{ x: tx, y: ty }],
+      doors: [],
+    }
+  );
+}
+
 /**
  * Trajet de (fx, fy) à (tx, ty) dans le lieu: graphe d'abord, grille à défaut; ligne droite en
  * dernier recours. `closed`: verrous d'histoire fermés (`lieux/`), ni arête ni case n'y passent.
+ * D'une pièce à l'autre, un trajet par pièce, relié par les portes (`doorChain`); sans porte qui
+ * les relie, l'habitant est posé à l'arrivée (un seul point `jump`).
  */
 export function findRoute(
   content: Content,
@@ -303,11 +345,26 @@ export function findRoute(
   ty: number,
   closed: ReadonlySet<string> = NONE,
 ): Route {
-  return (
-    graphRoute(place, fx, fy, tx, ty, closed) ??
-    gridRoute(gridOf(content, place, state, closed), fx, fy, tx, ty) ?? {
-      points: [{ x: tx, y: ty }],
-      doors: [],
-    }
-  );
+  const chain = doorChain(place, fx, fy, tx, ty);
+  if (chain === null) return { points: [{ x: tx, y: ty, jump: true }], doors: [] };
+  if (chain.length === 0)
+    return legRoute(content, place, state, areaAt(place, fx, fy) === '', fx, fy, tx, ty, closed);
+  const points: RoutePoint[] = [];
+  const doors: { at: number; id: string }[] = [];
+  let x = fx;
+  let y = fy;
+  const append = (toX: number, toY: number): void => {
+    const leg = legRoute(content, place, state, areaAt(place, x, y) === '', x, y, toX, toY, closed);
+    for (const door of leg.doors) doors.push({ at: door.at + points.length, id: door.id });
+    points.push(...leg.points);
+  };
+  for (const hop of chain) {
+    append(hop.fromX, hop.fromY);
+    doors.push({ at: points.length, id: hop.door });
+    points.push({ x: hop.toX, y: hop.toY, jump: true });
+    x = hop.toX;
+    y = hop.toY;
+  }
+  append(tx, ty);
+  return { points, doors };
 }

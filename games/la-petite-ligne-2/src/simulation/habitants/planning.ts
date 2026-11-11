@@ -75,8 +75,15 @@ export interface Goal {
   y: number;
   /** Cap une fois arrivé, `null`: garder celui de la marche. */
   facing: number | null;
-  /** Place assise: on marche jusqu'à (`x`, `y`), devant le siège, puis on s'y installe. */
-  seat: { object: string; index: number; x: number; y: number; facing: number } | null;
+  /** Place assise ou couchée: on marche jusqu'à (`x`, `y`), devant le meuble, puis on s'y installe. */
+  seat: {
+    object: string;
+    index: number;
+    x: number;
+    y: number;
+    facing: number;
+    pose: 'sit' | 'lie';
+  } | null;
 }
 
 /** Façade d'un meuble: 0 au sud, puis par quarts de tour (même convention que `briques/postures.ts`). */
@@ -128,6 +135,22 @@ function besideObject(
   return { x, y, facing: side === 'front' ? Math.atan2(-f.y, -f.x) : Math.atan2(f.y, f.x) };
 }
 
+/** Le meuble que nomme un poste, `null` pour un point. */
+export function spotObject(spot: Spot): string | null {
+  if ('seat' in spot) return spot.seat;
+  if ('bed' in spot) return spot.bed;
+  return 'object' in spot ? spot.object : null;
+}
+
+/** Places d'un meuble pour s'y asseoir (brique `sit`) ou s'y coucher (brique `sleep`), 0 sans la brique. */
+export function placesOf(def: PropDef, pose: 'sit' | 'lie'): number {
+  for (const b of def.bricks) {
+    if (pose === 'sit' && b.brick === 'sit') return b.seats;
+    if (pose === 'lie' && b.brick === 'sleep') return b.places;
+  }
+  return 0;
+}
+
 /**
  * L'endroit d'une ligne. `seatsTaken(object, index)` dit si une place est déjà prise (joueur ou
  * autre habitant): on prend la première libre, sinon on reste debout devant le siège.
@@ -142,25 +165,28 @@ export function goalOf(
     const p = place.map.points[spot.point];
     return p === undefined ? null : { x: p.x, y: p.y, facing: null, seat: null };
   }
-  const id = 'seat' in spot ? spot.seat : spot.object;
-  const object = findObject(place, id);
+  const id = spotObject(spot);
+  const object = id === null ? null : findObject(place, id);
   const def = object === null ? undefined : content.props[object.type];
   if (object === null || def === undefined) return null;
   if ('object' in spot) {
     const at = besideObject(object, def, spot.side, object.x, object.y);
     return { x: at.x, y: at.y, facing: at.facing, seat: null };
   }
-  const brick = def.bricks.find((b) => b.brick === 'sit');
-  if (brick?.brick !== 'sit') return null;
+  const places = placesOf(def, 'bed' in spot ? 'lie' : 'sit');
+  if (places === 0) return null;
   let index = 0;
-  while (index < brick.seats && seatTaken(object.id, index)) index++;
-  const chosen = Math.min(index, brick.seats - 1);
-  const pose = seatPose(object, def, brick.seats, chosen);
+  while (index < places && seatTaken(object.id, index)) index++;
+  const chosen = Math.min(index, places - 1);
+  const pose = seatPose(object, def, places, chosen);
   const stand = besideObject(object, def, 'front', pose.x, pose.y);
   return {
     x: stand.x,
     y: stand.y,
     facing: pose.facing,
-    seat: index < brick.seats ? { object: object.id, index, ...pose } : null,
+    seat:
+      index < places
+        ? { object: object.id, index, ...pose, pose: 'bed' in spot ? 'lie' : 'sit' }
+        : null,
   };
 }

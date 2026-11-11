@@ -69,7 +69,8 @@
         "from": 420,
         "to": 1200,
         "at": {
-          "point": "cf0"
+          "object": "basile-etabli",
+          "side": "front"
         },
         "activity": "raboter",
         "gesture": "raboter",

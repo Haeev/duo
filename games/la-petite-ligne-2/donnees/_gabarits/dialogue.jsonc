@@ -13,6 +13,10 @@
   //   { "type": "need_at_least", "need": "hygiene", "value": 21 }
   //   { "type": "item_in_bag", "item": "pomme", "count": 3 }
   //   { "type": "time_is", "from": 360, "to": 720 }
+  //   { "type": "money_at_least", "amount": 300 }   (la bourse de qui parle: 3,00 € au moins)
+  //   { "type": "decision_is", "decision": "<décision>", "state": "agreed", "option": "<a>" }
+  //       décision à deux: agreed (prise, sur "option" si elle est donnée), split (deux avis:
+  //       inviter à se mettre d'accord), mine (qui parle a choisi), theirs (l'autre a choisi)
   "when": [],
   // "duo": une seule fois pour les deux; "player": une fois chacun; null: à volonté.
   "once": null,
@@ -54,6 +58,10 @@
       "emote": "joy",
       "next": null,
     },
+    // Décision à deux (déclarée par une étape de quête, champ "decision"): une option par choix,
+    //   "effects": [{ "type": "choose", "decision": "<décision>", "option": "<a>" }], puis un nœud
+    //   "branch" sur decision_is: agreed (la suite), split (« mettez-vous d'accord »), sinon
+    //   (« j'attends l'autre »). Exemple: donnees/lieux/aubrune/dialogues/achille-decision.json.
     // Autres nœuds: { "kind": "branch", "cases": [{ "when": [...], "next": "..." }], "otherwise": "..." }
     //               { "kind": "effects", "effects": [...], "next": "...", "otherwise": "..." }
     //               ("otherwise", facultatif: nœud joué si l'échange est impossible, rien appliqué)

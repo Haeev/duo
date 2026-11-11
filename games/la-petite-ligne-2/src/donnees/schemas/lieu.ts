@@ -100,6 +100,12 @@ export const MapObjectSchema = v.strictObject({
    * `sit`, tous à `GROUP_MAX_SPAN` m au plus l'un de l'autre.
    */
   group: v.exactOptional(IdSchema),
+  /**
+   * Meuble conditionné: il n'existe que si toutes ces conditions sont vraies (fait d'histoire,
+   * pièce de logement restaurée: fait `<lieu>.<logement>.<pièce>`). Absent, il ne bloque pas, ne
+   * se vise pas et ne se dessine pas (`simulation/lieux/presents.ts`). Sans ce champ: toujours là.
+   */
+  when: v.exactOptional(v.pipe(v.array(ConditionSchema), v.minLength(1), v.maxLength(8))),
   /** Note de placement: pourquoi cet élément est ici, dans ce sens (règle « cohérence du monde »). Ignorée du moteur. */
   pourquoi: v.exactOptional(TextSchema),
 });

@@ -11,7 +11,7 @@ import { currentBlockers } from '../src/simulation/noyau/obstacles';
 import { insidePolygon } from '../src/simulation/lieux/zones';
 import { closedLocks, reachMask, zoneViews } from '../src/simulation/lieux/index';
 import { planToMap } from '../outils/plan-vers-lieu';
-import { dataFiles, newSim } from './aides';
+import { dataFiles, newSim, withAssembly } from './aides';
 
 const PLAN = fileURLToPath(new URL('../donnees/lieux/aubrune/plan.json', import.meta.url));
 
@@ -19,11 +19,12 @@ function aubrune(): ReturnType<typeof newSim> {
   const plan = JSON.parse(readFileSync(PLAN, 'utf8')) as unknown;
   const { map } = planToMap(plan, { place: 'aubrune', annex: 48 });
   const files = dataFiles() as Record<string, Record<string, unknown>>;
-  files['lieux/aubrune/carte.json'] = v.parse(MapSchema, JSON.parse(JSON.stringify(map)));
-  // La grille seule, telle que l'outil la produit: les intérieurs livrés (portes vers la carte
-  // assemblée) n'ont pas leur porte d'arrivée ici. `assembler_lieu.py` prouve le reste.
-  for (const path of Object.keys(files))
-    if (path.startsWith('lieux/aubrune/interieurs/')) Reflect.deleteProperty(files, path);
+  // La grille telle que l'outil la produit, avec les points, les meubles et les portes de
+  // l'assemblage: les intérieurs et les fiches livrés (habitants à leur comptoir) s'y chargent.
+  files['lieux/aubrune/carte.json'] = v.parse(
+    MapSchema,
+    withAssembly(JSON.parse(JSON.stringify(map)) as object, files['lieux/aubrune/carte.json']),
+  );
   files['lieux/aubrune/lieu.json'] = {
     schema: 1,
     id: 'aubrune',

@@ -7,6 +7,7 @@
 import type { BrickId } from '../../donnees/schemas/briques';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Stack } from '../../etat/joueur';
+import { isObjectAbsent } from '../lieux/presents';
 import { findProp, footprintOf, type PropInstance } from '../noyau/obstacles';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { sleepThroughNight } from './dormir';
@@ -48,7 +49,8 @@ function propBrick(
   const placeContent = content.places[world.common.place];
   const place = world.places[world.common.place];
   if (placeContent === undefined || place === undefined) return null;
-  const prop = findProp(placeContent, place, id);
+  // Un meuble conditionné absent (`when` de la carte) n'existe pas: aucune brique ne s'y joue.
+  const prop = isObjectAbsent(sim, id) ? null : findProp(placeContent, place, id);
   const brick =
     prop === null ? undefined : content.props[prop.type]?.bricks.find((b) => b.brick === brickId);
   if (prop === null || brick === undefined) return null;

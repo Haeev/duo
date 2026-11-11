@@ -53,7 +53,8 @@
         "from": 420,
         "to": 1200,
         "at": {
-          "point": "gr6"
+          "object": "forge-foyer",
+          "side": "front"
         },
         "activity": "forger",
         "gesture": "marteler",

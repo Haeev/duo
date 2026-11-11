@@ -8,6 +8,7 @@ import type { Condition } from '../../donnees/schemas/regles';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { bondKey } from '../../etat/progression';
 import { calendarOf } from '../monde/calendrier';
+import { choiceOf, decisionState, decisionTaken } from '../quetes/decisions';
 
 export interface RuleContext {
   readonly world: ReadonlyWorld;
@@ -46,8 +47,19 @@ export function evaluate(ctx: RuleContext, condition: Condition): boolean {
       return forActor(ctx, (p) => world.players[p].needs[condition.need] >= condition.value);
     case 'item_in_bag':
       return forActor(ctx, (p) => countHeld(world.players[p], condition.item) >= condition.count);
+    case 'money_at_least':
+      return forActor(ctx, (p) => world.players[p].money >= condition.amount);
     case 'place_is':
       return world.common.place === condition.place;
+    case 'decision_is': {
+      const { decision, option } = condition;
+      const fits = (chosen: string | null): boolean =>
+        chosen !== null && (option === undefined || chosen === option);
+      if (condition.state === 'agreed') return fits(decisionTaken(world, decision));
+      if (condition.state === 'split') return decisionState(world, decision) === 'split';
+      const mine = condition.state === 'mine';
+      return forActor(ctx, (p) => fits(choiceOf(world, decision, mine ? p : p === 0 ? 1 : 0)));
+    }
     case 'bond_at_least':
       return forActor(
         ctx,

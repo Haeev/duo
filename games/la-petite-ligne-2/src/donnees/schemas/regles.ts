@@ -21,6 +21,10 @@ export type FactValue = v.InferOutput<typeof FactValueSchema>;
 /** Clé de mémoire: `lieu.sujet.detail`. */
 export const FactKeySchema = v.pipe(v.string(), v.regex(/^[a-z][a-z0-9-]*(\.[a-z0-9-]+){0,3}$/));
 
+/** États d'une décision à deux que lit la condition `decision_is`. */
+export const DECISION_IS = ['agreed', 'split', 'mine', 'theirs'] as const;
+export type DecisionIs = (typeof DECISION_IS)[number];
+
 export type Condition =
   | { type: 'all'; conditions: Condition[] }
   | { type: 'any'; conditions: Condition[] }
@@ -29,7 +33,15 @@ export type Condition =
   | { type: 'remembered'; key: string; equals?: FactValue }
   | { type: 'need_at_least'; need: NeedId; value: number }
   | { type: 'item_in_bag'; item: string; count: number }
+  /** La bourse du joueur qui agit contient au moins `amount` centimes. */
+  | { type: 'money_at_least'; amount: number }
   | { type: 'place_is'; place: string }
+  /**
+   * Décision à deux (`simulation/quetes/decisions.ts`): `agreed` les deux choix concordent (sur
+   * `option` si elle est donnée), `split` deux avis différents, `mine` celui qui agit a choisi,
+   * `theirs` l'autre a choisi.
+   */
+  | { type: 'decision_is'; decision: string; state: DecisionIs; option?: string }
   /** Points d'amitié du joueur qui agit avec cet habitant (cahier 4.9: 100 par cœur). */
   | { type: 'bond_at_least'; villager: string; points: number }
   /** Heure de jeu, en minutes depuis minuit (`from` inclus, `to` exclu; la plage peut passer minuit). */
@@ -80,7 +92,17 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
       item: IdSchema,
       count: v.pipe(CountSchema, v.minValue(1)),
     }),
+    v.strictObject({
+      type: v.literal('money_at_least'),
+      amount: v.pipe(CentsSchema, v.minValue(1)),
+    }),
     v.strictObject({ type: v.literal('place_is'), place: IdSchema }),
+    v.strictObject({
+      type: v.literal('decision_is'),
+      decision: IdSchema,
+      state: v.picklist(DECISION_IS),
+      option: v.exactOptional(IdSchema),
+    }),
     v.strictObject({
       type: v.literal('bond_at_least'),
       villager: IdSchema,
@@ -162,5 +184,22 @@ export const EffectSchema = v.variant('type', [
   v.strictObject({ type: v.literal('give_bag'), bag: IdSchema }),
   /** Ouvre la boutique de ce commerce du lieu pour celui qui agit (dialogue du commerçant). */
   v.strictObject({ type: v.literal('open_shop'), shop: IdSchema }),
+  /**
+   * Récompenses qui ne sont ni un objet ni de l'argent (`simulation/regles/recompenses.ts`),
+   * acquises au duo et annoncées aux deux joueurs. Déjà acquise: sans effet.
+   */
+  /** Apprend une recette à apprendre (`known: "learned"` de `commun/recettes/<id>.json`). */
+  v.strictObject({ type: v.literal('give_recipe'), recipe: IdSchema }),
+  /** Apprend un plan d'artisanat à apprendre (`source` autre que `start`, `commun/plans/<id>.json`). */
+  v.strictObject({ type: v.literal('give_plan'), plan: IdSchema }),
+  /** Inscrit une entrée au carnet des collections (carte postale, musique: `commun/collections/`). */
+  v.strictObject({ type: v.literal('give_entry'), entry: IdSchema }),
+  /** Ajoute à la garde-robe une pièce de tenue à gagner (étiquette `a-gagner` du catalogue). */
+  v.strictObject({ type: v.literal('give_piece'), piece: IdSchema }),
+  /**
+   * Décision à deux: celui qui agit dit son choix. Elle n'est prise que si l'autre dit le même
+   * (`decision` et ses options: champ `decision` d'une étape de quête; lire par `decision_is`).
+   */
+  v.strictObject({ type: v.literal('choose'), decision: IdSchema, option: IdSchema }),
 ]);
 export type Effect = v.InferOutput<typeof EffectSchema>;

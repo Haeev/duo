@@ -29,4 +29,13 @@ export const PLACE_EVENTS = [
     to: IdSchema,
     interior: v.nullable(IdSchema),
   }),
+  /**
+   * Un meuble conditionné de la carte (`when`) paraît ou disparaît: le rendu le montre ou le
+   * cache (il peut aussi lire `absentObjects` à chaque image), le son joue la pose.
+   */
+  v.strictObject({
+    type: v.literal('map_object_changed'),
+    object: IdSchema,
+    present: v.boolean(),
+  }),
 ] as const;

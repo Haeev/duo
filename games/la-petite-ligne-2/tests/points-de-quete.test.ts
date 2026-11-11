@@ -279,14 +279,22 @@ describe('Aubrune: les deux signalements, joués à pied', () => {
 
   /**
    * Le joueur 0 part devant la porte `door` du dehors, puis passe chaque porte de `legs` en
-   * marchant (il doit se retrouver dans la salle annoncée) et finit au point `spot`.
+   * marchant (il doit se retrouver dans la salle annoncée) et finit au point `spot`. `restored`:
+   * pièces de la maison du garde déjà restaurées (leurs escaliers ne s'ouvrent qu'alors).
    */
   function walkIn(
     door: string,
     legs: readonly (readonly [string, string])[],
     spot: string,
+    restored: readonly string[] = [],
   ): number {
     const sim = atAubrune();
+    for (const room of restored)
+      sim.world.progress.memory[`aubrune.maison-du-garde.${room}`] = {
+        v: 'restored',
+        by: 'duo',
+        day: 1,
+      };
     const place = content.places.aubrune;
     const d = place?.map.doors?.[door];
     const target = place?.map.points[spot];
@@ -330,6 +338,7 @@ describe('Aubrune: les deux signalements, joués à pied', () => {
         ['maison-rdc-esc-maison-cave', 'maison-cave'],
       ],
       'cave-lanterne',
+      ['cave'],
     );
     expect(cave).toBeLessThan(0.75);
     const etage = walkIn(
@@ -339,6 +348,7 @@ describe('Aubrune: les deux signalements, joués à pied', () => {
         ['maison-rdc-esc-maison-etage', 'maison-etage'],
       ],
       'maison-etage-milieu',
+      ['etage'],
     );
     expect(etage).toBeLessThan(0.75);
   });

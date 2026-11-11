@@ -9,7 +9,7 @@ import type { Content } from '../../donnees/charger';
 import type { ShopDef } from '../../donnees/schemas/commerce';
 import type { DialogueDef } from '../../donnees/schemas/dialogue';
 import type { ReadonlyWorld } from '../../etat/monde';
-import { isOpen } from '../commerces/prix';
+import { isTrading } from '../commerces/prix';
 
 /** Le dialogue contient-il, quelque part, un effet qui ouvre ce commerce ? */
 function opensItself(dialogue: DialogueDef, shop: string): boolean {
@@ -48,7 +48,6 @@ export function shopOffered(
   dialogue: DialogueDef,
 ): ShopDef | null {
   const shop = talkingShop(look, villager);
-  if (shop === null || !isOpen(shop, look.world.minutes) || opensItself(dialogue, shop.id))
-    return null;
+  if (shop === null || !isTrading(look, shop) || opensItself(dialogue, shop.id)) return null;
   return shop;
 }

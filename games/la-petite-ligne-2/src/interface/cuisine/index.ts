@@ -428,6 +428,9 @@ export function createKitchen(
       case 'craft_started':
       case 'crafted':
       case 'plan_learned':
+      case 'reward_given':
+      case 'decision_changed':
+      case 'map_object_changed':
       case 'shelter_collected':
       case 'shelter_filled':
       case 'shelter_opened':

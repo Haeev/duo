@@ -15,6 +15,9 @@
   "icon": "etagere",
   // Heures d'ouverture, en minutes depuis minuit (8 h = 480, 19 h = 1140). Peut passer minuit.
   "hours": { "from": 480, "to": 1140 },
+  // Facultatif: commerce conditionné par l'histoire, fermé tant qu'une condition est fausse
+  // (le commerçant n'est pas encore arrivé):
+  //   "when": [{ "type": "remembered", "key": "aubrune.acte2.train" }],
   // Ce qu'il vend. Prix en CENTIMES, multiples de 10 (120 = 1,20 €).
   //   dailyStock: exemplaires par réassort, ou null (sans limite).
   //   restockDays (facultatif): jours entre deux réassorts, 1 par défaut (chaque matin).
@@ -37,6 +40,8 @@
   // précis l'emporte. Un objet peut aussi prendre un coefficient du prix de sa famille ici:
   // { "item": "pomme", "factor": 1.5 } (il faut alors une ligne "family" pour sa famille).
   // Tout le reste, il n'en veut pas: l'écran le grise avec la phrase "refusal".
+  // "unlock" (facultatif, comme pour "sells"): il ne rachète cette ligne qu'une fois la condition
+  // vraie: { "item": "truite", "price": 400, "unlock": { "type": "remembered", "key": "..." } }
   "buys": [
     { "item": "pomme", "price": 60 },
     { "family": "material", "price": 40 },
@@ -50,6 +55,14 @@
   "friendship": [{ "hearts": 3, "factor": 1.1 }],
   // Facultatif: ce qu'il dit, avec son caractère, de ce qu'il ne rachète pas.
   "refusal": "Ça ? Je n'en saurais que faire, moi.",
+  // Facultatif: ses répliques de comptoir, dites dans l'écran de boutique après un achat du
+  // joueur (bought), après une vente (sold), quand l'argent manque (noMoney). 150 caractères au
+  // plus chacune; absente, l'écran dit son texte commun (« Merci ! »).
+  "lines": {
+    "bought": "Et avec ça ?",
+    "sold": "Voilà qui fera mon affaire.",
+    "noMoney": "Ah. Il manque quelques sous, je crois.",
+  },
   // Recommandé: le choix offert à la FIN de toute conversation avec le commerçant, boutique
   // ouverte (open: ouvre la boutique, leave: clôt). Ainsi un dialogue de quête ne cache jamais
   // la boutique. Pas de page en plus si le dialogue joué ouvre déjà ce commerce (open_shop).

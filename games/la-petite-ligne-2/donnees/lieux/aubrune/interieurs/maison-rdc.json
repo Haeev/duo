@@ -48,14 +48,26 @@
       "type": "cuisiniere",
       "x": 9.5,
       "y": 6.5,
-      "rotation": 2
+      "rotation": 2,
+      "when": [
+        {
+          "type": "remembered",
+          "key": "aubrune.maison-du-garde.cuisine"
+        }
+      ]
     },
     {
       "id": "maison-plan",
       "type": "plan-de-travail",
       "x": 8,
       "y": 6.5,
-      "rotation": 2
+      "rotation": 2,
+      "when": [
+        {
+          "type": "remembered",
+          "key": "aubrune.maison-du-garde.cuisine"
+        }
+      ]
     },
     {
       "id": "maison-table",
@@ -111,13 +123,27 @@
       "x": 5.5,
       "y": 4.5,
       "facing": 1,
-      "to": "maison-etage-esc-maison-rdc"
+      "to": "maison-etage-esc-maison-rdc",
+      "opens": [
+        {
+          "type": "remembered",
+          "key": "aubrune.maison-du-garde.etage"
+        }
+      ],
+      "says": "Pas d'escalier: l'étage reste à construire."
     },
     "maison-rdc-esc-maison-cave": {
       "x": 0.5,
       "y": 3.5,
       "facing": 2,
-      "to": "maison-cave-esc-maison-rdc"
+      "to": "maison-cave-esc-maison-rdc",
+      "opens": [
+        {
+          "type": "remembered",
+          "key": "aubrune.maison-du-garde.cave"
+        }
+      ],
+      "says": "La trappe est prise sous les gravats: la cave reste à déblayer."
     }
   },
   "pourquoi": "au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de l'étage part de la cuisine, celui de la cave de la chambre",

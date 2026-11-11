@@ -2,15 +2,15 @@
 
 Un habitant vit si sa fiche a un bloc `life` (schéma `src/donnees/schemas/vie-habitant.ts`, gabarit commenté `donnees/_gabarits/habitant.jsonc`). Sans `life`, il reste planté à `stands`. Le moteur ne nomme aucun habitant.
 
-| Fichier       | Rôle                                                                                                                                            |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `index.ts`    | le système: présence, planning, marche, places assises, regard, bonjour, réactions; intention `give_gift`                                       |
-| `planning.ts` | ligne en cours (heure, jour de la semaine, météo, saison, conditions d'histoire), but exact (point, place assise, devant ou derrière un meuble) |
-| `chemins.ts`  | trajet sur le graphe des chemins de la carte (`map.graph`: nœuds et arêtes du plan) ou, à défaut, A* sur la grille; portes franchissables       |
-| `presence.ts` | regard, premier bonjour du jour, réactions déclarées, cadeaux                                                                                   |
-| `lecture.ts`  | lecture pure pour le rendu, l'interface et les commerces: `villagerView`, `isShopOpen`, `hasSomethingFor`                                       |
-| `valider.ts`  | contrôle au chargement (branché dans `donnees/valider.ts`)                                                                                      |
-| `reglages.ts` | valeurs de jeu (marche 1,4 m/s, rayons, fréquences, points des cadeaux)                                                                         |
+| Fichier       | Rôle                                                                                                                                                     |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `index.ts`    | le système: présence, planning, marche, places assises, regard, bonjour, réactions; intention `give_gift`                                                |
+| `planning.ts` | ligne en cours (heure, jour de la semaine, météo, saison, conditions d'histoire), but exact (point, place assise, devant ou derrière un meuble)          |
+| `chemins.ts`  | trajet sur le graphe des chemins de la carte (`map.graph`: nœuds et arêtes du plan) ou, à défaut, A* sur la grille; d'une pièce à l'autre par les portes |
+| `presence.ts` | regard, premier bonjour du jour, réactions déclarées, cadeaux                                                                                            |
+| `lecture.ts`  | lecture pure pour le rendu, l'interface et les commerces: `villagerView`, `isShopOpen`, `hasSomethingFor`                                                |
+| `valider.ts`  | contrôle au chargement (branché dans `donnees/valider.ts`)                                                                                               |
+| `reglages.ts` | valeurs de jeu (marche 1,4 m/s, rayons, fréquences, points des cadeaux)                                                                                  |
 
 ## Règles
 
@@ -24,6 +24,15 @@ Un habitant vit si sa fiche a un bloc `life` (schéma `src/donnees/schemas/vie-h
 - **Conversation**: on lui parle, il s'arrête et écoute; si sa ligne de planning change pendant ce temps, il reprend son trajet à la fin de la conversation (debout, `stand`, en attendant).
 - **Économe**: à plus de `nearRadius` des deux joueurs, un pas sur `farEveryTicks`; le planning se relit tous les `planEveryTicks`. Chemins et minuteries ne sont pas dans l'état: à la reprise d'une sauvegarde ou au retour dans le lieu, chacun est posé à son poste du moment.
 
+## Planning vers un intérieur (recette)
+
+1. Le poste est un point ou un meuble d'un intérieur du lieu (`interieurs/<id>.json`): `{ "point": "<point>" }`, `{ "object": "<comptoir>", "side": "behind" }`, `{ "seat": "<chaise>" }`, ou `{ "bed": "<lit>" }` (brique `sleep`, posture `lie`).
+2. Rien d'autre: `findRoute` découpe le trajet par pièce et franchit les portes (`lieux/traversee.ts`, même seuil que les joueurs); l'événement `villager_door` part à chaque porte.
+3. La nuit au lit: `home` est un point de la même pièce que le lit (contrôlé à 3 h).
+4. Un joueur dans son lit ou sur sa chaise: l'habitant reste debout à côté.
+5. Une scène qui le fait venir (`walk`) le sort d'abord par la porte; le coup d'œil des quêtes (`glanceTarget`) montre la porte à prendre quand le but est dans une autre pièce.
+6. Test court: `tests/planning-interieur.test.ts` (chambre factice, facteur du gabarit).
+
 ## Pour le rendu (lecture seule, chez l'hôte et l'invité)
 
-`villagerView(look, id)`: `visible`, `pose` (`stand`, `walk`, `sit`), `activity`, `gesture` (clip en boucle à son poste), `emote` (onomatopée en cours), `gaze` (joueur 0 ou 1, ou identifiant d'un habitant: la tête suit). Position, cap et vitesse: `body`, canal rapide. Événements: `villager_greeted`, `villager_reacted`, `villager_gift`, `villager_door`, `villager_arrived`, `villager_left`.
+`villagerView(look, id)`: `visible`, `pose` (`stand`, `walk`, `sit`, `lie`: couché sur le meuble `seat`, comme un joueur sur la brique `sleep`), `activity`, `gesture` (clip en boucle à son poste), `emote` (onomatopée en cours), `gaze` (joueur 0 ou 1, ou identifiant d'un habitant: la tête suit). Position, cap et vitesse: `body`, canal rapide. Événements: `villager_greeted`, `villager_reacted`, `villager_gift`, `villager_door`, `villager_arrived`, `villager_left`.

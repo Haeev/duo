@@ -7,6 +7,7 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ChapterEndDef, QuestLineDef, StepEffect } from '../../donnees/schemas/quete';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { agreeFor } from '../dialogues/accords';
+import { doorChain } from '../lieux/traversee';
 import { sceneSeenOn } from './faits';
 import { activeSteps, currentChapter, findQuest } from './moteur';
 import { STORY } from './reglages';
@@ -141,14 +142,21 @@ export function glanceTarget(
     const t = step.target;
     if (t === null) continue;
     const head = { quest, step: step.id, objective: agreeFor(world, player, step.objective) };
+    // Le but est dans une autre pièce (un commerçant derrière son comptoir): le repère mène à la
+    // porte à prendre, pas à travers les murs.
+    const me = world.players[player].body;
+    const via = (x: number, y: number): { x: number; y: number } => {
+      const hop = doorChain(place, me.x, me.y, x, y)?.[0];
+      return hop === undefined ? { x, y } : { x: hop.fromX, y: hop.fromY };
+    };
     if ('point' in t) {
       const point = place.map.points[t.point];
       if (point !== undefined)
-        return { ...head, target: { kind: 'point', id: t.point, x: point.x, y: point.y } };
+        return { ...head, target: { kind: 'point', id: t.point, ...via(point.x, point.y) } };
     } else {
       const body = world.places[found.place]?.villagers[t.villager]?.body;
       if (body !== undefined)
-        return { ...head, target: { kind: 'villager', id: t.villager, x: body.x, y: body.y } };
+        return { ...head, target: { kind: 'villager', id: t.villager, ...via(body.x, body.y) } };
     }
   }
   return null;

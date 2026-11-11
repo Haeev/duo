@@ -59,7 +59,8 @@
         "from": 420,
         "to": 1320,
         "at": {
-          "point": "gr6"
+          "object": "cafe-comptoir",
+          "side": "behind"
         },
         "activity": "tenir-le-cafe",
         "gesture": null,

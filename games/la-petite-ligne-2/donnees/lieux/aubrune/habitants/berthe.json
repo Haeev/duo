@@ -37,7 +37,7 @@
   "stands": "mc",
   "voice": "medium",
   "life": {
-    "home": "mc",
+    "home": "moulin-grenier",
     "schedule": [
       {
         "from": 420,
@@ -52,7 +52,7 @@
         "from": 1260,
         "to": 420,
         "at": {
-          "point": "mc"
+          "point": "moulin-grenier"
         },
         "activity": "dormir",
         "gesture": null

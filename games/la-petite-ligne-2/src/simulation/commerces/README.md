@@ -32,3 +32,11 @@ On ne vend qu'aux commerçants: chacun ne rachète que ce qui touche à son mét
 ## Ajouter un commerce
 
 `pnpm nouveau commerce <id> <lieu>`, remplir d'après le gabarit, poser un comptoir sur la carte ou ajouter l'effet `open_shop` au dialogue du commerçant. Aucun changement de moteur (test « commerce factice »).
+
+## Répliques et commerce conditionnés (recette)
+
+1. Répliques de comptoir: champ `lines` de la fiche (`bought`, `sold`, `noMoney`), plus `refusal` (ce qu'il ne rachète pas). L'écran de boutique les dit à l'achat, à la vente et aux refus `not-enough-money` et `not-wanted` (`shopSays`, `shopSaysRefusal`); sans réplique, son texte commun.
+2. Rachat conditionné: `"unlock": <condition>` sur une ligne de `buys` (comme sur `sells`); faux, il n'en veut pas (`not-wanted`).
+3. Commerce conditionné: `"when": [conditions]` sur la fiche; faux, il est fermé partout (comptoir, dialogue, achats, ventes: `shop-closed`).
+4. En dialogue, « assez d'argent ? »: condition `{ "type": "money_at_least", "amount": <centimes> }` sur une option ou un nœud `branch`.
+5. Rien à toucher au moteur. Test court: `tests/repliques-boutique.test.ts` (échoppe factice).

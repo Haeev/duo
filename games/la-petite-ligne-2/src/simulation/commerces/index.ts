@@ -12,7 +12,15 @@ import type { GameSystem, SimContext } from '../noyau/systemes';
 import { RULES } from '../regles/reglages';
 import { earn } from '../sac/argent';
 import { addItem, countItem, removeItem, roomFor } from '../sac/inventaire';
-import { capLeft, isOpen, isUnlocked, offerFor, restockPeriod, shopDef, stockLeft } from './prix';
+import {
+  capLeft,
+  isTrading,
+  isUnlocked,
+  offerFor,
+  restockPeriod,
+  shopDef,
+  stockLeft,
+} from './prix';
 import { SHOP_TUNING } from './reglages';
 
 /** Raisons de refus des commerces (textes: `interface/boutique/textes.ts`). */
@@ -70,7 +78,7 @@ function access(sim: SimContext, player: PlayerIndex, id: string): ShopDef | nul
     refuse(sim, player, 'too-far', id);
     return null;
   }
-  if (!isOpen(shop, sim.world.minutes)) {
+  if (!isTrading(sim, shop)) {
     refuse(sim, player, 'shop-closed', id);
     return null;
   }
@@ -110,7 +118,7 @@ export function openShop(sim: SimContext, player: PlayerIndex, id: string): void
     refuse(sim, player, 'gone', id);
     return;
   }
-  if (!isOpen(shop, sim.world.minutes)) {
+  if (!isTrading(sim, shop)) {
     refuse(sim, player, 'shop-closed', id);
     return;
   }

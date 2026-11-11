@@ -6,7 +6,7 @@
 import type { Brick } from '../../donnees/schemas/briques';
 import type { BrickBehaviour } from '../briques/types';
 import { openShop } from './index';
-import { isOpen, shopDef } from './prix';
+import { isTrading, shopDef } from './prix';
 
 type ShopBrick = Extract<Brick, { brick: 'shop' }>;
 
@@ -15,7 +15,7 @@ export const shopBehaviour: BrickBehaviour<ShopBrick> = {
   refuse(look, _player, target) {
     const shop = shopDef(look, target.params.shop);
     if (shop === null) return 'gone';
-    return isOpen(shop, look.world.minutes) ? null : 'shop-closed';
+    return isTrading(look, shop) ? null : 'shop-closed';
   },
   use(sim, player, target) {
     openShop(sim, player, target.params.shop);
