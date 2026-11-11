@@ -71,6 +71,59 @@
       "x": 2.5,
       "y": 0.5,
       "rotation": 0
+    },
+    {
+      "id": "marthe-seau",
+      "type": "seau",
+      "x": 4.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "marthe-tapis-de-sol",
+      "type": "tapis-rond",
+      "x": 3,
+      "y": 3,
+      "rotation": 0
+    },
+    {
+      "id": "marthe-chevet",
+      "type": "caisse",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "marthe-lampe",
+      "type": "lampe-a-petrole",
+      "x": 0.5,
+      "y": 4.6,
+      "rotation": 2,
+      "on": "marthe-table"
+    },
+    {
+      "id": "marthe-journal",
+      "type": "journal",
+      "x": 1.4,
+      "y": 4.3,
+      "rotation": 2,
+      "on": "marthe-table"
+    },
+    {
+      "id": "marthe-bouquet",
+      "type": "bouquet",
+      "x": 0.95,
+      "y": 4.65,
+      "rotation": 2,
+      "on": "marthe-table"
+    },
+    {
+      "id": "marthe-missel",
+      "type": "pile-de-livres",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0,
+      "on": "marthe-chevet"
     }
   ],
   "doors": {

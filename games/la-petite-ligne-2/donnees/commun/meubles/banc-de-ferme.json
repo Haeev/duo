@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "banc-de-ferme",
+  "name": "Banc de ferme",
+  "model": "bench-farm",
+  "size": {
+    "w": 2,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "sit",
+      "seats": 2,
+      "restPerMinute": 6
+    }
+  ]
+}

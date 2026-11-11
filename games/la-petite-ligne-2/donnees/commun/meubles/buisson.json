@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "buisson",
+  "name": "Buisson",
+  "model": "berry-bush-bare",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

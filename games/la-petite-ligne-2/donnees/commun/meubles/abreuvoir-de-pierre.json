@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "abreuvoir-de-pierre",
+  "name": "Abreuvoir de pierre",
+  "model": "sink-stone",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "top": 0.85,
+  "bricks": []
+}

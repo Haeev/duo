@@ -166,6 +166,38 @@
       "x": 2.5,
       "y": 0.5,
       "rotation": 0
+    },
+    {
+      "id": "maison-rdc-lampe",
+      "type": "lampe-a-petrole",
+      "x": 7.42,
+      "y": 0.3,
+      "rotation": 0,
+      "on": "maison-table"
+    },
+    {
+      "id": "maison-rdc-pain",
+      "type": "corbeille-de-pain",
+      "x": 6.95,
+      "y": 0.38,
+      "rotation": 0,
+      "on": "maison-table"
+    },
+    {
+      "id": "maison-rdc-journal",
+      "type": "journal",
+      "x": 6.55,
+      "y": 0.68,
+      "rotation": 2,
+      "on": "maison-table"
+    },
+    {
+      "id": "maison-rdc-pots",
+      "type": "pots-de-gres",
+      "x": 8.77,
+      "y": 6.65,
+      "rotation": 3,
+      "on": "maison-plan"
     }
   ],
   "doors": {

@@ -55,6 +55,28 @@
       "x": 1.5,
       "y": 0.5,
       "rotation": 0
+    },
+    {
+      "id": "moulin-etage-caisse",
+      "type": "caisse",
+      "x": 6.5,
+      "y": 2.5,
+      "rotation": 0
+    },
+    {
+      "id": "moulin-etage-tonneau",
+      "type": "tonneau",
+      "x": 6.5,
+      "y": 3.5,
+      "rotation": 0
+    },
+    {
+      "id": "moulin-etage-lampe",
+      "type": "lampe-a-petrole",
+      "x": 6.5,
+      "y": 0.5,
+      "rotation": 3,
+      "on": "moulin-grain-1"
     }
   ],
   "doors": {

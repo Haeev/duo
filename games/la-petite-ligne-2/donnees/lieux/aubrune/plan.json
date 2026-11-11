@@ -3620,10 +3620,10 @@
     },
     {
       "id": "tonneaux-ferme",
-      "type": null,
+      "type": "tonneau",
       "modele": "barrel",
       "x": 196.5,
-      "y": 154.4,
+      "y": 154.5,
       "rotation": 0,
       "pourquoi": "tonneaux de cidre contre le logis",
       "regarde": null,
@@ -3631,10 +3631,10 @@
     },
     {
       "id": "caisses-epicerie",
-      "type": null,
+      "type": "caisse",
       "modele": "crate",
-      "x": 194.7,
-      "y": 113.4,
+      "x": 194.5,
+      "y": 113.5,
       "rotation": 0,
       "pourquoi": "cageots de légumes devant la vitrine d'Odette",
       "regarde": null,
@@ -4205,6 +4205,906 @@
       "y": 94.5,
       "rotation": 0,
       "pourquoi": "le seau de graisse, à côté",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "cloture-potager-n1",
+      "type": "cloture",
+      "modele": "fence",
+      "x": 211,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cloture-potager-n2",
+      "type": "cloture",
+      "modele": "fence",
+      "x": 213,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cloture-potager-n3",
+      "type": "cloture",
+      "modele": "fence",
+      "x": 215,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cloture-potager-n4",
+      "type": "cloture",
+      "modele": "fence",
+      "x": 217,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cloture-potager-n5",
+      "type": "cloture",
+      "modele": "fence",
+      "x": 219,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cloture-potager-n6",
+      "type": "cloture",
+      "modele": "fence",
+      "x": 221,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cloture-potager-e1",
+      "type": "cloture",
+      "modele": "fence",
+      "x": 222.5,
+      "y": 154,
+      "rotation": 1,
+      "pourquoi": "la clôture du potager, côté est",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cloture-potager-e2",
+      "type": "cloture",
+      "modele": "fence",
+      "x": 222.5,
+      "y": 156,
+      "rotation": 1,
+      "pourquoi": "la clôture du potager, côté est; le côté du chemin reste ouvert",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cloture-potager-o1",
+      "type": "cloture",
+      "modele": "fence",
+      "x": 209.5,
+      "y": 154,
+      "rotation": 1,
+      "pourquoi": "la clôture du potager, côté de la cour",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cloture-potager-o2",
+      "type": "cloture",
+      "modele": "fence",
+      "x": 209.5,
+      "y": 156,
+      "rotation": 1,
+      "pourquoi": "la clôture du potager, côté de la cour",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "herbes-pre-1",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 224.5,
+      "y": 149.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré, que la faux n'a pas encore prise",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "buisson-pre-1",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 229.5,
+      "y": 149.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de la haie vive qui borde le pré au nord",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "buisson-pre-2",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 232.5,
+      "y": 150.5,
+      "rotation": 0,
+      "pourquoi": "la haie vive du pré",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "epierrage-1",
+      "type": "rocher",
+      "modele": "rock",
+      "x": 224.5,
+      "y": 153.5,
+      "rotation": 0,
+      "pourquoi": "le tas d'épierrage: les pierres sorties du champ, au coin du potager",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "epierrage-2",
+      "type": "rocher-moussu",
+      "modele": "rock-mossy",
+      "x": 225.5,
+      "y": 153.5,
+      "rotation": 0,
+      "pourquoi": "le tas d'épierrage, les plus vieilles pierres moussues",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "epierrage-3",
+      "type": "rocher",
+      "modele": "rock",
+      "x": 224.5,
+      "y": 154.5,
+      "rotation": 0,
+      "pourquoi": "le tas d'épierrage",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "herbes-pre-2",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 230.5,
+      "y": 153.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "herbes-pre-3",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 228.5,
+      "y": 151.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "bloc-pre",
+      "type": "gros-rocher-moussu",
+      "modele": "boulder-mossy",
+      "x": 210,
+      "y": 167,
+      "rotation": 0,
+      "pourquoi": "le bloc que la charrue contourne depuis toujours, au coin du pré",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "herbes-labour-1",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 212.5,
+      "y": 167.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la tournière, au bout des sillons",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "herbes-labour-2",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 211.5,
+      "y": 169.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la tournière",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "herbes-labour-3",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 209.5,
+      "y": 171.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "herbes-labour-4",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 211.5,
+      "y": 173.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "buisson-labour-1",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 209.5,
+      "y": 163.5,
+      "rotation": 0,
+      "pourquoi": "un buisson au bord du chemin, à l'angle du pré",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "buisson-labour-2",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 213.5,
+      "y": 172.5,
+      "rotation": 0,
+      "pourquoi": "un buisson au bout du labour",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "epierrage-4",
+      "type": "rocher",
+      "modele": "rock",
+      "x": 213.5,
+      "y": 166.5,
+      "rotation": 0,
+      "pourquoi": "les pierres jetées hors du labour, au bord du champ",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "epierrage-5",
+      "type": "rocher-moussu",
+      "modele": "rock-mossy",
+      "x": 213.5,
+      "y": 167.5,
+      "rotation": 0,
+      "pourquoi": "les pierres jetées hors du labour",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "buisson-berge-1",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 187.5,
+      "y": 140.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de berge en haut du talus, les racines dans la pente",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "herbes-berge-1",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 189.5,
+      "y": 140.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du haut de la berge, que personne ne fauche",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "herbes-berge-2",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 196.5,
+      "y": 140.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du haut de la berge",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "herbes-berge-3",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 200.5,
+      "y": 140.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du haut de la berge",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "herbes-berge-4",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 203.5,
+      "y": 141.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du haut de la berge",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "bloc-talus",
+      "type": "gros-rocher-moussu",
+      "modele": "boulder-mossy",
+      "x": 190,
+      "y": 144,
+      "rotation": 0,
+      "pourquoi": "un bloc moussu à mi-pente, tombé du talus il y a longtemps",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "rocher-talus",
+      "type": "rocher",
+      "modele": "rock",
+      "x": 193.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "une pierre du talus",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "herbes-talus-1",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 187.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la pente",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "herbes-talus-2",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 191.5,
+      "y": 148.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la pente",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "herbes-talus-3",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 196.5,
+      "y": 147.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la pente",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "buisson-talus",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 199.5,
+      "y": 143.5,
+      "rotation": 0,
+      "pourquoi": "un buisson au coin du logis, côté rivière",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "buches-pignon",
+      "type": "tas-de-buches",
+      "modele": "log-pile",
+      "x": 199.5,
+      "y": 148.5,
+      "rotation": 0,
+      "pourquoi": "les bûches empilées contre le pignon ouest du logis",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "baquet-margot",
+      "type": "baquet",
+      "modele": "tub",
+      "x": 202,
+      "y": 143.5,
+      "rotation": 0,
+      "pourquoi": "le baquet de lessive de Margot, en haut de la berge: elle rince à la rivière",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "tonneau-cheminots",
+      "type": "tonneau",
+      "modele": "barrel",
+      "x": 147.5,
+      "y": 102.5,
+      "rotation": 0,
+      "pourquoi": "le tonneau d'eau de pluie du jardin des cheminots",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "herbes-voie-1",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 149.5,
+      "y": 100.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute au pied de la clôture de la voie, où la faux ne passe pas",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "herbes-voie-2",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 154.5,
+      "y": 100.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute au pied de la clôture",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "herbes-voie-3",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 155.5,
+      "y": 101.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute au pied de la clôture",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "buisson-cheminots",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 159.5,
+      "y": 101.5,
+      "rotation": 0,
+      "pourquoi": "un buisson qui ferme le pré à l'est",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "rocher-cheminots",
+      "type": "rocher",
+      "modele": "rock",
+      "x": 153.5,
+      "y": 103.5,
+      "rotation": 0,
+      "pourquoi": "une borne de pierre oubliée par la Compagnie",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "caisse-cheminots",
+      "type": "caisse",
+      "modele": "crate",
+      "x": 150.5,
+      "y": 103.5,
+      "rotation": 0,
+      "pourquoi": "une caisse de la Compagnie qui sert de table au jardin",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "herbes-cheminots-1",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 151.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré des cheminots",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "herbes-cheminots-2",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 157.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré des cheminots",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "herbes-cheminots-3",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 143.5,
+      "y": 103.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute au bord du jardin",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "herbes-greve-1",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 194.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "une touffe de joncs au bord de l'eau",
+      "regarde": null,
+      "acte": 1,
+      "vue": "berge"
+    },
+    {
+      "id": "herbes-greve-2",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 198.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "une touffe de joncs au bord de l'eau",
+      "regarde": null,
+      "acte": 1,
+      "vue": "berge"
+    },
+    {
+      "id": "buisson-tonnelle",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 199.5,
+      "y": 123.5,
+      "rotation": 0,
+      "pourquoi": "un sureau au coin de la tonnelle, côté rivière",
+      "regarde": null,
+      "acte": 1,
+      "vue": "berge"
+    },
+    {
+      "id": "buisson-oree-1",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 101.5,
+      "y": 87.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de l'orée: la forêt gagne sur le sous-bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "buisson-oree-2",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 104.5,
+      "y": 86.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de l'orée",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "buisson-oree-3",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 108.5,
+      "y": 87.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de l'orée",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "buisson-oree-4",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 112.5,
+      "y": 86.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de l'orée",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-oree-1",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 102.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-oree-2",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 106.5,
+      "y": 83.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-oree-3",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 110.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-oree-4",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 114.5,
+      "y": 83.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-oree-5",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 103.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-oree-6",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 108.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-oree-7",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 112.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "bloc-oree",
+      "type": "gros-rocher-moussu",
+      "modele": "boulder-mossy",
+      "x": 106,
+      "y": 86,
+      "rotation": 0,
+      "pourquoi": "un bloc moussu au pied de la forêt",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "rocher-oree-1",
+      "type": "rocher-moussu",
+      "modele": "rock-mossy",
+      "x": 110.5,
+      "y": 82.5,
+      "rotation": 0,
+      "pourquoi": "une pierre moussue du sous-bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "rocher-oree-2",
+      "type": "rocher-moussu",
+      "modele": "rock-mossy",
+      "x": 101.5,
+      "y": 81.5,
+      "rotation": 0,
+      "pourquoi": "une pierre moussue du sous-bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "buches-oree",
+      "type": "tas-de-buches",
+      "modele": "log-pile",
+      "x": 114.5,
+      "y": 87.5,
+      "rotation": 0,
+      "pourquoi": "les bûches d'une ancienne coupe, laissées à sécher au bord du bois",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-friche-1",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 94.5,
+      "y": 85.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la friche du garage",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-friche-2",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 97.5,
+      "y": 87.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la friche du garage",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-friche-3",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 95.5,
+      "y": 90.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la friche du garage",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "herbes-friche-4",
+      "type": "herbes-hautes",
+      "modele": "wild-herbs",
+      "x": 98.5,
+      "y": 92.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la friche du garage",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "buisson-friche-1",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 93.5,
+      "y": 88.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de la friche",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "buisson-friche-2",
+      "type": "buisson",
+      "modele": "berry-bush-bare",
+      "x": 96.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de la friche",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "rocher-friche",
+      "type": "rocher",
+      "modele": "rock",
+      "x": 98.5,
+      "y": 89.5,
+      "rotation": 0,
+      "pourquoi": "un rocher laissé là quand on a tracé la voie, dans la friche",
       "regarde": null,
       "acte": 2,
       "vue": "oree"
@@ -4994,6 +5894,36 @@
           "y": 4.5,
           "rotation": 0,
           "pourquoi": "un fût expédié par la ligne, en consigne"
+        },
+        {
+          "id": "halte-lampe",
+          "type": "lampe-de-table",
+          "modele": "table-lamp",
+          "x": 8.45,
+          "y": 0.32,
+          "rotation": 0,
+          "on": "halte-bureau",
+          "pourquoi": "la lampe du bureau de Firmin: il fait ses écritures avant le premier train"
+        },
+        {
+          "id": "halte-registres",
+          "type": "pile-de-livres",
+          "modele": "book-stack",
+          "x": 8.05,
+          "y": 0.3,
+          "rotation": 0,
+          "on": "halte-bureau",
+          "pourquoi": "les registres de la halte (billets, colis, retards)"
+        },
+        {
+          "id": "halte-journal",
+          "type": "journal",
+          "modele": "newspaper",
+          "x": 7.55,
+          "y": 0.65,
+          "rotation": 0,
+          "on": "halte-bureau",
+          "pourquoi": "le journal que le train du matin dépose, devant sa chaise"
         }
       ],
       "points": [
@@ -5159,6 +6089,46 @@
           "y": 0.5,
           "rotation": 0,
           "pourquoi": "le seau des gravats de la chambre en ruine"
+        },
+        {
+          "id": "maison-rdc-lampe",
+          "type": "lampe-a-petrole",
+          "modele": "oil-lamp",
+          "x": 7.42,
+          "y": 0.3,
+          "rotation": 0,
+          "on": "maison-table",
+          "pourquoi": "la lampe du repas, au bout de la table côté mur: on y mange et on y lit le soir"
+        },
+        {
+          "id": "maison-rdc-pain",
+          "type": "corbeille-de-pain",
+          "modele": "bread-basket",
+          "x": 6.95,
+          "y": 0.38,
+          "rotation": 0,
+          "on": "maison-table",
+          "pourquoi": "la miche du jour au milieu de la table"
+        },
+        {
+          "id": "maison-rdc-journal",
+          "type": "journal",
+          "modele": "newspaper",
+          "x": 6.55,
+          "y": 0.68,
+          "rotation": 2,
+          "on": "maison-table",
+          "pourquoi": "le journal du matin, déplié devant la chaise"
+        },
+        {
+          "id": "maison-rdc-pots",
+          "type": "pots-de-gres",
+          "modele": "stoneware-pots",
+          "x": 8.77,
+          "y": 6.65,
+          "rotation": 3,
+          "on": "maison-plan",
+          "pourquoi": "la saumure et le cidre, au bout du plan de travail près de la cuisinière"
         }
       ],
       "points": [
@@ -5234,6 +6204,26 @@
           "y": 0.5,
           "rotation": 0,
           "pourquoi": "un tonnelet de vin oublié par l'ancien garde"
+        },
+        {
+          "id": "maison-cave-bocaux",
+          "type": "bocaux-de-confiture",
+          "modele": "jam-jars",
+          "x": 4.5,
+          "y": 3.3,
+          "rotation": 3,
+          "on": "cave-coffre",
+          "pourquoi": "les confitures de l'ancien garde, au frais sur le coffre"
+        },
+        {
+          "id": "maison-cave-pots",
+          "type": "pots-de-gres",
+          "modele": "stoneware-pots",
+          "x": 4.49,
+          "y": 3.72,
+          "rotation": 0,
+          "on": "cave-coffre",
+          "pourquoi": "les pots de grès de la saumure, à côté"
         }
       ],
       "points": [{ "id": "cave-lanterne", "x": 2.5, "y": 1.5, "role": "poste", "qui": null }],
@@ -5433,6 +6423,46 @@
           "y": 8,
           "rotation": 0,
           "pourquoi": "sous la table du souper"
+        },
+        {
+          "id": "epicerie-rdc-bocaux",
+          "type": "bocaux-de-confiture",
+          "modele": "jam-jars",
+          "x": 2.58,
+          "y": 2.7,
+          "rotation": 1,
+          "on": "epicerie-comptoir",
+          "pourquoi": "les confitures à vendre, devant la balance, côté client"
+        },
+        {
+          "id": "epicerie-rdc-boites",
+          "type": "boites-a-provisions",
+          "modele": "tin-canisters",
+          "x": 2.67,
+          "y": 3.45,
+          "rotation": 1,
+          "on": "epicerie-comptoir",
+          "pourquoi": "les boîtes de sucre et de café au détail, au bord du comptoir"
+        },
+        {
+          "id": "epicerie-rdc-pain",
+          "type": "corbeille-de-pain",
+          "modele": "bread-basket",
+          "x": 2.2,
+          "y": 7.5,
+          "rotation": 0,
+          "on": "epicerie-table",
+          "pourquoi": "le pain du souper des pensionnaires"
+        },
+        {
+          "id": "epicerie-rdc-lampe",
+          "type": "lampe-a-petrole",
+          "modele": "oil-lamp",
+          "x": 1.6,
+          "y": 7.35,
+          "rotation": 0,
+          "on": "epicerie-table",
+          "pourquoi": "la lampe du souper, du côté de la cuisinière"
         }
       ],
       "points": [
@@ -5565,6 +6595,54 @@
           "y": 8,
           "rotation": 0,
           "pourquoi": "le tapis tressé de la chambre d'Odette, à côté du lit"
+        },
+        {
+          "id": "epicerie-etage-chevet",
+          "type": "caisse",
+          "modele": "crate",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "une caisse retournée sert de table de nuit entre les deux lits des pensionnaires"
+        },
+        {
+          "id": "epicerie-etage-odette-chevet",
+          "type": "caisse",
+          "modele": "crate",
+          "x": 1.5,
+          "y": 6.5,
+          "rotation": 0,
+          "pourquoi": "la table de nuit d'Odette, une caisse de l'épicerie, à la tête de son lit"
+        },
+        {
+          "id": "epicerie-etage-chevet-lampe",
+          "type": "lampe-de-table",
+          "modele": "table-lamp",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "on": "epicerie-etage-chevet",
+          "pourquoi": "la lampe des pensionnaires, entre les deux lits"
+        },
+        {
+          "id": "epicerie-etage-odette-livres",
+          "type": "pile-de-livres",
+          "modele": "book-stack",
+          "x": 1.37,
+          "y": 6.5,
+          "rotation": 0,
+          "on": "epicerie-etage-odette-chevet",
+          "pourquoi": "les cahiers de comptes d'Odette, qu'elle reprend au lit"
+        },
+        {
+          "id": "epicerie-etage-odette-lampe",
+          "type": "lampe-a-petrole",
+          "modele": "oil-lamp",
+          "x": 1.67,
+          "y": 6.5,
+          "rotation": 0,
+          "on": "epicerie-etage-odette-chevet",
+          "pourquoi": "sa lampe de chevet"
         }
       ],
       "points": [
@@ -5712,6 +6790,26 @@
           "y": 2.5,
           "rotation": 1,
           "pourquoi": "l'allée de la porte au comptoir"
+        },
+        {
+          "id": "fournil-pain",
+          "type": "corbeille-de-pain",
+          "modele": "bread-basket",
+          "x": 5.15,
+          "y": 2.58,
+          "rotation": 0,
+          "on": "fournil-comptoir",
+          "pourquoi": "la corbeille des pains du jour, devant les miches, côté client"
+        },
+        {
+          "id": "fournil-boites",
+          "type": "boites-a-provisions",
+          "modele": "tin-canisters",
+          "x": 1.93,
+          "y": 0.3,
+          "rotation": 0,
+          "on": "fournil-petrin",
+          "pourquoi": "le sel, le sucre et le levain, au milieu du pétrin"
         }
       ],
       "points": [
@@ -5832,6 +6930,45 @@
           "y": 3.5,
           "rotation": 0,
           "pourquoi": "le tabouret où l'on attend son tour au salon"
+        },
+        {
+          "id": "mercerie-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 0.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "l'eau tiède du shampoing, à côté du fauteuil de coiffure"
+        },
+        {
+          "id": "mercerie-boites-boutons",
+          "type": "boites-a-provisions",
+          "modele": "tin-canisters",
+          "x": 2.77,
+          "y": 1.4,
+          "rotation": 1,
+          "on": "mercerie-comptoir",
+          "pourquoi": "les boîtes de boutons, au bout du comptoir"
+        },
+        {
+          "id": "mercerie-bouquet",
+          "type": "bouquet",
+          "modele": "flower-vase",
+          "x": 2.0,
+          "y": 1.6,
+          "rotation": 0,
+          "on": "mercerie-comptoir",
+          "pourquoi": "le bouquet de Solange au milieu du comptoir: une loge d'actrice garde toujours des fleurs"
+        },
+        {
+          "id": "mercerie-patrons",
+          "type": "pile-de-livres",
+          "modele": "book-stack",
+          "x": 2.35,
+          "y": 1.65,
+          "rotation": 0,
+          "on": "mercerie-comptoir",
+          "pourquoi": "les catalogues de patrons, ouverts aux clientes"
         }
       ],
       "points": [
@@ -5940,6 +7077,53 @@
           "y": 4.5,
           "rotation": 0,
           "pourquoi": "à côté de la porte"
+        },
+        {
+          "id": "forge-fers-neufs",
+          "type": "caisse",
+          "modele": "crate",
+          "x": 4.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "la caisse des fers neufs, sous le râtelier"
+        },
+        {
+          "id": "forge-tonneau",
+          "type": "tonneau",
+          "modele": "barrel",
+          "x": 4.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "l'eau de pluie où l'on remplit le seau de trempe"
+        },
+        {
+          "id": "forge-tabouret",
+          "type": "tabouret-de-ferme",
+          "modele": "stool-farm",
+          "x": 1.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "le tabouret où Mado s'assied pour ferrer, près du foyer"
+        },
+        {
+          "id": "forge-lampe",
+          "type": "lampe-a-petrole",
+          "modele": "oil-lamp",
+          "x": 0.5,
+          "y": 2.25,
+          "rotation": 1,
+          "on": "forge-coffre",
+          "pourquoi": "la lampe de Mado sur le coffre: la forge est sombre hors du foyer"
+        },
+        {
+          "id": "forge-clous",
+          "type": "boites-a-provisions",
+          "modele": "tin-canisters",
+          "x": 0.5,
+          "y": 2.65,
+          "rotation": 1,
+          "on": "forge-coffre",
+          "pourquoi": "les boîtes de clous à ferrer"
         }
       ],
       "points": [
@@ -6065,6 +7249,35 @@
           "y": 5.5,
           "rotation": 0,
           "pourquoi": "la colle et l'huile de lin"
+        },
+        {
+          "id": "atelier-basile-chevilles",
+          "type": "caisse",
+          "modele": "crate",
+          "x": 6.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "la caisse des chevilles et des clous, au bout de l'établi"
+        },
+        {
+          "id": "atelier-basile-carnet",
+          "type": "pile-de-livres",
+          "modele": "book-stack",
+          "x": 3.93,
+          "y": 0.3,
+          "rotation": 0,
+          "on": "basile-etabli",
+          "pourquoi": "le carnet de cotes de Basile, au milieu de l'établi"
+        },
+        {
+          "id": "atelier-basile-lampe",
+          "type": "lampe-a-petrole",
+          "modele": "oil-lamp",
+          "x": 3.23,
+          "y": 0.35,
+          "rotation": 0,
+          "on": "basile-etabli",
+          "pourquoi": "la lampe de l'établi, au bout, loin des copeaux du rabot"
         }
       ],
       "points": [{ "id": "basile-p-etabli", "x": 4, "y": 1.6, "role": "poste", "qui": "Basile" }],
@@ -6229,6 +7442,76 @@
           "y": 2.5,
           "rotation": 1,
           "pourquoi": "l'allée de la porte au comptoir: on s'y essuie les pieds"
+        },
+        {
+          "id": "cafe-pendule",
+          "type": "pendule",
+          "modele": "mantel-clock",
+          "x": 4.3,
+          "y": 1.61,
+          "rotation": 0,
+          "on": "cafe-comptoir",
+          "pourquoi": "la pendule du zinc, cadran vers la salle: les clients y lisent l'heure du train"
+        },
+        {
+          "id": "cafe-boites",
+          "type": "boites-a-provisions",
+          "modele": "tin-canisters",
+          "x": 1.93,
+          "y": 0.3,
+          "rotation": 0,
+          "on": "cafe-plan",
+          "pourquoi": "le café, le sucre et la chicorée, au milieu du plan de travail"
+        },
+        {
+          "id": "cafe-bocaux",
+          "type": "bocaux-de-confiture",
+          "modele": "jam-jars",
+          "x": 1.23,
+          "y": 0.4,
+          "rotation": 1,
+          "on": "cafe-plan",
+          "pourquoi": "les confitures du petit déjeuner, au bout du plan, près de la cuisinière"
+        },
+        {
+          "id": "cafe-bouquet-1",
+          "type": "bouquet",
+          "modele": "flower-vase",
+          "x": 0.28,
+          "y": 3.0,
+          "rotation": 1,
+          "on": "cafe-table-1",
+          "pourquoi": "un bouquet du pré, côté mur: on ne le renverse pas en s'asseyant"
+        },
+        {
+          "id": "cafe-pain",
+          "type": "corbeille-de-pain",
+          "modele": "bread-basket",
+          "x": 0.55,
+          "y": 2.65,
+          "rotation": 1,
+          "on": "cafe-table-1",
+          "pourquoi": "la corbeille de pain des casse-croûte"
+        },
+        {
+          "id": "cafe-journal",
+          "type": "journal",
+          "modele": "newspaper",
+          "x": 5.4,
+          "y": 3.6,
+          "rotation": 3,
+          "on": "cafe-table-2",
+          "pourquoi": "le journal du café, qui passe de table en table"
+        },
+        {
+          "id": "cafe-bouquet-2",
+          "type": "bouquet",
+          "modele": "flower-vase",
+          "x": 5.7,
+          "y": 4.35,
+          "rotation": 3,
+          "on": "cafe-table-2",
+          "pourquoi": "le bouquet de la seconde table, contre le mur est"
         }
       ],
       "points": [
@@ -6333,6 +7616,74 @@
           "y": 4.5,
           "rotation": 0,
           "pourquoi": "l'eau de l'éponge du tableau"
+        },
+        {
+          "id": "ecole-caisse",
+          "type": "caisse",
+          "modele": "crate",
+          "x": 4.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "la caisse des ardoises et des craies, au pied de l'armoire"
+        },
+        {
+          "id": "ecole-tabouret",
+          "type": "tabouret-de-ferme",
+          "modele": "stool-farm",
+          "x": 2.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "le tabouret du maître, à côté du tableau"
+        },
+        {
+          "id": "ecole-registres",
+          "type": "pile-de-livres",
+          "modele": "book-stack",
+          "x": 0.6,
+          "y": 3.5,
+          "rotation": 0,
+          "on": "ecole-table-mairie",
+          "pourquoi": "les registres de l'état civil, sur la table de la mairie"
+        },
+        {
+          "id": "ecole-lampe",
+          "type": "lampe-de-table",
+          "modele": "table-lamp",
+          "x": 1.45,
+          "y": 3.35,
+          "rotation": 0,
+          "on": "ecole-table-mairie",
+          "pourquoi": "la lampe du secrétaire de mairie: Armand écrit le soir"
+        },
+        {
+          "id": "ecole-journal",
+          "type": "journal",
+          "modele": "newspaper",
+          "x": 1.05,
+          "y": 3.65,
+          "rotation": 0,
+          "on": "ecole-table-mairie",
+          "pourquoi": "le journal officiel, à afficher à la porte"
+        },
+        {
+          "id": "ecole-bouquet",
+          "type": "bouquet",
+          "modele": "flower-vase",
+          "x": 0.95,
+          "y": 3.3,
+          "rotation": 0,
+          "on": "ecole-table-mairie",
+          "pourquoi": "le bouquet que les enfants cueillent pour le maître"
+        },
+        {
+          "id": "ecole-cahiers",
+          "type": "pile-de-livres",
+          "modele": "book-stack",
+          "x": 4.5,
+          "y": 1.5,
+          "rotation": 0,
+          "on": "ecole-caisse",
+          "pourquoi": "les cahiers ramassés, à corriger"
         }
       ],
       "points": [{ "id": "armand-tableau", "x": 3.5, "y": 1.5, "role": "poste", "qui": "Armand" }],
@@ -6549,6 +7900,26 @@
           "y": 2.5,
           "rotation": 0,
           "pourquoi": "à côté de l'escalier, hors de son arrivée"
+        },
+        {
+          "id": "poste-lampe",
+          "type": "lampe-de-table",
+          "modele": "table-lamp",
+          "x": 0.5,
+          "y": 2.3,
+          "rotation": 1,
+          "on": "poste-coffre",
+          "pourquoi": "la lampe de l'aiguilleur, sur le coffre"
+        },
+        {
+          "id": "poste-registre",
+          "type": "journal",
+          "modele": "newspaper",
+          "x": 0.5,
+          "y": 2.7,
+          "rotation": 1,
+          "on": "poste-coffre",
+          "pourquoi": "le registre des circulations, ouvert à la page du jour"
         }
       ],
       "points": [{ "id": "poste-bas", "x": 2.5, "y": 1.5, "role": "poste", "qui": null }],
@@ -6680,6 +8051,44 @@
           "y": 0.5,
           "rotation": 0,
           "pourquoi": "à droite de la porte"
+        },
+        {
+          "id": "moulin-caisse",
+          "type": "caisse",
+          "modele": "crate",
+          "x": 5.5,
+          "y": 6.5,
+          "rotation": 0,
+          "pourquoi": "la caisse du son, à côté du coffre aux sacs"
+        },
+        {
+          "id": "moulin-tonneau",
+          "type": "tonneau",
+          "modele": "barrel",
+          "x": 6.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "le tonneau de farine blutée, prêt à livrer (le coffre aux sacs reste abordable par le nord)"
+        },
+        {
+          "id": "moulin-lampe",
+          "type": "lampe-a-petrole",
+          "modele": "oil-lamp",
+          "x": 6.5,
+          "y": 6.3,
+          "rotation": 3,
+          "on": "moulin-sacs",
+          "pourquoi": "la lampe de Berthe, sur le coffre aux sacs"
+        },
+        {
+          "id": "moulin-moutures",
+          "type": "pile-de-livres",
+          "modele": "book-stack",
+          "x": 6.5,
+          "y": 6.7,
+          "rotation": 3,
+          "on": "moulin-sacs",
+          "pourquoi": "le livre des moutures: qui a apporté quoi, et combien"
         }
       ],
       "points": [{ "id": "berthe-meules", "x": 4.5, "y": 3.5, "role": "poste", "qui": "Berthe" }],
@@ -6739,6 +8148,34 @@
           "y": 0.5,
           "rotation": 0,
           "pourquoi": "le linge de Berthe, à la tête du lit"
+        },
+        {
+          "id": "moulin-etage-caisse",
+          "type": "caisse",
+          "modele": "crate",
+          "x": 6.5,
+          "y": 2.5,
+          "rotation": 0,
+          "pourquoi": "une caisse de grain, à la suite des coffres"
+        },
+        {
+          "id": "moulin-etage-tonneau",
+          "type": "tonneau",
+          "modele": "barrel",
+          "x": 6.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "le tonneau de son du grenier"
+        },
+        {
+          "id": "moulin-etage-lampe",
+          "type": "lampe-a-petrole",
+          "modele": "oil-lamp",
+          "x": 6.5,
+          "y": 0.5,
+          "rotation": 3,
+          "on": "moulin-grain-1",
+          "pourquoi": "la lampe du grenier, posée sur le coffre à grain"
         }
       ],
       "points": [
@@ -6897,6 +8334,36 @@
           "y": 3,
           "rotation": 0,
           "pourquoi": "sous la table"
+        },
+        {
+          "id": "ferme-logis-lampe",
+          "type": "lampe-a-petrole",
+          "modele": "oil-lamp",
+          "x": 6.4,
+          "y": 2.35,
+          "rotation": 0,
+          "on": "logis-table",
+          "pourquoi": "la lampe de la veillée, au bout de la table"
+        },
+        {
+          "id": "ferme-logis-pain",
+          "type": "corbeille-de-pain",
+          "modele": "bread-basket",
+          "x": 5.85,
+          "y": 2.55,
+          "rotation": 0,
+          "on": "logis-table",
+          "pourquoi": "la miche de la ferme"
+        },
+        {
+          "id": "ferme-logis-pots",
+          "type": "pots-de-gres",
+          "modele": "stoneware-pots",
+          "x": 1.23,
+          "y": 0.4,
+          "rotation": 1,
+          "on": "logis-plan",
+          "pourquoi": "les pots de grès du lard et du cidre, au bout du plan près de la cuisinière"
         }
       ],
       "points": [
@@ -6986,6 +8453,73 @@
           "y": 0.5,
           "rotation": 0,
           "pourquoi": "sous la fenêtre"
+        },
+        {
+          "id": "marthe-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 4.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "l'eau de la toilette, dans le coin le plus loin du lit"
+        },
+        {
+          "id": "marthe-tapis-de-sol",
+          "type": "tapis-rond",
+          "modele": "rug-round",
+          "x": 3,
+          "y": 3,
+          "rotation": 0,
+          "pourquoi": "le tapis tressé devant la porte"
+        },
+        {
+          "id": "marthe-chevet",
+          "type": "caisse",
+          "modele": "crate",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "une caisse en guise de table de chevet, à la tête du lit"
+        },
+        {
+          "id": "marthe-lampe",
+          "type": "lampe-a-petrole",
+          "modele": "oil-lamp",
+          "x": 0.5,
+          "y": 4.6,
+          "rotation": 2,
+          "on": "marthe-table",
+          "pourquoi": "la lampe de Marthe, du côté du mur"
+        },
+        {
+          "id": "marthe-journal",
+          "type": "journal",
+          "modele": "newspaper",
+          "x": 1.4,
+          "y": 4.3,
+          "rotation": 2,
+          "on": "marthe-table",
+          "pourquoi": "le journal, devant sa chaise: elle y vérifie l'heure des offices"
+        },
+        {
+          "id": "marthe-bouquet",
+          "type": "bouquet",
+          "modele": "flower-vase",
+          "x": 0.95,
+          "y": 4.65,
+          "rotation": 2,
+          "on": "marthe-table",
+          "pourquoi": "le bouquet qu'elle prend aux fleurs de l'autel quand elles fanent"
+        },
+        {
+          "id": "marthe-missel",
+          "type": "pile-de-livres",
+          "modele": "book-stack",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "on": "marthe-chevet",
+          "pourquoi": "son missel et l'almanach, au chevet"
         }
       ],
       "points": [{ "id": "marthe-lit-p", "x": 1.5, "y": 1.5, "role": "lit", "qui": "Marthe" }],

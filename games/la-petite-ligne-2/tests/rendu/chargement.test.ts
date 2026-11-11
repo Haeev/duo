@@ -50,11 +50,12 @@ describe('description d’un lieu', () => {
         const prop = content.props[object.type];
         expect(volume, object.id).toBeDefined();
         if (volume === undefined || prop === undefined) continue;
-        expect(volume.aimable).toBe(true);
+        // Un objet posé sur un meuble (`on`) ne se vise pas: la touche reste celle du porteur.
+        expect(volume.aimable, object.id).toBe(object.on === undefined);
         // L'objet visible d'une porte est dessiné sur son seuil, en porte: pas à la taille du meuble.
         if (volume.shape === 'door' || volume.shape === 'mat' || volume.shape === 'hatch') continue;
         expect(volume.model).toBe(prop.model);
-        expect(volume.aimable).toBe(true);
+        expect(volume.aimable, object.id).toBe(object.on === undefined);
         // L'emprise tournée est celle des données: un quart de tour échange largeur et profondeur.
         const size = footprint(volume);
         expect(size).toEqual(

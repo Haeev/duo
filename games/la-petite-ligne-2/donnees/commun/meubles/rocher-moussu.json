@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "rocher-moussu",
+  "name": "Rocher moussu",
+  "model": "rock-mossy",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

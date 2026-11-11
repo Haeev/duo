@@ -125,6 +125,22 @@
       "x": 3.5,
       "y": 2.5,
       "rotation": 1
+    },
+    {
+      "id": "fournil-pain",
+      "type": "corbeille-de-pain",
+      "x": 5.15,
+      "y": 2.58,
+      "rotation": 0,
+      "on": "fournil-comptoir"
+    },
+    {
+      "id": "fournil-boites",
+      "type": "boites-a-provisions",
+      "x": 1.93,
+      "y": 0.3,
+      "rotation": 0,
+      "on": "fournil-petrin"
     }
   ],
   "doors": {

@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "rocher",
+  "name": "Rocher",
+  "model": "rock",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

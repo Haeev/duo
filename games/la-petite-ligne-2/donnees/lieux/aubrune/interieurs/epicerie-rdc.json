@@ -173,6 +173,38 @@
       "x": 2,
       "y": 8,
       "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-bocaux",
+      "type": "bocaux-de-confiture",
+      "x": 2.58,
+      "y": 2.7,
+      "rotation": 1,
+      "on": "epicerie-comptoir"
+    },
+    {
+      "id": "epicerie-rdc-boites",
+      "type": "boites-a-provisions",
+      "x": 2.67,
+      "y": 3.45,
+      "rotation": 1,
+      "on": "epicerie-comptoir"
+    },
+    {
+      "id": "epicerie-rdc-pain",
+      "type": "corbeille-de-pain",
+      "x": 2.2,
+      "y": 7.5,
+      "rotation": 0,
+      "on": "epicerie-table"
+    },
+    {
+      "id": "epicerie-rdc-lampe",
+      "type": "lampe-a-petrole",
+      "x": 1.6,
+      "y": 7.35,
+      "rotation": 0,
+      "on": "epicerie-table"
     }
   ],
   "doors": {

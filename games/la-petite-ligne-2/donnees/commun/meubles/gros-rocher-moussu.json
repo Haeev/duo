@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "gros-rocher-moussu",
+  "name": "Gros rocher moussu",
+  "model": "boulder-mossy",
+  "size": {
+    "w": 2,
+    "h": 2
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

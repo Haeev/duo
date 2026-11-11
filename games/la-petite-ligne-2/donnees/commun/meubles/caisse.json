@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "caisse",
+  "name": "Caisse",
+  "model": "crate",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "top": 0.6,
+  "bricks": []
+}

@@ -78,6 +78,60 @@
       "x": 1.5,
       "y": 4.5,
       "rotation": 0
+    },
+    {
+      "id": "ecole-caisse",
+      "type": "caisse",
+      "x": 4.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "ecole-tabouret",
+      "type": "tabouret-de-ferme",
+      "x": 2.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "ecole-registres",
+      "type": "pile-de-livres",
+      "x": 0.6,
+      "y": 3.5,
+      "rotation": 0,
+      "on": "ecole-table-mairie"
+    },
+    {
+      "id": "ecole-lampe",
+      "type": "lampe-de-table",
+      "x": 1.45,
+      "y": 3.35,
+      "rotation": 0,
+      "on": "ecole-table-mairie"
+    },
+    {
+      "id": "ecole-journal",
+      "type": "journal",
+      "x": 1.05,
+      "y": 3.65,
+      "rotation": 0,
+      "on": "ecole-table-mairie"
+    },
+    {
+      "id": "ecole-bouquet",
+      "type": "bouquet",
+      "x": 0.95,
+      "y": 3.3,
+      "rotation": 0,
+      "on": "ecole-table-mairie"
+    },
+    {
+      "id": "ecole-cahiers",
+      "type": "pile-de-livres",
+      "x": 4.5,
+      "y": 1.5,
+      "rotation": 0,
+      "on": "ecole-caisse"
     }
   ],
   "doors": {

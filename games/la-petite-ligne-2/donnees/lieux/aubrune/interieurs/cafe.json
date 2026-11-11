@@ -135,6 +135,62 @@
       "x": 3.5,
       "y": 2.5,
       "rotation": 1
+    },
+    {
+      "id": "cafe-pendule",
+      "type": "pendule",
+      "x": 4.3,
+      "y": 1.61,
+      "rotation": 0,
+      "on": "cafe-comptoir"
+    },
+    {
+      "id": "cafe-boites",
+      "type": "boites-a-provisions",
+      "x": 1.93,
+      "y": 0.3,
+      "rotation": 0,
+      "on": "cafe-plan"
+    },
+    {
+      "id": "cafe-bocaux",
+      "type": "bocaux-de-confiture",
+      "x": 1.23,
+      "y": 0.4,
+      "rotation": 1,
+      "on": "cafe-plan"
+    },
+    {
+      "id": "cafe-bouquet-1",
+      "type": "bouquet",
+      "x": 0.28,
+      "y": 3.0,
+      "rotation": 1,
+      "on": "cafe-table-1"
+    },
+    {
+      "id": "cafe-pain",
+      "type": "corbeille-de-pain",
+      "x": 0.55,
+      "y": 2.65,
+      "rotation": 1,
+      "on": "cafe-table-1"
+    },
+    {
+      "id": "cafe-journal",
+      "type": "journal",
+      "x": 5.4,
+      "y": 3.6,
+      "rotation": 3,
+      "on": "cafe-table-2"
+    },
+    {
+      "id": "cafe-bouquet-2",
+      "type": "bouquet",
+      "x": 5.7,
+      "y": 4.35,
+      "rotation": 3,
+      "on": "cafe-table-2"
     }
   ],
   "doors": {

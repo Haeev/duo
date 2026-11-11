@@ -102,7 +102,12 @@ describe('maison du garde d’Aubrune (données livrées)', () => {
 
   it('cuisinière et plan de travail à l’achat de la cuisine', () => {
     const sim = atAubrune();
-    expect([...absentObjects(sim)].sort()).toEqual(['maison-cuisiniere', 'maison-plan']);
+    // Les pots de grès posés sur le plan de travail (`on`) s'en vont et reviennent avec lui.
+    expect([...absentObjects(sim)].sort()).toEqual([
+      'maison-cuisiniere',
+      'maison-plan',
+      'maison-rdc-pots',
+    ]);
     sim.world.progress.memory['aubrune.maison-du-garde.cuisine'] = {
       v: 'restored',
       by: 'duo',

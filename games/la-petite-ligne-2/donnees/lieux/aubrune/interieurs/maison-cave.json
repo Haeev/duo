@@ -44,6 +44,22 @@
       "x": 4.5,
       "y": 0.5,
       "rotation": 0
+    },
+    {
+      "id": "maison-cave-bocaux",
+      "type": "bocaux-de-confiture",
+      "x": 4.5,
+      "y": 3.3,
+      "rotation": 3,
+      "on": "cave-coffre"
+    },
+    {
+      "id": "maison-cave-pots",
+      "type": "pots-de-gres",
+      "x": 4.49,
+      "y": 3.72,
+      "rotation": 0,
+      "on": "cave-coffre"
     }
   ],
   "doors": {

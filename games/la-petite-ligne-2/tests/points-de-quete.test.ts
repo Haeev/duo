@@ -30,7 +30,7 @@ const PROLOGUE = content.settings.start.place;
 type Json = Record<string, unknown>;
 interface RoomJson {
   blocked: { x: number; y: number; w: number; h: number }[];
-  objects: { id: string; x: number; y: number; rotation: number }[];
+  objects: { id: string; x: number; y: number; rotation: number; on?: string | number }[];
 }
 
 /** Les éléments inaccessibles d'Aubrune après une retouche des fiches (copie des données). */
@@ -48,9 +48,14 @@ function room(files: Record<string, Json>, id: string): RoomJson {
   return r as unknown as RoomJson;
 }
 
+/** Déplace un meuble; ce qui est posé dessus (`on`) le suit (même décalage). */
 function move(r: RoomJson, id: string, x: number, y: number, rotation: number): void {
   const o = r.objects.find((m) => m.id === id);
   if (o === undefined) throw new Error(`meuble ${id} absent`);
+  const dx = x - o.x;
+  const dy = y - o.y;
+  for (const posed of r.objects)
+    if (posed.on === id) Object.assign(posed, { x: posed.x + dx, y: posed.y + dy });
   Object.assign(o, { x, y, rotation });
 }
 
