@@ -1,0 +1,370 @@
+{
+  "aide": "Configuration de publier-sons.mjs: noms français, familles d'effets et phrases « où et quand ». Les faits (fichiers, règles, durées, dates) viennent du jeu; ici, seulement les mots.",
+  "jeu": "games/la-petite-ligne-2",
+  "titreJeu": "La Petite Ligne (refonte)",
+  "documentSonore": "docs/jeux/jeu-1/refonte/son.md",
+  "debitKbps": 96,
+  "plafondTotalMo": 25,
+  "plafondFichierMo": 15,
+  "nouveauDepuis": "2026-11-11",
+  "silenceEntreVariantes": 0.4,
+  "nonBranche": "Pas encore branché dans le jeu: rien ne le déclenche pour l'instant.",
+  "lieuxEssai": ["essai-gare", "essai-halte"],
+
+  "sections": [
+    { "id": "musiques", "titre": "Musiques d'ambiance", "sorte": "morceaux" },
+    {
+      "id": "airs",
+      "titre": "Airs de la collection",
+      "sorte": "airs",
+      "nonBranche": "Pas encore branché dans le jeu: le bouton « Écouter » du carnet n'est pas encore relié, et aucune règle de musique ne le joue."
+    },
+    { "id": "jingles", "titre": "Jingles", "sorte": "jingles" },
+    {
+      "id": "peche",
+      "titre": "Effets: pêche",
+      "sorte": "effets",
+      "sons": [
+        "peche-lancer",
+        "peche-touche",
+        "peche-moulinet",
+        "peche-prise",
+        "peche-bouchon",
+        "peche-casse"
+      ]
+    },
+    {
+      "id": "cuisine",
+      "titre": "Effets: cuisine",
+      "sorte": "effets",
+      "sons": ["cuisine-decoupe", "cuisine-mijote", "cuisine-friture", "plat-reussi", "plat-rate"]
+    },
+    {
+      "id": "meubles",
+      "titre": "Effets: meubles",
+      "sorte": "effets",
+      "sons": ["meuble-soulever", "meuble-poser", "meuble-tourner", "meuble-ranger"]
+    },
+    {
+      "id": "portes-boutique",
+      "titre": "Effets: portes, boutique et argent",
+      "sorte": "effets",
+      "sons": ["porte", "clochette-boutique", "pieces-vente", "pieces-achat", "monnaie"]
+    },
+    {
+      "id": "histoire",
+      "titre": "Effets: histoire (cloches, passage à niveau, 5 h 12)",
+      "sorte": "effets",
+      "sons": [
+        "cloche-marthe",
+        "cloche-marthe-coup",
+        "cloche-felee",
+        "passage-a-niveau",
+        "cinq-douze"
+      ]
+    },
+    {
+      "id": "train-journee",
+      "titre": "Effets: train et journée",
+      "sorte": "effets",
+      "sons": ["train-arrive", "embarquement", "reveil"]
+    },
+    {
+      "id": "pas",
+      "titre": "Effets: pas",
+      "sorte": "effets",
+      "sons": [
+        "pas-herbe",
+        "pas-terre",
+        "pas-pave",
+        "pas-bois",
+        "pas-gravier",
+        "pas-eau",
+        "pas-tapis"
+      ]
+    },
+    {
+      "id": "gestes",
+      "titre": "Effets: gestes et objets",
+      "sorte": "effets",
+      "sons": [
+        "reussite",
+        "ramasser",
+        "poser",
+        "asseoir",
+        "rangement-ouvre",
+        "rangement-ferme",
+        "eau-pompe",
+        "photo-declic"
+      ]
+    },
+    {
+      "id": "interface",
+      "titre": "Effets: interface",
+      "sorte": "effets",
+      "sons": [
+        "cible",
+        "choix",
+        "refus",
+        "sac-plein",
+        "carnet-ouvre",
+        "carnet-ferme",
+        "page",
+        "palier-bas",
+        "palier-bonus",
+        "decision-accord",
+        "decision-desaccord"
+      ]
+    },
+    { "id": "ambiances", "titre": "Ambiances de fond", "sorte": "ambiances" },
+    { "id": "voix", "titre": "Voix des habitants (babil)", "sorte": "voix" },
+    { "id": "autres", "titre": "Autres effets", "sorte": "effets", "sons": [] }
+  ],
+
+  "noms": {
+    "musique-bourg-aube": "Le bourg à l'aube",
+    "musique-bourg-matin": "Le bourg le matin",
+    "musique-bourg-apres-midi": "Le bourg l'après-midi",
+    "musique-bourg-soir": "Le bourg le soir",
+    "musique-bourg-nuit": "Le bourg la nuit",
+    "musique-bourg-pluie": "Le bourg sous la pluie",
+    "musique-riviere": "La rivière",
+    "musique-train": "Le train",
+    "musique-mystere": "Le mystère de 5 h 12",
+    "musique-fete": "Le bal de la fête",
+    "jingle-prise-nouvelle": "Nouvelle trouvaille",
+    "jingle-etape-quete": "Étape de quête",
+    "jingle-quete-terminee": "Quête terminée",
+    "jingle-reveil": "Réveil",
+    "jingle-repas-partage": "Repas partagé",
+    "jingle-collection-complete": "Collection complète",
+    "jingle-arrivee-aubrune": "Arrivée à Aubrune",
+    "effet-peche-lancer": "Lancer la ligne",
+    "effet-peche-touche": "Ça mord",
+    "effet-peche-moulinet": "Moulinet",
+    "effet-peche-prise": "Poisson sorti de l'eau",
+    "effet-peche-bouchon": "Le bouchon remonte",
+    "effet-peche-casse": "Le poisson se décroche",
+    "effet-cuisine-decoupe": "Découpe",
+    "effet-cuisine-mijote": "Mijoter",
+    "effet-cuisine-friture": "Friture",
+    "effet-plat-reussi": "Plat réussi",
+    "effet-plat-rate": "Plat raté",
+    "effet-meuble-soulever": "Soulever un meuble",
+    "effet-meuble-poser": "Poser un meuble",
+    "effet-meuble-tourner": "Tourner un meuble",
+    "effet-meuble-ranger": "Ranger un meuble",
+    "effet-porte": "Porte",
+    "effet-clochette-boutique": "Clochette de la boutique",
+    "effet-pieces-vente": "Encaisser des pièces",
+    "effet-pieces-achat": "Payer",
+    "effet-monnaie": "Monnaie (ancien son)",
+    "effet-cloche-marthe": "La grande cloche, trois coups",
+    "effet-cloche-marthe-coup": "La grande cloche, un coup (les heures)",
+    "effet-cloche-felee": "La Fêlée",
+    "effet-passage-a-niveau": "Sonnerie du passage à niveau",
+    "effet-cinq-douze": "Le 5 h 12",
+    "effet-train-arrive": "Le train arrive",
+    "effet-embarquement": "Montée à bord",
+    "effet-reveil": "Réveil du matin",
+    "effet-pas-herbe": "Pas dans l'herbe",
+    "effet-pas-terre": "Pas sur la terre",
+    "effet-pas-pave": "Pas sur les pavés",
+    "effet-pas-bois": "Pas sur le plancher",
+    "effet-pas-gravier": "Pas sur le gravier",
+    "effet-pas-eau": "Pas dans l'eau",
+    "effet-pas-tapis": "Pas sur un tapis",
+    "effet-reussite": "Geste réussi",
+    "effet-ramasser": "Ramasser",
+    "effet-poser": "Poser",
+    "effet-asseoir": "S'asseoir",
+    "effet-rangement-ouvre": "Ouvrir un rangement",
+    "effet-rangement-ferme": "Fermer un rangement",
+    "effet-eau-pompe": "Eau de la pompe",
+    "effet-photo-declic": "Déclic de l'appareil photo",
+    "effet-cible": "Cible visée",
+    "effet-choix": "Choix",
+    "effet-refus": "Refus",
+    "effet-sac-plein": "Sac plein",
+    "effet-carnet-ouvre": "Ouvrir le carnet",
+    "effet-carnet-ferme": "Fermer le carnet",
+    "effet-page": "Page de dialogue",
+    "effet-palier-bas": "Besoin bas",
+    "effet-palier-bonus": "Besoin comblé",
+    "effet-decision-accord": "Décision à deux: d'accord",
+    "effet-decision-desaccord": "Décision à deux: pas d'accord",
+    "ambiance-jour": "Ambiance de jour",
+    "ambiance-nuit": "Ambiance de nuit",
+    "ambiance-trajet": "Dans le train",
+    "voix-flute": "Voix à la flûte",
+    "voix-clarinette": "Voix à la clarinette",
+    "voix-marimba": "Voix au marimba",
+    "voix-basson": "Voix au basson",
+    "voix-boite-a-musique": "Voix à la boîte à musique",
+    "voix-ocarina": "Voix à l'ocarina"
+  },
+
+  "descriptions": {
+    "ambiance-jour": "Vent, feuillage et oiseaux, en boucle de 32 s.",
+    "ambiance-nuit": "Vent grave et grillons, en boucle de 32 s.",
+    "ambiance-trajet": "Les rails sous le wagon, en boucle de 8 s.",
+    "voix": "Une seule note de l'instrument. En jeu, elle est rejouée à plusieurs hauteurs, une par lettre écrite: voyelle plus longue, consonne plus brève, la phrase monte à la question."
+  },
+
+  "audience": {
+    "both": "les deux joueurs l'entendent",
+    "own": "seul le joueur concerné l'entend",
+    "other": "seul l'autre joueur l'entend",
+    "signal": "seul le joueur qui agit l'entend"
+  },
+
+  "evenements": {
+    "gesture_started clip=wash": "quand on se lave les mains à la pompe",
+    "gesture_done clip=pickup": "quand on ramasse un objet",
+    "gesture_done": "quand un geste aboutit et n'a pas de son à lui",
+    "refused": "quand une action est refusée",
+    "brick_used brick=sit": "quand on s'assoit",
+    "store_opened": "quand on ouvre un rangement",
+    "pockets_full": "quand le sac est plein",
+    "tool_blunt": "quand l'outil est émoussé",
+    "money_changed delta>0": "quand on gagne de l'argent (vente, récompense)",
+    "money_changed delta<0": "quand on dépense de l'argent (achat, loyer)",
+    "fish_cast": "quand on lance sa ligne",
+    "fish_hooked": "quand un poisson mord",
+    "fish_caught": "quand on sort un poisson de l'eau",
+    "fish_lost reason=escaped": "quand le poisson se décroche",
+    "fish_lost reason=missed": "quand on rate le ferrage",
+    "fish_lost reason=cancelled": "quand on range sa ligne sans prise",
+    "dish_cooked quality=1": "quand un plat est raté",
+    "dish_cooked": "quand un plat est réussi",
+    "deco_changed action=rotate": "quand on tourne un meuble",
+    "deco_changed action=drop": "quand on pose un meuble",
+    "deco_changed action=cancel": "quand on annule le déplacement d'un meuble",
+    "deco_changed action=store": "quand on range un meuble",
+    "deco_changed": "quand on soulève ou prend un meuble",
+    "cook_step_done kind=chop": "quand on découpe en cuisine",
+    "cook_step_done kind=stir": "quand on remue la marmite",
+    "cook_step_done kind=heat": "quand on fait chauffer",
+    "calendar_started": "quand arrive {event} (le train passe la barrière)",
+    "clock_struck": "aux heures pleines, de 7 h à 19 h, un coup par heure",
+    "door_passed": "quand on passe une porte",
+    "shop_opened": "quand on ouvre une boutique",
+    "decision_changed state=agreed": "quand vous tombez d'accord sur une décision à deux",
+    "decision_changed state=split": "quand vos choix divergent sur une décision à deux",
+    "photo_taken": "quand on prend une photo",
+    "scene_beat": "pendant la scène {scene}",
+    "need_tier state=low": "quand un besoin devient bas",
+    "need_tier state=blocked": "quand un besoin bloque",
+    "need_tier state=bonus": "quand un besoin est comblé",
+    "meal_shared": "quand vous partagez un repas",
+    "talk_page": "à chaque page de dialogue",
+    "day_started slept=true": "au réveil, quand vous avez dormi tous les deux",
+    "train_boarded to=nonnul": "quand vous montez dans le train",
+    "train_arrived": "quand le train arrive en gare",
+    "collection_found first=true": "quand on trouve une pièce de collection pour la première fois",
+    "quest_step_done": "quand une étape de quête est faite",
+    "quest_done": "quand une quête est terminée",
+    "collection_completed": "quand une collection est complète"
+  },
+
+  "signaux": {
+    "carnet-ouvre": "quand on ouvre le carnet",
+    "carnet-ferme": "quand on ferme le carnet",
+    "rangement-ferme": "quand on ferme un rangement",
+    "choix": "à chaque choix dans un menu (saison, assiette)",
+    "poser": "quand on pose le plat terminé en cuisine",
+    "refus": "quand l'interface refuse une action",
+    "cuisine-chop": "à chaque coup de couteau, chez celui qui cuisine",
+    "cuisine-stir": "à chaque tour de cuillère, chez celui qui cuisine",
+    "cuisine-heat": "quand on met sur le feu, chez celui qui cuisine",
+    "peche-moulinet": "à chaque tour de moulinet pendant la tirée",
+    "peche-bouchon": "quand le bouchon remonte, chez celui qui pêche",
+    "meuble-tourner": "quand on tourne un meuble, chez celui qui décore"
+  },
+  "signauxConstruits": {
+    "cuisine-chop": { "fichier": "src/interface/index.ts", "motif": "`cuisine-${cue.kind}`" },
+    "cuisine-stir": { "fichier": "src/interface/index.ts", "motif": "`cuisine-${cue.kind}`" },
+    "cuisine-heat": { "fichier": "src/interface/index.ts", "motif": "`cuisine-${cue.kind}`" }
+  },
+
+  "branchementsDirects": {
+    "cible": {
+      "phrase": "quand l'objet ou l'habitant visé change",
+      "audience": "signal",
+      "preuve": { "fichier": "src/audio/moteur.ts", "motif": "tables.events.aim" }
+    },
+    "pas-herbe": {
+      "phrase": "à chaque foulée sur l'herbe (une tous les 0,85 m)",
+      "audience": "both",
+      "preuve": { "fichier": "src/main.ts", "motif": "createSurfaceLookup" }
+    },
+    "pas-terre": {
+      "phrase": "à chaque foulée sur la terre, le sable, la vase ou au potager",
+      "audience": "both",
+      "preuve": { "fichier": "src/main.ts", "motif": "createSurfaceLookup" }
+    },
+    "pas-pave": {
+      "phrase": "à chaque foulée sur les pavés",
+      "audience": "both",
+      "preuve": { "fichier": "src/main.ts", "motif": "createSurfaceLookup" }
+    },
+    "pas-bois": {
+      "phrase": "à chaque foulée sur un plancher",
+      "audience": "both",
+      "preuve": { "fichier": "src/main.ts", "motif": "createSurfaceLookup" }
+    },
+    "pas-gravier": {
+      "phrase": "à chaque foulée sur les galets ou le ballast de la voie",
+      "audience": "both",
+      "preuve": { "fichier": "src/main.ts", "motif": "createSurfaceLookup" }
+    },
+    "pas-eau": {
+      "phrase": "à chaque foulée dans l'eau d'un gué",
+      "audience": "both",
+      "preuve": { "fichier": "src/main.ts", "motif": "createSurfaceLookup" }
+    },
+    "pas-tapis": {
+      "phrase": "à chaque foulée sur un tapis",
+      "audience": "both",
+      "preuve": { "fichier": "src/main.ts", "motif": "createSurfaceLookup" }
+    }
+  },
+
+  "voix": {
+    "phrase": "quand parle un habitant à la voix {caracteres} ({habitants})",
+    "preuve": { "fichier": "src/main.ts", "motif": "sound.onBabble" }
+  },
+
+  "ambiances": {
+    "day": "de jour, en fond continu; elle se fond avec la nuit de {aube} et de {soir}",
+    "night": "la nuit, en fond continu; elle se fond avec le jour de {aube} et de {soir}",
+    "travel": "pendant le voyage en train, à la place des ambiances de jour et de nuit"
+  },
+
+  "musique": {
+    "lieux": { "aubrune": "à Aubrune" },
+    "zones": { "riviere": "au bord de la rivière" },
+    "tranches": {
+      "cinq-douze": "vers 5 h 12",
+      "aube": "à l'aube",
+      "matin": "le matin",
+      "apres-midi": "l'après-midi",
+      "soir": "le soir",
+      "nuit": "la nuit"
+    },
+    "meteo": { "rain": "pluie", "storm": "orage", "snow": "neige", "mist": "brume" },
+    "saisons": { "spring": "printemps", "summer": "été", "autumn": "automne", "winter": "hiver" },
+    "phases": { "boarding": "à l'embarquement", "travel": "pendant le voyage en train" },
+    "evenement": "pendant {event}",
+    "scene": "pendant la scène {scene}",
+    "essai": "lieu d'essai seulement",
+    "rythmes": {
+      "steady": "en continu",
+      "normal": "avec des pauses de silence",
+      "rare": "rarement, avec de longs silences",
+      "long": "longuement, peu de silences"
+    },
+    "arrivee": "quand on arrive à {lieu}, ou au début de la partie",
+    "nomsLieux": { "aubrune": "Aubrune" }
+  }
+}
