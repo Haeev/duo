@@ -21,12 +21,13 @@ import { evaluateAll } from '../regles/conditions';
 import { remember } from '../regles/memoire';
 import { bodyCollides } from '../noyau/grille';
 import { placeBlockers } from '../noyau/obstacles';
-import { findRoute, type Route } from './chemins';
+import { type AvoidSegment, findRoute, type Route } from './chemins';
 import { closedDoorSet, closedLockSet } from '../lieux/chemins';
 import { currentEntry, goalOf, type Goal } from './planning';
 import { attend, giveGift, showEmote } from './presence';
 import { VILLAGERS } from './reglages';
 import { arrivalFrame } from '../voyage/arrivee';
+import { inTrainWay, segmentAcrossStoppedTrain, trainsPresent } from '../monde/trains';
 
 /** Ce qui ne se sauvegarde pas: le trajet en cours et les minuteries. */
 interface Runtime {
@@ -36,6 +37,8 @@ interface Runtime {
   goal: Goal | null;
   /** Secondes passées à attendre quelqu'un devant soi. */
   waited: number;
+  /** Secondes passées au bord de la voie à attendre qu'un train la libère. */
+  trainWait: number;
   readonly lastReact: Map<string, number>;
 }
 
@@ -198,6 +201,31 @@ function clearArrival(sim: SimContext, content: PlaceContent, place: PlaceState,
   }
 }
 
+/**
+ * Arêtes du graphe à contourner tant qu'une rame est à quai (elle y reste des heures: on passe
+ * par un autre passage); `null` sans train. Une rame qui passe, on l'attend au bord.
+ */
+function trainAvoid(sim: SimContext, content: PlaceContent): AvoidSegment | null {
+  if (!trainsPresent(sim, content)) return null;
+  return (ax, ay, bx, by) => segmentAcrossStoppedTrain(sim, content, ax, ay, bx, by, 0);
+}
+
+/** Un pas de (x, y) vers (nx, ny) entrerait-il sur le chemin d'un train ? (en sortir est permis) */
+function stepsOnTrain(
+  sim: SimContext,
+  content: PlaceContent,
+  x: number,
+  y: number,
+  nx: number,
+  ny: number,
+): boolean {
+  // Le centre du corps hors de la caisse: on attend au bord du quai (à 1,5 m de l'axe), comme
+  // les joueurs, sans jamais être au-dessus des rails.
+  return inTrainWay(sim, content, nx, ny, 0) && !inTrainWay(sim, content, x, y, 0);
+}
+
+const NO_DOORS: ReadonlySet<string> = new Set();
+
 /** Choisit le but de la ligne en cours et le trajet pour y aller (ou l'y pose: `snap`). */
 function head(
   sim: SimContext,
@@ -224,6 +252,7 @@ function head(
   rt.route = null;
   rt.next = 0;
   rt.waited = 0;
+  rt.trainWait = 0;
   if (rt.goal === null) return;
   const body = villager.body;
   if (snap) {
@@ -242,6 +271,7 @@ function head(
     rt.goal.y,
     closedLockSet(sim),
     closedDoorSet(sim, content, id),
+    trainAvoid(sim, content),
   );
   if (rt.route === null) {
     // Seule une porte fermée y mène: il reste où il est, sans but (pas de retour au poste).
@@ -317,16 +347,23 @@ function updatePresence(
             platform.x,
             platform.y,
             closedLockSet(sim),
+            NO_DOORS,
+            trainAvoid(sim, content),
           );
     rt.next = 0;
+    rt.trainWait = 0;
     sim.touch('place');
   }
   return state.presence !== 'leaving';
 }
 
-/** Avance le long du trajet; `true` une fois au bout. Il s'écarte et attend devant quelqu'un. */
+/**
+ * Avance le long du trajet; `true` une fois au bout. Il s'écarte et attend devant quelqu'un; il
+ * s'arrête au bord de la voie quand un train y est ou y vient (`trainWait`), sans y entrer.
+ */
 function walk(
   sim: SimContext,
+  content: PlaceContent,
   place: PlaceState,
   id: string,
   villager: VillagerState,
@@ -348,6 +385,15 @@ function walk(
     const dy = target.y - body.y;
     // Une porte se franchit d'un coup: il arrive devant l'autre porte de la paire.
     const d = target.jump === true ? 0 : Math.hypot(dx, dy);
+    if (d > 0) {
+      const t = Math.min(1, budget / d);
+      if (stepsOnTrain(sim, content, body.x, body.y, body.x + dx * t, body.y + dy * t)) {
+        rt.trainWait += dt;
+        body.speed = 0;
+        return false;
+      }
+    }
+    rt.trainWait = 0;
     if (d <= budget) {
       body.x = target.x;
       body.y = target.y;
@@ -491,6 +537,7 @@ function backToPost(
     goal.y,
     closedLockSet(sim),
     closedDoorSet(sim, content, id),
+    trainAvoid(sim, content),
   );
   if (rt.route === null) {
     rt.goal = null;
@@ -498,6 +545,7 @@ function backToPost(
   }
   rt.next = 0;
   rt.waited = 0;
+  rt.trainWait = 0;
   state.activity = null;
   state.gesture = null;
   state.pose = 'walk';
@@ -518,7 +566,7 @@ function liveOne(
   let rt = all.get(def.id);
   const snap = rt === undefined;
   if (rt === undefined) {
-    rt = { route: null, next: 0, goal: null, waited: 0, lastReact: new Map() };
+    rt = { route: null, next: 0, goal: null, waited: 0, trainWait: 0, lastReact: new Map() };
     all.set(def.id, rt);
   }
   if (villager.life === undefined) {
@@ -583,7 +631,12 @@ function liveOne(
     state.pose = busy ? 'stand' : 'walk';
     sim.touch('place');
   }
-  const arrived = !busy && walk(sim, place, def.id, villager, rt, dt, near);
+  const arrived = !busy && walk(sim, content, place, def.id, villager, rt, dt, near);
+  // Arrêté au bord de la voie: au bout d'un moment, un autre chemin (un autre passage) s'il y en a.
+  if (rt.trainWait > VILLAGERS.trainRetrySeconds && rt.route !== null) {
+    rt.trainWait = 0;
+    backToPost(sim, content, place, def.id, state, rt, body);
+  }
   if (arrived && rt.route !== null) {
     rt.route = null;
     if (state.presence === 'leaving') {

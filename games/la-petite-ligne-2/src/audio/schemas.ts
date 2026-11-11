@@ -28,6 +28,16 @@ export const SoundDefSchema = v.strictObject({
   maxVoices: v.pipe(IntSchema, v.minValue(1), v.maxValue(8)),
   /** Délai minimal entre deux lectures (ms): deux joueurs qui font le même geste ne doublent pas. */
   minIntervalMs: v.pipe(IntSchema, v.minValue(0), v.maxValue(2000)),
+  /**
+   * Son tenu (une sonnerie): après une lecture jusqu'à `to`, il reprend de `from` à `to` (s, sur
+   * des attaques du fichier) jusqu'à ce qu'une règle `stop` le fasse taire.
+   */
+  loop: v.exactOptional(
+    v.strictObject({
+      from: v.pipe(FiniteSchema, v.minValue(0)),
+      to: v.pipe(FiniteSchema, v.minValue(0.1)),
+    }),
+  ),
 });
 export type SoundDef = v.InferOutput<typeof SoundDefSchema>;
 export const SoundTableSchema = v.record(IdSchema, SoundDefSchema);
@@ -59,6 +69,8 @@ export const EventRuleSchema = v.strictObject({
   audience: v.picklist(['own', 'both', 'other']),
   /** Joué à la position de l'acteur (écoute placée) ou sans position. */
   placed: v.boolean(),
+  /** Fait taire `sound` (un son tenu) au lieu de le jouer. */
+  stop: v.exactOptional(v.boolean()),
 });
 export type EventRule = v.InferOutput<typeof EventRuleSchema>;
 
@@ -159,6 +171,8 @@ export const TuningSchema = v.strictObject({
   }),
   /** Plafond de lectures simultanées d'effets: au-delà, les priorités 4 puis 3 cèdent. */
   maxVoices: v.pipe(IntSchema, v.minValue(4)),
+  /** Fondu (s) d'un son tenu qu'une règle `stop` fait taire (la sonnerie s'éteint, pas de coupure). */
+  heldFadeSeconds: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0.02), v.maxValue(3)), 0.4),
   defaults: v.strictObject({
     master: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1)),
     effects: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1)),

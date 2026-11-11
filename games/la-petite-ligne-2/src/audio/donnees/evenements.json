@@ -140,32 +140,19 @@
       "placed": true
     },
     {
-      "on": "calendar_started",
-      "where": { "event": "train-du-samedi" },
+      "on": "crossing_bell",
+      "where": { "ringing": true },
       "sound": "passage-a-niveau",
       "audience": "both",
       "placed": false
     },
     {
-      "on": "calendar_started",
-      "where": { "event": "depart-du-train-du-samedi" },
+      "on": "crossing_bell",
+      "where": { "ringing": false },
       "sound": "passage-a-niveau",
       "audience": "both",
-      "placed": false
-    },
-    {
-      "on": "calendar_started",
-      "where": { "event": "autorail-de-5h12" },
-      "sound": "passage-a-niveau",
-      "audience": "both",
-      "placed": false
-    },
-    {
-      "on": "calendar_started",
-      "where": { "event": "depart-de-l-autorail" },
-      "sound": "passage-a-niveau",
-      "audience": "both",
-      "placed": false
+      "placed": false,
+      "stop": true
     },
     { "on": "clock_struck", "sound": "cloche-marthe-coup", "audience": "both", "placed": false },
     { "on": "door_passed", "sound": "porte", "audience": "both", "placed": true },

@@ -491,7 +491,8 @@
     "gainVariationDb": 0,
     "priority": 2,
     "maxVoices": 1,
-    "minIntervalMs": 2000
+    "minIntervalMs": 0,
+    "loop": { "from": 0.437, "to": 3.011 }
   },
   "cinq-douze": {
     "files": ["effets/cinq-douze.ogg"],

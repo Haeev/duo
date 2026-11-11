@@ -774,3 +774,13 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `InkKit` ne se construit pas dans Node (couches dessinées sur un canevas 2D): `vi.mock` de `encre/textures` (`createInkLayers`, `createNoise` en textures d'un point) et un faux `WebGLRenderer` suffisent pour tester création et libération.
 - La démonstration de l'éditeur en `#miroir` ne s'ouvre pas (apparence non révélée): rouvrir par `window.editeur.mirror()` après une première validation sur la page normale. Thème sombre: poser `dataset.lplStyle = 'encre'` après le chargement (dans `addInitScript`, `documentElement` est nul).
 - Capture d'une page de jeu en rendu logiciel: `page.screenshot` dépasse 120 s; lire `canvas.toDataURL()` juste après un `renderer.frame` dans la page (et recommencer si l'image est vide: le souffle du rendu encré saute des images).
+
+## Voie ferrée finie: lits, sonnerie, habitants, trajet (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Un module plié sur un tracé (lit de voie): sommet (x, y, z) du module vers P(s) + N(s) * x, avec s = s0 + (z + 0,5) * longueur et N = (T.y, -T.x) en (x, y) de la carte: rotation propre, aucun triangle retourné. Tangente lissée par différence centrée (1,5 m) aux angles du tracé; deux modules voisins partagent alors exactement leurs bords.
+- Un nœud du graphe des chemins posé sur l'axe de la voie (`pn`, `trav`) et des arêtes `voie` le long des rails: les habitants marchent sur la voie. Éviter un train à quai demande de filtrer aussi le nœud de départ (segment départ vers nœud libre) et celui d'arrivée, sinon l'habitant reste figé devant la locomotive (vu dans `fetes-aubrune.test.ts`).
+- Ne contourner (arêtes barrées, nouveau trajet) que pour une rame à quai; une rame qui passe, l'habitant l'attend au bord: barrer son chemin d'approche envoyait tout le bourg en détours de 300 m.
+- Un nouvel événement de simulation demande deux `case` dans `interface/index.ts` et `interface/cuisine/index.ts` (lint `switch-exhaustiveness-check`), même quand l'interface est hors périmètre: le signaler.
+- Un AABB d'occultation de repère géant (coteau du tunnel, 30 x 19 m) fond tout le repère dès qu'un joueur s'en approche, même devant lui.
+- Capture du trajet en train (10 s): la machine chargée retarde l'horloge de la scène; viser `LPL2_ATTENTE_TRAJET` de 7 s et vérifier l'étape sur l'image.
+- Machine partagée (charge 16 à 21 sur 4 cœurs): les longs fichiers dépassent 20 s et les parcours e2e meurent au battement (« Le jeu ne répond plus »): relancer seuls avec `--testTimeout=120000`.

@@ -15,7 +15,7 @@ import { freePlayer } from '../noyau/deblocage';
 import { stopPlayer } from '../noyau/deplacement';
 import { stepBell } from './cloche';
 import { morningWeather, weatherAt } from './meteo';
-import { touchesTrain, trainsPresent } from './trains';
+import { crossingBellRinging, touchesTrain, trainsPresent } from './trains';
 
 const PLAYERS = [0, 1] as const;
 
@@ -39,6 +39,19 @@ function clearTrainPath(sim: SimContext): void {
 }
 
 /**
+ * Sonnerie des passages à niveau: elle part quand une rame qui va passer sur une route approche
+ * (début du freinage) ou démarre, et se tait quand la route est dégagée (`trains.ts`). Après une
+ * reprise en pleine approche, elle repart.
+ */
+function ringCrossings(sim: SimContext, memo: Seen): void {
+  const place = sim.content.places[sim.world.common.place];
+  const ringing = place !== undefined && crossingBellRinging(sim, place);
+  if (ringing === memo.ringing) return;
+  memo.ringing = ringing;
+  sim.emit({ type: 'crossing_bell', place: sim.world.common.place, ringing });
+}
+
+/**
  * Ce que le système a vu au pas précédent. Non sauvegardé: après une reprise, les événements en
  * cours repartent (`calendar_started` de nouveau, faits réécrits à l'identique).
  */
@@ -47,6 +60,8 @@ interface Seen {
   day: number;
   active: Set<string>;
   wateredOn: number;
+  /** La sonnerie des passages à niveau sonnait au pas précédent. */
+  ringing: boolean;
 }
 const seen = new WeakMap<WorldState, Seen>();
 
@@ -77,7 +92,7 @@ function step(sim: SimContext): void {
   // Premier pas d'une partie neuve ou reprise: l'état se met à jour sans rien annoncer.
   const fresh = memo === undefined;
   if (memo === undefined) {
-    memo = { place: '', day: 0, active: new Set(), wateredOn: 0 };
+    memo = { place: '', day: 0, active: new Set(), wateredOn: 0, ringing: false };
     seen.set(world, memo);
   }
 
@@ -93,7 +108,10 @@ function step(sim: SimContext): void {
   }
 
   if (memo.place !== place || memo.day !== day) {
-    if (memo.place !== place) memo.active.clear();
+    if (memo.place !== place) {
+      memo.active.clear();
+      memo.ringing = false;
+    }
     memo.place = place;
     memo.day = day;
     updateOutlook(sim, !fresh);
@@ -117,6 +135,7 @@ function step(sim: SimContext): void {
   }
   memo.active = now;
   clearTrainPath(sim);
+  ringCrossings(sim, memo);
   noteMemories(sim);
   stepBell(sim);
 }

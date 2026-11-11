@@ -43,8 +43,11 @@ describe('scène du trajet', () => {
     expect(riding.trainSpeed).toBeGreaterThan(10);
     expect(riding.worldX).toBeCloseTo(-TRIP_SETTINGS.rideDistance / 2, 0);
     for (const actor of riding.players) {
-      expect(Math.abs(actor.y)).toBeLessThan(TRIP_SETTINGS.wagon.halfWidth - 0.3);
-      expect(Math.abs(actor.x - doorX())).toBeLessThan(TRIP_SETTINGS.wagon.length / 2 - 0.3);
+      const train = TRIP_SETTINGS.train;
+      expect(Math.abs(actor.y)).toBeLessThan(train.halfWidth - 0.3);
+      // Dans la salle, entre les deux portes de la caisse (pas dans une cabine).
+      expect(actor.x).toBeGreaterThan(doorX() + 0.4);
+      expect(actor.x).toBeLessThan(train.center + train.door - 0.4);
     }
 
     // Arrivée: quai d'arrivée en face, les deux descendus et immobiles, et cela tient ensuite.

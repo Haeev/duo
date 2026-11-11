@@ -299,6 +299,8 @@ export interface LandmarkPose {
   readonly yaw: number;
   readonly scale: number;
   readonly sink: number;
+  /** Pied drapé sur le relief (m), `LandmarkLook.drape`. */
+  readonly drape?: number;
   readonly footprint: Footprint;
 }
 
@@ -448,6 +450,7 @@ export function landmarkPoses(
       yaw,
       scale,
       sink: look.sink,
+      ...(look.drape === undefined ? {} : { drape: look.drape }),
       footprint: { x0: mark.x - hw, z0: mark.y - hd, x1: mark.x + hw, z1: mark.y + hd },
     });
   }

@@ -77,6 +77,7 @@ const ZERO_PLACEMENT: Placement = { gain: 1, pan: 0, audible: true };
 
 interface ActiveVoice {
   readonly poolId: number;
+  readonly sound: string;
   readonly source: AudioBufferSourceNode;
   readonly gain: GainNode;
 }
@@ -190,6 +191,12 @@ export function createAudioEngine(options: AudioEngineOptions): AudioEngine {
     }
     const source = ctx.createBufferSource();
     source.buffer = buffer;
+    const held = def.loop !== undefined && def.loop.to > def.loop.from;
+    if (held) {
+      source.loop = true;
+      source.loopStart = def.loop?.from ?? 0;
+      source.loopEnd = Math.min(def.loop?.to ?? buffer.duration, buffer.duration);
+    }
     source.playbackRate.value =
       def.pitchVariation > 0 ? 1 + random.float(-def.pitchVariation, def.pitchVariation) : 1;
     const gain = ctx.createGain();
@@ -205,8 +212,9 @@ export function createAudioEngine(options: AudioEngineOptions): AudioEngine {
       tail = panner;
     }
     tail.connect(categoryNodes[def.category]);
-    const poolId = pool.add(id, def.priority, t, t + buffer.duration / source.playbackRate.value);
-    active.set(poolId, { poolId, source, gain });
+    const ends = held ? Number.POSITIVE_INFINITY : t + buffer.duration / source.playbackRate.value;
+    const poolId = pool.add(id, def.priority, t, ends);
+    active.set(poolId, { poolId, sound: id, source, gain });
     source.onended = (): void => {
       source.disconnect();
       tail.disconnect();
@@ -214,6 +222,20 @@ export function createAudioEngine(options: AudioEngineOptions): AudioEngine {
       active.delete(poolId);
     };
     source.start();
+  }
+
+  /** Fait taire les voix d'un son (un son tenu): fondu court, puis arrêt. */
+  function silence(id: string): void {
+    const t = ctx.currentTime;
+    const fade = tables.tuning.heldFadeSeconds;
+    for (const voice of active.values()) {
+      if (voice.sound !== id) continue;
+      voice.gain.gain.cancelScheduledValues(t);
+      voice.gain.gain.setTargetAtTime(0, t, fade / 3);
+      voice.source.stop(t + fade);
+      pool.remove(voice.poolId);
+      active.delete(voice.poolId);
+    }
   }
 
   function listenerPose(): { x: number; y: number } | null {
@@ -246,7 +268,9 @@ export function createAudioEngine(options: AudioEngineOptions): AudioEngine {
   // --- Événements de la simulation -----------------------------------------------------------
   const unsubscribe = view.onEvent((event: GameEvent) => {
     const hit = soundForEvent(tables.events, event, view.localIndex());
-    if (hit !== null) playAt(hit.sound, hit.actor, hit.placed, hit.own);
+    if (hit === null) return;
+    if (hit.stop) silence(hit.sound);
+    else playAt(hit.sound, hit.actor, hit.placed, hit.own);
   });
 
   // --- Babil ------------------------------------------------------------------------------------

@@ -107,8 +107,17 @@ export const INK_SETTINGS = {
    * dernière lampe est pleinement allumée, et monte sur `windowRamp` (revue du 2026-11-11: une
    * rue aux fenêtres allumées sous un réverbère éteint). Avec l'ambiance livrée: lampes de 17 h 50
    * à 18 h 35, fenêtres de 18 h 35 à 18 h 55; le matin, fenêtres éteintes avant les lampes.
+   * `vehicle`: la lampe d'une voiture éclairée (`light` d'un véhicule au manifeste) est au milieu
+   * de la caisse, à 1,5 m du bord du quai; force et rayon multipliés pour que sa flaque sur le quai
+   * vaille celle d'une lanterne de maison (revue du 2026-11-11: l'autorail éclairait moins).
    */
-  lamps: { from: 0.3, spread: 0.2, ramp: 0.1, windowRamp: 0.1 },
+  lamps: {
+    from: 0.3,
+    spread: 0.2,
+    ramp: 0.1,
+    windowRamp: 0.1,
+    vehicle: { gain: 1.8, radius: 1.25 },
+  },
 
   /**
    * Bâtiments éclairés de l'intérieur (`lieu/eclairage.ts`): d'après les heures des commerces, les

@@ -82,7 +82,7 @@ function walk(
 
 /** Milieu de la portière du wagon, sur la voie (m). */
 export function doorX(settings: TripSettings = TRIP_SETTINGS): number {
-  return -settings.wagon.length / 2;
+  return settings.train.center - settings.train.door;
 }
 
 /**

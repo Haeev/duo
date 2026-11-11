@@ -268,9 +268,9 @@ describe('espace, pas et ambiances', () => {
 /** Contexte audio factice: compte les sources lancées et garde leurs réglages. */
 function fakeHost(): {
   host: AudioEngineOptions['host'];
-  started: { rate: number; gain: number }[];
+  started: { rate: number; gain: number; loop: boolean }[];
 } {
-  const started: { rate: number; gain: number }[] = [];
+  const started: { rate: number; gain: number; loop: boolean }[] = [];
   const param = (): {
     value: number;
     setTargetAtTime(): void;
@@ -302,7 +302,7 @@ function fakeHost(): {
         onended: null,
         stop: () => undefined,
         start: () => {
-          started.push({ rate: rate.value, gain: 0 });
+          started.push({ rate: rate.value, gain: 0, loop: source.loop === true });
         },
       };
       return source;
@@ -355,6 +355,40 @@ describe('moteur', () => {
     expect(started.length).toBe(base + 1);
     engine.cue('carnet-ouvre');
     expect(started.length).toBe(base + 2);
+    engine.dispose();
+  });
+
+  it('tient la sonnerie du passage à niveau tant qu elle sonne, puis la fait taire', async () => {
+    const { host, started } = fakeHost();
+    const listeners: ((e: GameEvent) => void)[] = [];
+    const view = {
+      content: { places: {} },
+      localIndex: () => 0,
+      world: () => null,
+      aim: () => null,
+      onEvent: (l: (e: GameEvent) => void) => {
+        listeners.push(l);
+        return () => undefined;
+      },
+    } as unknown as AudioEngineOptions['view'];
+    const engine = createAudioEngine({
+      host,
+      view,
+      tables: loadTables(),
+      assetUrl: (f) => `/${f}`,
+      random: {
+        int: (a: number) => a,
+        float: (a: number, b: number) => (a + b) / 2,
+      } as unknown as AudioEngineOptions['random'],
+      cameraYaw: () => 0,
+      load: () => Promise.resolve({ duration: 4.6, length: 1, numberOfChannels: 1 } as AudioBuffer),
+    });
+    await engine.ready();
+    listeners[0]?.({ type: 'crossing_bell', place: 'aubrune', ringing: true });
+    expect(started.at(-1)?.loop).toBe(true);
+    expect(engine.stats().voices).toBe(1);
+    listeners[0]?.({ type: 'crossing_bell', place: 'aubrune', ringing: false });
+    expect(engine.stats().voices).toBe(0);
     engine.dispose();
   });
 });

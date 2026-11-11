@@ -87,6 +87,81 @@ export const RUN_SORTS: Readonly<Record<string, RunSort>> = {
   },
 };
 
+/**
+ * Une sorte de lit de voie: un module d'un mètre (profil en travers, long de z) posé bout à bout
+ * sous les rails et les traverses du jeu, le long du tracé réel des voies (`rails` de la carte).
+ */
+export interface TrackBedSort {
+  readonly pourquoi: string;
+  readonly model: string;
+  /** Posé à moins de cette distance (m, le long de la voie) d'une bouche de tunnel; absent: partout. */
+  readonly nearTunnel?: number;
+  /**
+   * Talus du profil (sommets à plus de `from` m de l'axe): il monte de rien à sa pleine hauteur
+   * sur `ramp` m depuis le bout de la sorte, sans bout de talus coupé à l'endroit où elle commence.
+   */
+  readonly talus?: { readonly from: number; readonly ramp: number };
+}
+
+/** Lits de voie: sortes (la première qui convient l'emporte) et pose sur le sol. */
+export const TRACK_BED = {
+  pourquoi:
+    'le ballast qui porte les traverses, les fossés qui le drainent; en tranchée à l’approche du tunnel, la voie entre dans le coteau',
+  sorts: [
+    {
+      pourquoi: 'les derniers mètres avant le tunnel: la voie est entaillée dans le coteau',
+      model: 'rail-cutting',
+      nearTunnel: 26,
+      talus: { from: 3.15, ramp: 10 },
+    },
+    {
+      pourquoi: 'partout ailleurs: la voie au ras du pré, entre deux fossés',
+      model: 'rail-bed',
+    },
+  ] as readonly TrackBedSort[],
+  /**
+   * Natures de sol où le lit se montre. Ailleurs (route d'un passage à niveau, quai, rue, cour,
+   * ponceau, bâtiment), il n'est pas posé sous l'axe et ses sommets passent sous le sol.
+   */
+  over: [
+    'voie',
+    'herbe',
+    'champ',
+    'lisiere',
+    'pre',
+    'friche',
+    'friche-rocheuse',
+    'herbe-rase',
+    'prairie-humide',
+    'lande',
+    'sous-bois',
+    'hors-jeu',
+  ] as readonly string[],
+  /** Longueur d'un module (m): ceux d'un tronçon sont étirés pour en couvrir la longueur exacte. */
+  step: 1,
+  /** Lit levé au-dessus du sol en relief (m): ses fossés ne se battent pas avec lui. */
+  lift: 0.015,
+  /**
+   * Enfoncement (m) des sommets du bord extérieur et de ceux qui tombent hors des natures `over`:
+   * le lit finit sous l'herbe, jamais en lame posée dessus.
+   */
+  sink: 0.12,
+  /**
+   * Deux voies qui se séparent (aiguillage): la seconde dans l'ordre de la carte garde son seul
+   * ballast (`crown` m de l'axe) dans le lit de la première, levé de `above` m; ses fossés y
+   * passent sous le sol.
+   */
+  junction: { crown: 1.62, above: 0.008 },
+  /**
+   * Petits repères posés au bord de la voie (la grue à eau, le sémaphore: emprise de `small` m de
+   * côté au plus): le fossé et l'épaulement s'arrêtent sous leur pied, grandi de `margin` m, au
+   * lieu de passer dessous.
+   */
+  clear: { small: 3, margin: 0.25 },
+  /** Lissage de la direction de la voie aux angles du tracé (m de part et d'autre). */
+  smooth: 1.5,
+} as const;
+
 /** Comment un repère s'oriente, d'après les données du lieu. */
 export type LandmarkFacing =
   /** Avant (+z) vers le point le plus proche d'une voie à ciel ouvert. */
@@ -109,6 +184,12 @@ export interface LandmarkLook {
   readonly sink: number;
   /** Mis à la hauteur du repère (`height` de la carte) au lieu de la sienne. */
   readonly fitHeight?: boolean;
+  /**
+   * Pied drapé sur le relief (m): les sommets plus bas que cette hauteur suivent le sol sous eux
+   * (en plein au ras du sol, plus du tout à cette hauteur). Un grand modèle (un coteau) se raccorde
+   * ainsi au terrain tout autour, sans lame qui flotte ni bord enterré trop bas.
+   */
+  readonly drape?: number;
 }
 
 /** Natures de repère (`landmarks.kind` de la carte) dessinées par un modèle livré. */
@@ -147,6 +228,7 @@ export const LANDMARK_LOOKS: Readonly<Record<string, LandmarkLook>> = {
     model: 'tunnel-portal',
     facing: { rule: 'along-rail' },
     sink: 0.3,
+    drape: 3,
   },
   pigeonnier: {
     pourquoi: 'la lucarne d’envol est au sud, au soleil',

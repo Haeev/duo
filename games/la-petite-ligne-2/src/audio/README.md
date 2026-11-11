@@ -34,7 +34,8 @@ La **musique** (airs par heure, météo et lieu, silences, jingles) a son propre
 1. Génère ou dépose `assets/commun/son/effets/<nom>.ogg` (OGG, mono, 48 kHz; effets calés à -16 LUFS momentanés, boucles à -16 LUFS intégrés, crête sous -1 dBFS). Pour en fabriquer un: ajoute une fonction dans `assets-src/son/generer.py`, puis `duo-python assets-src/son/generer.py --seulement <nom>` et `duo-python assets-src/son/controler.py`.
 2. Ajoute une entrée à `donnees/sons.json` (copie d'une voisine).
 3. S'il répond à un événement de la simulation, ajoute une ligne à `rules` de `donnees/evenements.json` (cas précis avant cas général); s'il répond à l'interface, une ligne à `cues`.
-4. `pnpm test`: le test des tables dit ce qui cloche. Aucune ligne de moteur.
+4. Son tenu (une sonnerie qui dure tant qu'un état dure): `loop` (`from`, `to` en secondes, sur deux attaques du fichier) dans `sons.json`, une règle qui le joue et une règle `"stop": true` qui le fait taire (fondu `heldFadeSeconds` de `reglages.json`); exemple: `crossing_bell` et `passage-a-niveau`.
+5. `pnpm test`: le test des tables dit ce qui cloche. Aucune ligne de moteur.
 
 ## Recette: ajouter une voix de personnage
 

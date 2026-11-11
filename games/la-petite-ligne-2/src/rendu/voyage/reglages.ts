@@ -20,31 +20,46 @@ export const TRIP_SETTINGS = {
   fadeSeconds: 0.35,
 
   /** Caméra: milieu visé (m), lacet et inclinaison (degrés), largeur de vue à quai et au plus large (m). */
-  camera: { x: -4.2, y: 1.6, yawDeg: 12, pitchDeg: 30, width: 15, rideWidth: 21 },
+  camera: { x: -1.6, y: 1.6, yawDeg: 12, pitchDeg: 30, width: 17, rideWidth: 22 },
 
-  /** Diorama: le quai est au niveau 0, la voie en contrebas (assez bas pour que les roues restent sous le plancher). */
-  ground: { trench: 1.1, trackHalfWidth: 1.6, halfDepth: 16, margin: 50 },
+  /**
+   * Diorama: le quai est au niveau 0, au plancher de la caisse; la voie en contrebas, le dessus
+   * des rails (`trench` - 0,1 - `rails.height`) là où l'autorail pose ses roues (0,26 m sous son
+   * plancher moins `train.floor`).
+   */
+  ground: { trench: 0.96, trackHalfWidth: 1.6, halfDepth: 16, margin: 50 },
   rails: { gauge: 1.44, height: 0.12, sleeperStep: 0.75 },
   platform: { length: 26, depth: 4.2, edge: 0.22 },
 
-  /** Wagon (m): longueur, demi-largeur, hauteurs (bas des fenêtres, haut, toit); portière au milieu. */
-  wagon: { length: 9.4, halfWidth: 1.3, sill: 0.95, lintel: 1.85, top: 2.3, roof: 2.5, door: 1.1 },
-  /** Places des deux joueurs: sur le quai, à côté de la portière (m); dans le wagon, à la fenêtre. */
+  /**
+   * Le train: l'autorail livré (manifeste des décors), sa caisse le long de x, sa tête vers +x.
+   * Mesures du modèle: longueur et largeur (m), plancher au-dessus du ballast, milieu de ses
+   * portes à `door` m du centre. Sa porte arrière est la portière du trajet: le centre de la
+   * caisse est à `center` m, la portière à `center - door` (`doorX`).
+   */
+  train: {
+    model: 'railcar',
+    length: 14.52,
+    halfWidth: 1.46,
+    height: 3.95,
+    floor: 1,
+    door: 4.9,
+    center: 0.2,
+  },
+  /** Places des deux joueurs: sur le quai, à côté de la portière (m); dans la salle, à la fenêtre. */
   spots: {
     quay: [
       { dx: -1.1, y: 2.5 },
       { dx: 1.1, y: 2.5 },
     ],
     inside: [
-      { dx: -2.3, y: 0.75 },
-      { dx: 2.3, y: 0.75 },
+      { dx: 1.7, y: 0.75 },
+      { dx: 3.7, y: 0.75 },
     ],
     /** Seuil de la portière, côté quai (m), et écart de chacun au milieu: on ne s'y marche pas dessus. */
     doorstep: 1.75,
     doorSpread: 0.3,
   },
-  /** Fumée de la locomotive: bouffées en boucle, montée (m) et durée de vie (s). */
-  smoke: { puffs: 6, rise: 2.2, drift: 3.5, life: 1.4, size: 0.32 },
 
   /** Décor qui défile: arbres et poteaux le long de la voie, collines au loin. */
   scenery: { trees: 90, poleStep: 14, hills: 9, seed: 5 },
@@ -57,12 +72,9 @@ export const TRIP_SETTINGS = {
     rail: '#8C8E91',
     stone: '#C0B4A1',
     edge: '#F3EDE0',
-    livery: '#3F6453',
-    band: '#EBDCBF',
-    chassis: '#9B4C3B',
-    roof: '#737B86',
     wheel: '#26282E',
-    interior: '#D9CAAE',
+    /** Caisse provisoire, tant que le modèle de l'autorail n'est pas chargé. */
+    standIn: '#3F6453',
     brass: '#C8A150',
     trunk: '#96704C',
     foliage: ['#7F9C79', '#93B45E', '#6F8F5A', '#96A98C'],
@@ -70,7 +82,6 @@ export const TRIP_SETTINGS = {
     pole: '#3F6453',
     shelterRoof: '#B86B4F',
     sign: '#2C3B57',
-    smoke: '#F3EDE0',
   },
 } as const;
 

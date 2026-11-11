@@ -44,6 +44,8 @@ Un événement: `pnpm nouveau evenement <id> <lieu>`. Un climat: copier `default
 
 Un événement peut amener un train (champ `train`): il arrive en freinant pour s'arrêter à `hours.from`, reste à quai jusqu'à `hours.to`, puis repart en accélérant, le long d'une voie de la carte (`rails`), courbes comprises. Sa pose ne dépend que de l'heure, du jour et des conditions de l'événement: rien n'est sauvegardé ni transmis, l'hôte et l'invité le voient au même endroit, aussi après un chargement ou une nuit sautée. Tant qu'il est là, son emprise barre la voie (`noyau/obstacles.ts`); un joueur surpris dessus est posé sur la case libre la plus proche (événement `unstuck`, sans dommage). Le rendu: `rendu/lieu/trains.ts`.
 
+Passages à niveau: là où une voie à ciel ouvert croise une case de route ou de rue (`TRAINS.crossing.natures`; la carte n'a pas d'autre donnée des ouvrages). La sonnerie (`crossing_bell`, `ringing` vrai puis faux, émis par `index.ts`) part quand une rame qui va passer sur la route commence à freiner, ou démarre, et se tait quand sa queue l'a dégagée; le son tenu est dans `audio/donnees/evenements.json`. Habitants: l'emprise d'une rame va de sa place à celle où elle va (`reachFrom`, `reachTo`); un habitant n'y entre pas (`inTrainWay`), il attend au bord et cherche au bout de `trainRetrySeconds` un chemin par un autre passage (arêtes du graphe qui croisent une rame à quai évitées, `segmentAcrossStoppedTrain`; une rame qui passe, on l'attend).
+
 Ajouter un train (aucun code):
 
 1. `pnpm nouveau evenement <id> <lieu>`, ou un événement existant: heures d'arrêt (`from`) et de départ (`to`).
