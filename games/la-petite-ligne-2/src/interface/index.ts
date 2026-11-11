@@ -26,6 +26,7 @@ import { DECO_TEXTS } from './deco/textes';
 import { createDecoMode, decoHousingFor } from './deco/deco';
 import { createDialogue, type BabbleInfo } from './dialogue';
 import { createDialogueScreens } from './ecrans-dialogue';
+import { isDecisionChoice } from './garde-choix';
 import type { UiSettings } from './carnet/lectures';
 import { createCharacterEditor, type EditorPreviewFactory } from './editeur/editeur';
 import { EDITOR_SETTINGS } from './editeur/reglages';
@@ -764,7 +765,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       editor.frame(dt, world, me);
       dialogueScreens.frame();
       fishing.frame(dtMs / 1000);
-      dialogue.sync(talkView(view.content, world, me), now);
+      dialogue.sync(
+        talkView(view.content, world, me),
+        now,
+        isDecisionChoice(view.content, world, me),
+      );
       dialogue.frame(dtMs);
       notebook.frame(world, me);
       if (notebook.isOpen() !== notebookWasOpen) {

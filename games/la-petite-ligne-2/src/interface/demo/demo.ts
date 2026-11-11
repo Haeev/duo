@@ -1,7 +1,7 @@
 /**
  * Démonstration de l'interface seule, sur une vraie partie neuve et un état factice choisi par
  * l'ancre de l'adresse (`#repos`, `#bulle`, `#coup-d-oeil`, `#dialogue-ecriture`,
- * `#dialogue-choix`, `#endurance`, `#endurance-renfort`, `#endurance-essouffle`,
+ * `#dialogue-choix`, `#dialogue-decision` (décision à deux, `-rappel`: après un Espace), `#endurance`, `#endurance-renfort`, `#endurance-essouffle`,
  * `#carnet-sans-sac`, `#carnet-sac`, `#rangement`, et un onglet du carnet:
  * `#carnet-quetes`, `-habitants`, `-collections`, `-carte`, `-tenues`, `-reglages`, chacun avec le
  * suffixe `-long` pour un contenu très long; le sac en objet: `#carnet-sac-equiper`, `-refus`,
@@ -174,12 +174,19 @@ if (state === 'endurance-renfort') {
   me.staminaMods.capacity = { extra: 0.5, until: world.tick + 10_000 };
   me.staminaMods.recovery = { factor: 1.5, until: world.tick + 10_000 };
 }
+// La cheffe de gare et son accueil sont à la gare d'essai (la partie neuve part du train de nuit).
+if (state === 'dialogue-ecriture' || state === 'dialogue-choix') world.common.place = 'essai-gare';
 if (state === 'dialogue-ecriture')
   me.talk = { villager: 'cheffe-de-gare', dialogue: 'accueil', node: 'bonjour' };
 if (state === 'dialogue-choix') {
   me.talk = { villager: 'cheffe-de-gare', dialogue: 'accueil', node: 'choix' };
   me.needs.hygiene = 8;
   me.tiers.hygiene = 'low';
+}
+// Décision à deux (la Baronne, chez Achille): Entrée seule la tranche; `-rappel`: un Espace donné.
+if (state === 'dialogue-decision' || state === 'dialogue-decision-rappel') {
+  world.common.place = 'aubrune';
+  me.talk = { villager: 'achille', dialogue: 'achille-decision', node: 'n3' };
 }
 if (state === 'carnet-sac' || state === 'rangement') {
   me.bag = {
@@ -362,4 +369,8 @@ setTimeout(() => {
     setTimeout(() => {
       press('ArrowDown');
     }, 400);
+  if (state === 'dialogue-decision-rappel')
+    setTimeout(() => {
+      press('Space');
+    }, 1200);
 }, 150);

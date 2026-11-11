@@ -201,8 +201,14 @@
 .lpl-cook-step.g2 {
   color: #6b8a3f;
 }
+/* Plan de travail: le plat, la jauge, les coups et la touche, groupés au bas de l'écran. */
+.lpl-cook-desk {
+  margin: auto 0 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .lpl-cook-stage {
-  margin-top: auto;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -275,7 +281,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  margin: 10px 0 56px;
+  margin: 10px 0 0;
   padding: 4px 12px;
   background: #fbf6e9;
   border-radius: 12px;
@@ -383,6 +389,19 @@
   border-color: var(--accent);
   color: var(--ink);
   box-shadow: var(--shadow-3);
+}
+/* Cuisson: le plan de travail devient un panneau sombre, la touche s'y range sans second cadre. */
+[data-lpl-style='encre'] .lpl-cook-desk {
+  padding: 14px 24px 16px;
+  background: var(--paper);
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  box-shadow: var(--shadow-3);
+}
+[data-lpl-style='encre'] .lpl-cook-desk .lpl-cook-keys {
+  background: none;
+  border: 0;
+  box-shadow: none;
 }
 [data-lpl-style='encre'] .lpl-cook-card {
   background: var(--paper-raised);

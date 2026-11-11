@@ -1,8 +1,10 @@
 /**
  * Écran de livraison de la commande de la semaine (cahier 4.1), ouvert par « Livrer la commande »
  * à la fin d'une conversation avec qui la reçoit (événement `order_opened`). Qui reçoit à gauche,
- * avec sa réplique; au centre une ligne par objet demandé: ce qui est demandé et déjà livré, ce
- * que ton sac et la consigne contiennent, le prix; à droite le courrier. Tout au clavier:
+ * avec sa réplique et l'expression qui va avec; au centre le total à recevoir, puis une ligne par
+ * objet demandé: ce qui est déjà livré, ce que ton sac et la consigne contiennent, le prix à
+ * l'unité et ce que le reste rapportera, et son état (livrée, à livrer, il en manque); à droite
+ * le courrier. Tout au clavier:
  * Z et S (ou les flèches) choisissent, Espace livre la ligne (ou prend le courrier, ou lit une
  * lettre), T livre tout ce qui peut l'être, Retour ferme. Propre à chaque joueur.
  */
@@ -55,7 +57,6 @@ export function createOrderScreen(
   let focus: string | null = null;
   let reading: string | null = null;
   let openedAt = 0;
-  let paid = 0;
   let flash: { text: string; until: number } | null = null;
   let drawn = '';
   let model: OrderScreenModel | null = null;
@@ -80,24 +81,34 @@ export function createOrderScreen(
     const thumb = el('span', { class: 'lpl-order-row__thumb' });
     thumb.innerHTML = itemThumb(row.item, row.name);
     const have = row.bag + row.store;
-    const action = row.done
-      ? el('span', { class: 'lpl-order-row__state lpl-order-row__state--done', text: T.delivered })
-      : row.deliverable > 0
+    // Trois états de ligne: livrée (tout reçu), livrable (Espace livre), il en manque.
+    const state = row.done ? 'done' : row.deliverable > 0 ? 'go' : 'miss';
+    const action =
+      state === 'done'
         ? el('span', {
-            class: 'lpl-order-row__state lpl-order-row__state--go',
-            text: `${T.deliver} ${String(row.deliverable)}`,
+            class: 'lpl-order-row__state lpl-order-row__state--done',
+            text: T.delivered,
           })
-        : el('span', { class: 'lpl-order-row__state lpl-order-row__state--miss', text: T.nothing });
+        : state === 'go'
+          ? el('span', { class: 'lpl-order-row__state lpl-order-row__state--go' }, [
+              focused ? chip('Space') : null,
+              `${T.deliver} ${String(row.deliverable)}`,
+            ])
+          : el('span', {
+              class: 'lpl-order-row__state lpl-order-row__state--miss',
+              text: fill(T.nothing, { n: row.left }),
+            });
     const node = el(
       'div',
       {
-        class: `lpl-order-row${focused ? ' lpl-order-on' : ''}${row.done ? ' lpl-order-row--done' : ''}`,
+        class: `lpl-order-row lpl-order-row--${state}${focused ? ' lpl-order-on' : ''}`,
         role: 'listitem',
         'aria-label': fill(T.aria.row, {
           objet: row.name,
           livre: row.delivered,
           demande: row.asked,
           prix: formatEuros(row.price),
+          reste: formatEuros(row.due),
           as: have,
         }),
       },
@@ -108,22 +119,24 @@ export function createOrderScreen(
           el('small', { text: row.tableName }),
         ]),
         el('span', { class: 'lpl-order-row__asked' }, [
-          el('b', { text: `× ${String(row.asked)}` }),
+          el('b', { text: fill(T.deliveredOf, { n: row.delivered, max: row.asked }) }),
           el('span', {
             class: 'lpl-order-row__bar',
             style: `--part:${String(row.delivered / row.asked)}`,
-          }),
-          el('small', {
-            text: fill(T.deliveredOf, { n: row.delivered, max: row.asked }),
           }),
         ]),
         el('span', { class: `lpl-order-row__have${have === 0 ? ' none' : ''}` }, [
           el('span', { text: fill(T.bag, { n: row.bag }) }),
           el('span', { text: fill(T.store, { n: row.store }) }),
         ]),
-        el('span', { class: 'lpl-order-row__price' }, [
-          el('b', { text: formatEuros(row.price * (row.asked - row.delivered || row.asked)) }),
-          el('small', { text: fill(T.each, { prix: formatEuros(row.price) }) }),
+        el('span', { class: 'lpl-order-row__unit', text: formatEuros(row.price) }),
+        el('span', { class: 'lpl-order-row__due' }, [
+          row.done ? null : el('b', { text: formatEuros(row.due) }),
+          row.done
+            ? el('small', { text: `${T.rowAllReceived}, ${formatEuros(row.received)}` })
+            : row.received > 0
+              ? el('small', { text: fill(T.rowReceived, { montant: formatEuros(row.received) }) })
+              : null,
         ]),
         action,
       ],
@@ -153,11 +166,11 @@ export function createOrderScreen(
   function draw(m: OrderScreenModel, now: number): void {
     const index = focusIndex(m);
     const current = m.entries[index];
-    const signature = JSON.stringify([m, index, reading, paid, flash?.text]);
+    const signature = JSON.stringify([m, index, reading, flash?.text]);
     if (signature === drawn) return;
     drawn = signature;
-    const bust = el('div', { class: 'lpl-order-bust' });
-    bust.innerHTML = portraitMarkup(m.receiver, m.mood === 'nothing' ? 'neutre' : 'content');
+    const bust = el('div', { class: 'lpl-order-bust', 'data-expr': m.expression });
+    bust.innerHTML = portraitMarkup(m.receiver, m.expression);
     const receiver = el('aside', { class: 'lpl-order-receiver' }, [
       el('div', { class: 'lpl-order-say', role: 'status', text: m.says }),
       bust,
@@ -173,19 +186,35 @@ export function createOrderScreen(
     const due = m.due === null ? '' : m.dueToday ? T.dueToday : fill(T.due, { jour: m.due });
     const main = el('section', { class: 'lpl-order-main' }, [
       el('header', { class: 'lpl-order-head' }, [
-        el('h2', { text: T.title }),
-        el('p', { class: 'lpl-order-due', text: due }),
-        el('p', { class: 'lpl-order-pay' }, [
-          T.pay[m.pay],
-          paid > 0 ? el('b', { text: fill(T.paid, { montant: formatEuros(paid) }) }) : null,
+        el('div', { class: 'lpl-order-head__title' }, [
+          el('h2', { text: T.title }),
+          el('p', { class: 'lpl-order-due', text: due }),
+          el('p', { class: 'lpl-order-pay', text: T.pay[m.pay] }),
         ]),
+        // Le total, en tête: ce que le reste rapportera, puis ce qui est déjà payé.
+        el(
+          'div',
+          {
+            class: 'lpl-order-sum',
+            'aria-label': fill(T.aria.sum, {
+              montant: formatEuros(m.toReceive),
+              recu: formatEuros(m.received),
+            }),
+          },
+          [
+            el('span', { class: 'lpl-order-sum__label', text: T.toReceive }),
+            el('b', { class: 'lpl-order-sum__amount', text: formatEuros(m.toReceive) }),
+            el('small', { text: fill(T.received, { montant: formatEuros(m.received) }) }),
+          ],
+        ),
       ]),
       el('div', { class: 'lpl-order-cols', 'aria-hidden': 'true' }, [
         el('span', {}),
         el('span', {}),
         el('span', { text: T.columns.asked }),
         el('span', { text: T.columns.have }),
-        el('span', { text: T.columns.price }),
+        el('span', { text: T.columns.unit }),
+        el('span', { text: T.columns.due }),
         el('span', {}),
       ]),
       rows,
@@ -245,7 +274,6 @@ export function createOrderScreen(
         main,
         mail,
         open === undefined ? null : letterNode(open),
-        el('span', { class: 'provisoire lpl-order-prov', text: T.provisional }),
       ]),
     );
   }
@@ -265,7 +293,6 @@ export function createOrderScreen(
     place = id;
     focus = null;
     reading = null;
-    paid = 0;
     flash = null;
     openedAt = now;
     drawn = '';
@@ -291,8 +318,8 @@ export function createOrderScreen(
         return;
       }
       if (place === null) return;
-      if (event.type === 'order_delivered' && event.player === me) paid += event.paid;
-      else if (event.type === 'mail_taken' && event.player === me) {
+      // Une livraison: le reçu se relit dans l'état (`orderScreenModel`), rien à retenir ici.
+      if (event.type === 'mail_taken' && event.player === me) {
         // La première lettre remise s'ouvre tout de suite: on la lit en main propre.
         reading = event.letters[0] ?? null;
         focus = reading === null ? focus : `letter:${reading}`;

@@ -22,6 +22,22 @@ export interface UiTuning {
   readonly linesPerPage: number;
   /** Anti-double-appui à l'ouverture d'un écran (ms). */
   readonly openGuardMs: number;
+  /**
+   * Garde des choix d'un dialogue (ms): à leur apparition, Espace et Entrée ne valident rien
+   * pendant ce temps (un joueur qui martèle Espace pour passer le texte ne répond pas par accident).
+   */
+  readonly choiceGuardMs: number;
+  /** Durée du rappel « Entrée pour décider » après un Espace sur une décision à deux (ms). */
+  readonly decisionHintMs: number;
+  /**
+   * Chantier: le travail restant se dit en mots, d'après les secondes qu'il faudrait au rythme du
+   * moment (la règle compte en secondes, le joueur en « encore un peu »). Bornes hautes, en s.
+   */
+  readonly worksiteFeel: {
+    readonly almostS: number;
+    readonly littleS: number;
+    readonly whileS: number;
+  };
   /** Message court sous la bulle (refus) et avis en haut à droite (ms). */
   readonly refusalMs: number;
   readonly noticeMs: number;
@@ -66,6 +82,9 @@ export const UI_TUNING: UiTuning = {
   charsPerLine: 60,
   linesPerPage: 3,
   openGuardMs: 300,
+  choiceGuardMs: 600,
+  decisionHintMs: 1600,
+  worksiteFeel: { almostS: 5, littleS: 20, whileS: 60 },
   refusalMs: 1600,
   noticeMs: 4000,
   shopSay: { baseMs: 1800, perCharMs: 55, maxMs: 7000 },

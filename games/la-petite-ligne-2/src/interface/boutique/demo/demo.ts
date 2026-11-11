@@ -5,7 +5,8 @@
  * son tenancier sont ajoutés ici seulement, pour montrer la mémoire des prix et sa couronne.
  * `#mercerie`: la vraie mercerie de Solange à Aubrune, ses pièces de tenue (vignettes 3D de
  * l'aperçu de l'éditeur), la casquette déjà à toi; `#mercerie-achat`: le gilet acheté;
- * `#mercerie-a-toi`: la casquette choisie (mention « À toi », sans bouton).
+ * `#mercerie-a-toi`: la casquette choisie (mention « À toi », sans bouton); `#mercerie-nouvelle`:
+ * Solange a un souvenir pas encore entendu (pastille sur « Parler »).
  */
 import { loadContent } from '../../../donnees/charger';
 import { DATA_FILES } from '../../../donnees/fichiers';
@@ -81,6 +82,9 @@ if (mercerie) {
   me.body.y = (counter?.y ?? keeper?.y ?? me.body.y) + 1;
   me.money = state === 'mercerie-achat' ? 4140 : 2140;
   world.progress.memory[pieceKey('hat-cap', 0)] = { v: true, by: 0, day: 1 };
+  // `#mercerie-nouvelle`: le train revenu, Solange a un souvenir à dire (pastille de « Parler »).
+  if (state === 'mercerie-nouvelle')
+    world.progress.memory['aubrune.acte2.fini'] = { v: true, by: 'duo', day: 1 };
 }
 
 const listeners = new Set<(event: GameEvent) => void>();
@@ -147,14 +151,8 @@ const keys: Readonly<Record<string, readonly string[]>> = {
   refus: ['KeyE', 'ArrowRight', 'ArrowRight', 'Enter'],
   mercerie: ['ArrowRight'],
   'mercerie-achat': ['ArrowRight', 'Enter'],
-  'mercerie-a-toi': [
-    'ArrowRight',
-    'ArrowRight',
-    'ArrowRight',
-    'ArrowRight',
-    'ArrowRight',
-    'ArrowRight',
-  ],
+  // La casquette est la treizième case (rangées de six), sous la ficelle et le bouquet.
+  'mercerie-a-toi': ['ArrowDown', 'ArrowDown'],
 };
 // La mercerie s'ouvre par son événement, puis la garde d'ouverture de l'écran passe.
 let delay = mercerie ? 2000 : 500;

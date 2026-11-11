@@ -823,6 +823,70 @@
 .lpl-ui .choice--fails {
   border-style: dashed;
 }
+/*
+ * Garde des choix (`garde-choix.ts`): à leur apparition, les choix restent atténués le temps de
+ * la garde, et la touche qui valide (sous eux) se remplit d'un trait; plein, ils sont actifs.
+ * Mouvement réduit: pas de trait qui avance, le passage d'atténué à net suffit.
+ */
+.lpl-ui .choices--garde .choice {
+  opacity: 0.5;
+}
+.lpl-ui .choices-hint {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0.25rem 0.625rem 0.375rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 750;
+  overflow: hidden;
+}
+.lpl-ui .choices--garde .choices-hint {
+  opacity: 0.5;
+}
+.lpl-ui .choices-hint::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.1875rem;
+  background: var(--accent);
+  transform-origin: left center;
+}
+.lpl-ui .choices--garde .choices-hint::after {
+  animation: choix-garde var(--garde, 600ms) linear both;
+}
+@keyframes choix-garde {
+  from {
+    transform: scaleX(0);
+  }
+}
+.lpl-ui[data-motion='reduced'] .choices--garde .choices-hint::after {
+  animation: none;
+  transform: scaleX(0);
+}
+/* Espace sur une décision à deux: la touche Entrée ressort, en accent. */
+.lpl-ui .choices--rappel .choices-hint {
+  background: var(--accent);
+  color: var(--on-accent);
+  animation: choix-rappel 0.36s steps(3, end);
+}
+@keyframes choix-rappel {
+  33% {
+    transform: translateX(-0.25rem);
+  }
+  66% {
+    transform: translateX(0.25rem);
+  }
+}
+.lpl-ui[data-motion='reduced'] .choices--rappel .choices-hint {
+  animation: none;
+}
 .lpl-ui .barre {
   position: relative;
   display: inline-flex;

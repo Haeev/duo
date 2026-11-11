@@ -16,6 +16,12 @@ import {
   shopDef,
   stockLeft,
 } from '../../simulation/commerces/prix';
+import {
+  awaitsAnswer,
+  hasNews,
+  heardThisDay,
+  pickDialogue,
+} from '../../simulation/dialogues/conversation';
 import { hasPiece } from '../../simulation/regles/recompenses';
 import { SHOP_TUNING } from '../../simulation/commerces/reglages';
 
@@ -73,6 +79,27 @@ export interface ShopModel {
   readonly refusedFrom: number;
   readonly focus: number;
   readonly detail: ShopDetail | null;
+  /** Le commerçant a une réplique que ce joueur n'a pas encore entendue (`keeperHasNews`). */
+  readonly news: boolean;
+}
+
+/**
+ * « Parler » a du neuf pour ce joueur: la réplique que le bouton jouerait (la plus prioritaire,
+ * `pickDialogue`, la règle même de la conversation) n'a pas encore été entendue. C'est un dialogue
+ * `once` pas encore épuisé (souvenir, cadeau, confidence), une décision à deux qui attend sa
+ * réponse, ou une réplique qui a quelque chose à dire (`hasNews`) pas encore entendue ce jour.
+ * Le bavardage du quotidien n'allume rien. Lecture seule de l'état.
+ */
+export function keeperHasNews(
+  content: Content,
+  world: ReadonlyWorld,
+  me: PlayerIndex,
+  keeper: string,
+): boolean {
+  const dialogue = pickDialogue({ content, world }, me, keeper);
+  if (dialogue === null) return false;
+  if (dialogue.once !== null || awaitsAnswer(world, me, dialogue)) return true;
+  return hasNews(dialogue) && !heardThisDay(world, me, dialogue);
 }
 
 export interface ShopUiState {
@@ -291,5 +318,6 @@ export function shopModel(
     refusedFrom: refusedFrom === -1 ? tiles.length : refusedFrom,
     focus,
     detail,
+    news: keeperHasNews(content, world, me, shop.keeper),
   };
 }

@@ -4,6 +4,7 @@
 // « Parler » de la boutique; une réplique de quête ne rouvre pas la boutique derrière elle. Test court.
 import { describe, expect, it } from 'vitest';
 import type { Content } from '../src/donnees/charger';
+import { keeperHasNews } from '../src/interface/boutique/modele';
 import { aimOf } from '../src/simulation/briques/visee';
 import { pickDialogue, startTalk, talkView } from '../src/simulation/dialogues/conversation';
 import { DIALOGUES } from '../src/simulation/dialogues/reglages';
@@ -263,6 +264,34 @@ describe('comptoir tenu', () => {
       shop: SHOP,
     });
     expect(sim.world.players[0].talk).toBeNull();
+  });
+
+  it('pastille de « Parler » (écran de boutique): allumée tant qu’une réplique non entendue attend', () => {
+    const sim = sim10h(content);
+    const news = (): boolean => keeperHasNews(sim.content, sim.world, 0, KEEPER);
+    const talkFromShop = (): void => {
+      act(sim, 0, { type: 'shop_talk', shop: SHOP });
+      readThrough(sim);
+      act(sim, 0, { type: 'talk_close' });
+      wait(sim, 0.2);
+    };
+    // Ce qu'Odette a de neuf au départ (première visite...) s'épuise; le quotidien n'allume rien.
+    for (let i = 0; i < 6 && news(); i++) talkFromShop();
+    expect(news()).toBe(false);
+    expect(pickDialogue(sim, 0, KEEPER)?.once ?? null).toBeNull();
+    // Un cadeau (une fois): allumée, puis éteinte une fois entendu.
+    remember(contextOf(sim), GIFT, true, 'duo');
+    wait(sim, 0.2);
+    expect(news()).toBe(true);
+    talkFromShop();
+    expect(news()).toBe(false);
+    // Une nouvelle d'histoire qui se répète: allumée jusqu'à l'écoute du jour, et le lendemain.
+    openStory(sim);
+    expect(news()).toBe(true);
+    talkFromShop();
+    expect(news()).toBe(false);
+    sim.world.common.day += 1;
+    expect(news()).toBe(true);
   });
 
   it('remarque d’hygiène plus prioritaire: elle masque l’histoire, la boutique s’ouvre', () => {

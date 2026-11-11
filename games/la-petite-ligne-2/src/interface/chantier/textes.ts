@@ -9,7 +9,15 @@ export const SITE_TEXTS = {
   free: 'Rien à payer',
   paid: 'Payé',
   work: 'Travail',
-  workLeft: 'Reste {n} s',
+  /** Le travail restant, en mots (`workFeel`): la barre dit le reste. */
+  workFeel: {
+    todo: 'Pas encore commencé',
+    long: 'Encore un bon moment',
+    while: 'Encore un moment',
+    little: 'Encore un peu',
+    almost: 'Presque fini',
+    done: 'Fini',
+  },
   workNone: 'Rien à faire au marteau',
   workDuo: 'à deux: {n} fois plus vite',
   working: '{nom} travaille',

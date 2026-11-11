@@ -5,7 +5,9 @@ import { describe, expect, it } from 'vitest';
 import type { Content } from '../src/donnees/charger';
 import type { PlayerIndex } from '../src/donnees/schemas/communs';
 import { DATA_SCHEMA } from '../src/etat/monde';
-import { worksiteModel } from '../src/interface/chantier/modele';
+import { workFeel, worksiteModel } from '../src/interface/chantier/modele';
+import { SITE_TEXTS } from '../src/interface/chantier/textes';
+import { UI_TUNING } from '../src/interface/reglages';
 import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { aimOf } from '../src/simulation/briques/visee';
 import { HOUSING_TUNING } from '../src/simulation/logement/reglages';
@@ -333,5 +335,17 @@ describe('chantier', () => {
         nth(rooms, 0).site = 'etabli-de-gare';
       }),
     ).toMatch(/n'a pas la brique worksite/);
+  });
+
+  it('l’écran dit le travail restant en mots, pas en secondes (la règle reste en secondes)', () => {
+    const { almostS, littleS, whileS } = UI_TUNING.worksiteFeel;
+    expect(workFeel({ total: 120, done: 0, left: 120 })).toBe('todo');
+    expect(workFeel({ total: 120, done: 1, left: whileS + 1 })).toBe('long');
+    expect(workFeel({ total: 120, done: 60, left: whileS })).toBe('while');
+    expect(workFeel({ total: 120, done: 100, left: littleS })).toBe('little');
+    expect(workFeel({ total: 120, done: 118, left: almostS })).toBe('almost');
+    expect(workFeel({ total: 120, done: 120, left: 0 })).toBe('done');
+    // Aucun texte du travail ne porte d'unité de temps.
+    for (const text of Object.values(SITE_TEXTS.workFeel)) expect(text).not.toMatch(/\d|\bs\b/);
   });
 });

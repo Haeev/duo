@@ -27,7 +27,11 @@ import type { Sim } from '../src/simulation/noyau/pas';
 import { remember } from '../src/simulation/regles/memoire';
 import { addItem, countItem } from '../src/simulation/sac/inventaire';
 import { plan } from '../outils/nouveau';
-import { orderReminder, orderScreenModel } from '../src/interface/commande/modele';
+import {
+  orderReminder,
+  orderScreenModel,
+  RECEIVER_EXPRESSION,
+} from '../src/interface/commande/modele';
 import { act, contentWith, contextOf, wait } from './aides-l3';
 import { dataFiles, MEMBERS, newSim } from './aides';
 
@@ -368,6 +372,19 @@ describe('écran de livraison et carnet', () => {
       'margot-on-arrive',
     ]);
     expect(model?.mood).toBe('mail');
+    // Prix à l'unité et « à recevoir » séparés: le reste rapporte prix x reste, rien n'est reçu.
+    const row = model?.rows[0];
+    expect(row?.due).toBe(first.price * first.asked);
+    expect(row?.received).toBe(0);
+    expect(model?.toReceive).toBe(view.lines.reduce((s, l) => s + l.price * l.asked, 0));
+    expect(model?.received).toBe(0);
+  });
+
+  it('l’expression de Rosalie suit sa réplique: soucieuse quand le reste attendra samedi prochain', () => {
+    expect(RECEIVER_EXPRESSION.partial).toBe('soucieux');
+    expect(RECEIVER_EXPRESSION.open).toBe('content');
+    expect(RECEIVER_EXPRESSION.thanks).toBe('content');
+    expect(RECEIVER_EXPRESSION.nothing).not.toBe('content');
   });
 });
 

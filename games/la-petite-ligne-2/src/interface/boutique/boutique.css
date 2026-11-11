@@ -207,6 +207,25 @@
 .lpl-ui .shop-talk .key {
   font-size: 0.75rem;
 }
+/*
+ * Pastille de « Parler »: une réplique pas encore entendue attend (`keeperHasNews`). Un disque
+ * d'accent cerclé d'encre sombre au coin du bouton: sa présence fait le signal (forme, pas teinte).
+ */
+.lpl-ui .shop-talk {
+  position: relative;
+}
+.lpl-ui .shop-talk__news {
+  position: absolute;
+  top: -0.4375rem;
+  right: -0.4375rem;
+  z-index: 2;
+  width: 1.125rem;
+  height: 1.125rem;
+  box-sizing: border-box;
+  background: var(--accent);
+  border: 0.1875rem solid var(--dark-shadow, #2a2522);
+  border-radius: 50%;
+}
 .lpl-ui .shop-bigtab {
   display: flex;
   align-items: center;
@@ -626,6 +645,30 @@
 }
 .lpl-ui .shop-tile--owned {
   background: var(--paper-sunken);
+}
+/*
+ * Thème sombre: une casquette ou un gilet sombre se perdait sur la case sombre. La pièce se pose
+ * sur une étiquette de papier (les teintes du papier du carnet et de la partition), dans la case
+ * qui garde son cadre, son prix et son focus comme les autres; même papier dans le détail.
+ */
+[data-lpl-style='encre'] .lpl-ui .shop-tile--piece :is(.obj--tenue, .obj--tenue-picto),
+[data-lpl-style='encre'] .lpl-ui .shop-v3d.shop-v3d--tenue {
+  box-sizing: border-box;
+  background: #efe2c4;
+  color: #231a17;
+  border: 0.125rem solid #6e5a45;
+  border-radius: 0.25rem;
+  box-shadow: 0.125rem 0.125rem 0 rgb(0 0 0 / 0.45);
+}
+[data-lpl-style='encre'] .lpl-ui .shop-tile--piece :is(.obj--tenue, .obj--tenue-picto) {
+  width: 4.25rem;
+  height: 4.25rem;
+  padding: 0.25rem;
+  rotate: -1.5deg;
+}
+[data-lpl-style='encre'] .lpl-ui .shop-v3d.shop-v3d--tenue {
+  border-image: none;
+  rotate: 0.8deg;
 }
 .lpl-ui .shop-tile__mine {
   position: absolute;
