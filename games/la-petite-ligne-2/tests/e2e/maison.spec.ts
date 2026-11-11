@@ -286,14 +286,18 @@ test('M1 maison: devis chez Basile, cuisine payée au coffre, escalier fermé', 
   await shot(host, '3-cuisine-montee-hote');
 
   // L'escalier de l'étage reste fermé avant son étape: on marche dessus, on reste en bas.
-  // L'invité prend la place devant la cuisinière.
+  // L'invité prend la place devant la cuisinière. L'hôte se met dans l'axe de l'escalier à 0,15 m
+  // près: sa case est un pilier d'un mètre entre deux passages de la cloison, et le jeu adoucit
+  // les coins (0,35 m). À 0,25 m au sud de l'axe, pousser vers l'ouest contourne le pilier et mène
+  // à la pièce voisine (rejoué dans Node: de 214,35 à 214,70 on reste devant l'escalier, à 214,20
+  // comme à 214,75 on passe à côté). La tolérance de 0,3 m laissait ce cas arriver.
   await walk(
     duo,
     journal,
     MAP,
     [{ x: STAIRS.x + 1.1, y: STAIRS.y }, STOVE_SPOT],
     'escalier et cuisinière',
-    { tolerance: 0.3 },
+    { tolerance: 0.15 },
   );
   expect(await aimAt(duo, g, STOVE, STOVE.id, journal), 'cuisinière visée par l’invité').toBe(true);
   await shot(guest, '3-cuisine-montee-invite');
@@ -306,6 +310,9 @@ test('M1 maison: devis chez Basile, cuisine payée au coffre, escalier fermé', 
   );
   expect(moved, 'pas d’étage avant son étape').toBe(false);
   const after = await duo.until(host, 'monde lu', () => true);
+  journal.log(
+    `après la marche contre l'escalier: hôte en ${player(after, h).body.x.toFixed(2)}; ${player(after, h).body.y.toFixed(2)} cap ${player(after, h).body.facing.toFixed(2)}, vise ${(await aimOf(h))?.id ?? 'rien'}`,
+  );
   expect(player(after, h).body.x, 'toujours au rez-de-chaussée').toBeGreaterThan(14);
   expect(player(after, h).body.x).toBeLessThan(24);
   // Tourné vers l'escalier, la bulle le dit fermé.

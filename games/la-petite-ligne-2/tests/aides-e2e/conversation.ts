@@ -5,6 +5,9 @@
 //   Espace « pour passer la réplique » parti trop tôt ou trop tard répondait à la place du joueur;
 // - après la fermeture d'un écran, la touche d'action est ignorée 300 ms (`entrees/reglages.ts`):
 //   un Espace enchaîné aussitôt était avalé.
+// - à leur apparition, les choix restent inactifs un instant (`interface/garde-choix.ts`, 0,6 s),
+//   et une décision à deux ne se valide que par Entrée: un choix se prend donc toujours par
+//   Entrée, une fois les choix prêts (`.choices--pret`).
 // Ici, Espace ne part que sur une réplique entièrement affichée et pas encore passée, et un appui
 // d'action n'est rejoué que si l'état prouve qu'il n'a rien fait.
 import type { Side } from './duo';
@@ -98,15 +101,38 @@ export async function readTalk(
   }
 }
 
+/** Attente des choix prêts quand rien ne dit qu'une garde est en cours (jeu d'avant la garde). */
+const CHOICES_READY_MS = 1500;
+/** Attente des choix prêts quand la garde est affichée: son horloge ralentit sous charge. */
+const CHOICES_GUARDED_MS = 15_000;
+
 /**
- * Sur des choix affichés: porte le focus sur l'option dont le texte contient `option` (touche S,
- * le bas d'un AZERTY comme d'un QWERTY), la valide (Entrée) et attend que les choix s'effacent.
+ * Attend que les choix affichés acceptent une validation. Avec la garde des choix, leur boîte
+ * porte `choices--garde` puis `choices--pret`: on attend la seconde. Sans ces classes (jeu d'avant
+ * la garde), on n'attend que `CHOICES_READY_MS`: les choix y sont actifs dès leur apparition.
+ */
+export async function waitChoicesReady(side: Side): Promise<void> {
+  const read = async (): Promise<'ready' | 'guarded' | 'plain'> =>
+    await side.game().evaluate(() => {
+      const box = document.querySelector('.lpl-ui .dialogue .choices');
+      if (box?.classList.contains('choices--pret') === true) return 'ready';
+      return box?.classList.contains('choices--garde') === true ? 'guarded' : 'plain';
+    });
+  const first = await poll(side, read, (state) => state !== 'plain', CHOICES_READY_MS);
+  if (first === 'guarded') await poll(side, read, (state) => state === 'ready', CHOICES_GUARDED_MS);
+}
+
+/**
+ * Sur des choix affichés: attend qu'ils soient prêts, porte le focus sur l'option dont le texte
+ * contient `option` (touche S, le bas d'un AZERTY comme d'un QWERTY), la valide (Entrée, la seule
+ * touche qui tranche aussi une décision à deux) et attend que les choix s'effacent.
  */
 export async function pickChoice(side: Side, option: string): Promise<string> {
   const start = await talkScreen(side);
   if (start.state !== 'choice') throw new Error(`${side.who}: pas de choix à l’écran`);
   if (!start.choices.some((c) => c.includes(option)))
     throw new Error(`${side.who}: aucun choix « ${option} » parmi ${start.choices.join(' / ')}`);
+  await waitChoicesReady(side);
   let focused = start.focused;
   for (let i = 0; i < start.choices.length && !focused.includes(option); i++) {
     const before = focused;

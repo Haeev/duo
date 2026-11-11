@@ -1,6 +1,7 @@
 // P01 dialogue complet avec une habitante, P02 bulle d'action accrochée, P03 immobile pendant le
 // dialogue (CA-15, CA-26, CA-14). Données: `essai-gare`, la cheffe de gare au guichet.
 import { expect, test } from '@playwright/test';
+import { waitChoicesReady } from '../aides-e2e/conversation';
 import { distance, startDuo } from '../aides-e2e/duo';
 
 const VILLAGER = { x: 20, y: 15 };
@@ -48,6 +49,7 @@ test('dialogue complet, bulle accrochée, joueur immobile', async ({ browser }) 
   }
   await expect(choices.first()).toBeVisible();
   await host.shot('3-choix');
+  await waitChoicesReady(host);
   await host.press('Enter');
   // Le premier choix donne la besace: l'invité le voit aussi (état de l'hôte).
   await duo.until(host, 'besace reçue', (w) => w.players[me]?.bag !== null);

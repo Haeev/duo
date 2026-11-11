@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { SIM_DT } from '../../src/simulation/noyau/constantes';
 import { STORY } from '../../src/simulation/quetes/reglages';
+import { waitChoicesReady } from '../aides-e2e/conversation';
 import { startDuo, type ProbeWorld, type Side } from '../aides-e2e/duo';
 
 const QUEST = 'le-train-de-5h12';
@@ -149,6 +150,7 @@ test('P18b acte 1: la lettre à Firmin fait avancer la première étape', async 
   }
   await expect(choices.first(), 'la lettre se montre par un choix').toBeVisible();
   await host.shot('2-choix-lettre');
+  await waitChoicesReady(host);
   await host.press('Enter');
   for (let i = 0; i < 12 && (await box.isVisible()); i++) {
     await host.press('Space');

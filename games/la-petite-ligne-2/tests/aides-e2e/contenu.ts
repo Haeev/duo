@@ -7,6 +7,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Duo, ProbeWorld, Side } from './duo';
 import {
+  changeKeys,
   loadMap,
   me,
   seats,
@@ -224,7 +225,12 @@ export async function walk(
   map: PlaceMap,
   targets: readonly [Point | null, Point | null],
   label: string,
-  options: { readonly tolerance?: number; readonly timeoutMs?: number } = {},
+  options: {
+    readonly tolerance?: number;
+    readonly timeoutMs?: number;
+    /** La marche n'a plus lieu d'être (porte déjà passée): on s'arrête là, sans défaut. */
+    readonly stop?: (w: ProbeWorld) => boolean;
+  } = {},
 ): Promise<void> {
   await windowSize(duo, true);
   const result = await walkBoth(duo, targets, {
@@ -235,6 +241,8 @@ export async function walk(
     timeoutMs: options.timeoutMs ?? 60_000,
     // Les cases des portes ne sont pas des passages: y marcher fait entrer dans la pièce.
     avoid: doorCells(map),
+    leaveAvoided: true,
+    ...(options.stop === undefined ? {} : { stop: options.stop }),
   });
   const [seatH, seatG] = await seats(duo);
   const end = await duo.host.world();
@@ -265,7 +273,7 @@ export async function holdUntil(
     window.focus();
     document.body.focus();
   });
-  for (const key of keys) await side.page.keyboard.down(key);
+  await changeKeys(side, [], keys);
   const t0 = Date.now();
   let ok = false;
   try {
@@ -278,7 +286,7 @@ export async function holdUntil(
       await side.page.waitForTimeout(150);
     }
   } finally {
-    for (const key of keys) await side.page.keyboard.up(key);
+    await changeKeys(side, keys, []);
   }
   return ok;
 }
@@ -305,7 +313,15 @@ export async function passDoor(
       seat.side === duo.host ? [approach, null] : [null, approach];
     await walk(duo, journal, map, targets, `devant la porte (${seat.side.who})`, {
       tolerance: 0.2,
+      stop: inside,
     });
+    // L'approche se fait à 0,5 m du seuil: un dernier pas en retard (commandes de l'invité, image
+    // longue) peut déjà faire passer la porte. Elle est passée au clavier: c'est ce qu'on voulait.
+    const arrived = await duo.host.world();
+    if (arrived !== null && inside(arrived)) {
+      journal.log(`porte passée pendant l'approche (${seat.side.who})`);
+      return true;
+    }
     const before = await doorReport(duo, seat, door);
     if (await holdUntil(duo, seat.side, [key], inside, 15_000)) return true;
     journal.log(
