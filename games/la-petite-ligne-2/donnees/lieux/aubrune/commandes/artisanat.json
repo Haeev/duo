@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "artisanat",
+  "name": "Bois et pierre",
+  "pourquoi": "Ce que le duo tire du bois de la Côte et des cailloux du bourg. Les meubles de l'établi ne se commandent pas: faits de planches qui s'achètent, ils ne pourraient être payés plus que leurs planches sans ouvrir une boucle d'argent (economie-aubrune.md, 2). Prix: 1,25 fois le meilleur rachat (Basile pour la bûche, Mado pour la pierre).",
+  "lines": [
+    {
+      "id": "buche",
+      "item": "buche",
+      "count": {
+        "min": 15,
+        "max": 25
+      },
+      "price": 180,
+      "when": []
+    },
+    {
+      "id": "pierre",
+      "item": "pierre",
+      "count": {
+        "min": 10,
+        "max": 16
+      },
+      "price": 80,
+      "when": []
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "simone-ceux-qui-reviennent",
+  "from": "Simone Arnal",
+  "order": 50,
+  "when": [{ "type": "remembered", "key": "aubrune.acte3.fini" }],
+  "text": [
+    "On m'écrit que le train s'arrête de nouveau à Aubrune. Je suis partie la semaine de la fermeture, avec une valise et pas de raison.",
+    "Est-ce que la barrière grince toujours ? Est-ce qu'on laisse encore un lumignon, le soir, pour ceux qui partent ? Moi, j'en laissais un pour ceux qui reviennent.",
+    "Je ne reviendrai sans doute pas. Mais j'aime savoir que le train, lui, revient."
+  ],
+  "signature": "Simone Arnal",
+  "attach": [],
+  "pourquoi": "Après la fin de l'acte 3: une ancienne du bourg, partie à la fermeture comme tant d'autres, répond au retour du train. Elle reprend la coutume du lumignon (cahier 6.1) sans rien affirmer du mystère. Elle n'est pas un habitant et ne vient pas: rien à écrire ailleurs."
+}

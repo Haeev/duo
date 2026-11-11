@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "petit-rail-la-halte",
+  "from": "Le Petit Rail, page des régions",
+  "order": 30,
+  "when": [{ "type": "fact_at_least", "key": "commande.aubrune.lignes-livrees", "value": 1 }],
+  "text": [
+    "Une coupure de journal, glissée là par un abonné du dépôt. « À Aubrune, le train du samedi s'arrête de nouveau. Deux gardes de ligne tiennent la halte et chargent la commande. »",
+    "« Le chef de halte, M. Lacombe, n'a pas souhaité commenter. Il a regardé sa montre et a dit: le train est à l'heure. Moi aussi. »"
+  ],
+  "signature": "Le Petit Rail",
+  "attach": [],
+  "pourquoi": "Se souvenir de ce que le duo a fait (réponse 41 du client): la première ligne livrée en entier fait un entrefilet. Firmin parle en horaires."
+}

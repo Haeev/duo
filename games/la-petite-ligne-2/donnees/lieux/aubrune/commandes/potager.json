@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "id": "potager",
+  "name": "Potager",
+  "pourquoi": "Les légumes et les fleurs du potager de la maison du garde. Chaque ligne attend sa saison (celle de la culture): on ne demande pas de tomates en hiver. Prix: 1,25 fois le meilleur rachat au comptoir, arrondi aux 10 centimes, et toujours sous le prix de l'étal des Delmas pour la carotte, le poireau et la pomme de terre. Les fleurs n'ont pas de rachat: un prix de bouquet, autour de deux à trois graines.",
+  "lines": [
+    {
+      "id": "radis",
+      "item": "radis",
+      "count": {
+        "min": 10,
+        "max": 16
+      },
+      "price": 90,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["spring", "autumn"]
+        }
+      ]
+    },
+    {
+      "id": "radis-croquant",
+      "item": "radis-croquant",
+      "count": {
+        "min": 4,
+        "max": 8
+      },
+      "price": 250,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["spring", "autumn"]
+        }
+      ]
+    },
+    {
+      "id": "tomate",
+      "item": "tomate",
+      "count": {
+        "min": 10,
+        "max": 15
+      },
+      "price": 100,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["spring", "summer"]
+        }
+      ]
+    },
+    {
+      "id": "carotte",
+      "item": "carotte",
+      "count": {
+        "min": 8,
+        "max": 12
+      },
+      "price": 140,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["spring", "summer", "autumn"]
+        }
+      ]
+    },
+    {
+      "id": "poireau",
+      "item": "poireau",
+      "count": {
+        "min": 6,
+        "max": 10
+      },
+      "price": 150,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["autumn", "winter"]
+        }
+      ]
+    },
+    {
+      "id": "pomme-de-terre",
+      "item": "pomme-de-terre",
+      "count": {
+        "min": 10,
+        "max": 16
+      },
+      "price": 110,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["spring", "summer"]
+        }
+      ]
+    },
+    {
+      "id": "tournesol",
+      "item": "tournesol",
+      "count": {
+        "min": 4,
+        "max": 8
+      },
+      "price": 120,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["summer"]
+        }
+      ]
+    },
+    {
+      "id": "pensee",
+      "item": "pensee",
+      "count": {
+        "min": 6,
+        "max": 10
+      },
+      "price": 90,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["autumn", "winter", "spring"]
+        }
+      ]
+    },
+    {
+      "id": "marguerite",
+      "item": "marguerite",
+      "count": {
+        "min": 6,
+        "max": 10
+      },
+      "price": 80,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["spring", "summer"]
+        }
+      ]
+    }
+  ]
+}

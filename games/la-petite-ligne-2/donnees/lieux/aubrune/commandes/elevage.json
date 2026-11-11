@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "elevage",
+  "name": "Basse-cour",
+  "pourquoi": "Les œufs des poules du jardin: la ligne la plus régulière, deux poules suffisent à la tenir en une semaine. Prix: 1,25 fois le rachat du fournil (le mieux payé), arrondi aux 10 centimes.",
+  "lines": [
+    {
+      "id": "oeuf",
+      "item": "oeuf",
+      "count": {
+        "min": 8,
+        "max": 14
+      },
+      "price": 130,
+      "when": []
+    },
+    {
+      "id": "oeuf-roux",
+      "item": "oeuf-roux",
+      "count": {
+        "min": 4,
+        "max": 8
+      },
+      "price": 190,
+      "when": []
+    }
+  ]
+}

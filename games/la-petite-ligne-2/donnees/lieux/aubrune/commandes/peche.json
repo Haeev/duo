@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "id": "peche",
+  "name": "Pêche",
+  "pourquoi": "Les poissons du ruisseau, du bief et de l'étang. Prix: 1,25 fois le rachat du café, arrondi aux 10 centimes. La commande ne passe pas par le plafond du café (85 euros par jour): c'est là qu'elle aide le plus un duo qui pêche beaucoup. Peu d'exemplaires des gros poissons, pour que la ligne reste faisable en une semaine de pêche tranquille.",
+  "lines": [
+    {
+      "id": "goujon",
+      "item": "goujon",
+      "count": {
+        "min": 5,
+        "max": 8
+      },
+      "price": 360,
+      "when": []
+    },
+    {
+      "id": "ablette",
+      "item": "ablette",
+      "count": {
+        "min": 5,
+        "max": 8
+      },
+      "price": 300,
+      "when": []
+    },
+    {
+      "id": "vairon",
+      "item": "vairon",
+      "count": {
+        "min": 5,
+        "max": 8
+      },
+      "price": 250,
+      "when": []
+    },
+    {
+      "id": "gardon",
+      "item": "gardon",
+      "count": {
+        "min": 4,
+        "max": 6
+      },
+      "price": 330,
+      "when": []
+    },
+    {
+      "id": "perche",
+      "item": "perche",
+      "count": {
+        "min": 3,
+        "max": 5
+      },
+      "price": 600,
+      "when": []
+    },
+    {
+      "id": "chevesne",
+      "item": "chevesne",
+      "count": {
+        "min": 2,
+        "max": 4
+      },
+      "price": 550,
+      "when": []
+    },
+    {
+      "id": "breme",
+      "item": "breme",
+      "count": {
+        "min": 2,
+        "max": 3
+      },
+      "price": 530,
+      "when": []
+    },
+    {
+      "id": "tanche",
+      "item": "tanche",
+      "count": {
+        "min": 2,
+        "max": 3
+      },
+      "price": 750,
+      "when": []
+    },
+    {
+      "id": "truite",
+      "item": "truite",
+      "count": {
+        "min": 2,
+        "max": 3
+      },
+      "price": 900,
+      "when": []
+    },
+    {
+      "id": "brochet",
+      "item": "brochet",
+      "count": {
+        "min": 1,
+        "max": 2
+      },
+      "price": 1500,
+      "when": []
+    }
+  ]
+}

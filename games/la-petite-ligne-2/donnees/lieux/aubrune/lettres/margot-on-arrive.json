@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "margot-on-arrive",
+  "from": "Margot Delmas",
+  "order": 20,
+  "when": [
+    { "type": "remembered", "key": "aubrune.acte2.fini" },
+    { "type": "not", "condition": { "type": "remembered", "key": "aubrune.acte3.train2" } }
+  ],
+  "text": [
+    "Bonjour les gardes. On nous a dit que la ferme d'en bas attendait quelqu'un. Paulin dit que non, que c'est trop loin, que les poules ne voudront pas.",
+    "Moi je dis que les poules iront où on les met. Nous viendrons par un train du samedi, avec Léon, les poules et la mauvaise humeur de Paulin.",
+    "En attendant, voici des graines de carotte de chez nous. Elles poussent même quand on ne les regarde pas."
+  ],
+  "signature": "Margot Delmas",
+  "enclosed": "Six graines de carotte",
+  "attach": [{ "type": "give_item", "item": "graines-carotte", "count": 6 }],
+  "pourquoi": "Les Delmas arrivent par le train de l'acte 3 (fait aubrune.acte3.train2): la lettre ne part que tant qu'ils ne sont pas là. Margot est la diplomate, Paulin le têtu. Les graines sont celles que la cour des Delmas vendra ensuite: rien qui fausse l'économie (six graines, 1,80 € au plus bas)."
+}

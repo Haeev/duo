@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "cueillette",
+  "name": "Cueillette",
+  "pourquoi": "Ce qui se ramasse sans semer: mûres des ronces (été, automne), coquelicots des talus (printemps, été), pommes du fruitier, vieilles pièces des fouilles le long de la voie. Prix: 1,25 fois le meilleur rachat; la pomme reste à 0,80 €, sous son prix à l'épicerie (0,90 €).",
+  "lines": [
+    {
+      "id": "mures",
+      "item": "mures",
+      "count": {
+        "min": 10,
+        "max": 16
+      },
+      "price": 60,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["summer", "autumn"]
+        }
+      ]
+    },
+    {
+      "id": "coquelicot",
+      "item": "coquelicot",
+      "count": {
+        "min": 6,
+        "max": 10
+      },
+      "price": 80,
+      "when": [
+        {
+          "type": "season_is",
+          "seasons": ["spring", "summer"]
+        }
+      ]
+    },
+    {
+      "id": "pomme",
+      "item": "pomme",
+      "count": {
+        "min": 6,
+        "max": 10
+      },
+      "price": 80,
+      "when": []
+    },
+    {
+      "id": "vieille-piece",
+      "item": "vieille-piece",
+      "count": {
+        "min": 3,
+        "max": 5
+      },
+      "price": 250,
+      "when": []
+    }
+  ]
+}

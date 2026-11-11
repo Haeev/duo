@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "compagnie-la-halte-rouvre",
+  "from": "La Compagnie de la Petite Ligne",
+  "order": 10,
+  "when": [{ "type": "remembered", "key": "aubrune.acte2.fini" }],
+  "text": [
+    "Aux gardes de la halte d'Aubrune. Le service des haltes vous informe que la halte figure de nouveau au tableau des arrêts: le samedi, de 10 h 04 à 14 h 40.",
+    "Une commande sera remise chaque semaine à la mécanicienne du train. Ce qui ne peut partir un samedi partira le suivant. Le service n'a jamais pressé une poule.",
+    "Le service rappelle que les gardes ne sont pas autorisés à donner un prénom aux locomotives. Le service sait qu'il est trop tard."
+  ],
+  "signature": "Le service des haltes, Hautefonte",
+  "attach": [],
+  "pourquoi": "La première lettre du premier samedi régulier: elle dit la règle de la commande (chaque semaine, rien de perdu) dans la voix de la Compagnie, avant même que les joueurs ouvrent l'écran. Le prénom de la locomotive, c'est Georgette (Rosalie)."
+}

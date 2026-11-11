@@ -204,10 +204,31 @@ Les jours suivants, le bonjour est celui du quotidien de l'habitant, suivi du ch
 | Meubles vendus par un commerce, ou livrés à la fin d'une étape | les meubles viennent de l'inventaire de départ et de l'établi |
 | Escaliers fermés tant que la pièce n'existe pas (les portes sont écrites par l'assembleur du plan) | on peut monter à l'étage avant de l'avoir construit |
 | Pièce en sous-sol (`floor` au moins 0) | la cave est déclarée au niveau 0 |
-| Commande du train du samedi | non comptée dans le revenu |
+| Commande du train du samedi | branchée le 2026-11-11 (section 6.1), hors du revenu par jour du script |
 | Enclume à poser près de la forge (le meuble existe) | l'amélioration d'outil à 30 € ne se joue que par le dialogue de l'histoire |
 
 À créer pour compléter l'offre (rien n'a été créé sans modèle): sac à dos de 10 cases (le modèle existe, ni fiche ni vignette), ferraille, plume, coquille de rivière, girolle, savon parfumé, vêtements et coiffures de Solange, un pommier et des coquelicots à poser sur la carte d'Aubrune (la ressource existe, le plan n'en place pas). Objets vendus ici qui ont une vignette mais pas de modèle 3D: grain, pierre à aiguiser, sac de toile, marteau.
+
+### 6.1 La commande du samedi (2026-11-11)
+
+Données: `donnees/lieux/aubrune/commande.json` (guichet), `commandes/` (six tables, 40 lignes), `lettres/` (huit lettres). Moteur: `src/simulation/commandes/`. Une fois l'acte 2 fini, chaque samedi de 10 h 04 à 14 h 40, Rosalie reçoit au quai une commande de 3 à 5 lignes tirées dans ce que le duo a déjà eu en main (récolté, pêché, cuisiné, reçu, vendu), une table après l'autre. Elle est au carnet dès le départ du train précédent. On livre ligne par ligne, du sac puis de la consigne de la halte; chaque unité est payée à la livraison, **au coffre commun** (la Compagnie paie la halte, et le coffre paie la maison). Ce qui manque reste demandé la semaine suivante, sans pénalité.
+
+**Rapport choisi: 1,25 fois le meilleur rachat au comptoir**, arrondi aux 10 centimes (test: au-dessus du rachat, au plus 1,3 fois, sous le besoin du jour qui paie 1,5). Trois garde-fous, vérifiés par `tests/commande-du-samedi.test.ts` sur toutes les lignes: sous le prix de tout commerce qui vend l'objet (pomme 0,80 contre 0,90 à l'épicerie; carotte 1,40, poireau 1,50, pomme de terre 1,10, sous l'étal des Delmas); un plat dont tous les ingrédients s'achètent est payé moins que ses ingrédients, même réussi parfait (soupe de légumes 2,30, pommes sautées 2,50; l'omelette reste à 3,40, sous les 3,50 du café; la tarte aux pommes à 2,20); ni meuble de l'établi (fait de planches achetées) ni repas spécial. Sans rachat au comptoir (fleurs, plats du café non rachetés), un prix proche des ingrédients ou de deux à trois graines.
+
+| Table | Lignes | Exemples (unité) |
+|---|---|---|
+| Potager | 9 (chacune en sa saison) | radis 0,90 x 10 à 16; carotte 1,40 x 8 à 12; tomate 1,00 x 10 à 15; pensée 0,90 x 6 à 10 |
+| Pêche | 10 | goujon 3,60 x 5 à 8; perche 6,00 x 3 à 5; truite 9,00 x 2 à 3; brochet 15,00 x 1 à 2 |
+| Cuisine | 13 | omelette 3,40 x 4 à 6; friture 9,60 x 2 à 3; truite grillée 9,90 x 2 à 3 |
+| Basse-cour | 2 | œuf 1,30 x 8 à 14; œuf roux 1,90 x 4 à 8 |
+| Bois et pierre | 2 | bûche 1,80 x 15 à 25; pierre 0,80 x 10 à 16 |
+| Cueillette | 4 | mûres 0,60 x 10 à 16 (été, automne); vieille pièce 2,50 x 3 à 5 |
+
+Gain attendu d'une commande livrée en entier (moyenne de 20 000 tirages, saisons comprises): **début** (après l'acte 2: radis, carottes, œufs, bûches, pierres, goujons, ablettes, vairons, œufs au plat, omelettes, cueillette) 60 à 63 € par semaine; **milieu** (acte 3: légumes d'été, perches, tanches, soupe, gratin, friture) 59 à 60 €; **fin** (tout) 57 à 59 €. Le montant reste stable: plus de lignes possibles, pas de lignes plus chères, la commande ne prend pas le pas sur le reste. Le gain se répartit sur des métiers variés, sans plafond de commerçant: un duo qui pêche beaucoup, bloqué par le plafond du café (85 € par jour), y gagne vraiment en plus.
+
+Comparé aux coûts de la maison: environ 60 € par semaine, c'est une demi-journée de revenu d'un duo médian (127 € par jour), versée tout entière au coffre commun, soit environ 13 % de plus au coffre (qui reçoit la moitié du revenu net). L'étage (800 €) passe du jour 31 au jour 28 ou 29 (estimation, hors script) pour un duo médian qui livre chaque semaine; la cuisine (jour 6) et la chambre (jour 11) ne bougent pas, la commande ne commençant qu'après l'acte 2. Pour aider davantage, une seule valeur à monter par ligne: `count` (les prix gardent leurs garde-fous).
+
+Le courrier: au plus deux lettres par passage, quand leurs conditions sont vraies. Huit lettres d'Aubrune: la Compagnie (la halte rouvre; douze lignes livrées, avec un mandat de 20 € une seule fois; l'horaire d'hiver), Margot Delmas (six graines de carotte, avant l'arrivée des Delmas), Berthe Lavergne (sa meule), Le Petit Rail (la première ligne livrée), les pêcheurs de Hautefonte (le premier brochet), Simone Arnal (après l'acte 3). Aucune ne touche au sac postal des « Lettres en retard », qui reste une suite à part.
 
 ## 7. Trois signalements
 
@@ -221,4 +242,5 @@ Les jours suivants, le bonjour est celui du quotidien de l'habitant, suivi du ch
 |---|---|---|
 | 2026-11-11 | Version 1 | première économie d'Aubrune |
 | 2026-11-11 | Rachats: bûche chez Basile 0,60 à 1,40; pierre 0,30 à 0,60; vieille pièce 1,20 à 2,00; radis croquant 1,00 à 2,00 (Café) et 0,80 à 1,40 (Épicerie); omelette 2,20 à 2,80; poissons multipliés par 2,4 (goujon 2,90, ablette 2,40, perche 4,80, tanche 6,00, truite 7,20, brochet 12,00). Plafonds: Basile 12 à 35 €, Colette 45 à 85 €. Pot-au-feu de l'acte 3 conditionné à la cuisine payée. | le client trouve la maison trop lente (cuisine au jour 10, étage au jour 82 pour un duo tranquille) et veut le pot-au-feu dans la cuisine de la maison. Cible: environ deux fois plus vite, 40 à 50 € par jour à l'acte 1. Prix des pièces inchangés (cahier). L'omelette ne peut dépasser 2,89 € sans être rachetée plus cher qu'elle ne se vend (3,50 €, amitié et repas compris), d'où 2,80 €; les œufs crus restent à 1,00 € pour que cuisiner paie toujours. |
+| 2026-11-11 | Commande du samedi branchée (section 6.1): 40 lignes à 1,25 fois le meilleur rachat, payées au coffre commun, environ 60 € par semaine; huit lettres. | audit d'Aubrune, B.6; le client trouve la maison trop lente: une rentrée régulière au coffre, sans plafond de commerçant. |
 | 2026-11-11 | Collections d'Aubrune: 10 poissons nouveaux rachetés au café (2,00 à 9,60 €), graines de fleurs en rayon (0,30 à 0,50 €), 9 trésors « rares » ajoutés aux fouilles; fleurs, insectes, trésors et nouveaux plats sans rachat. | `collections-aubrune.md`. Le prix moyen d'une prise passe de 4,72 à 4,31 € (plus de poissons communs): duo tranquille 103,30 à 99,40 € (acte 2) et 104,90 à 101,10 € (acte 3); médian et appliqué inchangés (plafond du café). Les fouilles rendent environ 1,50 € de moins par jour en vieilles pièces (non compté par le script). |

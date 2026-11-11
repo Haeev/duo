@@ -1,0 +1,31 @@
+// GABARIT: une table de lignes de la commande de la semaine (un métier: potager, pêche, cuisine...).
+// Créer: pnpm nouveau commande <table> <lieu>   -> donnees/lieux/<lieu>/commandes/<table>.json
+// Schéma: src/donnees/schemas/commande.ts. Moteur: src/simulation/commandes/ (rien à y toucher).
+// Le lieu doit avoir un guichet (commande.json). Chaque semaine, le jeu tire 3 à 5 lignes dans
+// toutes les tables du lieu, une table après l'autre, parmi les lignes que le duo sait produire.
+{
+  "schema": 1,
+  "id": "exemple-commande",
+  // Nom court, affiché à côté de chaque ligne (40 caractères au plus).
+  "name": "Verger",
+  // Facultatif: d'où viennent les objets, comment les prix ont été fixés.
+  "pourquoi": "Exemple: les fruits du verger, payés 1,25 fois le meilleur rachat au comptoir.",
+  "lines": [
+    {
+      // Unique dans le lieu, toutes tables confondues.
+      "id": "pomme-du-verger",
+      // L'objet demandé (commun/objets/). La ligne ne sort au tirage que si le duo l'a déjà eu en
+      // main (récolté, pêché, cuisiné, reçu, vendu): « ce que le duo sait produire ».
+      "item": "pomme",
+      // Quantité tirée entre min et max.
+      "count": { "min": 4, "max": 8 },
+      // Prix d'une unité livrée, en CENTIMES, multiple de 10. Règle d'Aubrune: un peu mieux que le
+      // comptoir (1,25 fois le meilleur rachat), toujours sous le prix d'un commerce qui le vend,
+      // et sous le coût de ses ingrédients si tous s'achètent (aucune boucle d'argent).
+      "price": 80,
+      // Conditions de plus (mêmes que les dialogues): saison de la culture, fait d'histoire...
+      //   [{ "type": "season_is", "seasons": ["autumn"] }]
+      "when": [],
+    },
+  ],
+}

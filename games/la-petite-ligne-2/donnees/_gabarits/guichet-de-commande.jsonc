@@ -1,0 +1,39 @@
+// GABARIT: le guichet de la commande de la semaine d'un lieu (cahier 4.1, train du samedi).
+// Créer: pnpm nouveau guichet-de-commande commande <lieu>   -> donnees/lieux/<lieu>/commande.json (un par lieu)
+// Schéma: src/donnees/schemas/commande.ts. Moteur: src/simulation/commandes/ (rien à y toucher).
+// Ensuite: les tables de lignes (pnpm nouveau commande <table> <lieu>) et les lettres
+// (pnpm nouveau lettre <id> <lieu>). Sans guichet, ni tables ni lettres ne se chargent.
+{
+  "schema": 1,
+  // Événement du calendrier du lieu (evenements/<id>.json) pendant lequel on livre: le train du
+  // samedi. Pendant ses heures, et seulement là, la livraison et le courrier sont possibles.
+  "event": "visiteur-du-samedi",
+  // L'habitant qui reçoit (habitants/ du même lieu): à la fin de chaque conversation avec lui,
+  // pendant l'événement, une page propose « talk.open » (comme la boutique d'un commerçant).
+  "receiver": "cheffe-de-gare",
+  // Conditions pour que les commandes commencent (fait d'histoire); [] = dès le début.
+  //   [{ "type": "remembered", "key": "aubrune.acte2.fini" }]
+  "when": [],
+  // Nombre de lignes de chaque commande, lignes reportées comprises (cahier: 3 à 5).
+  "lines": { "min": 3, "max": 5 },
+  // Où va l'argent d'une ligne livrée: "chest" (coffre commun) ou "deliverer" (bourse de qui livre).
+  "pay": "chest",
+  // Rangements de la carte (meubles à brique store, par identifiant d'objet de la carte) où la
+  // livraison puise après le sac: la consigne de la gare. [] = le sac seul.
+  "stores": ["coffre-de-gare"],
+  // Lettres qui arrivent au plus à chaque passage de l'événement (0: pas de courrier).
+  "mailPerVisit": 2,
+  // Les deux choix de la page ajoutée à la conversation (40 caractères au plus).
+  "talk": { "open": "Livrer la commande", "leave": "Pas maintenant" },
+  // Répliques de qui reçoit, dans sa voix, dans l'écran de livraison (400 caractères au plus):
+  // à l'ouverture, tout livré, livré en partie, rien à livrer, courrier qui attend.
+  "says": {
+    "open": "La commande ? Pose tout là, je compte.",
+    "thanks": "Tout y est. Merci, c'est parti.",
+    "partial": "Le reste partira la semaine prochaine. Rien ne presse.",
+    "nothing": "Rien cette fois ? La commande attendra.",
+    "mail": "Et il y a du courrier pour vous.",
+  },
+  // Facultatif: pourquoi c'est lui qui reçoit, pourquoi l'argent va là, où est la consigne.
+  "pourquoi": "Exemple: la cheffe de gare reçoit, l'argent va au coffre commun.",
+}

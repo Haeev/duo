@@ -115,6 +115,22 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     folder: 'lieux/<lieu>/logements',
     inPlace: true,
   },
+  // Commande de la semaine (src/simulation/commandes/): un guichet par lieu, des tables, des lettres.
+  'guichet-de-commande': {
+    files: [{ from: 'guichet-de-commande.jsonc', to: 'commande.json' }],
+    folder: 'lieux/<lieu>',
+    inPlace: true,
+  },
+  commande: {
+    files: [{ from: 'commande.jsonc', to: '<id>.json' }],
+    folder: 'lieux/<lieu>/commandes',
+    inPlace: true,
+  },
+  lettre: {
+    files: [{ from: 'lettre.jsonc', to: '<id>.json' }],
+    folder: 'lieux/<lieu>/lettres',
+    inPlace: true,
+  },
   quete: {
     files: [{ from: 'quete.jsonc', to: '<id>.json' }],
     folder: 'lieux/<lieu>/quetes',

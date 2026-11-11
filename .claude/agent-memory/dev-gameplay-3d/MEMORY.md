@@ -789,3 +789,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Cadeau d'un habitant en fin de suite: dialogue `once: "player"`, priorité 58, `when` sur `aubrune.<suite>.fini`, nœud `effects` avec `give_piece` (comme `achille-canne-fine`): aucune quête à toucher.
 - Vignettes 3D hors éditeur: la fabrique `characterPreview` sur un canevas détaché, `thumbnail(look, 'piece')`, puis `dispose` aussitôt; démonstration de la boutique: `#mercerie` (départ réglé sur Aubrune par `settings.start`, `editorAtStart: false`, boutique ouverte par un faux `shop_opened`: le comptoir tenu donne d'abord la parole à Solange).
 - `src/interface/cuisine/index.ts` avait un `switch` incomplet (`clock_struck`) laissé par un autre lot: lint seul, `tsc` ne le voit pas.
+
+## Commande du samedi et courrier (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Un type de contenu par lieu sans toucher au format: tout l'état en faits de `progress.memory` (clés à 4 segments au plus), l'hôte tire avec `world.seed` (`unitHash` de `monde/meteo.ts`), l'invité lit les faits. Test hôte/invité: `progressParts` puis `createProgressAssembler` sur un monde à `seed: 0`.
+- « Ce que le duo sait produire »: un système placé en dernier dans `SYSTEMS` lit `item_gained` de `sim.events` (tout passe par `giveItem`, achats et rangements compris).
+- Page ajoutée en fin de conversation (comme la boutique): nœud réservé dans `DIALOGUES`, ajouté à la liste `reserved` de `dialogues/valider.ts`, géré dans `offerShop`, `talkChoose` et `talkView` de `conversation.ts`.
+- Les poches ne tiennent pas 25 bûches: dans un test, ranger les grosses quantités dans un rangement (`objects[id].store[i] = { item, count }`).
+- Ports du serveur Vite: d'autres membres en tiennent (5391, 5947...); `ss -ltnp` avant, `--strictPort --host 127.0.0.1`, attendre « ready » avant la capture. Playwright global: `require('/opt/node22/lib/node_modules/playwright')`.
+- Thème sombre: la classe `focus` reçoit le contour global d'`encre.css` (décalé de 0,44 rem, il déborde sur la ligne voisine); prendre une classe à soi. Une `.key` posée sur du papier hors du carnet garde le cadre sombre: la redéfinir sous `[data-lpl-style='encre']`.

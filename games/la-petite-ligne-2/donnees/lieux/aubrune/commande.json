@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "event": "train-du-samedi",
+  "receiver": "rosalie",
+  "when": [{ "type": "remembered", "key": "aubrune.acte2.fini" }],
+  "lines": { "min": 3, "max": 5 },
+  "pay": "chest",
+  "stores": ["halte-consigne"],
+  "mailPerVisit": 2,
+  "talk": { "open": "Livrer la commande", "leave": "Pas maintenant" },
+  "says": {
+    "open": "La commande de la semaine ! Pose ça sur le quai, je charge. Georgette tire tout, sauf les excuses.",
+    "thanks": "Tout y est. Je charge, je signe, et je repars à l'heure: j'ai une réputation.",
+    "partial": "Le reste, samedi prochain. La commande attend, Georgette aussi. Elles ont l'habitude.",
+    "nothing": "Rien pour le fourgon ? Pas grave. La commande reste au carnet, et moi je reviens samedi.",
+    "mail": "Et du courrier pour vous, ramassé au dépôt. Le dépôt ne lit pas les lettres. Moi non plus. Presque."
+  },
+  "pourquoi": "Rosalie reçoit la commande: c'est elle qui descend du train du samedi et reste au quai de 10 h 04 à 14 h 40 (le Contrôleur ne vient qu'avec l'autorail de 5 h 12), et le fourgon à bagages s'arrête au droit du quai. La Compagnie paie la halte et non un garde: l'argent va au coffre commun, celui des pièces de la maison. La livraison puise dans le sac, puis dans la consigne de la halte (le coffre du guichet, à quelques pas du quai): de quoi préparer la commande dans la semaine sans tout porter sur soi."
+}
