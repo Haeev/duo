@@ -97,6 +97,11 @@
       "item": "graines-giroflee",
       "price": 40,
       "dailyStock": 5
+    },
+    {
+      "item": "bobine-de-fil",
+      "price": 250,
+      "dailyStock": 4
     }
   ],
   "buys": [
