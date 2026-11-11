@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-averse",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Hier, la pluie, et vous deux dehors. La roue a bien tourné: l'eau, ça la réveille. Vous aussi, on dirait.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

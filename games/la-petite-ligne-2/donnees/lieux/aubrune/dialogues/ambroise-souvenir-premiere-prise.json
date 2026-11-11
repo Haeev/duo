@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-premiere-prise",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "souvenirs.premiere-prise",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Un poisson. Sorti à quelle heure ? ... Tu ne sais pas. Évidemment. Un jour, je te prêterai une montre. Un jour.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

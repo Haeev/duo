@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "armand-absence",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.armand.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.armand.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Oh ! Tu... enfin, plusieurs jours. J'avais préparé une phrase pour ton retour. Je l'ai oubliée. Enfin: bonjour. C'était ça.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Ta moitié est passée chaque jour. Je voulais lui demander où tu étais. Enfin, je l'ai pensé très fort. Ça a dû s'entendre.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

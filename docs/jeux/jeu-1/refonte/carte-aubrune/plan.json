@@ -4023,7 +4023,7 @@
     },
     {
       "id": "pommier-verger",
-      "type": "fruitier",
+      "type": "pommier-d-automne",
       "x": 309.5,
       "y": 118.5,
       "pourquoi": "le pommier du verger communal: on le secoue, les pommes tombent dans l'herbe; le coin de cueillette est au sud-est, côté caméra, hors du houppier"

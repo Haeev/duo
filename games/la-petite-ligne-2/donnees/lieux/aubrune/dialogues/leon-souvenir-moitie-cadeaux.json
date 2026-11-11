@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-moitie-cadeaux",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.leon.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Ta moitié m'a fait cent cadeaux ! Enfin, trois. Mais trois, c'est un record. Enfin, c'est mon record.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

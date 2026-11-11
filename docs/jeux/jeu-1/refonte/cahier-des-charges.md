@@ -4,8 +4,8 @@
 |---|---|
 | Identifiant | nouveau paquet de jeu à côté de l'ancien, identifiant proposé `petite-ligne` (à fixer par ADR, `technique.md` 2.3); l'ancien `la-petite-ligne` 0.13.0 reste jouable jusqu'à l'Alpha du premier lieu, puis il est retiré |
 | Statut | validé sur le fond par le client le 2026-11-10; questions restantes en section 14 |
-| Version du document | 0.2 |
-| Dernière mise à jour | 2026-11-10 |
+| Version du document | 0.3 |
+| Dernière mise à jour | 2026-11-11 |
 | Rédaction | game-designer (sections 1 à 6, 11, propositions des sections 12 à 14); sections 7 à 10 résumées ici, leurs documents de référence font foi |
 | Sources | réponses du client aux 75 questions: `docs/jeux/jeu-1/refonte/reponses-client-2026-11-10.md` (fait foi; les renvois « R23 » désignent ses réponses); ressenti visé: `docs/jeux/jeu-1/refonte/references-de-ressenti.md`; direction artistique: `bible-artistique.md`; interface: `interface.md`; technique: `technique.md` (même dossier); simulation: `docs/jeux/jeu-1/simulations/refonte_besoins_economie.py` |
 | Remplace | pour tout le contenu: `docs/jeux/jeu-1/cahier-des-charges.md` et les documents de conception 0.12 et 0.13, qui deviennent des archives |
@@ -129,7 +129,8 @@ Le client cite deux références de genre: un jeu de vie paisible très connu (p
 | Durée | 2 heures de jeu ajoutées à l'horloge; à l'écran, une scène de wagon de 20 à 40 secondes (le temps de charger le lieu) où l'on peut parler au contrôleur | le trajet a un coût léger et un charme |
 | Prix | gratuit avec la carte de ligne reçue à la fin d'Aubrune | l'argent sert à la maison, pas au billet (R33) |
 | Retour | toujours possible vers tout lieu déjà rouvert | R6 |
-| Train du samedi | à Aubrune, chaque samedi à 10 h: la commande de la semaine (3 à 5 lignes d'objets, payée en euros, ce qui manque est reporté sans pénalité), le courrier, parfois un nouvel habitant | décision du premier tour |
+| Train du samedi | à Aubrune, chaque samedi à 10 h: la commande de la semaine (3 à 5 lignes d'objets, payée en euros, ce qui manque est reporté sans pénalité), le courrier, parfois un nouvel habitant. Livré: une fois l'acte 2 fini, le train de Rosalie est à quai chaque samedi de 10 h 04 à 14 h 40 (événements `train-du-samedi` et `depart-du-train-du-samedi`), et son sifflet entre au carnet des musiques; la commande hebdomadaire n'est pas encore branchée (seule la première commande, à l'acte 2, existe) | décision du premier tour |
+| Autorail de 5 h 12 | à Aubrune, après le premier départ vers Hautefonte, l'autorail crème s'arrête chaque nuit de 5 h 12 à 5 h 45; le Contrôleur descend sur le quai, on peut lui parler; il ne prend personne (`autorail-de-5h12`, `depart-de-l-autorail`) | la récompense de la Veillée: le mystère devenu un horaire; sans lui, le Contrôleur ne reviendrait jamais |
 | Une seule horloge | l'heure, le jour, la saison et la météo sont les mêmes dans tous les lieux; seul le lieu où se trouvent les joueurs est simulé en détail | simple à comprendre et à sauvegarder |
 | Pendant l'absence | le potager pousse sans faner, le poulailler garde ses œufs jusqu'à la limite du pondoir, les habitants avancent leur calendrier | rien ne punit le voyage |
 
@@ -271,6 +272,7 @@ Prix: amélioré 30 € et des matériaux, à la forge de Mado ou chez l'artisan
 - **Vente** (R34): uniquement aux commerçants, dans le thème de leur métier. Chaque commerçant affiche à son ardoise ce qu'il achète. Ce qu'il n'achète pas, il le dit avec son caractère (« Du goujon ? Ça sent la vase. »). Chaque matin, chaque commerçant a un **besoin du jour** écrit à la craie devant sa boutique: cet objet est payé 50 % de plus.
 - **Mémoire des prix** (validée le 10 novembre): le carnet retient, pour chaque objet, le prix vu chez chaque commerçant déjà visité, par l'un ou l'autre des joueurs. Dans le sac, la fiche d'un objet montre qui l'achète et à combien; un prix jamais vu reste un point d'interrogation.
 - **Boutiques** (R64): un menu en images, deux onglets (Acheter, Vendre), les objets vendables du sac déjà triés, le prix de ce commerçant sous chaque objet, un bouton « Tout vendre de cette sorte ».
+- **Derrière le comptoir** (livré le 11 novembre): Odette, Achille, Colette, Solange et Mado se tiennent derrière leur comptoir, hors de portée; on s'adresse à eux par-dessus. La touche d'action ouvre d'abord ce qu'ils ont à dire (histoire, quête, souvenir, décision à deux qui attend ta réponse), une fois par jour, puis la boutique; dans la boutique, « Parler » rouvre la conversation. Basile et Margot vendent dehors, là où ils travaillent. Règle: `src/simulation/commerces/README.md` (« Comptoir tenu »); emplacements: `economie-aubrune.md`.
 
 Prix d'achat par les commerçants d'Aubrune (en euros, « non » = n'achète pas):
 
@@ -325,14 +327,16 @@ Résultats de la simulation relancée en euros (deux joueurs, la moitié des gai
 | Palier atteint au jour de jeu | Duo tranquille (25 % du temps) | Duo médian (40 %) | Duo appliqué (55 %) |
 |---|---|---|---|
 | Sac de 6 pour chaque joueur | 5 | 7 | 3 |
-| Cuisine | 11 | 7 | 6 |
+| Cuisine | 6 | 6 | 6 |
 | 3 outils améliorés par joueur | 16 | 9 | 7 |
 | Sac de 10 pour chaque joueur | 23 | 14 | 11 |
-| Chambre | 26 | 16 | 12 |
-| Troisième pièce | 47 | 28 | 21 |
-| Étage | 83 | 51 | 37 |
+| Chambre | 12 | 11 | 11 |
+| Troisième pièce | 22 | 18 | 18 |
+| Étage | 39 | 31 | 31 |
 
-Lecture: le sac agrandit surtout le confort (moins d'allers-retours), ce sont les outils qui augmentent le revenu. Le duo médian a sa cuisine quand l'histoire lui apprend les repas à deux (acte 2), et son étage vers la fin de la première année de jeu: la maison reste un but au long cours, y compris quand on revient à Aubrune depuis un autre lieu. Le passage à l'euro divise tous les montants par dix sans changer les rapports: les jours du tableau sont les mêmes qu'en version 0.1. Le modèle est grossier (revenu moyen par pile, pas de fêtes ni de commandes du samedi): à recaler au jalon J2.
+Rythme de la maison accéléré le 11 novembre, à la demande du client (« la maison trop lente »): rachats et plafonds des commerçants d'Aubrune relevés, prix des pièces inchangés. Les quatre lignes de la maison viennent du modèle d'Aubrune (`docs/jeux/jeu-1/simulations/economie_aubrune.py`, détail dans `economie-aubrune.md`), les lignes du sac et des outils de l'ancien modèle. La cuisine ne s'achète qu'après la scène du règlement (jour 5) et la chambre après celle de la trappe (jour 11): les deux arrivent presque au plus tôt.
+
+Lecture: le sac agrandit surtout le confort (moins d'allers-retours), ce sont les outils qui augmentent le revenu. Les trois duos ont leur cuisine au jour 6, avant le pot-au-feu de l'acte 3 qui la demande (6.3), et leur étage entre les jours 31 et 39, au cours de la troisième saison (14 jours par saison): la maison reste un but au long cours, y compris quand on revient à Aubrune depuis un autre lieu. Le passage à l'euro divise tous les montants par dix sans changer les rapports: les jours du tableau sont les mêmes qu'en version 0.1. Le modèle est grossier (revenu moyen par pile, pas de fêtes ni de commandes du samedi): à recaler au jalon J2.
 
 ### 4.7 Activités
 
@@ -437,7 +441,8 @@ Une collection complète dans un lieu donne un meuble trophée unique. Les meubl
 
 | Valeur | Départ | Raison |
 |---|---|---|
-| Marche, course | 3,0 m/s, 5,0 m/s | course sans jauge d'endurance: c'est la faim qui la paie |
+| Marche, course | 1,5 m/s, 3,2 m/s (`reglages.json`, `movement`) | valeurs du jeu livré, plus lentes que celles de départ (3,0 et 5,0): la carte se parcourt à hauteur de personnage |
+| Endurance (réponse du client du 11 novembre) | une jauge pleine fait 55 s de course; vide, on marche, et la course revient quand la jauge remonte à 30 %. Recharge complète en 90 s en marchant, 30 s arrêté, 15 s assis, 8 s couché. Les plats la remplissent et la renforcent: pomme 15 %, pain 25 %, sandwich 35 %, omelette 50 % et jauge plus grande de 25 % pendant 4 min, soupe de légumes 50 % et recharge 1,5 fois plus rapide pendant 4 min, tarte aux pommes de même pendant 5 min, pot-au-feu pleine jauge, plus grande de 50 % et recharge 1,5 fois plus rapide pendant 8 min (`besoins.json`, section `stamina`; bloc `food.stamina` des objets) | courir a un prix visible et court, sans punir: s'asseoir ou manger un vrai plat remet en route; la faim reste payée par l'effort (4.4) |
 | Accélération, freinage | 0,15 s, 0,10 s | doux, sans glisser |
 | Portée de la touche d'action | 1,2 m devant le personnage, cône de 100 degrés; une seule cible à la fois, la plus proche de l'axe | la cible se montre toujours avant l'appui |
 | Réponse à une action | visible et audible en moins de 0,1 s; aucune action courante ne bloque plus de 1,5 s (toilette au baquet, repas spécial et mini-jeux sont des moments choisis, que l'on peut quitter) | note de ressenti |
@@ -551,6 +556,7 @@ Durée visée: 9 à 10 heures, soit 16 à 18 journées de jeu pour un duo média
 - **La cave**: elle n'existe sur aucun plan. On la trouve en restaurant la chambre (trappe sous le plancher). Dedans: le registre de nuit d'Émile, une colonne par jour, une seule ligne à chaque fois, « 5 h 12, passé », et une lanterne sans verre.
 - **La photo**: Lucie, à qui vous avez appris l'heure, veille avec vous et photographie la lueur (activité photo, nuit jouable). Au développement, la pose longue montre une traînée claire au ras des rails, ponctuée de carrés réguliers. « Des fenêtres », dit Jeanne. « Des gouttes sur l'objectif », dit Lucie, pas très sûre. Firmin regarde longtemps, puis sort enfin la lettre de sa poche: il a reconnu l'écriture dès le premier jour.
 - **La coutume**: Honorine (4 cœurs) et Marthe racontent ce que les anciens savaient sans le dire: on laissait un lumignon à la barrière « pour ceux qui partent », et le garde levait sa lanterne à 5 h 12. On disait que cela portait bonheur aux voyageurs. Honorine jure avoir vu le train, petite; Marthe rappelle qu'Honorine jure aussi avoir dansé avec un préfet.
+- **Le pot-au-feu** (livré): le prix d'Honorine pour raconter est un vrai pot-au-feu, fait à deux dans la cuisine de la maison du garde (légumes des Delmas, bœuf d'Odette), porté au café où Colette assoit Firmin et Ambroise à la même table. L'étape demande la cuisine payée; sans elle, Colette renvoie vers Basile pour le devis (`colette-repas`). Les trois duos simulés l'ont depuis le jour 6 (4.6).
 - **Préparer la halte de nuit**: retrouver le verre de la lanterne (fouilles le long de la voie avec Jeanne, qui connaît la cachette d'Émile), le faire sertir par Mado, graisser la barrière, obtenir de Marthe qu'elle sonne à l'heure juste, remplir le registre de la halte (les Delmas, Berthe et Barnabé arrivent par le train du samedi: la halte a ses « douze foyers »).
 - **Dénouement (scène à deux obligatoire)**: nuit du dernier jour, 5 h 12. L'un baisse la barrière, l'autre lève la lanterne. De la brume sort un vieil autorail crème, tout ce qu'il y a de plus réel, qui s'arrête dans un soupir de freins. Le Contrôleur du prologue descend, regarde sa montre: « Du retard. On va encore dire que c'est ma faute. » Il poinçonne vos lettres d'embauche, vous remet deux cartes de ligne et un ordre de mission: le siège de la Compagnie, à Hautefonte, bureau 512. « Monsieur Lacombe vous y attend. Enfin, il attend. » Il remonte, l'autorail repart dans la brume. C'est le seul moment d'Aubrune où le mystère se montre, et il a l'air d'un train en retard.
 - **Fin**: au matin, les habitants trouvent la barrière baissée et la lanterne chaude; personne d'autre n'a rien vu, et Rosalie assure qu'aucun autorail crème ne dort à son dépôt. Chacun garde son explication. Firmin remonte la montre d'Émile. Fête sur le quai (première Veillée du premier train).
@@ -817,3 +823,9 @@ Signalements au manager (création originale): le babil est un procédé de genr
 |---|---|---|---|
 | 2026-11-10 | 0.1 | première rédaction de la refonte, d'après les 75 réponses du client | client, via le manager |
 | 2026-11-10 | 0.2 | décisions du client reportées (section 14): monnaie en euros et prix revus, simulation relancée; surnaturel très doux à Aubrune (arc, prologue et trois actes adoucis, aucun fantôme au premier lieu); habitants de la 0.13 gardés et refondus; joueurs adultes, choix femme ou homme et règle d'écriture des accords; mémoire des prix; contrôles accordés avec `interface.md` (barre repliée, touche G, zoom au clavier, sept onglets); gestes ramenés sous 1,5 seconde; sections 7 à 10 résumées avec renvois; jalons alignés sur `technique.md` | client, via le manager |
+| 2026-11-11 | 0.3 | 4.12: vitesses du jeu livré (marche 1,5 m/s, course 3,2 m/s) et jauge d'endurance (55 s de course, recharge selon la posture, renforts par les plats) | client, via le manager (endurance); game-designer (mise en conformité) |
+| 2026-11-11 | 0.3 | 6.3: le pot-au-feu de l'acte 3 se cuisine dans la cuisine de la maison du garde, que l'étape demande | client, via le manager |
+| 2026-11-11 | 0.3 | 4.6: rythme de la maison accéléré (cuisine au jour 6, étage entre les jours 31 et 39), d'après `economie_aubrune.py` | client, via le manager |
+| 2026-11-11 | 0.3 | 4.1: horaires livrés du train du samedi (10 h 04 à 14 h 40, après l'acte 2) et nouvel autorail de 5 h 12 chaque nuit après le premier départ; commande hebdomadaire signalée comme non branchée | game-designer (mise en conformité), choix ouvert en `ecriture-habitants.md` 7.1 |
+| 2026-11-11 | 0.3 | 4.6: les commerçants d'Aubrune servent derrière leur comptoir (Basile et Margot dehors), ce qu'ils ont à dire passe avant la boutique | règle livrée par l'équipe, consignée par game-designer |
+| 2026-11-11 | 0.3 | Aubrune: le pommier du verger ne donne des pommes qu'en automne (comme le plan); la pomme reste en rayon chez Odette toute l'année; revenu des tables d'économie inchangé, 2,10 € par jour de pommes en moins hors automne au plus | level-designer (recommandation), game-designer |

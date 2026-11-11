@@ -212,13 +212,13 @@ export function createCompatCheck(
 /** Textes montrés aux joueurs: tutoiement, sans jargon, la machine en retard nommée. */
 export const COMPAT_TEXTS = {
   selfOlder:
-    'Ton jeu est plus ancien que celui de {nom}: la partie ne peut pas commencer. Quitte la partie, puis ferme et relance Duo sur ta machine pour mettre le jeu à jour.',
+    'Ton jeu a une version de retard sur celui de {nom}, et la partie ne peut pas commencer. Quitte-la, puis ferme et rouvre Duo pour mettre ton jeu à jour.',
   peerOlder:
-    'Le jeu de {nom} est plus ancien que le tien: la partie ne peut pas commencer. Quittez la partie; {nom} ferme et relance Duo sur sa machine pour mettre le jeu à jour.',
+    'Le jeu de {nom} a une version de retard sur le tien, et la partie ne peut pas commencer. Quittez-la: {nom} ferme Duo et le rouvre pour mettre son jeu à jour.',
   different:
-    'Ton jeu et celui de {nom} ne sont pas tout à fait les mêmes: la partie ne peut pas commencer. Quittez la partie, puis fermez et relancez Duo sur vos deux machines pour avoir la même version.',
+    'Vos deux jeux n’ont pas tout à fait la même version, et la partie ne peut pas commencer. Quittez-la, puis fermez et rouvrez Duo sur vos deux machines.',
   rejected:
-    'Ton jeu ne comprend plus tout ce que lui envoie celui de {nom}. Quittez la partie, puis fermez et relancez Duo sur vos deux machines pour mettre le jeu à jour.',
+    'Ton jeu et celui de {nom} ne se comprennent plus tout à fait. Quittez la partie, puis fermez et rouvrez Duo sur vos deux machines pour les mettre à jour.',
 } as const;
 
 /** Le texte d'un verdict, `null` si la partie peut se jouer. */

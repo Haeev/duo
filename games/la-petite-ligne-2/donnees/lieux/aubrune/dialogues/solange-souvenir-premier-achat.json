@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-premier-achat",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "commerces.mercerie-merigot.premier-achat",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ton premier achat chez moi ! Rien de plus beau qu'une première. Rien de plus terrifiant non plus. Tu as tremblé ? Moi, oui.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

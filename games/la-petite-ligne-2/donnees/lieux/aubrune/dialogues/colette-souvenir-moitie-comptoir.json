@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-moitie-comptoir",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "ventes.cafe-de-la-halte.oeuf",
+      "of": "other",
+      "value": 12
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ta moitié m'a vendu douze œufs. Douze ! J'ai fait des omelettes à toute la tablée. Franchement, dis-lui merci. Non: je lui dirai.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

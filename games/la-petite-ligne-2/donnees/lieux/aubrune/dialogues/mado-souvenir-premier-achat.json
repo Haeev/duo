@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-premier-achat",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "commerces.forge-cazals.premier-achat",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ton premier outil de chez moi ! Garde-le sec, aiguise-le, tape avec. S'il casse, c'est que tu tapes plus fort que moi. Ha !",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

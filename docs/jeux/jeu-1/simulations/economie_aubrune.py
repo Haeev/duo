@@ -271,6 +271,35 @@ def table_de_la_maison():
     return '\n'.join(lignes)
 
 
+SAISONS = [('printemps', 'spring'), ('été', 'summer'), ('automne', 'autumn'), ('hiver', 'winter')]
+
+
+def table_des_pommes():
+    """Pommes des arbres de la carte, par saison: unités par jour et valeur au meilleur rachat.
+    Hors du revenu ci-dessus (le duo n'y passe que quelques secondes), donné pour juger d'un
+    changement de saison des fruits (pommes d'Aubrune en automne seulement, 2026-11-11)."""
+    lignes = ['| Saison | Arbres | Pommes par jour | Valeur au rachat (€ par jour) |', '|---|---|---|---|']
+    prix = prix_de_rachat('pomme', set())[0][0]
+    for nom, saison in SAISONS:
+        arbres, pommes = 0, 0.0
+        for o in CARTE['objects']:
+            meuble = MEUBLES.get(o['type'])
+            for brique in (meuble or {}).get('bricks', []):
+                if brique.get('brick') != 'harvest':
+                    continue
+                r = RESSOURCES[brique['resource']]
+                lignes_butin = [l for l in r['loot'] if not l['rare'] and not l['weathers']
+                                and (not l['seasons'] or saison in l['seasons'])]
+                total = sum(l['weight'] for l in r['loot'] if not l['rare'] and not l['weathers'])
+                par_recolte = r['rolls'] * sum(l['weight'] / total * (l['min'] + l['max']) / 2
+                                               for l in lignes_butin if l['item'] == 'pomme')
+                if any(l['item'] == 'pomme' for l in r['loot']):
+                    arbres += 1
+                    pommes += par_recolte / r['respawnDays']
+        lignes.append('| %s | %d | %.1f | %s |' % (nom, arbres, pommes, euros(pommes * prix)))
+    return '\n'.join(lignes)
+
+
 def main():
     print('Journée de jeu: %.0f s réelles (%.1f min)\n' % (JOUR_S, JOUR_S / 60))
     print('## Prix\n\n' + table_des_prix() + '\n')
@@ -278,6 +307,7 @@ def main():
     for periode in PERIODES:
         print('## Détail, duo médian, %s, cuisine achetée si possible\n\n%s\n' % (periode['nom'], table_du_detail(periode, 0.40)))
     print('## Jours pour payer la maison (moitié du revenu net au coffre commun)\n\n' + table_de_la_maison() + '\n')
+    print('## Pommes des arbres de la carte, par saison (hors revenu ci-dessus)\n\n' + table_des_pommes() + '\n')
     plafonds = sum(c.get('dailyBuyCap', 0) for c in COMMERCES.values())
     print('Plafond de rachat de tous les commerçants réunis: %s € par jour.' % euros(plafonds))
     return 0

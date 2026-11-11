@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-nuit-blanche",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.nuit-blanche",
+      "of": "actor",
+      "atMost": 0
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "T'as pas dormi ? Trop bien ! Je parie que t'as vu passer un train. Moi on m'oblige à dormir. C'est injuste, je l'ai noté.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

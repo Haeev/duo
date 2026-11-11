@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "marthe-absence",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.marthe.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.marthe.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Plusieurs jours. Tu n'as pas entendu la cloche ? Elle sonnait aussi pour toi. Je ne le dirai pas deux fois.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ta moitié est venue chaque jour. Toi, non. Je ne compte pas. J'ai compté: les heures, c'est mon métier.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

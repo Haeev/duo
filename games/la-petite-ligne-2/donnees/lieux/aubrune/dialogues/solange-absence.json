@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "solange-absence",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.solange.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.solange.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Tiens, une rentrée en scène ! Plusieurs jours de relâche sans prévenir le régisseur. Le régisseur, c'est moi. Il boude.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ta moitié a joué seule ces jours-ci: une pièce pour deux, avec une chaise vide. Le public a été poli. Moi, moins.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

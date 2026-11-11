@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-nuit-blanche",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.nuit-blanche",
+      "of": "actor",
+      "atMost": 0
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Pas dormi ? Ça se voit: les yeux d'un chauffeur au bout d'une ligne de nuit. Une chicorée chez Colette, et au lit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "mado-absence",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.mado.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.mado.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Te voilà ! Plusieurs jours sans toi: j'ai tapé deux fois plus fort, pour que tu m'entendes de loin. Rien entendu ? Bon. Ha !",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ta moitié passait, toi rien ! J'allais forger une cloche pour t'appeler. Cling ! Voilà, tu es là, je garde le fer.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

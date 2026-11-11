@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-premier-achat",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "commerces.cafe-de-la-halte.premier-achat",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Ton premier repas payé chez Colette ! Elle m'a dit: « encore une tête qui revient ». C'est sa façon de bénir. La mienne est plus lente.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

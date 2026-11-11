@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "barnabe-absence",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.barnabe.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.barnabe.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Te voilà ! Plusieurs jours que je chante le troisième couplet sans personne pour l'entendre. Les hêtres s'en fichent.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Ta moitié passait, je lui chantais ton couplet. Elle a ri. Au bon endroit, en plus. Tu lui diras ?",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "odette-absence",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.odette.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.odette.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Te voilà ! Plusieurs jours sans te voir. J'ai demandé à tout le monde, personne ne savait. Ça ne m'arrive jamais, de ne pas savoir.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ta moitié passait, toi pas. Je lui ai demandé de tes nouvelles: « ça va ». Deux mots ! J'ai dû inventer tout le reste.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

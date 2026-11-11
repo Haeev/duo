@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-averse",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Hier, sous la pluie, dehors à deux ? Paulin a dit « Non mais regarde-moi ça ». Traduction: « j'aimerais bien, moi aussi ».",
+      "emote": null,
+      "next": null
+    }
+  }
+}

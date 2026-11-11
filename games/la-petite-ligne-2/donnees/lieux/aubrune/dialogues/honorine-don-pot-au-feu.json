@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "honorine-don-pot-au-feu",
+  "villager": "honorine",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.honorine-prix",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Je te donne la recette du pot-au-feu. La vraie, pas celle que je raconte: celle qu'on mange. La différence, c'est le jarret.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-moitie-comptoir",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "ventes.fournil-pradel.buche",
+      "of": "other",
+      "value": 4
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Ta moitié a porté au moins quatre bûches au fournil. Je les ai fendues à l'aube en chantant. Le four était content. Moi aussi.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

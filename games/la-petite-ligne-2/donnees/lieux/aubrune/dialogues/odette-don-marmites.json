@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-don-marmites",
+  "villager": "odette",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.concours",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "La chanson des marmites, on l'a chantée faux sur la place. Colette plus faux que moi. Retiens-la, que quelqu'un s'en souvienne juste.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

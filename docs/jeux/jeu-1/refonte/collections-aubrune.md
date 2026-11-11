@@ -205,7 +205,7 @@ Effets ajoutés à la fin (`onDone`) d'étapes existantes; ils ne changent ni le
 | Ceux qui partent, `veillee` | air « Sonnerie de 5 h 12 » | la nuit de 5 h 12 |
 | Événement « Train du samedi » | air « Le sifflet du samedi » | chaque samedi, quand le train entre en gare |
 
-L'omelette et le pot-au-feu existaient sans que rien ne les apprenne à Aubrune: ces deux branchements comblent ce manque. Les répliques qui accompagnent un cadeau (graines, recette) restent à écrire dans les dialogues des habitants concernés: aujourd'hui l'annonce du jeu suffit.
+L'omelette et le pot-au-feu existaient sans que rien ne les apprenne à Aubrune: ces deux branchements comblent ce manque. Chaque don a sa réplique, dans la voix de qui le donne (2026-11-11: dialogues `<habitant>-don-<sujet>`, liste dans `ecriture-habitants.md`, section 9).
 
 ## 10. Économie
 
@@ -225,6 +225,6 @@ L'omelette et le pot-au-feu existaient sans que rien ne les apprenne à Aubrune:
 | Fossile en plusieurs morceaux à assembler au carnet (cahier 4.7) | chaque fossile est d'une pièce | une entrée à fragments |
 | Insectes rendus par espèce | toutes les zones montrent le même repère d'insecte | un modèle par espèce (liste des assets) |
 | Coquillages de rivière (cahier 4.7, grèves de la berge et de l'Île) | pas de collection de coquillages; les grèves n'ont que des cailloux | ressource de ramassage par le plan |
-| Répliques de cadeau | les graines et recettes reçues à la fin d'une étape ne sont pas dites par l'habitant | une ligne de dialogue par branchement (section 9) |
+| Répliques de cadeau | fait le 2026-11-11: une réplique par branchement de la section 9 | (fait) |
 
 Les 6 tables de pêche proposées par le plan (`peche_lieu`) ne sont pas recopiées: `lieu.json` fait foi pour les poissons et leurs poids, comme le dit la note de l'assembleur.

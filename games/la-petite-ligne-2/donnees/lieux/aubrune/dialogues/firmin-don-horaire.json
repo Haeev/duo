@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "firmin-don-horaire",
+  "villager": "firmin",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.cachette",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "L'horaire de 1987, service d'été. Je le sais par cœur, je l'annonce le soir, tout bas. Garde-le. Moi, je n'ai plus besoin du papier.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "pommier-d-automne",
+  "name": "Pommier",
+  "model": "apple-tree",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "pommier-d-automne"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "armand-don-marche",
+  "villager": "armand",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.concert",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "La marche est à toi aussi: tu l'as jouée. Et les graines d'œillet, sème-les. La boutonnière, c'est la tradition. Enfin, depuis hier.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

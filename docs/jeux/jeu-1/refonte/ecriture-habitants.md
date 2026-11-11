@@ -149,3 +149,36 @@ Mise à jour du 2026-11-11: les points 1 à 6 ont leurs briques (`src/simulation
 ## 8. Contrôles
 
 `tests/habitants-aubrune.test.ts` (2 s, 7 essais): 21 habitants; pour chacun, 12 souvenirs dont la condition est faite de faits que les données ou le moteur écrivent, vérifiée par l'évaluateur du jeu dans un monde mis dans l'état demandé; 4 sur l'autre joueur; le second des deux à venir entend bien la variante (conversation jouée chez Lucie); une réplique par heure et par temps, pluie et brume une fois sur deux; un secret par amitié; des goûts connus; aucune réplique du quotidien au-dessus de la priorité 50 et aucune étape en dessous; pages de 150 caractères au plus, sans tiret long; les deux trains réguliers écrivent et retirent leurs faits.
+
+## 9. Avec les briques du 11 novembre: absence, ta moitié, temps partagé, premières fois, dons
+
+Ajout du 2026-11-11 (game-designer): 102 dialogues, tous en données. Quatre répliques nouvelles par habitant, plus une variante pour l'absence, et une réplique pour chaque don de l'histoire.
+
+| Sorte | Fichier | Priorité, fois | Condition |
+|---|---|---|---|
+| Absence | `<habitant>-absence` | 30, à volonté | `days_since` de `amitie.<habitant>.jour` (`of: actor`) au moins 3 jours (Rosalie: 8, elle ne vient que le samedi); variante `moitie` si ta moitié lui a parlé hier ou aujourd'hui (`of: other`, au plus 1 jour) |
+| Ta moitié chez lui | `<habitant>-souvenir-moitie-comptoir` ou `-cadeaux` | 30, une fois par joueur | les sept commerçants: ventes ou achats de l'autre joueur à leur comptoir (`fact_at_least` sur `ventes.<commerce>.<objet>`: douze œufs chez Colette, dix radis chez Odette, dix mûres chez Margot, six œufs chez Achille, cinq bûches chez Basile, trois vieilles pièces chez Solange; première vente chez Mado); Paulin: premier achat de l'autre à la ferme; Barnabé: quatre bûches portées au fournil; les autres: trois cadeaux de l'autre au moins (`habitants.<id>.cadeaux`) |
+| Temps partagé | `<habitant>-souvenir-averse` ou `-nuit-blanche` | 30, une fois par joueur | pluie passée dehors ensemble la veille (`souvenirs.pluie-ensemble`, exactement 1 jour): 12 habitants du jour; nuit blanche du jour (`souvenirs.nuit-blanche`, `of: actor`): les 9 qui vivent la nuit ou en parlent (Firmin, Achille, Solange, Ambroise, Honorine, Jeanne, Rosalie, le Contrôleur, Martial) |
+| Première fois | `<habitant>-souvenir-premiere-prise`, `-premier-achat`, `-premiere-vente` | 30, une fois par joueur | première prise (`souvenirs.premiere-prise`) pour 9; premier achat ou première vente au comptoir de l'habitant, ou chez un voisin qui compte pour lui (Berthe au fournil, c'est sa farine; Barnabé à la forge de Mado; Honorine et Lucie chez Solange; Martial au café) |
+| Don | `<habitant>-don-<sujet>` | 51, une fois par joueur | le fait de l'étape qui donne (`"fait"`), ou le train du samedi à quai pour le sifflet de Rosalie |
+
+Le don passe sous les étapes d'histoire (52 et plus) et devant les souvenirs: il se dit à la première conversation où l'habitant n'a pas d'étape en attente.
+
+| Don (section 9 de `collections-aubrune.md`) | Qui le dit |
+|---|---|
+| Valse de la minute | Ambroise |
+| Canon de la répétition; Marche de la halte et graines d'œillet | Armand |
+| Pain perdu | Achille |
+| Chant de la coupe | Barnabé |
+| Carillon des deux sœurs et muguet; pot-au-feu du dimanche | Honorine |
+| Tomates farcies; Chanson des marmites; plants de violette | Odette |
+| Truite grillée; perche meunière; omelette aux herbes | Colette |
+| Bouture de rosier | Marthe |
+| Lampe de mineur | Jeanne |
+| Horaire de 1987 | Firmin |
+| Sonnerie de 5 h 12 | le Contrôleur |
+| Le sifflet du samedi | Rosalie |
+
+Aucune carte postale n'est donnée par une quête ou un habitant: elles se photographient toutes. Rien à écrire.
+
+Contrôle: `tests/habitants-aubrune.test.ts`, trois essais de plus: les quatre sortes chez les 21, conditions faites de faits que le moteur écrit; l'absence vraie au jour près, sa variante quand ta moitié est passée, puis jouée dans une vraie conversation chez Lucie et plus le même jour; une réplique et une seule par don, dans la voix de qui donne.

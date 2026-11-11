@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "berthe-absence",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.berthe.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.berthe.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Plusieurs jours sans toi ! Ma meule a tourné à vide. Elle dit que c'est pas pareil sans ta tête dans l'embrasure. Moi aussi.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Ta moitié montait au moulin, toi non. La meule faisait clac... clac... sans le troisième. Elle le gardait pour toi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

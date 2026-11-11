@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-averse",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Hier, sous la pluie, dehors à deux ! Moi aussi, à la coupe. La pluie dans les feuilles, ça fait un chœur. Vous étiez dedans.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

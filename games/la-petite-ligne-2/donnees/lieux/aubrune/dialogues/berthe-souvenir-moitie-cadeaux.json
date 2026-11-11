@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-moitie-cadeaux",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.berthe.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Trois cadeaux de ta moitié. Ma meule les a vus passer. Elle dit qu'on est gâtées, elle et moi. Je dis pareil, en moins poli.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

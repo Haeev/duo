@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-don-tomates",
+  "villager": "odette",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.vexee",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Les tomates farcies, avec MON bœuf. Je ne suis pas vexée: je montre. Voilà ma recette. Colette peut toujours essayer.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

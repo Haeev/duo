@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-moitie-comptoir",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "ventes.menuiserie-cornu.buche",
+      "of": "other",
+      "value": 5
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Ta moitié. Cinq bûches. Plus. Du chêne sec, bien fendu. Dis-lui. Moi, je dis mal.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

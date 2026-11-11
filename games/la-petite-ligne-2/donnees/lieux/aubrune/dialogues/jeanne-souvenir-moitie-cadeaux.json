@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-moitie-cadeaux",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.jeanne.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Ta moitié m'a fait trois cadeaux. Au moins ! Je parie que tu fais pas mieux. Enfin si. Je parie que si. Je parie sur les deux.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

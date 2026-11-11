@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-premier-achat",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "commerces.mercerie-merigot.premier-achat",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ton premier achat chez Solange ? Bienvenue chez ceux qui portent des choses. Moi, c'est la sacoche, depuis vingt ans. Ha !",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-premiere-vente",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "commerces.cour-des-delmas.premiere-vente",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ta première vente à la ferme ! Paulin a payé en grognant. Je traduis: il est content. Le grognement du milieu, c'est le plus content.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

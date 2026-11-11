@@ -93,7 +93,7 @@ Ce qui rapporte reste ce qui se récolte, se pêche ou se pond, borné par le li
 
 | Objet | Cahier | Ici | Raison |
 |---|---|---|---|
-| Pomme | Odette 0,60, Achille 0,90 | Odette la vend 0,90, Achille 0,70 | aucun pommier à Aubrune: la pomme s'achète, sa revente doit rester sous 0,90 |
+| Pomme | Odette 0,60, Achille 0,90 | Odette la vend 0,90, Achille 0,70 | la pomme s'achète toute l'année chez Odette, sa revente doit rester sous 0,90; le pommier du verger communal n'en donne qu'en automne (2026-11-11: 3 par jour, 2,10 € au rachat, hors du revenu du script) |
 | Soupe de légumes | Colette 3,50, Odette 2,00 | 2,00 et 1,50 | carotte, poireau et pomme de terre ne se cultivent pas encore: tout s'achète; à remonter quand les cultures existeront |
 | Planche | Basile l'achète 1,40 | il la vend 1,60 et ne la rachète pas | aucun plan ne fait de planche |
 | Ferraille, plume, coquille, girolle, insectes, fossile en double | prix prévus | absents | objets à créer, ou sans acheteur |

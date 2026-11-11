@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "firmin-absence",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.firmin.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.firmin.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Plusieurs jours sans te voir au guichet. J'avais ouvert une ligne « absences » au registre. Au crayon. Je gomme.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ta moitié passait chaque jour, à l'heure. Toi, plusieurs jours de retard. Je ne dis rien. Je note. Et je suis content.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

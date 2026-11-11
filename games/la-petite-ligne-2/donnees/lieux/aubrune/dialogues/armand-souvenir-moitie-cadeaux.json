@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-moitie-cadeaux",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.armand.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Ta moitié m'a fait trois cadeaux. Trois ! En classe, je l'écrirais au tableau. Enfin, je ne l'écrirai pas. Enfin, en petit.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

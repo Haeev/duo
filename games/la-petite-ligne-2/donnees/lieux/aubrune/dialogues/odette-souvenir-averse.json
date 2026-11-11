@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-averse",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Hier, sous l'averse, dehors à deux ? Je regardais par la vitrine. Tout le bourg l'a su à midi. Par moi, oui. Il fallait bien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

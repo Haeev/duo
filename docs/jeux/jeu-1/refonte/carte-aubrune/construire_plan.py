@@ -1103,11 +1103,12 @@ for _it in INT:
         _it['meubles'].append(dict(id='berthe-lit', type='lit-simple', modele='bed-single', x=0.5, y=1, rotation=0))
         _it['points'].append(dict(id='berthe-lit-p', x=1.5, y=1.5, role='lit', qui='Berthe'))
         _it['note'] = "le grain monté en sacs, la trémie au-dessus des meules; le lit de Berthe au coin nord-ouest: le meunier dort au moulin, il entend la meule et la vanne"
-# 3. Un pommier et deux touffes de coquelicots (types existants `fruitier` et `coquelicots`). Revenu possible ajouté,
+# 3. Un pommier et deux touffes de coquelicots (types `pommier-d-automne` et `coquelicots`). Revenu possible ajouté,
 #    tirages à leur moyenne (méthode de economie-aubrune.md, section 3): pommier 2 tirages de 1 à 2 pommes par jour,
-#    3 x 0,70 = 2,10 EUR; coquelicots 1 à 2 fleurs par jour et par touffe, au printemps et en été, 1,5 x 0,60 = 0,90 EUR
-#    chacune. Total: 3,90 EUR par jour au printemps et en été (2,10 EUR le reste de l'année), 5,20 EUR au plus haut tirage.
-ARBRES_SINGULIERS.append(dict(id='pommier-verger', type='fruitier', x=309.5, y=118.5,
+#    en automne seulement (2026-11-11, game-designer), 3 x 0,70 = 2,10 EUR; coquelicots 1 à 2 fleurs par jour et par
+#    touffe, au printemps et en été, 1,5 x 0,60 = 0,90 EUR chacune. Total: 1,80 EUR par jour au printemps et en été,
+#    2,10 EUR en automne, rien en hiver.
+ARBRES_SINGULIERS.append(dict(id='pommier-verger', type='pommier-d-automne', x=309.5, y=118.5,
                               pourquoi="le pommier du verger communal: on le secoue, les pommes tombent dans l'herbe; le coin de cueillette est au sud-est, côté caméra, hors du houppier"))
 mob('coquelicots-verger', 'coquelicots', 'poppies', 305.5, 124.5, 0,
     "dans l'herbe haute du verger, qu'on ne fauche qu'en juillet: la seule touffe du bourg (la mercerie les rachète)")

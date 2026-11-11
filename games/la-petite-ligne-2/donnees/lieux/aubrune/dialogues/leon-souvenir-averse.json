@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-averse",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Hier, sous la pluie, dehors à deux ! Moi, je suis resté dans le foin. Enfin, sous la bâche. Enfin, dans la cuisine.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

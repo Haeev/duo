@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-don-violettes",
+  "villager": "odette",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.odette",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Des violettes. Il en avait glissé dans l'enveloppe, il y a trente ans: elles ont séché. Plante celles-ci, qu'elles aient le temps.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

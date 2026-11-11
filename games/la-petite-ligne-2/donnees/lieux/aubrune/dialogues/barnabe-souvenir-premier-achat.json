@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-premier-achat",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "commerces.forge-cazals.premier-achat",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Tu as acheté chez Mado ? Elle a... elle a parlé de moi ? Non ? Elle a tapé fort ? Alors elle a parlé de moi.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

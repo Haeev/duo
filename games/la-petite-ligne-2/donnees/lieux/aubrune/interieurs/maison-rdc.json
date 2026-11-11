@@ -130,7 +130,7 @@
           "key": "aubrune.maison-du-garde.etage"
         }
       ],
-      "says": "Pas d'escalier: l'étage reste à construire."
+      "says": "Trois marches, puis le vide. L'étage est encore à rebâtir."
     },
     "maison-rdc-esc-maison-cave": {
       "x": 0.5,
@@ -143,7 +143,7 @@
           "key": "aubrune.maison-du-garde.cave"
         }
       ],
-      "says": "La trappe est prise sous les gravats: la cave reste à déblayer."
+      "says": "La trappe de la cave dort sous les gravats. Il faudra déblayer avant de descendre."
     }
   },
   "pourquoi": "au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de l'étage part de la cuisine, celui de la cave de la chambre",

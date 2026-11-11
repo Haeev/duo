@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-averse",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Hier, la pluie, et vous dehors à deux. J'ai sonné midi d'une main glissante. Vous aviez l'air contents. Curieux.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

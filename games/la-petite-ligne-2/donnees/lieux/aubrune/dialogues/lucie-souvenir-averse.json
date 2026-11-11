@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-averse",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "souvenirs.pluie-ensemble",
+      "atLeast": 1,
+      "atMost": 1
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Hier, sous la pluie, dehors à deux ? J'ai fait la photo. Floue: on ne voit que deux taches qui rient. C'est ma meilleure.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

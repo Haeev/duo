@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-premiere-prise",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "souvenirs.premiere-prise",
+      "of": "actor"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Tu pêches, maintenant. Non. Enfin... qu'est-ce que tu as pris ? Non, ne dis rien. Si. Dis. Margot voudra savoir.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

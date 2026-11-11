@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-moitie-cadeaux",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.honorine.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Trois cadeaux de ta moitié. Le duc, en 1951, s'était arrêté à deux. Ou le facteur. Bref: ta moitié bat la noblesse.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -158,14 +158,14 @@
     "une-voix": {
       "kind": "line",
       "speaker": "achille",
-      "text": "Une voix. Il m'en faut deux, et la même. J'attends l'autre, les yeux fermés.",
+      "text": "Mmh. Une voix. Pour la Baronne, il en faut deux, et qui disent pareil. Je ferme les yeux en attendant l'autre. Je ne dors pas. Presque.",
       "emote": null,
       "next": null
     },
     "desaccord": {
       "kind": "line",
       "speaker": "achille",
-      "text": "Deux voix, deux avis. Mettez-vous d'accord, puis revenez me le dire. Elle attend depuis 1934, elle a le temps.",
+      "text": "Deux voix, deux avis. Une pâte qui hésite, on la laisse reposer. Parlez-en à deux, puis revenez me dire la même chose. Mmh.",
       "emote": null,
       "next": null
     }

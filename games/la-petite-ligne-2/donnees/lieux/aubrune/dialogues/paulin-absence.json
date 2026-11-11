@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "paulin-absence",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.paulin.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.paulin.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Te revoilà. Non, je n'ai pas remarqué. ... Plusieurs jours. Les poireaux ont remarqué. Moi, non.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Ta moitié venait seule. Je n'ai rien demandé. Margot a demandé. Je n'ai pas écouté la réponse. Si. Un peu.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

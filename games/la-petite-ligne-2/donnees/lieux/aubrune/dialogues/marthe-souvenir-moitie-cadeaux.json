@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-moitie-cadeaux",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "habitants.marthe.cadeaux",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Trois cadeaux de ta moitié. Je n'ai rien demandé. Je les range sur l'étagère des choses dont je ne parle pas. Elle se remplit.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

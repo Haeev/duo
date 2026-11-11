@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "colette-absence",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "amitie.colette.jour",
+      "of": "actor",
+      "atLeast": 3
+    }
+  ],
+  "once": null,
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "days_since",
+              "key": "amitie.colette.jour",
+              "of": "other",
+              "atMost": 1
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "absence"
+    },
+    "absence": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ah, te voilà. Plusieurs jours sans toi au comptoir. Franchement ? Ça m'a manqué. C'est dit, on n'en reparle pas.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ta moitié prenait son café sans toi. Elle gardait la place d'à côté, sans rien dire. Ne refais pas ça trop souvent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

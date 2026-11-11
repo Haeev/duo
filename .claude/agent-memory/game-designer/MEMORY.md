@@ -416,3 +416,10 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Cohérence: Honorine a 89 ans, Marthe 76 (pas de souvenir d'enfance commun avant 1941); Paulin est un nouveau venu (pas de « de mon temps »); le registre compte 19 habitants et 2 gardes depuis Martial; ne pas faire dire un secret d'amitié (la meule Marguerite, la chicorée, la montre de Rosalie) dans une réplique sans condition.
 - Garde de l'arbre isolé: un heredoc à parenthèses ou un `cd` vers le scratchpad est refusé. Écrire les scripts par l'outil d'écriture, les lancer depuis l'arbre avec des chemins en arguments.
 - Générateur: `gdfetes/` du scratchpad (`textes.py`: tables de répliques par fête; `fetes.py`: événements, plannings, tournantes, décisions, scènes, suites; il tient le journal de ses fiches et refuse d'écraser les autres). 392 répliques en une passe, un seul texte trop long.
+## Briques de faits par joueur en données (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Absence: `days_since` sur `amitie.<id>.jour` (`of: actor`, `atLeast` 3), dialogue `once: null` priorité 30: il se tait seul après la conversation (le jour est réécrit après le choix du dialogue). Variante « ta moitié est passée »: aiguillage sur le même fait `of: other`, `atMost` 1.
+- « Hier il pleuvait »: `days_since` sur `souvenirs.pluie-ensemble` (clé du duo, sans `of`) avec `atLeast` 1 et `atMost` 1; nuit blanche: `souvenirs.nuit-blanche`, `of: actor`, `atMost` 0.
+- Réplique d'un don d'histoire: dialogue `<habitant>-don-<sujet>` priorité 51 (sous les étapes, devant souvenirs et arrivée), `once: player`, condition le fait de l'étape (`"fait"`).
+- Changer la saison d'un fruit pour un seul lieu: nouvelle ressource et nouveau meuble à brique `harvest` (la ressource commune sert aussi au lieu d'essai, dont `recolte.test.ts` secoue l'arbre au printemps), puis le `type` de l'objet dans `carte.json`, les deux `plan.json` et `construire_plan.py`.
+- Le garde de l'outil refuse les commandes Bash à heredoc Python ou qui contiennent « .git »: passer par Edit, et `--exclude-dir='.gi?'` pour le contrôle typographique.

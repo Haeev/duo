@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-moitie-comptoir",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "fact_at_least",
+      "key": "ventes.mercerie-merigot.vieille-piece",
+      "of": "other",
+      "value": 3
+    }
+  ],
+  "once": "player",
+  "start": "moitie",
+  "nodes": {
+    "moitie": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ta moitié m'a vendu trois vieilles pièces, et je compte encore. J'en couds une à chaque costume. Ça fait cliqueter les rois.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}
