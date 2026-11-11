@@ -768,12 +768,17 @@
         },
         {
           "id": "repas",
-          "objective": "Un pot-au-feu cuisiné à deux: légumes des Delmas, bœuf d'Odette. Porte la marmite à Colette, au café.",
+          "objective": "Quand la maison du garde aura sa cuisine (devis chez Basile), un pot-au-feu à deux: légumes des Delmas, bœuf d'Odette. Porte-le à Colette, au café.",
           "target": {
             "villager": "colette"
           },
           "after": ["honorine-prix", "gue"],
           "done": [
+            {
+              "type": "talked",
+              "dialogue": "colette-repas",
+              "node": "a1"
+            },
             {
               "type": "deliver",
               "item": "pot-au-feu",

@@ -1,6 +1,6 @@
 # Économie d'Aubrune: commerces, prix, revenu, maison
 
-Version 1 du 2026-11-11 (game-designer). Complète le cahier des charges (4.2 et 4.6). Les valeurs vivent dans les données du jeu; ce document les explique. Les tableaux de prix et de revenu sortent du script `docs/jeux/jeu-1/simulations/economie_aubrune.py`, qui lit ces données: en cas d'écart, les données font foi et on relance le script.
+Version 2 du 2026-11-11 (game-designer), après la réponse du client sur le rythme de la maison (section 8). Complète le cahier des charges (4.2 et 4.6). Les valeurs vivent dans les données du jeu; ce document les explique. Les tableaux de prix et de revenu sortent du script `docs/jeux/jeu-1/simulations/economie_aubrune.py`, qui lit ces données: en cas d'écart, les données font foi et on relance le script.
 
 ## 1. Les sept commerces
 
@@ -10,10 +10,10 @@ Fiches: `games/la-petite-ligne-2/donnees/lieux/aubrune/commerces/`. Chaque comme
 |---|---|---|---|---|---|---|
 | Épicerie Ferrand | Odette | comptoir de la boutique, face à la porte de la place | 7 h à 21 h | pomme, farine, grain, graines de radis et de tomate, livre de cuisine (avec le réchaud), bœuf (avec le repas de l'acte 3) | ce qui se mange, au prix le plus bas | 20 € |
 | Fournil Pradel | Achille | comptoir devant le four, à droite en entrant | 7 h à 18 h | pain, tarte aux pommes | œufs (le mieux payé), pommes, mûres, bûches, tartes | 15 € |
-| Café de la Halte | Colette (acte 2) | comptoir au fond de la salle, à droite | 7 h à 22 h | soupe de légumes (plat du jour), omelette | poissons, légumes, œufs, plats cuisinés (le mieux payé) | 45 € |
+| Café de la Halte | Colette (acte 2) | comptoir au fond de la salle, à droite | 7 h à 22 h | soupe de légumes (plat du jour), omelette | poissons, légumes, œufs, plats cuisinés (le mieux payé) | 85 € |
 | Mercerie Mérigot | Solange | comptoir de la boutique, à l'ouest de la porte | 7 h à 19 h 30 | sac de toile (après les besaces), filet à insectes | coquelicots, vieilles pièces | 10 € |
 | Forge Cazals | Mado | râtelier de la forge | 7 h à 20 h | pierre à aiguiser, hache, bêche | pierres, bûches | 8 € |
-| Menuiserie Cornu | Basile | en lui parlant, sous son auvent | 7 h à 20 h | planche (bourse ou coffre commun), marteau | bûches (le mieux payé) | 12 € |
+| Menuiserie Cornu | Basile | en lui parlant, sous son auvent | 7 h à 20 h | planche (bourse ou coffre commun), marteau | bûches (le mieux payé) | 35 € |
 | Cour des Delmas | Margot (acte 3) | en lui parlant, dans la cour de la ferme | 7 h à 20 h | carotte, poireau, pomme de terre, grain et graines moins chers qu'au bourg | mûres, coquelicots | 6 € |
 
 Raisons des emplacements. Les cinq comptoirs sont ceux que le plan dessinait « à créer »; ils deviennent cinq types de meubles (`comptoir-epicerie`, `comptoir-fournil`, `comptoir-cafe`, `comptoir-mercerie`, `ratelier-de-la-forge`). Faute de modèle de comptoir livré, ils montrent la table de ferme (`table-farm`), le tonneau (`barrel`, au café) et l'étagère (`shelf`, à la forge), trois modèles livrés: une ligne à changer dans chaque fiche quand les modèles `comptoir` et `ratelier` existeront. Deux ont bougé d'une case pour tenir sur la grille et laisser libre l'axe de la porte: le comptoir d'Odette (2,5; 3) et celui d'Achille, à l'est devant le four (5; 2,5). Celui de Colette garde sa case (4,5; 1,5) et n'en fait qu'une: large de deux, il fermait soit le passage derrière le comptoir, soit l'accès à la table de l'est. Le râtelier de la forge donnait une hache forgée gratuite par jour: il est devenu le comptoir de Mado. Basile et Margot vendent dehors, là où ils travaillent: pas de comptoir à inventer.
@@ -29,21 +29,21 @@ Prix de base en euros. « Meilleur rachat » dit où porter l'objet: c'est la le
 | Œuf | 1,00 (Fournil) | 0,70 (Café), 0,60 (Épicerie) | |
 | Œuf roux | 1,50 (Fournil) | 1,10 (Café), 1,00 (Épicerie) | |
 | Radis | 0,70 (Café) | 0,50 (Épicerie) | |
-| Radis croquant | 1,00 (Café) | 0,80 (Épicerie) | |
+| Radis croquant | 2,00 (Café) | 1,40 (Épicerie) | |
 | Tomate | 0,80 (Café) | 0,60 (Épicerie) | |
 | Mûres | 0,50 (Fournil) | 0,40 (Café, Delmas), 0,30 (Épicerie) | |
 | Coquelicot | 0,60 (Mercerie) | 0,50 (Café, Delmas), 0,40 (Épicerie) | |
-| Bûche | 0,60 (Menuiserie) | 0,50 (Fournil), 0,40 (Forge) | |
-| Pierre | 0,30 (Forge) | | |
-| Vieille pièce | 1,20 (Mercerie) | | |
-| Goujon | 1,20 (Café) | | |
-| Ablette | 1,00 (Café) | | |
-| Perche | 2,00 (Café) | | |
-| Tanche | 2,50 (Café) | | |
-| Truite fario | 3,00 (Café) | 2,00 (Épicerie) | |
-| Brochet | 5,00 (Café) | | |
+| Bûche | 1,40 (Menuiserie) | 0,50 (Fournil), 0,40 (Forge) | |
+| Pierre | 0,60 (Forge) | | |
+| Vieille pièce | 2,00 (Mercerie) | | |
+| Goujon | 2,90 (Café) | | |
+| Ablette | 2,40 (Café) | | |
+| Perche | 4,80 (Café) | | |
+| Tanche | 6,00 (Café) | | |
+| Truite fario | 7,20 (Café) | 2,00 (Épicerie) | |
+| Brochet | 12,00 (Café) | | |
 | Œuf au plat | 1,20 (Café) | | |
-| Omelette aux herbes | 2,20 (Café) | | 3,50 (Café) |
+| Omelette aux herbes | 2,80 (Café) | | 3,50 (Café) |
 | Soupe de légumes | 2,00 (Café) | 1,50 (Épicerie) | 3,00 (Café) |
 | Pommes sautées | 2,00 (Café) | | |
 | Tarte aux pommes | 1,70 (Fournil) | | 4,50 (Fournil) |
@@ -76,7 +76,7 @@ Règles qui empêchent d'imprimer de l'argent, vérifiées par `tests/commerces-
 - les commerçants ne rachètent que des objets nommés (aucune famille entière): un objet ajouté plus tard ne se vend pas par accident;
 - un dialogue qui vend un objet le vend au prix du rayon.
 
-Ce qui rapporte reste ce qui se récolte, se pêche ou se pond, borné par le lieu et par le plafond de chaque commerçant. Cuisiner sa récolte paie: deux œufs valent 2 € chez Achille, une omelette 2,20 € chez Colette, et deux omelettes si elle est parfaite.
+Ce qui rapporte reste ce qui se récolte, se pêche ou se pond, borné par le lieu et par le plafond de chaque commerçant. Cuisiner sa récolte paie: deux œufs valent 2 € chez Achille, une omelette 2,80 € chez Colette, et deux omelettes si elle est parfaite.
 
 Écarts au tableau du cahier (4.6), tous dus à ce qui existe aujourd'hui à Aubrune:
 
@@ -93,19 +93,19 @@ Modèle: le duo passe une part de sa journée (30 minutes réelles) à récolter
 
 | Période | Duo tranquille (25 % du temps) | Duo médian (40 %) | Duo appliqué (55 %) |
 |---|---|---|---|
-| Acte 1 (jours 1 à 4) | 23,90 € | 23,90 € | 23,90 € |
-| Acte 2 (jours 5 à 10) | 46,30 € | 65,50 € | 67,20 € |
-| Acte 3 et après | 48,20 € | 67,50 € | 69,40 € |
+| Acte 1 (jours 1 à 4) | 49,90 € | 49,90 € | 49,90 € |
+| Acte 2 (jours 5 à 10) | 103,30 € | 131,40 € | 131,40 € |
+| Acte 3 et après | 104,90 € | 133,60 € | 133,60 € |
 
 Le pain de la journée (deux par joueur) retire 4,80 €.
 
-Journée type du duo médian à l'acte 2, cuisine achetée: radis croquants 10,80 €, omelettes 5,80 €, bûches 13,60 € (23 bûches), pêche 26,40 € (13 poissons), vieilles pièces 3,60 €, pierres 3,00 €: 63,20 €.
+Journée type du duo médian à l'acte 3, cuisine achetée: radis croquants 22,80 €, omelettes 12,00 €, bûches 32,40 € (23 bûches), pêche 48,40 € (10 poissons), vieilles pièces 6,00 €, pierres 6,00 €: 127,60 €. Aucune activité ne dépasse 40 % de la journée: pêche 38 %, bûches 25 %, radis 18 %.
 
 Lecture:
 
 - À l'acte 1, le revenu est borné par la carte (6 cases de potager, 2 poules, 13 chênes, 10 cailloux, 6 fouilles), pas par le temps: les trois duos gagnent pareil, et personne n'a de raison de se presser. C'est doux pour un début.
-- Dès l'acte 2, la pêche est le débouché du temps en plus: elle seule ne s'épuise pas. Le plafond de Colette (45 €) la borne pour le duo appliqué.
-- Le revenu tombe dans la fourchette du cahier (22 à 41 € par joueur). Le sac ne change pas ces nombres, il épargne des allers-retours.
+- Dès l'acte 2, la pêche est le débouché du temps en plus: elle seule ne s'épuise pas. Le plafond de Colette (85 €) la borne pour les duos médian et appliqué, qui gagnent donc pareil: s'appliquer davantage ne fait pas creuser l'écart.
+- Le revenu dépasse désormais la fourchette du cahier (22 à 41 € par joueur): c'est voulu depuis la version 2, pour le rythme de la maison. Le sac ne change pas ces nombres, il épargne des allers-retours.
 - Le tas de bois rendait 8 bûches toutes les 12 heures (18 € par jour sans outil): réglé à 4 bûches par jour.
 
 ## 4. La maison du garde-barrière
@@ -127,12 +127,21 @@ Jours pour payer chaque étape, la moitié du revenu net allant au coffre commun
 
 | Étape | Prix | Planches achetées | Duo tranquille | Duo médian | Duo appliqué | Cahier (médian) |
 |---|---|---|---|---|---|---|
-| Cuisine | 150 € | 6,40 € | jour 10 | jour 8 | jour 8 | jour 7 |
-| Chambre | 300 € | 9,60 € | jour 24 | jour 19 | jour 19 | jour 16 |
-| Troisième pièce | 450 € | 12,80 € | jour 45 | jour 35 | jour 35 | jour 28 |
-| Étage | 800 € | 16,00 € | jour 82 | jour 63 | jour 63 | jour 51 |
+| Cuisine | 150 € | 6,40 € | jour 6 | jour 6 | jour 6 | jour 7 |
+| Chambre | 300 € | 9,60 € | jour 12 | jour 11 | jour 11 | jour 16 |
+| Troisième pièce | 450 € | 12,80 € | jour 21 | jour 18 | jour 18 | jour 28 |
+| Étage | 800 € | 16,00 € | jour 38 | jour 31 | jour 31 | jour 51 |
 
-La cuisine est payée avant le repas de l'acte 3 (jour 11 et suivants) par les trois duos; l'étage reste un but au long cours (une année de jeu fait 56 jours).
+La cuisine ne peut se payer qu'à partir du jour 5 (scène du règlement) et la chambre du jour 11 (scène de la trappe): la cuisine au jour 6 et la chambre au jour 11 ou 12 sont donc presque au plus tôt. Le pot-au-feu de l'acte 3 (étape `repas`, jour 11 et suivants) demande la cuisine payée: les trois duos l'ont depuis cinq jours au moins. Sans elle, Colette renvoie vers Basile (section 4.1). L'étage reste un but au long cours, atteint dans la première année de jeu (56 jours).
+
+### 4.1 Le pot-au-feu attend la cuisine
+
+L'étape `repas` de l'acte 3 (suite `ceux-qui-partent`) ne se franchit que si le dialogue `colette-repas` atteint son nœud `a1`, ce qu'il ne fait que si le fait `aubrune.maison-du-garde.cuisine` existe (cuisine payée et finie). Raison: Honorine annonce « un vrai pot-au-feu, fait à deux, dans une vraie cuisine », et la cuisinière et le plan de travail de la maison n'apparaissent qu'à ce moment. Sans la cuisine:
+
+- les mains vides, Colette dit: « Mais un pot-au-feu pareil se mitonne chez soi, et la maison du garde n'a pas encore de cuisine. Va voir Basile pour le devis: 150 €. », puis la recette;
+- avec une marmite cuisinée ailleurs, elle la laisse au joueur: « Elle sent bon, ta marmite. Mais Honorine a dit une vraie cuisine: la vôtre, à la maison du garde. Ces deux-là sentiraient la différence. » puis « Pas encore de cuisine ? Va voir Basile pour le devis: 150 €, quelques planches, quelques pierres. Garde la marmite, je garde le plan de table. »
+
+Rien d'autre n'attend: les autres étapes de l'acte 3 et les suites secondaires qui ne dépendent pas du repas restent ouvertes. Seules attendent la suite de l'acte 3 après le repas et la guerre de la soupe, ouverte par lui. La condition passe par le dialogue parce que le validateur des quêtes ne connaît pas les faits écrits par les logements; une marmite cuisinée ailleurs avant le paiement est acceptée une fois la cuisine payée.
 
 ## 5. Les répliques de comptoir
 
@@ -168,3 +177,10 @@ Les jours suivants, le bonjour est celui du quotidien de l'habitant, suivi du ch
 - L'assembleur du plan (`carte-aubrune/assembler_lieu.py`) n'est plus rejouable tel quel: il réécrit les intérieurs sans les champs ajoutés depuis à la main (`style`, tapis, étage de la pension). Seuls les comptoirs ont été reportés dans les fichiers versionnés.
 - L'étal de l'épicerie donne encore une tourte du quai gratuite toutes les 12 heures (repas spécial): à retirer ou à mettre en rayon.
 - Le râtelier de Basile prête des haches de base sans fin: sans danger tant qu'aucun commerçant ne rachète d'outil (le test le garde).
+
+## 8. Historique des réglages
+
+| Date | Changement | Raison |
+|---|---|---|
+| 2026-11-11 | Version 1 | première économie d'Aubrune |
+| 2026-11-11 | Rachats: bûche chez Basile 0,60 à 1,40; pierre 0,30 à 0,60; vieille pièce 1,20 à 2,00; radis croquant 1,00 à 2,00 (Café) et 0,80 à 1,40 (Épicerie); omelette 2,20 à 2,80; poissons multipliés par 2,4 (goujon 2,90, ablette 2,40, perche 4,80, tanche 6,00, truite 7,20, brochet 12,00). Plafonds: Basile 12 à 35 €, Colette 45 à 85 €. Pot-au-feu de l'acte 3 conditionné à la cuisine payée. | le client trouve la maison trop lente (cuisine au jour 10, étage au jour 82 pour un duo tranquille) et veut le pot-au-feu dans la cuisine de la maison. Cible: environ deux fois plus vite, 40 à 50 € par jour à l'acte 1. Prix des pièces inchangés (cahier). L'omelette ne peut dépasser 2,89 € sans être rachetée plus cher qu'elle ne se vend (3,50 €, amitié et repas compris), d'où 2,80 €; les œufs crus restent à 1,00 € pour que cuisiner paie toujours. |

@@ -24,17 +24,75 @@
               "count": 1
             }
           ],
-          "next": "a1"
+          "next": "tri-cuisine"
         }
       ],
       "otherwise": "n1"
+    },
+    "tri-cuisine": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.maison-du-garde.cuisine"
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "s1"
+    },
+    "s1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Elle sent bon, ta marmite. Mais Honorine a dit une vraie cuisine: la vôtre, à la maison du garde. Ces deux-là sentiraient la différence.",
+      "emote": null,
+      "next": "s2"
+    },
+    "s2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Pas encore de cuisine ? Va voir Basile pour le devis: 150 €, quelques planches, quelques pierres. Garde la marmite, je garde le plan de table.",
+      "emote": null,
+      "next": null
     },
     "n1": {
       "kind": "line",
       "speaker": "colette",
       "text": "Firmin et Ambroise à ma table ? J'ai servi des noces qui finissaient plus mal.",
       "emote": null,
-      "next": "n2"
+      "next": "tri-n"
+    },
+    "tri-n": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.maison-du-garde.cuisine"
+            }
+          ],
+          "next": "n2"
+        }
+      ],
+      "otherwise": "c1"
+    },
+    "c1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Mais un pot-au-feu pareil se mitonne chez soi, et la maison du garde n'a pas encore de cuisine. Va voir Basile pour le devis: 150 €.",
+      "emote": null,
+      "next": "c2"
+    },
+    "c2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ensuite, la marmite: légumes des Delmas, bœuf d'Odette. Je m'occupe du plan de table.",
+      "emote": null,
+      "next": null
     },
     "n2": {
       "kind": "line",

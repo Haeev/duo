@@ -49,7 +49,7 @@
     },
     {
       "item": "radis-croquant",
-      "price": 100
+      "price": 200
     },
     {
       "item": "tomate",
@@ -81,27 +81,27 @@
     },
     {
       "item": "goujon",
-      "price": 120
+      "price": 290
     },
     {
       "item": "ablette",
-      "price": 100
+      "price": 240
     },
     {
       "item": "perche",
-      "price": 200
+      "price": 480
     },
     {
       "item": "tanche",
-      "price": 250
+      "price": 600
     },
     {
       "item": "truite",
-      "price": 300
+      "price": 720
     },
     {
       "item": "brochet",
-      "price": 500
+      "price": 1200
     },
     {
       "item": "oeuf-au-plat",
@@ -109,7 +109,7 @@
     },
     {
       "item": "omelette",
-      "price": 220
+      "price": 280
     },
     {
       "item": "soupe-de-legumes",
@@ -120,7 +120,7 @@
       "price": 200
     }
   ],
-  "dailyBuyCap": 4500,
+  "dailyBuyCap": 8500,
   "dailyNeeds": ["goujon", "ablette", "perche", "truite", "radis", "tomate", "oeuf"],
   "friendship": [
     {
