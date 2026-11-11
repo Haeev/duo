@@ -10,6 +10,8 @@
 # par l'avis de nouvelle version de Duo. Sans préversion (déclenchement manuel),
 # la release reste un brouillon que le manager relit, puis publie avec
 # `gh release edit vX.Y.Z --draft=false --latest`.
+# Avec la case « finale » du déclenchement manuel: release publiée tout de suite et
+# marquée « Latest », pour que les liens stables et l'avis de nouvelle version la suivent.
 #
 # Déclenchement manuel depuis une branche: fabrication seule, installateurs
 # gardés 30 jours en artefacts, sans release. Depuis un tag: comme un push du tag.
@@ -33,6 +35,10 @@ on:
         description: Depuis une branche, tag vX.Y.Z à créer sur ce commit avec la release (vide = fabrication seule)
         type: string
         default: ''
+      finale:
+        description: Release finale, publiée tout de suite et marquée « Latest » (celle que l'avis de nouvelle version annonce); prime sur les deux premières cases
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -88,6 +94,8 @@ jobs:
       # Un push de tag n'a pas d'entrées (inputs.* vaut null): préversion publiée.
       PREVERSION: ${{ github.event_name != 'workflow_dispatch' || inputs.preversion }}
       BROUILLON: ${{ github.event_name == 'workflow_dispatch' && inputs.brouillon }}
+      # Release finale: publiée et marquée « Latest » sans passer par un brouillon (décision du client).
+      FINALE: ${{ github.event_name == 'workflow_dispatch' && inputs.finale }}
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
     steps:
@@ -125,7 +133,11 @@ jobs:
             publication/SHA256SUMS.txt
             publication/duo-version.json
           )
-          if [ "$PREVERSION" = true ]; then
+          if [ "$FINALE" = true ]; then
+            # Les liens stables releases/latest/download/... et l'avis de nouvelle version la suivent.
+            titre="Duo $version"
+            etat=(--latest)
+          elif [ "$PREVERSION" = true ]; then
             titre="Duo $version (préversion)"
             etat=(--prerelease --latest=false)
             if [ "$BROUILLON" = true ]; then etat+=(--draft); fi
@@ -138,6 +150,9 @@ jobs:
             # Relance après correction: fichiers et notes remplacés (releases non immuables, ADR 0011).
             gh release upload "$TAG" "${fichiers[@]}" --clobber
             gh release edit "$TAG" --title "$titre" --notes-file publication/notes.md
+            if [ "$FINALE" = true ]; then
+              gh release edit "$TAG" --draft=false --prerelease=false --latest
+            fi
           else
             if [ "$SUR_TAG" = true ]; then cible=(--verify-tag); else cible=(--target "$GITHUB_SHA"); fi
             gh release create "$TAG" "${fichiers[@]}" "${cible[@]}" --title "$titre" --notes-file publication/notes.md "${etat[@]}"
