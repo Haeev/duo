@@ -390,6 +390,19 @@ export const fishingSystem: GameSystem = {
       sim.emit({ type: 'fish_lost', player, reason: 'cancelled' });
     }
   },
+  /**
+   * Règle des coupures. En pause, rien à faire: la ligne est dans l'état du lieu, sur l'horloge
+   * des pas. À la reprise d'une sauvegarde, plus personne ne joue cette ligne: elle est rangée
+   * sans effrayer l'ombre, et l'appât déjà mangé revient au sac.
+   */
+  interrupt(sim, player, why) {
+    if (why !== 'reload') return;
+    const fishing = placeOf(sim)?.fishing;
+    const line = fishing?.lines[player] ?? null;
+    if (fishing === undefined || line === null) return;
+    if (line.hooked && line.bait !== undefined) giveItem(sim, player, line.bait, 1);
+    endLine(sim, fishing, player, false);
+  },
   step(sim) {
     const place = placeOf(sim);
     if (

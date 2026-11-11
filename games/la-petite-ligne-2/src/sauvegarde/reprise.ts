@@ -4,7 +4,10 @@
  */
 import type { Content } from '../donnees/charger';
 import type { WorldState } from '../etat/monde';
-import { MINUTES_PER_DAY } from '../simulation/noyau/constantes';
+import { createRandom } from '@duo/sdk/sim';
+import { MINUTES_PER_DAY, SIM_DT } from '../simulation/noyau/constantes';
+import { idleInput } from '../simulation/noyau/entrees';
+import { interruptPlayers } from '../simulation/noyau/systemes';
 import type { Member } from '../simulation/noyau/monde';
 import { restVehicles } from '../simulation/vehicules/etat';
 import { fillText, SAVE_TEXTS } from './textes';
@@ -58,7 +61,8 @@ export function seatMembers(
 
 /**
  * Ce qui n'a pas de sens après un rechargement: gestes et dialogues en cours, cible visée, voyage
- * interrompu, place tenue à bord d'un véhicule de voie. Le trajet en train se termine (heures comprises); un départ sur le marchepied s'annule.
+ * interrompu, place tenue à bord d'un véhicule de voie, et ce que chaque système déclare lui-même
+ * (`GameSystem.interrupt`, cause `reload`). Le trajet en train se termine (heures comprises); un départ sur le marchepied s'annule.
  */
 export function settleForResume(content: Content, world: WorldState): void {
   const { common } = world;
@@ -74,5 +78,20 @@ export function settleForResume(content: Content, world: WorldState): void {
     villager.talkingWith = null;
   // Un véhicule de voie reste où il était (rangé ou posé), à l'arrêt, les joueurs descendus.
   restVehicles(world);
+  // Règle des coupures: chaque système rend ce qu'un joueur tenait et qui demandait une interface
+  // ouverte (ligne à l'eau, meuble en main). Personne n'écoute encore: les événements se perdent.
+  const idle = idleInput(0);
+  interruptPlayers(
+    {
+      world,
+      content,
+      dt: SIM_DT,
+      random: createRandom(world.rng),
+      inputs: [idle, idle],
+      emit: () => undefined,
+      touch: () => undefined,
+    },
+    'reload',
+  );
   if (world.minutes >= MINUTES_PER_DAY) world.minutes = 0;
 }

@@ -6,13 +6,13 @@
  * `file-commandes.ts`; la progression (canal 8, `progression.ts`) et l'état lent du lieu (canal 5,
  * `etat-lieu.ts`) partent par différences et par morceaux, par la même méthode (`par-cles.ts`).
  */
-import type { Logger, Net, NetChannel } from '@duo/sdk';
+import type { Logger, Net, NetChannel, PauseReason } from '@duo/sdk';
 import type { PlayerIndex } from '../donnees/schemas/communs';
 import type { PlaceSlow } from '../etat/lieu';
 import { SLICES, type Slice } from '../etat/monde';
 import type { Intent, StepInput } from '../simulation/noyau/entrees';
 import type { GameEvent } from '../simulation/noyau/evenements';
-import { step, type AuthoredIntent, type Sim } from '../simulation/noyau/pas';
+import { interruptForPause, step, type AuthoredIntent, type Sim } from '../simulation/noyau/pas';
 import {
   BUDGET_BYTES,
   CHANNEL,
@@ -56,6 +56,13 @@ export interface Host {
    * de l'invité et renvoie tout, progression complète comprise.
    */
   resume(): void;
+  /**
+   * Pause de la plateforme (Échap, liaison perdue): chaque système annule ce qui ne peut pas
+   * attendre (règle des coupures, `GameSystem.interrupt`). Renvoie les événements à jouer sur
+   * cette machine: `session_paused`, puis ceux des annulations, qui partent aussi chez l'invité
+   * (tout de suite, ou au retour de la liaison).
+   */
+  pause(reason: PauseReason): readonly GameEvent[];
   /** Le lieu courant vient de changer (au pas même, avant l'envoi de ses tranches). */
   onPlaceSwitch(listener: (change: PlaceSwitch) => void): () => void;
   /** Mesures: commandes de l'invité en attente, plus gros message de chaque canal depuis le départ. */
@@ -287,6 +294,14 @@ export function createHost(
       sentProgress = null;
       sentPlace = null;
       sendAll();
+    },
+    pause(reason) {
+      const born = interruptForPause(sim);
+      if (born.length > 0) {
+        const message = { tick: sim.world.tick, events: born };
+        if (fits('events', message)) events.send(message);
+      }
+      return [{ type: 'session_paused', reason }, ...born];
     },
     onPlaceSwitch(listener) {
       switchListeners.add(listener);

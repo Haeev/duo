@@ -80,6 +80,11 @@ export interface Session {
   onAlert(listener: (alert: SessionAlert) => void): () => void;
   /** Les deux jeux sont incompatibles: plus aucun pas, rien n'est envoyé ni enregistré. */
   blocked(): boolean;
+  /**
+   * La plateforme tient la partie en pause: les pas sont arrêtés, mais la page dessine encore.
+   * L'interface arrête alors ses horloges (mini-jeux joués sur cette machine), comme les pas.
+   */
+  paused(): boolean;
   /** Sauvegarde sur demande (hôte); chez l'invité: `refused`. */
   saveNow(): Promise<SaveStatus>;
   /** Simulation de l'hôte (tests et outils), `null` chez l'invité. */
@@ -98,6 +103,7 @@ export function createSession(options: SessionOptions): Session {
   let local: PlayerIndex = 0;
   let notice: ResumeNotice | null = null;
   let saves: SaveTrigger | null = null;
+  let paused = false;
 
   // Compatibilité des deux jeux et messages refusés (ADR 0006, MA2 de la revue du 2026-11-11).
   const peerName = duo.remotePlayer.name;
@@ -215,9 +221,21 @@ export function createSession(options: SessionOptions): Session {
     host?.resume();
   });
   const offResume = duo.on('resume', () => {
+    paused = false;
     compat.resend();
     host?.resume();
     guest?.resume();
+  });
+  // Pause (Échap, liaison perdue): règle des coupures. L'hôte annule ce qui ne peut pas attendre;
+  // chaque machine prévient son interface, sans attendre l'autre (`session_paused`).
+  const offPause = duo.on('pause', ({ reason }) => {
+    paused = true;
+    if (blocked()) return;
+    if (host !== null) {
+      const events = host.pause(reason);
+      saves?.notify(events);
+      for (const event of events) for (const listener of listeners) listener(event);
+    } else guest?.pause(reason);
   });
 
   return {
@@ -244,6 +262,7 @@ export function createSession(options: SessionOptions): Session {
       };
     },
     blocked,
+    paused: () => paused,
     saveNow() {
       if (blocked()) return Promise.resolve('refused');
       return saves?.saveNow() ?? Promise.resolve('refused');
@@ -252,6 +271,7 @@ export function createSession(options: SessionOptions): Session {
       return sim;
     },
     dispose() {
+      offPause();
       offResume();
       offStart();
       offVerdict();

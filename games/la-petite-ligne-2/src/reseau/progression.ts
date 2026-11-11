@@ -126,8 +126,6 @@ export interface ProgressAssembler {
   /** Renvoie la progression quand une révision vient d'être complétée et validée, sinon `null`. */
   receive(part: ProgressPart): ProgressState | null;
   current(): ProgressState | null;
-  /** Reprise de la liaison: les différences attendent la prochaine révision complète. */
-  reset(): void;
 }
 
 export function createProgressAssembler(): ProgressAssembler {
@@ -161,10 +159,6 @@ export function createProgressAssembler(): ProgressAssembler {
     },
     current() {
       return published;
-    },
-    reset() {
-      // On garde la progression affichée: seules les différences attendent la prochaine complète.
-      keyed.reset();
     },
   };
 }

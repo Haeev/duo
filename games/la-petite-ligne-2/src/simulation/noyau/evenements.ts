@@ -60,6 +60,15 @@ export const CORE_EVENTS = [
   }),
   /** Le personnage était coincé: il vient d'être replacé (le rendu ne lisse pas ce saut). */
   v.strictObject({ type: v.literal('unstuck'), player: PlayerIndexSchema }),
+  /**
+   * La plateforme vient de mettre la partie en pause (Échap, liaison perdue). Né sur chaque
+   * machine à sa propre pause, jamais transmis: ce qui se joue sur l'horloge de la machine et non
+   * sur les pas (air en cours, touche tenue) s'arrête là, même sans nouvelles de l'autre.
+   */
+  v.strictObject({
+    type: v.literal('session_paused'),
+    reason: v.picklist(['request', 'disconnect', 'system']),
+  }),
 ] as const;
 
 export const GameEventSchema = v.variant('type', [

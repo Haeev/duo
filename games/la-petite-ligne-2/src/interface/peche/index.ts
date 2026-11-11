@@ -440,6 +440,13 @@ export function createFishingOverlay(options: FishingOverlayOptions): FishingOve
       return phase !== undefined && phase !== 'closed' && phase !== 'end';
     },
     onEvent(event) {
+      // Pause: le clavier passe à la plateforme, un relâchement ne nous parviendrait pas.
+      if (event.type === 'session_paused') {
+        keys.left = false;
+        keys.right = false;
+        keys.space = false;
+        return;
+      }
       const me = options.local();
       const wasNetting = netting;
       const mine = game !== null && game.phase().kind === 'pair';

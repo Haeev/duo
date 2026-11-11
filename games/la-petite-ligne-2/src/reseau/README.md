@@ -24,6 +24,7 @@ Compatibilité (ADR 0006, MA2 de la revue du 2026-11-11): le schéma de la carte
 
 - `Predictor` (`prediction.ts`): `canWalk`, `walk`, `gesture`, fonctions pures qui ne lisent que l'état connu de l'invité. L'hôte appelle les mêmes dans son pas. Passé à `createGuest(content, net, member, { predictor })`.
 - `session.ts`: `host.resume()` et `guest.resume()` sur l'événement `resume` de la plateforme; le rendu de l'invité lit `guest.render(now, alpha)` (même horloge que l'option `now`), pas `world()`.
+- Pause de la plateforme (Échap, liaison perdue): `host.pause(reason)` applique la règle des coupures (`GameSystem.interrupt`, cause `pause`) et envoie les annulations; `guest.pause(reason)` prévient l'interface de l'invité (`session_paused`, événement local jamais transmis). `session.paused()` gèle les horloges de l'interface (`main.ts`). À la reprise, l'invité garde son état assemblé: l'envoi complet de l'hôte peut arriver avant son signal comme après. Tableau par activité: `docs/jeux/jeu-1/refonte/reconnexion-activites.md`.
 - Voyage: `onPlaceSwitch` des deux côtés au pas du changement de `common.place`; la machine charge le lieu puis envoie l'intention `place_loaded`.
 
 ## Ce que l'invité voit: tout ce que l'hôte possède (2026-11-11)
@@ -84,4 +85,4 @@ Une minute chargée au pire (`tests/etat-lieu.test.ts`, 80 ms, 20 ms de gigue, 2
 
 Un message hors budget n'est jamais envoyé ni fatal: il est journalisé (avertissement au-delà de 75 % du budget).
 
-Tests: `tests/reseau-gigue.test.ts` (banc de gigue, geste prédit), `tests/reseau-envois.test.ts` (tailles au pire, progression, bascule, reprise), `tests/etat-lieu.test.ts` (état du lieu par morceaux, système factice, débit), `tests/reseau-etat-partage.test.ts` (égalité de l'état entre hôte et invité, couverture des champs, reconnexion, coût). Aides: `tests/aides-reseau.ts` (lien virtuel, prédicteur et pas factices).
+Tests: `tests/reseau-gigue.test.ts` (banc de gigue, geste prédit), `tests/reseau-envois.test.ts` (tailles au pire, progression, bascule, reprise), `tests/etat-lieu.test.ts` (état du lieu par morceaux, système factice, débit), `tests/reseau-etat-partage.test.ts` (égalité de l'état entre hôte et invité, couverture des champs, reconnexion, coût). `tests/reconnexion-activites.test.ts` (coupure en pleine activité, une par activité, reprise d'une sauvegarde). Aides: `tests/aides-reseau.ts` (lien virtuel, prédicteur et pas factices), `tests/aides-coupure.ts` (banc des coupures: fil qui garde les messages fiables comme la liaison de Duo, 2 s sans l'autre, pause, retour).

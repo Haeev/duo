@@ -414,4 +414,13 @@ function step(sim: SimContext): void {
   }
 }
 
-export const musicSystem: GameSystem = { id: 'musique', intent: onIntent, step };
+/**
+ * Règle des coupures: un air en cours se joue sur l'heure de session et sur le son de chaque
+ * machine, qui ne s'arrêtent pas avec les pas. Il est abandonné comme si chacun rangeait son
+ * instrument: ni mot de la fin, ni accord perdu, ni chapeau, ni amitié comptés pour un air gâché.
+ */
+function interrupt(sim: SimContext, player: PlayerIndex): void {
+  if ((recitalWith(sim.world, player)?.playing ?? null) !== null) leave(sim, player);
+}
+
+export const musicSystem: GameSystem = { id: 'musique', intent: onIntent, step, interrupt };
