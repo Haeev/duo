@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "id": "les-lisses-en-fleurs",
+  "title": "Les lisses en fleurs",
+  "together": true,
+  "roles": {
+    "a": "À la manivelle",
+    "b": "Au ruban"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.fete.jour",
+        "equals": "barrieres"
+      },
+      {
+        "type": "time_is",
+        "from": 600,
+        "to": 1020
+      },
+      {
+        "type": "reach",
+        "point": "pn-s",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "daily"
+  },
+  "beats": [
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Article 44: « Au premier beau samedi, le garde fleurit ses lisses. » Trente ans que personne ne l'applique. Faute de garde.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "En 1951, on y avait mis tant de pivoines qu'elle ne remontait plus. Le préfet a attendu une heure. C'est là qu'on a dansé.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "marthe",
+      "text": "Il n'y avait pas de préfet. Pas un vrai. Il y avait des pivoines. Baissez, les gardes, qu'on fleurisse.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu prends la manivelle. Elle tourne rond: Mado l'a graissée hier. D'ici, tu ne vois pas si la lisse d'en face descend droit.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu tiens le ruban de la lisse nord. D'ici, tu vois les deux bras descendre. Dis à ta moitié quand ralentir.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Tourne la manivelle: maintiens.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 2
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Quand les deux lisses sont à plat, noue le ruban: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Les deux lisses sont baissées. La route du Gué est fermée, pour la plus belle raison de l'année.",
+      "emote": null,
+      "sound": "Clac !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "jeanne",
+      "text": "Je parie trois caramels qu'à cinq heures on ne verra plus le rouge et blanc. Qui tient ? Personne ? Vous avez raison.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Une fleur par âme, et les gardes d'abord. À dix-sept heures, on relève. Dix-sept heures précises.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.fete.jour",
+          "value": "barrieres",
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.barrieres.lisses",
+          "value": "baissees",
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

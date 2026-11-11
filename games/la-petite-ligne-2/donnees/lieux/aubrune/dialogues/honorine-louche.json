@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "id": "honorine-louche",
+  "villager": "honorine",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.concours.louche",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "soupe"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "theirs"
+            }
+          ],
+          "next": "autre"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "autre": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié a déjà voté. Je ne dirai rien, même sous la torture. Sauf si la torture a de la crème.",
+      "emote": null,
+      "next": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "La louche des gardes ne se donne qu'une fois. Elle ira au mur de la gagnante, et on en parlera à table pendant vingt ans.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "La soupe des mères, ou la panade du moulin ? Vous n'avez pas goûté la même: racontez-vous, et tranchez à deux.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "meres",
+          "text": "À la soupe des mères.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "louche-des-gardes",
+              "option": "meres"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "moulin",
+          "text": "À la panade du moulin.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "louche-des-gardes",
+              "option": "moulin"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "attendre-1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Parlez. Une soupe qui attend est meilleure. Un jury aussi.",
+      "emote": null,
+      "next": null
+    },
+    "accord": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "agreed",
+              "option": "meres"
+            }
+          ],
+          "next": "accord-meres"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "agreed",
+              "option": "moulin"
+            }
+          ],
+          "next": "accord-moulin"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "split"
+            }
+          ],
+          "next": "desaccord"
+        }
+      ],
+      "otherwise": "une-voix"
+    },
+    "une-voix": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Une voix. Il m'en faut deux, et la même. Va chercher ta moitié: je garde la louche sur mes genoux.",
+      "emote": null,
+      "next": null
+    },
+    "desaccord": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Deux gardes, deux marmites, deux avis. Ça ne m'étonne pas. Mettez-vous d'accord, et revenez.",
+      "emote": null,
+      "next": null
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Pas un mot avant ce soir. Le palmarès, c'est à dix-sept heures, sur la place. J'aime bien quand ça mijote.",
+      "emote": null,
+      "next": null
+    },
+    "accord-meres": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.concours.laureate",
+          "value": "meres",
+          "by": "duo"
+        }
+      ],
+      "next": "dit-meres"
+    },
+    "dit-meres": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Les mères ! Odette va pleurer dans le sel, Colette dans le laurier. Elles accrocheront la louche à mi-chemin des deux cuisines.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "accord-moulin": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.concours.laureate",
+          "value": "moulin",
+          "by": "duo"
+        }
+      ],
+      "next": "dit-moulin"
+    },
+    "dit-moulin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "La panade ! Berthe va le dire à sa meule avant de le dire aux gens. Odette et Colette seront d'accord pour bouder: c'est déjà ça.",
+      "emote": "joy",
+      "next": "fin"
+    }
+  }
+}

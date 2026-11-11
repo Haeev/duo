@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "firmin-bouquet-fleurs",
+  "villager": "firmin",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.barrieres.bouquet",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "barrieres"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "coquelicot",
+      "count": 3
+    }
+  ],
+  "once": null,
+  "start": "prise",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Trois coquelicots. Rouge signal fermé: réglementaire. Je les noue au bout de la lisse, là où le garde pose la main.",
+      "emote": null,
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Mon oncle disait qu'une barrière fleurie se lève plus volontiers. C'est faux. Elle pèse plus lourd. Mais on la lève plus volontiers.",
+      "emote": null,
+      "next": null
+    },
+    "prise": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "take_item",
+          "item": "coquelicot",
+          "count": 3
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.barrieres.garniture",
+          "value": "coquelicots",
+          "by": "duo"
+        }
+      ],
+      "next": "a1"
+    }
+  }
+}

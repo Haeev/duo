@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "id": "la-veillee-d-hiver",
+  "kind": "side",
+  "title": "La Veillée du premier train",
+  "giver": "firmin",
+  "requires": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "premier-train"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "la-fete",
+      "title": "Ceux qui veillent",
+      "steps": [
+        {
+          "id": "ouverture",
+          "objective": "C'est la Veillée du premier train: retrouve ta moitié sur le quai, Firmin vous y attend pour l'appel du registre.",
+          "target": {
+            "point": "quai"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "l-appel-du-registre"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.premier-train.ouverture",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.premier-train.ouverture",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "pommes",
+          "objective": "La table du quai manque de dessert: Odette a des pommes d'hiver. Fais-en cuire deux au réchaud et porte-les à Colette.",
+          "target": {
+            "villager": "colette"
+          },
+          "after": ["ouverture"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "pomme-cuite",
+              "count": 2,
+              "villager": "colette"
+            },
+            {
+              "type": "remembered",
+              "key": "aubrune.fete.jour",
+              "equals": "premier-train"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.premier-train.pommes",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.premier-train.pommes",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "devise",
+          "objective": "Quelle devise sous la ligne de 5 h 12 ? Décidez à deux, puis dis votre choix à Firmin.",
+          "target": {
+            "villager": "firmin"
+          },
+          "after": ["ouverture"],
+          "done": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "agreed"
+            },
+            {
+              "type": "talked",
+              "dialogue": "firmin-devise",
+              "node": "fin"
+            }
+          ],
+          "decision": {
+            "id": "devise-de-la-halte",
+            "options": ["a-l-heure", "de-la-place"]
+          },
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.premier-train.devise",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.premier-train.devise",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "lanterne",
+          "objective": "À partir de 19 h, à deux sur le quai: levez la lanterne et sonnez la cloche, comme les gardes d'autrefois.",
+          "target": {
+            "point": "quai"
+          },
+          "after": ["pommes", "devise"],
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-lanterne-et-la-cloche"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.premier-train.lanterne",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.premier-train.lanterne",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "give_item",
+              "item": "tourte-du-quai",
+              "count": 1,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "firmin",
+              "points": 30,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "ambroise",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "colette",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.premier-train.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

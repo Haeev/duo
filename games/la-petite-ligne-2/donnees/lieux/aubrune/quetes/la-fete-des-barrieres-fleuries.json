@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "id": "la-fete-des-barrieres-fleuries",
+  "kind": "side",
+  "title": "La fête des barrières fleuries",
+  "giver": "firmin",
+  "requires": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "barrieres"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "la-fete",
+      "title": "Les lisses en fleurs",
+      "steps": [
+        {
+          "id": "ouverture",
+          "objective": "C'est la fête des barrières fleuries: retrouve ta moitié au passage à niveau, Firmin vous y attend pour baisser les lisses.",
+          "target": {
+            "point": "pn-s"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "les-lisses-en-fleurs"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.barrieres.ouverture",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.barrieres.ouverture",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "bouquet",
+          "objective": "Les lisses du garde attendent leurs fleurs: porte trois coquelicots à Firmin. Faute de fleurs, trois radis du potager.",
+          "target": {
+            "villager": "firmin"
+          },
+          "after": ["ouverture"],
+          "done": [
+            {
+              "type": "remembered",
+              "key": "aubrune.barrieres.garniture"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.barrieres.bouquet",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.barrieres.bouquet",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "passage",
+          "objective": "Qui passera en premier sous la barrière fleurie ? Décidez à deux, puis dis votre choix à Honorine.",
+          "target": {
+            "villager": "honorine"
+          },
+          "after": ["ouverture"],
+          "done": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "agreed"
+            },
+            {
+              "type": "talked",
+              "dialogue": "honorine-premier-passage",
+              "node": "fin"
+            }
+          ],
+          "decision": {
+            "id": "premier-passage",
+            "options": ["doyenne", "enfants"]
+          },
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.barrieres.passage",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.barrieres.passage",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "levee",
+          "objective": "À partir de 17 h, à deux au passage à niveau: relevez les lisses fleuries. La belle saison attend dessous.",
+          "target": {
+            "point": "pn-s"
+          },
+          "after": ["bouquet", "passage"],
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-barriere-se-leve"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.barrieres.levee",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.barrieres.levee",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "give_recipe",
+              "recipe": "omelette-aux-herbes"
+            },
+            {
+              "type": "give_item",
+              "item": "omelette",
+              "count": 1,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "firmin",
+              "points": 30,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "honorine",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "jeanne",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.barrieres.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

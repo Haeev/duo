@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "id": "margot-panier",
+  "villager": "margot",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.concours.marmite",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "soupe"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "item_in_bag",
+        "item": "carotte",
+        "count": 1
+      }
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "item_in_bag",
+        "item": "soupe-de-legumes",
+        "count": 1
+      }
+    }
+  ],
+  "once": null,
+  "start": "prise",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Le panier du concours: une carotte, un poireau, une pomme de terre. Paulin a dit non. C'est lui qui l'a rempli.",
+      "emote": null,
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "La cuisinière de la maison du garde est à deux pas. Honorine attend votre marmite, et elle n'attend pas bien.",
+      "emote": null,
+      "next": null
+    },
+    "prise": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "carotte",
+          "count": 1
+        },
+        {
+          "type": "give_item",
+          "item": "poireau",
+          "count": 1
+        },
+        {
+          "type": "give_item",
+          "item": "pomme-de-terre",
+          "count": 1
+        }
+      ],
+      "next": "a1",
+      "otherwise": "plein"
+    },
+    "plein": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Tes poches débordent. Fais-y trois places: je te garde le panier du concours.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

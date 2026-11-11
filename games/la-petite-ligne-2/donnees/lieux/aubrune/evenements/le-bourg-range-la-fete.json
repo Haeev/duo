@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "id": "le-bourg-range-la-fete",
+  "name": "Le bourg range la fête",
+  "kind": "other",
+  "when": {
+    "type": "weekly",
+    "weekday": "monday",
+    "seasons": []
+  },
+  "days": 7,
+  "hours": {
+    "from": 360,
+    "to": 600
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "announce": false,
+  "activates": {
+    "facts": [
+      {
+        "key": "aubrune.fete.jour",
+        "value": "aucune"
+      },
+      {
+        "key": "aubrune.barrieres.lisses",
+        "value": "levees"
+      }
+    ],
+    "villagers": [],
+    "shop": null,
+    "scene": null,
+    "tune": null
+  }
+}

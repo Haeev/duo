@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "id": "la-lanterne-et-la-cloche",
+  "title": "La lanterne et la cloche",
+  "together": true,
+  "roles": {
+    "a": "À la lanterne",
+    "b": "À la cloche du quai"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.fete.jour",
+        "equals": "premier-train"
+      },
+      {
+        "type": "time_is",
+        "from": 1140,
+        "to": 1320
+      },
+      {
+        "type": "reach",
+        "point": "quai",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "daily"
+  },
+  "beats": [
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "C'est l'heure. Les anciens gardes levaient la lanterne pour dire: la halte veille. Mon oncle l'a fait tous les soirs. À vous.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu lèves la lanterne d'Émile à bout de bras. Elle pèse plus qu'on ne croit. D'en bas, tu ne vois pas si la flamme tient.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu tiens la corde de la cloche du quai. Toi, tu vois la flamme, là-haut: quand elle est bien droite, sonne.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Lève la lanterne: maintiens.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 3
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Quand la flamme est droite, sonne la cloche: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Un coup de cloche, une lanterne levée. Tout le quai se tait. Même Odette. Trois secondes entières.",
+      "emote": null,
+      "sound": "Dong !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Voilà. Maintenant, il sait qu'on l'attend. Qui ? Le train, voyons. De qui veux-tu que je parle ?",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Un billet de quai pour qui a veillé. Poinçonné de ma main. Il ne donne droit à aucun train. Il donne droit au quai.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "À dix heures, le bourg rentrera se coucher par la Grand-Route. Le premier train, lui, passe à 5 h 12. Rien ne t'oblige à dormir.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "billet-poinconne",
+          "count": 1,
+          "to": "duo"
+        }
+      ]
+    }
+  ]
+}

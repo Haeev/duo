@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "id": "tous-premiers",
+  "title": "Tous premiers",
+  "together": true,
+  "roles": {
+    "a": "À l'anse de gauche",
+    "b": "À l'anse de droite"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.fete.jour",
+        "equals": "soupe"
+      },
+      {
+        "type": "time_is",
+        "from": 1020,
+        "to": 1320
+      },
+      {
+        "type": "reach",
+        "point": "pl",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "daily"
+  },
+  "beats": [
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Palmarès ! Silence. Marthe, ne sonne pas, c'est moi qui parle. Premier prix: tout le monde. Ex aequo. Je reprends de tout.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "marthe",
+      "text": "Ce sera le même palmarès tous les ans. Je le note quand même: il faut bien que quelqu'un tienne les comptes de ses bontés.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le grand chaudron du banquet pèse comme une enclume. Tu tiens l'anse de gauche. Si tu lèves avant ta moitié, la soupe part à droite.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu tiens l'anse de droite. Si tu lèves avant ta moitié, la soupe part à gauche, sur les souliers de Firmin. Comptez tout haut.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "À trois, lève ton anse: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        },
+        {
+          "role": "b",
+          "hint": "À trois, lève ton anse: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le chaudron se pose au milieu de la table sans une goutte perdue. Firmin regarde ses souliers. Il a l'air presque déçu.",
+      "emote": null,
+      "sound": "Clong !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "colette",
+      "text": "À table ! Les gardes entre Odette et moi: comme ça on vous ressert des deux côtés, et personne ne compte.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "odette",
+      "text": "Moi, je compte. Et emportez ça: la soupe aux herbes du concours. On n'en fait qu'aujourd'hui, pour les gens qu'on garde.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "soupe-aux-herbes",
+          "count": 1,
+          "to": "duo"
+        }
+      ]
+    }
+  ]
+}

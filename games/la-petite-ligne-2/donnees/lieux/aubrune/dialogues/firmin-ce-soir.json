@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "id": "firmin-ce-soir",
+  "villager": "firmin",
+  "priority": 44,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "remembered",
+        "key": "aubrune.veillee.premiere"
+      }
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "any",
+        "conditions": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "barrieres"
+          },
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "lumignons"
+          },
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "soupe"
+          },
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "premier-train"
+          }
+        ]
+      }
+    },
+    {
+      "type": "time_is",
+      "from": 360,
+      "to": 1110
+    }
+  ],
+  "once": "player",
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ce soir, dix-huit heures trente, sur le quai. Tout le bourg. Présence souhaitée. ... Présence espérée. Venez à deux.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

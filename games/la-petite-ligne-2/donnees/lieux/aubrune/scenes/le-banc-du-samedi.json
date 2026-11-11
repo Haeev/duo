@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "id": "le-banc-du-samedi",
+  "title": "Le banc du samedi",
+  "together": true,
+  "roles": null,
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.fete.jour",
+        "equals": "veillee"
+      },
+      {
+        "type": "time_is",
+        "from": 1110,
+        "to": 1320
+      },
+      {
+        "type": "reach",
+        "point": "quai",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "daily"
+  },
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Samedi soir. Le quai veille: les lampions, la table, le banc qu'on vous garde. Le train du jour est reparti; celui de la nuit a le temps.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "colette",
+      "text": "Un bol pour qui s'assoit. C'est la règle du samedi: on ne paie pas, on raconte sa semaine.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.fete.jour",
+          "value": "veillee",
+          "by": "duo"
+        },
+        {
+          "type": "give_item",
+          "item": "soupe-de-legumes",
+          "count": 1,
+          "to": "duo"
+        }
+      ]
+    }
+  ]
+}

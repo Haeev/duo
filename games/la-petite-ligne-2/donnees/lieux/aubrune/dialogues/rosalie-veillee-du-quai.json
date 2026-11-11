@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "id": "rosalie-veillee-du-quai",
+  "villager": "rosalie",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.veillee.premiere"
+    },
+    {
+      "type": "weekday_is",
+      "weekdays": ["saturday"]
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 900
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "any",
+        "conditions": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "barrieres"
+          },
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "lumignons"
+          },
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "soupe"
+          },
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "premier-train"
+          }
+        ]
+      }
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.rosalie",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.rosalie",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.rosalie",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Il paraît que ce soir, vous veillez sur le quai. Georgette et moi, on repart à 14 h 40. On rate tout, on a l'habitude.",
+      "emote": "joy",
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.rosalie",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Dis à ta moitié de me garder un bol pour la prochaine fois. Je le mangerai froid, en cabine, et je dirai que c'était parfait.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.rosalie",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Un quai qui veille le soir où je m'en vais. Je ne suis pas vexée. ... Si, un peu. Faites du bruit, que je vous entende du tournant.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "id": "veillee-du-quai-printemps",
+  "name": "Veillée du quai",
+  "kind": "other",
+  "when": {
+    "type": "date",
+    "season": "spring",
+    "day": 6
+  },
+  "days": 1,
+  "hours": {
+    "from": 1110,
+    "to": 1320
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.veillee.premiere"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "remembered",
+        "key": "aubrune.fete.jour",
+        "equals": "premiere-veillee"
+      }
+    }
+  ],
+  "announce": true,
+  "activates": {
+    "facts": [
+      {
+        "key": "aubrune.fete.jour",
+        "value": "veillee"
+      }
+    ],
+    "villagers": [
+      "firmin",
+      "odette",
+      "basile",
+      "achille",
+      "solange",
+      "mado",
+      "ambroise",
+      "honorine",
+      "marthe",
+      "jeanne",
+      "lucie",
+      "colette",
+      "armand",
+      "paulin",
+      "margot",
+      "leon",
+      "berthe",
+      "barnabe",
+      "martial"
+    ],
+    "shop": null,
+    "scene": "le-banc-du-samedi",
+    "tune": null
+  }
+}

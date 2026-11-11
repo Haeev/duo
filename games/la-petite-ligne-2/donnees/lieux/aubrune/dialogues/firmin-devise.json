@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "id": "firmin-devise",
+  "villager": "firmin",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.premier-train.devise",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "premier-train"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "theirs"
+            }
+          ],
+          "next": "autre"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "autre": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ta moitié m'a déjà dicté son choix. Je l'ai noté au crayon. Le crayon, ça s'efface: à toi.",
+      "emote": null,
+      "next": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Sous la ligne de 5 h 12, il faut une devise. Une halte sans devise, c'est un arrêt de car. Ambroise propose: « À l'heure, ou presque. »",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Odette propose: « On a de la place. » C'est de moi, à l'origine. Je ne vote pas: conflit d'intérêts. Tranchez à deux.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "a-l-heure",
+          "text": "« À l'heure, ou presque. »",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "devise-de-la-halte",
+              "option": "a-l-heure"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "de-la-place",
+          "text": "« On a de la place. »",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "devise-de-la-halte",
+              "option": "de-la-place"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "attendre-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Parlez. Une devise, ça engage une halte pour cent ans. Prenez cinq minutes.",
+      "emote": null,
+      "next": null
+    },
+    "accord": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "agreed",
+              "option": "a-l-heure"
+            }
+          ],
+          "next": "accord-a-l-heure"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "agreed",
+              "option": "de-la-place"
+            }
+          ],
+          "next": "accord-de-la-place"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "split"
+            }
+          ],
+          "next": "desaccord"
+        }
+      ],
+      "otherwise": "une-voix"
+    },
+    "une-voix": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Une voix. Le règlement en exige deux, concordantes. J'attends ta moitié. Je suis sur le quai, comme toujours.",
+      "emote": null,
+      "next": null
+    },
+    "desaccord": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Deux gardes, deux devises. Une halte n'en porte qu'une. Mettez-vous d'accord, puis revenez me la dicter.",
+      "emote": null,
+      "next": null
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Je l'écrirai ce soir, à la craie, en capitales. Les capitales tiennent mieux la pluie. Va, la tourte refroidit.",
+      "emote": null,
+      "next": null
+    },
+    "accord-a-l-heure": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.halte.devise",
+          "value": "a-l-heure",
+          "by": "duo"
+        }
+      ],
+      "next": "dit-a-l-heure"
+    },
+    "dit-a-l-heure": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "« À l'heure, ou presque. » Ambroise dira que le « presque » est de trop. Moi aussi. On la garde quand même.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "accord-de-la-place": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.halte.devise",
+          "value": "de-la-place",
+          "by": "duo"
+        }
+      ],
+      "next": "dit-de-la-place"
+    },
+    "dit-de-la-place": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "« On a de la place. » ... C'est une bonne devise. Je le dis d'autant plus librement qu'elle est de moi.",
+      "emote": "joy",
+      "next": "fin"
+    }
+  }
+}

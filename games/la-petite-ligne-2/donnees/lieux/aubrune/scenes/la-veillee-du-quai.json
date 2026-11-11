@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "id": "la-veillee-du-quai",
+  "title": "La veillée du quai",
+  "together": true,
+  "roles": {
+    "a": "Côté pendule",
+    "b": "Côté voie"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.fete.jour",
+        "equals": "premiere-veillee"
+      },
+      {
+        "type": "time_is",
+        "from": 1110,
+        "to": 1320
+      },
+      {
+        "type": "reach",
+        "point": "quai",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le soir est là, et tout Aubrune avec. Des lampions de la halte au bout du quai, une table, vingt voix. On vous fait une place.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Service de nuit, exceptionnel. Motif: les gardes. Asseyez-vous. C'est un ordre, et c'est le dernier de la journée.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Ambroise se pousse pour toi sur le banc. Il te glisse: « La pendule est juste. Grâce à vous. Ne le répète pas à Firmin. »",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Honorine te garde une place contre elle. Elle te glisse: « Firmin a ri, tout à l'heure. Trente ans que je guettais ça. »",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Ce qu'on vous a soufflé à l'oreille, dites-le-vous: sur ce quai, ce soir, tout se partage.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Lève ton bol avec ta moitié: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Lève ton bol avec ta moitié: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tous les bols se lèvent avec les vôtres. La soupe d'Odette fume, la tarte de Colette attend son tour, et personne ne regarde l'heure.",
+      "emote": null,
+      "sound": "À la vôtre !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "odette",
+      "text": "Mangez ! Et emportez-en: une veillée, ça se finit le lendemain, au petit-déjeuner, en racontant qui a dit quoi.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Tous les samedis soir, désormais, le quai veille. Ce n'est pas au règlement. Je l'y ajouterai. Article dernier.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.fete.jour",
+          "value": "premiere-veillee",
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.veillee.premiere",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "give_item",
+          "item": "soupe-de-legumes",
+          "count": 1,
+          "to": "duo"
+        },
+        {
+          "type": "give_item",
+          "item": "tarte-aux-pommes",
+          "count": 1,
+          "to": "duo"
+        },
+        {
+          "type": "change_bond",
+          "villager": "firmin",
+          "points": 20,
+          "to": "duo"
+        },
+        {
+          "type": "change_bond",
+          "villager": "ambroise",
+          "points": 20,
+          "to": "duo"
+        },
+        {
+          "type": "change_bond",
+          "villager": "honorine",
+          "points": 20,
+          "to": "duo"
+        },
+        {
+          "type": "change_bond",
+          "villager": "odette",
+          "points": 20,
+          "to": "duo"
+        }
+      ]
+    }
+  ]
+}

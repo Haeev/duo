@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "id": "marthe-pour-qui",
+  "villager": "marthe",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lumignons.pour-qui",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "lumignons"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "theirs"
+            }
+          ],
+          "next": "autre"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "autre": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ta moitié m'a déjà répondu. Je ne te dirai pas quoi. Je ne suis pas Odette.",
+      "emote": null,
+      "next": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Votre lumignon, à la barrière: il brûle pour qui ? La coutume dit: pour ceux qui partent. Je suis pour la coutume.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Firmin, lui, veut qu'il brûle pour ceux qui reviennent. Depuis votre arrivée, il a des idées. Tranchez à deux, à voix haute.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "partent",
+          "text": "Pour ceux qui partent.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "lumignon-des-gardes",
+              "option": "partent"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "reviennent",
+          "text": "Pour ceux qui reviennent.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "lumignon-des-gardes",
+              "option": "reviennent"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "attendre-1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Parlez. La cire a toute la journée pour durcir. Moi aussi.",
+      "emote": null,
+      "next": null
+    },
+    "accord": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "agreed",
+              "option": "partent"
+            }
+          ],
+          "next": "accord-partent"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "agreed",
+              "option": "reviennent"
+            }
+          ],
+          "next": "accord-reviennent"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "split"
+            }
+          ],
+          "next": "desaccord"
+        }
+      ],
+      "otherwise": "une-voix"
+    },
+    "une-voix": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Une voix. Il m'en faut deux, et la même. Je ne sonne pas pour un seul avis.",
+      "emote": null,
+      "next": null
+    },
+    "desaccord": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Deux gardes, deux avis. Mettez-vous d'accord, puis revenez. Un lumignon ne brûle pas pour deux raisons contraires.",
+      "emote": null,
+      "next": null
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "À la nuit, à la barrière, avec ta moitié. Et abritez la flamme: le vent de la tranchée n'a aucun respect.",
+      "emote": null,
+      "next": null
+    },
+    "accord-partent": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.lumignons.pour",
+          "value": "partent",
+          "by": "duo"
+        }
+      ],
+      "next": "dit-partent"
+    },
+    "dit-partent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Pour ceux qui partent. Comme toujours. C'est bien: une coutume, ça ne se discute pas, ça se rallume.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "accord-reviennent": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.lumignons.pour",
+          "value": "reviennent",
+          "by": "duo"
+        }
+      ],
+      "next": "dit-reviennent"
+    },
+    "dit-reviennent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Pour ceux qui reviennent. Bon. Ça ne s'est jamais fait. Il faut bien que les coutumes commencent un soir.",
+      "emote": "joy",
+      "next": "fin"
+    }
+  }
+}

@@ -40,6 +40,122 @@
     "home": "odette-lit-p",
     "schedule": [
       {
+        "from": 600,
+        "to": 1320,
+        "days": ["sat"],
+        "seasons": ["spring"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "barrieres"
+          }
+        ],
+        "at": {
+          "point": "gr0"
+        },
+        "activity": "fleurir-la-barriere",
+        "gesture": null
+      },
+      {
+        "from": 600,
+        "to": 1230,
+        "days": ["sat"],
+        "seasons": ["summer"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "lumignons"
+          }
+        ],
+        "at": {
+          "point": "pv"
+        },
+        "activity": "fondre-les-lumignons",
+        "gesture": null
+      },
+      {
+        "from": 1230,
+        "to": 120,
+        "days": ["sat"],
+        "seasons": ["summer"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "lumignons"
+          }
+        ],
+        "at": {
+          "point": "pl-o"
+        },
+        "activity": "veiller-son-lumignon",
+        "gesture": null
+      },
+      {
+        "from": 600,
+        "to": 1320,
+        "days": ["sat"],
+        "seasons": ["autumn"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "soupe"
+          }
+        ],
+        "at": {
+          "point": "pl-o"
+        },
+        "activity": "gouter-les-soupes",
+        "gesture": null
+      },
+      {
+        "from": 600,
+        "to": 1320,
+        "days": ["sat"],
+        "seasons": ["winter"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "premier-train"
+          }
+        ],
+        "at": {
+          "point": "quai"
+        },
+        "activity": "veiller-sur-le-quai",
+        "gesture": null
+      },
+      {
+        "from": 1110,
+        "to": 1320,
+        "when": [
+          {
+            "type": "any",
+            "conditions": [
+              {
+                "type": "remembered",
+                "key": "aubrune.fete.jour",
+                "equals": "veillee"
+              },
+              {
+                "type": "remembered",
+                "key": "aubrune.fete.jour",
+                "equals": "premiere-veillee"
+              }
+            ]
+          }
+        ],
+        "at": {
+          "point": "quai"
+        },
+        "activity": "veiller-au-quai",
+        "gesture": null
+      },
+      {
         "from": 420,
         "to": 1260,
         "at": {

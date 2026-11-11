@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "firmin-bouquet",
+  "villager": "firmin",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.barrieres.bouquet",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "barrieres"
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Trois fleurs pour les lisses du garde. Des coquelicots, s'il en pousse. Le règlement dit « garnies ». Il ne dit pas de quoi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

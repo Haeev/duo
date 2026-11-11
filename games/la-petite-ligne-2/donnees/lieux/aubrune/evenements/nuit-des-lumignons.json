@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "nuit-des-lumignons",
+  "name": "Nuit des lumignons",
+  "kind": "festival",
+  "when": {
+    "type": "date",
+    "season": "summer",
+    "day": 13
+  },
+  "days": 1,
+  "hours": {
+    "from": 600,
+    "to": 120
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "announce": true,
+  "activates": {
+    "facts": [
+      {
+        "key": "aubrune.fete.jour",
+        "value": "lumignons"
+      }
+    ],
+    "villagers": [
+      "firmin",
+      "odette",
+      "basile",
+      "achille",
+      "solange",
+      "mado",
+      "ambroise",
+      "honorine",
+      "marthe",
+      "jeanne",
+      "lucie",
+      "colette",
+      "armand",
+      "paulin",
+      "margot",
+      "leon",
+      "berthe",
+      "barnabe",
+      "martial",
+      "rosalie"
+    ],
+    "shop": null,
+    "scene": "la-cire-et-la-meche",
+    "tune": null
+  }
+}

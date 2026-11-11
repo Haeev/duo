@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "colette-pommes",
+  "villager": "colette",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.premier-train.pommes",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "premier-train"
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Pour la table du quai, il me manque le dessert. Deux pommes cuites, bien chaudes: en hiver, c'est ce qui tient le mieux une veillée.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

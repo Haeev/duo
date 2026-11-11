@@ -50,6 +50,96 @@
     "home": "quai",
     "schedule": [
       {
+        "from": 600,
+        "to": 1320,
+        "days": ["sat"],
+        "seasons": ["spring"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "barrieres"
+          }
+        ],
+        "at": {
+          "point": "quai-o"
+        },
+        "activity": "fleurir-la-barriere",
+        "gesture": null
+      },
+      {
+        "from": 600,
+        "to": 1230,
+        "days": ["sat"],
+        "seasons": ["summer"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "lumignons"
+          }
+        ],
+        "at": {
+          "point": "re1"
+        },
+        "activity": "fondre-les-lumignons",
+        "gesture": null
+      },
+      {
+        "from": 1230,
+        "to": 120,
+        "days": ["sat"],
+        "seasons": ["summer"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "lumignons"
+          }
+        ],
+        "at": {
+          "point": "quai-e"
+        },
+        "activity": "veiller-son-lumignon",
+        "gesture": null
+      },
+      {
+        "from": 600,
+        "to": 1320,
+        "days": ["sat"],
+        "seasons": ["autumn"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "soupe"
+          }
+        ],
+        "at": {
+          "point": "gr1"
+        },
+        "activity": "gouter-les-soupes",
+        "gesture": null
+      },
+      {
+        "from": 600,
+        "to": 1320,
+        "days": ["sat"],
+        "seasons": ["winter"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "premier-train"
+          }
+        ],
+        "at": {
+          "point": "quai"
+        },
+        "activity": "veiller-sur-le-quai",
+        "gesture": null
+      },
+      {
         "from": 420,
         "to": 1260,
         "at": {
@@ -95,6 +185,44 @@
         "type": "remembered",
         "key": "aubrune.train.en-gare",
         "equals": false
+      },
+      {
+        "type": "not",
+        "condition": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.fete.jour",
+                  "equals": "barrieres"
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.fete.jour",
+                  "equals": "lumignons"
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.fete.jour",
+                  "equals": "soupe"
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.fete.jour",
+                  "equals": "premier-train"
+                }
+              ]
+            },
+            {
+              "type": "time_is",
+              "from": 600,
+              "to": 1320
+            }
+          ]
+        }
       }
     ]
   }
