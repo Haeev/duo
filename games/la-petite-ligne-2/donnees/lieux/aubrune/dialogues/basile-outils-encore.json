@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "id": "basile-outils-encore",
+  "villager": "basile",
+  "priority": 61,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.outils"
+    },
+    {
+      "type": "remembered",
+      "key": "dialogues.aubrune.basile-outils",
+      "equals": true,
+      "of": "actor"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "remembered",
+        "key": "aubrune.acte1.outils-recus",
+        "of": "actor"
+      }
+    },
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "not",
+          "condition": {
+            "type": "item_owned",
+            "items": ["hache", "hache-forgee"],
+            "count": 1
+          }
+        },
+        {
+          "type": "not",
+          "condition": {
+            "type": "item_owned",
+            "items": ["beche", "beche-forgee"],
+            "count": 1
+          }
+        }
+      ]
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Mains vides ? Les outils. Je les gardais.",
+      "emote": "question",
+      "next": "quoi"
+    },
+    "quoi": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "not",
+              "condition": {
+                "type": "item_owned",
+                "items": ["hache", "hache-forgee"],
+                "count": 1
+              }
+            },
+            {
+              "type": "not",
+              "condition": {
+                "type": "item_owned",
+                "items": ["beche", "beche-forgee"],
+                "count": 1
+              }
+            }
+          ],
+          "next": "deux"
+        },
+        {
+          "when": [
+            {
+              "type": "not",
+              "condition": {
+                "type": "item_owned",
+                "items": ["hache", "hache-forgee"],
+                "count": 1
+              }
+            }
+          ],
+          "next": "hache"
+        }
+      ],
+      "otherwise": "beche"
+    },
+    "deux": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "hache",
+          "count": 1
+        },
+        {
+          "type": "give_item",
+          "item": "beche",
+          "count": 1
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.acte1.outils-recus",
+          "value": true,
+          "by": "actor",
+          "of": "actor"
+        }
+      ],
+      "next": "fin"
+    },
+    "hache": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "hache",
+          "count": 1
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.acte1.outils-recus",
+          "value": true,
+          "by": "actor",
+          "of": "actor"
+        }
+      ],
+      "next": "fin"
+    },
+    "beche": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "beche",
+          "count": 1
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.acte1.outils-recus",
+          "value": true,
+          "by": "actor",
+          "of": "actor"
+        }
+      ],
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Prêtés. Ronces, bêche. Chênes, hache.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

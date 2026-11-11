@@ -162,7 +162,7 @@
           "id": "nuit",
           "objective": "Les deux marmites mijotent dehors toute la nuit: va dormir, le bourg goûtera demain.",
           "target": {
-            "point": "hd"
+            "point": "maison-lit-g"
           },
           "done": [
             {

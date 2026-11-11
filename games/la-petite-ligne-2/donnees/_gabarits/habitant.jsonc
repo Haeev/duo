@@ -15,6 +15,9 @@
   "stands": "guichet",
   // Timbre du babil: low, medium, high (ou un timbre du sound designer).
   "voice": "medium",
+  // Facultatif: ce qu'il dit quand son don ne tient pas dans les poches (il le garde pour plus
+  // tard). Absent: `dialogue.pocketsFull` de `commun/reglages.json`.
+  "pocketsFull": "Tes poches débordent. Repasse, je te le garde.",
   // Sa vie. Retirer ce bloc: il reste planté à `stands`.
   "life": {
     // Point de la carte chez lui (dans sa maison): il doit y être à 3 h (contrôlé).

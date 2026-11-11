@@ -28,6 +28,15 @@ export function countHeld(player: ReadonlyWorld['players'][number], item: string
   return total;
 }
 
+/** Exemplaires d'un objet dans les rangements (brique `store`) de tous les lieux, coffres du duo. */
+export function countStored(world: ReadonlyWorld, item: string): number {
+  let total = 0;
+  for (const place of Object.values(world.places))
+    for (const states of Object.values(place.objects))
+      for (const stack of states.store ?? []) if (stack?.item === item) total += stack.count;
+  return total;
+}
+
 function forActor(ctx: RuleContext, test: (player: PlayerIndex) => boolean): boolean {
   return ctx.actor === null ? test(0) || test(1) : test(ctx.actor);
 }
@@ -86,6 +95,22 @@ export function evaluate(ctx: RuleContext, condition: Condition): boolean {
       return forActor(ctx, (p) => world.players[p].needs[condition.need] >= condition.value);
     case 'item_in_bag':
       return forActor(ctx, (p) => countHeld(world.players[p], condition.item) >= condition.count);
+    case 'item_owned': {
+      const stored = condition.items.reduce((n, item) => n + countStored(world, item), 0);
+      return forActor(
+        ctx,
+        (p) =>
+          stored + condition.items.reduce((n, item) => n + countHeld(world.players[p], item), 0) >=
+          condition.count,
+      );
+    }
+    case 'harvested': {
+      const objects = world.places[world.common.place]?.objects;
+      return condition.objects.every((id) => {
+        const back = objects?.[id]?.harvest?.back ?? null;
+        return back !== null && world.common.day < back;
+      });
+    }
     case 'instrument_out_of_tune':
       return forActor(ctx, (p) => worstTune(ctx.content, world, p) !== 'just');
     case 'money_at_least':

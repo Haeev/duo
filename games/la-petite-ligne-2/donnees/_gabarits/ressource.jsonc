@@ -24,11 +24,13 @@
   "effort": 0,
   // Ce qui reste une fois récolté: gone (rien), stump (souche), bare (sans fruits).
   "after": "gone",
-  // Jours avant de revenir (1 = chaque jour).
+  // Jours avant de revenir (1 = chaque jour); null = ne revient jamais (les ronces arrachées
+  // devant la maison: une fois débroussaillé, c'est fini).
   "respawnDays": 1,
   // true: le butin tombe au sol autour (fruits secoués); false: dans les poches.
   "toGround": false,
-  // Tirages par récolte, puis la table: chaque ligne avec ses conditions (heures en minutes
+  // Tirages par récolte, puis la table (vide permis: un débroussaillage ne rapporte rien).
+  // Chaque ligne avec ses conditions (heures en minutes
   // depuis minuit, la plage peut passer minuit; météos clear, overcast, rain, mist, snow;
   // saisons; [] = toutes) et son poids. « rare »: poids multiplié par la chance des besoins.
   // Facultatif: "rainedYesterday" (true: seulement s'il a plu la veille, au moins une heure de

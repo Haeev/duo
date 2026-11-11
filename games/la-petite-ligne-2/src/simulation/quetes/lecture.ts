@@ -45,6 +45,35 @@ export interface JournalEntry {
 
 const KIND_ORDER: Readonly<Record<QuestLineDef['kind'], number>> = { main: 0, side: 1, errand: 2 };
 
+/**
+ * Mots d'un objectif remplacés par une valeur des réglages, pour ne pas recopier un chiffre qui
+ * peut changer: `{coucher}`, l'heure dès laquelle on peut se coucher (`clock.sleepFrom`).
+ */
+export const OBJECTIVE_TOKENS: Readonly<Record<string, (content: Content) => string>> = {
+  '{coucher}': (content) => hourText(content.settings.clock.sleepFrom),
+};
+
+/** « 15 h », « 15 h 30 » (espaces insécables). */
+function hourText(minutes: number): string {
+  const nbsp = String.fromCharCode(0xa0);
+  const h = `${String(Math.floor(minutes / 60))}${nbsp}h`;
+  const m = minutes % 60;
+  return m === 0 ? h : `${h}${nbsp}${String(m).padStart(2, '0')}`;
+}
+
+/** Texte d'un objectif pour ce joueur: accordé, ses mots remplacés (`OBJECTIVE_TOKENS`). */
+export function objectiveText(
+  world: ReadonlyWorld,
+  content: Content,
+  player: PlayerIndex,
+  objective: string,
+): string {
+  let text = agreeFor(world, player, objective);
+  for (const [token, value] of Object.entries(OBJECTIVE_TOKENS))
+    if (text.includes(token)) text = text.replaceAll(token, value(content));
+  return text;
+}
+
 /** Le carnet du joueur: suites ouvertes, la principale d'abord, les finies à la fin. */
 export function journal(
   world: ReadonlyWorld,
@@ -69,7 +98,7 @@ export function journal(
         ? []
         : activeSteps(line, passed).map((s) => ({
             id: s.id,
-            objective: agreeFor(world, player, s.objective),
+            objective: objectiveText(world, content, player, s.objective),
             together: s.together,
           })),
       passed: passed.length,
@@ -96,7 +125,7 @@ export function stepText(
 ): string | null {
   const line = findQuest(content, quest)?.line;
   const def = line?.chapters.flatMap((c) => c.steps).find((s) => s.id === step);
-  return def === undefined ? null : agreeFor(world, player, def.objective);
+  return def === undefined ? null : objectiveText(world, content, player, def.objective);
 }
 
 /** Scènes vues, à relire au carnet. */
@@ -142,7 +171,11 @@ export function glanceTarget(
   for (const step of activeSteps(found.line, state.passed ?? [])) {
     const t = step.target;
     if (t === null) continue;
-    const head = { quest, step: step.id, objective: agreeFor(world, player, step.objective) };
+    const head = {
+      quest,
+      step: step.id,
+      objective: objectiveText(world, content, player, step.objective),
+    };
     // Le but est dans une autre pièce (un commerçant derrière son comptoir): le repère mène à la
     // porte à prendre, pas à travers les murs.
     const me = world.players[player].body;

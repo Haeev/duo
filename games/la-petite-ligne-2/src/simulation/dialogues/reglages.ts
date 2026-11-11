@@ -17,6 +17,12 @@ export interface DialogueTuning {
    */
   readonly orderOffer: { readonly node: string; readonly open: string; readonly leave: string };
   /**
+   * Page dite quand un don (`give_item`) ne tient pas dans les poches: rien n'est donné, l'habitant
+   * le dit (`pocketsFull` de sa fiche, sinon `dialogue.pocketsFull` de `reglages.json`), puis la
+   * conversation se ferme; elle reprendra au don la prochaine fois. Nœud réservé.
+   */
+  readonly giftRefused: { readonly node: string };
+  /**
    * Priorité à partir de laquelle un dialogue a quelque chose à dire (histoire, quête, souvenir,
    * première rencontre, remarque sur l'hygiène): l'offre de la boutique ne le suit pas à sa
    * première écoute du jour. En dessous: conversation ordinaire (quotidien). Ce qui passe avant la
@@ -37,6 +43,7 @@ export const DIALOGUES: DialogueTuning = {
   shopOffer: { node: 'offre-du-commerce', open: 'voir-le-commerce', leave: 'au-revoir' },
   shopClosed: { node: 'commerce-ferme' },
   orderOffer: { node: 'offre-de-la-commande', open: 'livrer-la-commande', leave: 'pas-maintenant' },
+  giftRefused: { node: 'don-sans-place' },
   pendingPriority: 10,
   heardPrefix: 'entendu',
 };

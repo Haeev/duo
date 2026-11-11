@@ -96,6 +96,23 @@ Exemple: les trouvailles de berge d'Aubrune (`coquilles-de-greve`, `plumes-de-he
 5. Un point de plus: une ligne dans `TROUVAILLES` de `construire_plan.py` (case au bord de l'eau, raison d'être), puis la chaîne du plan et `controler_trouvailles.py` (0 erreur).
 6. `pnpm test`; sans dessin, l'objet entre dans les exceptions provisoires de `tests/interface-plume.test.ts`.
 
+## Un obstacle à défaire une fois pour toutes (les ronces de la maison)
+
+Exemple: `commun/ressources/ronces-maison.json`, `commun/meubles/ronces-maison.json`, étape `debroussailler` de `lieux/aubrune/quetes/le-train-de-5h12.json`.
+
+1. `pnpm nouveau ressource <id>`: verbe (« Arracher »), outil et clip, `after: "gone"`, `respawnDays: null` (ne revient jamais), `loot: []` (rien à récolter, donc aucune saison: le geste reste permis toute l'année).
+2. `pnpm nouveau meuble <id>` avec la brique `{ "brick": "harvest", "resource": "<id>" }`, un modèle existant (`bramble`).
+3. Pose les objets dans le plan (`construire_plan.py`, avec leur « pourquoi »), puis la chaîne du plan.
+4. Une fois défait, l'objet n'est plus dessiné, ne bloque plus et ne se vise plus (`harvestedAway`, `src/simulation/noyau/obstacles.ts`).
+5. L'étape qui attend qu'il soit défait: `{ "type": "harvested", "objects": ["<objet>", "..."] }` (tous récoltés et pas revenus, lieu courant). Le repère de l'étape vise un point près de l'un d'eux.
+
+## Conditions et dons d'histoire: règles à connaître
+
+- `item_owned`: `{ "type": "item_owned", "items": ["hache", "hache-forgee"], "count": 1 }`: exemplaires de l'un ou l'autre objet à qui agit, barre, sac et rangements (coffres) compris. Pour savoir si un outil prêté est encore là, même rangé ou amélioré.
+- Un don d'objet (`give_item`) d'un dialogue ou d'une étape ne tombe jamais au sol. Option de choix ou bloc `effects` sans `otherwise`: si les poches n'ont pas la place pour tout, rien n'est donné, l'habitant dit sa réplique `pocketsFull` (fiche de l'habitant, sinon `dialogue.pocketsFull` de `commun/reglages.json`) et la conversation reprendra au don. Étape de quête: elle attend qu'il y ait de la place (refus « poches pleines » redit toutes les 5 s).
+- Un don prévu pour chacun des deux joueurs (`once: "player"`): la condition `when` du dialogue ne doit pas dépendre d'un fait que l'étape change dès que le premier l'a entendu (`"equals": "ouvert"`), sinon le second ne l'entend jamais. Lire le fait sans `equals`.
+- Objectif d'étape: `{coucher}` s'écrit « 15 h » (`clock.sleepFrom` de `commun/reglages.json`). Un autre mot entre accolades est refusé au chargement. Le repère (`target`) peut viser un point d'un intérieur: le coup d'œil mène d'abord à la porte. Relevé mécanique: `tests/objectifs-lieux.test.ts`.
+
 ## Une réplique qui ouvre un écran, et l'apparence révélée (la photo)
 
 Avant la photo du prologue, un joueur n'a pas de visage: son personnage est une silhouette sombre (monde, portraits, onglet Tenues fermé, miroir refusé). Gabarit commenté: `_gabarits/dialogue.jsonc`; exemple: `lieux/train-de-nuit/dialogues/controleur-papiers.json`.

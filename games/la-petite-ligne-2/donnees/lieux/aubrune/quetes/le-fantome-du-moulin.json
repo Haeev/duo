@@ -113,7 +113,7 @@
         },
         {
           "id": "mures",
-          "objective": "Le tarif des témoins: quatre poignées de mûres pour Léon, cueillies aux ronces.",
+          "objective": "Le tarif des témoins: quatre poignées de mûres pour Léon, cueillies aux ronces de la tranchée.",
           "target": {
             "villager": "leon"
           },

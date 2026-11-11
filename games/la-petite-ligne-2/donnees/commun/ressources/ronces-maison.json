@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "ronces-maison",
+  "name": "Ronces de la maison",
+  "kind": "dig",
+  "verb": "Arracher",
+  "clip": "dig",
+  "seconds": 1,
+  "tool": "spade",
+  "minTier": 0,
+  "work": 9,
+  "dirty": false,
+  "effort": 0.2,
+  "after": "gone",
+  "respawnDays": null,
+  "toGround": false,
+  "rolls": 1,
+  "loot": []
+}

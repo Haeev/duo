@@ -6,8 +6,7 @@
   "when": [
     {
       "type": "remembered",
-      "key": "aubrune.acte1.outils",
-      "equals": "ouvert"
+      "key": "aubrune.acte1.outils"
     }
   ],
   "once": "player",
@@ -44,6 +43,13 @@
               "type": "give_item",
               "item": "beche",
               "count": 1
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.outils-recus",
+              "value": true,
+              "by": "actor",
+              "of": "actor"
             }
           ],
           "next": "fin"
@@ -81,6 +87,13 @@
               "type": "give_item",
               "item": "beche",
               "count": 1
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.outils-recus",
+              "value": true,
+              "by": "actor",
+              "of": "actor"
             }
           ],
           "next": "fin"

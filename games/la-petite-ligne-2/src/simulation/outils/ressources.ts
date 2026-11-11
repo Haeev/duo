@@ -2,7 +2,8 @@
  * Brique `harvest`: un point de récolte du monde (couper un arbre, ramasser bois, pierres, fleurs
  * et baies, creuser un point de fouille, secouer un arbre fruitier). Tout vient de la fiche de la
  * ressource (`commun/ressources/<id>.json`). Un appui, un coup: les coups se cumulent dans l'état
- * de la brique, la récolte tombe au dernier; la ressource revient `respawnDays` jours plus tard.
+ * de la brique, la récolte tombe au dernier; la ressource revient `respawnDays` jours plus tard
+ * (jamais si `null`).
  */
 import type { Brick } from '../../donnees/schemas/briques';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
@@ -105,8 +106,12 @@ export const harvestBehaviour: BrickBehaviour<HarvestBrick> = {
     const resource = resourceOf(look, target);
     if (resource === null) return 'gone';
     if (!resourceReady(look, target.states.harvest)) return 'not-yet-back';
-    // Fleurs hors saison: rien à prendre maintenant, la bulle le dit.
-    if (!resource.loot.some((entry) => lootAvailable(look.content, look.world, entry)))
+    // Fleurs hors saison: rien à prendre maintenant, la bulle le dit. Une table vide (ronces à
+    // arracher) n'a pas de saison: le geste reste permis.
+    if (
+      resource.loot.length > 0 &&
+      !resource.loot.some((entry) => lootAvailable(look.content, look.world, entry))
+    )
       return 'nothing-now';
     if (resource.tool !== null) {
       const held = heldTool(look, player, resource.tool);
@@ -139,7 +144,10 @@ export const harvestBehaviour: BrickBehaviour<HarvestBrick> = {
     });
     if (done) {
       state.work = 0;
-      state.back = sim.world.common.day + resource.respawnDays;
+      state.back =
+        resource.respawnDays === null
+          ? HARVEST_TUNING.neverBack
+          : sim.world.common.day + resource.respawnDays;
       const { rareLuck, extraCatch } = luckOf(sim, player);
       const drawn = drawLoot(sim, resource, rareLuck, extraCatch);
       // À deux sur le même point (R12): le butin est multiplié.

@@ -220,7 +220,7 @@
           "id": "nuit",
           "objective": "Le concert est pour demain: va dormir, les cymbales sous l'oreiller.",
           "target": {
-            "point": "hd"
+            "point": "maison-lit-g"
           },
           "done": [
             {

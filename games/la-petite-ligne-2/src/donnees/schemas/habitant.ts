@@ -16,6 +16,11 @@ export const VillagerSchema = v.strictObject({
   stands: IdSchema,
   /** Babil: identifiant du timbre de voix. */
   voice: IdSchema,
+  /**
+   * Sa réplique quand un de ses dons ne tient pas dans les poches (rien n'est donné, il le garde
+   * pour plus tard). Absent: `dialogue.pocketsFull` de `commun/reglages.json`.
+   */
+  pocketsFull: v.exactOptional(v.pipe(v.string(), v.minLength(1), v.maxLength(150))),
   /** Sa vie au fil des heures (`vie-habitant.ts`); absent: il reste à `stands`. */
   life: v.exactOptional(VillagerLifeSchema),
 });

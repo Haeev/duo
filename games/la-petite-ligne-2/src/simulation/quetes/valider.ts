@@ -21,6 +21,7 @@ import { housingFacts } from '../logement/faits';
 import { playerFactKey } from '../regles/memoire';
 import { isStoryCondition } from './conditions';
 import { decisionKey, previousDecisionKey } from './decisions';
+import { OBJECTIVE_TOKENS } from './lecture';
 import { prerequisites } from './moteur';
 
 /** Les contrôles de référence des conditions et effets communs (`donnees/valider.ts`). */
@@ -405,6 +406,9 @@ function checkQuest(env: Env, line: QuestLineDef): void {
       if (step.decision !== undefined) checkDecisionStep(env, step, where);
       for (const problem of checkAgreementTags(step.objective))
         problems.push(`${where}: ${problem}`);
+      for (const token of step.objective.match(/\{[^}]*\}/g) ?? [])
+        if (!(token in OBJECTIVE_TOKENS))
+          problems.push(`${where}: mot à remplacer inconnu « ${token} » dans l'objectif`);
     });
     for (const id of ids) earlier.add(id);
   }

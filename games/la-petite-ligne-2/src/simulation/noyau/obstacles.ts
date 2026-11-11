@@ -4,7 +4,9 @@
  * d'un pas à l'autre: la couche mobile n'est refaite que si un meuble a changé ou si un verrou
  * s'est ouvert ou fermé, ou si un train d'événement a bougé (`monde/trains.ts`), ou si un véhicule
  * de voie s'est arrêté ou est reparti (`vehicules/emprise.ts`), ou si une barrière de passage à
- * niveau s'est baissée ou levée (`monde/barrieres.ts`: ses lisses vont dans `bars`, hors de la grille). Sert à l'hôte et à la prédiction de l'invité, qui lit la même progression.
+ * niveau s'est baissée ou levée (`monde/barrieres.ts`: ses lisses vont dans `bars`, hors de la grille), ou si une
+ * ressource partie pour de bon (`harvestedAway`, les ronces arrachées) a été récoltée: elle n'est
+ * plus dessinée, elle ne bloque plus. Sert à l'hôte et à la prédiction de l'invité, qui lit la même progression.
  */
 import type { Content, PlaceContent } from '../../donnees/charger';
 import type { PropDef } from '../../donnees/schemas/meuble';
@@ -48,6 +50,8 @@ interface Cached {
   vehicles: number;
   /** Barrières de passage à niveau baissées (`barrierSignature`). */
   barriers: number;
+  /** Meubles partis avec leur ressource à la dernière construction (`goneSignature`). */
+  gone: number;
 }
 
 const cache = new WeakMap<PlaceContent, Cached>();
@@ -67,8 +71,16 @@ export function footprintOf(
  * Un meuble solide bloque, sauf une porte ouverte (brique `open`), l'obstacle d'un verrou ouvert
  * ou un meuble conditionné absent.
  */
-function blocks(def: PropDef, state: ReadPlace, id: string, cached: Cached): boolean {
+function blocks(
+  content: Content,
+  def: PropDef,
+  state: ReadPlace,
+  id: string,
+  cached: Cached,
+  day: number,
+): boolean {
   if (!def.solid) return false;
+  if (harvestedAway(content, def, state, id, day)) return false;
   const when = cached.conditional.get(id);
   if (when !== undefined && cached.present[when] !== 1) return false;
   const lock = cached.lockObjects.get(id);
@@ -91,10 +103,58 @@ function signatureOf(place: PlaceContent, state: ReadPlace): number {
   return h;
 }
 
-function mark(content: Content, cached: Cached, state: ReadPlace, prop: PropInstance): void {
+/**
+ * Meuble parti pour de bon avec sa ressource: elle ne laisse rien (`after: "gone"`) et ne revient
+ * jamais (`respawnDays: null`, les ronces arrachées). Le rendu ne le dessine plus
+ * (`rendu/lieu/recoltes.ts`): il ne bloque plus et ne se vise plus. Une ressource qui repousse
+ * (caillou, coquelicots) garde sa place et sa bulle « pas encore repoussé ».
+ */
+export function harvestedAway(
+  content: Content,
+  def: PropDef,
+  state: ReadPlace,
+  id: string,
+  day: number,
+): boolean {
+  const back = state.objects[id]?.harvest?.back ?? null;
+  if (back === null || day >= back) return false;
+  return def.bricks.some((b) => {
+    if (b.brick !== 'harvest') return false;
+    const resource = content.resources[b.resource];
+    return resource?.after === 'gone' && resource.respawnDays === null;
+  });
+}
+
+/** Empreinte des meubles partis avec leur ressource (`harvestedAway`): change quand l'un part ou revient. */
+function goneSignature(
+  content: Content,
+  place: PlaceContent,
+  state: ReadPlace,
+  day: number,
+): number {
+  let h = 0;
+  for (const id in state.objects) {
+    const back = state.objects[id]?.harvest?.back ?? null;
+    if (back === null || day >= back) continue;
+    const prop = findProp(place, state, id);
+    const def = prop === null ? undefined : content.props[prop.type];
+    if (def === undefined || !harvestedAway(content, def, state, id, day)) continue;
+    h += 1;
+    for (let i = 0; i < id.length; i++) h = (Math.imul(h, 31) + id.charCodeAt(i)) | 0;
+  }
+  return h;
+}
+
+function mark(
+  content: Content,
+  cached: Cached,
+  state: ReadPlace,
+  prop: PropInstance,
+  day: number,
+): void {
   const b = cached.blockers;
   const def = content.props[prop.type];
-  if (def === undefined || !blocks(def, state, prop.id, cached)) return;
+  if (def === undefined || !blocks(content, def, state, prop.id, cached, day)) return;
   const size = footprintOf(def, prop.rotation);
   const maxX = Math.floor(prop.x + size.w / 2 - EDGE);
   const maxY = Math.floor(prop.y + size.h / 2 - EDGE);
@@ -141,6 +201,7 @@ export function placeBlockers(
       trains: Number.NaN,
       vehicles: Number.NaN,
       barriers: Number.NaN,
+      gone: Number.NaN,
     };
     cache.set(place, cached);
   }
@@ -150,24 +211,28 @@ export function placeBlockers(
   const trains = trainSignature({ content, world }, place);
   const vehicles = vehicleSignature(state);
   const barriers = barrierSignature({ content, world }, place);
+  const day = world.common.day;
+  const gone = goneSignature(content, place, state, day);
   if (
     signature !== cached.signature ||
     locksChanged ||
     presenceChanged ||
     trains !== cached.trains ||
     vehicles !== cached.vehicles ||
-    barriers !== cached.barriers
+    barriers !== cached.barriers ||
+    gone !== cached.gone
   ) {
     cached.signature = signature;
     cached.trains = trains;
     cached.vehicles = vehicles;
     cached.barriers = barriers;
+    cached.gone = gone;
     cached.blockers.props.fill(0);
     markClosedLocks(place, cached.locks, cached.blockers.props, place.map.width, place.map.height);
     // Un objet posé sur un meuble (champ `on`) ne bloque jamais: il n'occupe pas le sol.
     for (const object of place.map.objects)
-      if (!isPosed(object)) mark(content, cached, state, object);
-    for (const placed of state.placed) mark(content, cached, state, placed);
+      if (!isPosed(object)) mark(content, cached, state, object, day);
+    for (const placed of state.placed) mark(content, cached, state, placed, day);
     // Un train d'événement à quai ou qui passe: sa caisse barre la voie (règle des données).
     markTrainCells({ content, world }, place, cached.blockers.props);
     // Un véhicule de voie posé à l'arrêt (la draisine): on le contourne.

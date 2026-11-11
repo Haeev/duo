@@ -1,9 +1,9 @@
 // R1 récolte à Aubrune (`simulation/outils/ressources.ts`, `briques/ramasser.ts`): l'hôte prend
 // la hache (touche 4 de la barre) et abat un chêne de la lisière (`chene-lisiere-4`, six coups):
-// la souche se voit chez les deux, les bûches vont dans son sac. Il cueille les ronces du jardin
-// de la maison (`ronces-maison-2`). L'invité pose son pain par terre (carnet, P) et l'hôte le
-// ramasse (Espace). Sauvegarde « aubrune-ete » (jour 15, été: les ronces ont des mûres); chaque
-// étape commence par une mise en place.
+// la souche se voit chez les deux, les bûches vont dans son sac. Il arrache à la bêche les ronces
+// du jardin de la maison (`ronces-maison-2`, parties pour de bon, chez les deux). L'invité pose
+// son pain par terre (carnet, P) et l'hôte le ramasse (Espace). Sauvegarde « aubrune-ete »
+// (jour 15, l'hôte a la bêche); chaque étape commence par une mise en place.
 import { expect, test } from '@playwright/test';
 import { startDuo, type ProbeWorld } from '../aides-e2e/duo';
 import {
@@ -90,8 +90,10 @@ test('R1 récolte: chêne abattu, ronces cueillies, objet au sol ramassé', asyn
   await shot(host, '1-souche-hote');
   await shot(guest, '1-souche-invite');
 
-  // Les ronces du jardin: mains libres (X range la hache), Espace face aux ronces.
-  await host.press('KeyX');
+  // Les ronces du jardin: bêche en main (sa touche), Espace face aux ronces, trois coups.
+  const spade = w0.players[h.index]?.toolbar.findIndex((s) => s?.item === 'beche') ?? -1;
+  expect(spade, 'la bêche dans la barre (touches 1 à 5)').toBeGreaterThanOrEqual(0);
+  await host.press(`Digit${String(spade + 1)}`);
   // Les ronces sont contre la clôture du jardin: les deux cases libres les plus proches.
   const [near, beside] = standSpots(MAP, BRAMBLE, 2);
   if (near === undefined || beside === undefined) throw new Error('pas de place près des ronces');
@@ -99,21 +101,20 @@ test('R1 récolte: chêne abattu, ronces cueillies, objet au sol ramassé', asyn
   await placeAt(duo, journal, g.index, beside, 'jardin');
   expect(await aimAt(duo, h, BRAMBLE, BRAMBLE.id, journal), 'ronces visées').toBe(true);
   journal.log(`ronces: ${JSON.stringify(await aimOf(h))}`);
-  for (let i = 0; i < 4; i++) {
+  expect((await aimOf(h))?.verb).toBe('Arracher');
+  for (let i = 0; i < 8; i++) {
     const w = await duo.until(host, 'monde lu', () => true);
     if (back(w, BRAMBLE.id) !== null) break;
+    if ((await aimOf(h))?.id !== BRAMBLE.id) await aimAt(duo, h, BRAMBLE, BRAMBLE.id, journal);
     await host.press('Space', 300);
     await host.page.waitForTimeout(2500);
   }
-  const picked0 = await duo.until(
-    host,
-    'ronces cueillies',
-    (w) => back(w, BRAMBLE.id) !== null,
-    20_000,
-  );
-  expect(countOf(picked0, h, 'mures'), 'des mûres dans le sac').toBeGreaterThan(0);
-  await duo.until(guest, 'ronces vues cueillies', (w) => back(w, BRAMBLE.id) !== null, 20_000);
-  await shot(host, '2-ronces-cueillies');
+  await duo.until(host, 'ronces arrachées', (w) => back(w, BRAMBLE.id) !== null, 20_000);
+  // Parties pour de bon: l'invité le voit aussi (état du lieu transmis), elles ne sont plus dessinées.
+  await duo.until(guest, 'ronces vues arrachées', (w) => back(w, BRAMBLE.id) !== null, 20_000);
+  await shot(host, '2-ronces-arrachees-hote');
+  await shot(guest, '2-ronces-arrachees-invite');
+  await host.press('KeyX');
 
   // L'invité pose son pain par terre (carnet, P), l'hôte le ramasse (Espace).
   const bread = countOf(await duo.until(host, 'monde lu', () => true), h, 'pain');

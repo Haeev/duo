@@ -28,6 +28,11 @@ export interface HarvestTuning {
    * faut la veille, entre le lever et la nuit, pour que la rive ait changé.
    */
   readonly rainedYesterdayMinutes: number;
+  /**
+   * Jour de retour écrit pour une ressource qui ne revient jamais (`respawnDays: null`): au-delà
+   * de toute partie, sans changer le format de l'état (`back` reste un jour).
+   */
+  readonly neverBack: number;
 }
 
 export const HARVEST_TUNING: HarvestTuning = {
@@ -40,4 +45,5 @@ export const HARVEST_TUNING: HarvestTuning = {
   dropSpread: 0.9,
   forgeReach: 1.2,
   rainedYesterdayMinutes: 60,
+  neverBack: 1_000_000,
 };

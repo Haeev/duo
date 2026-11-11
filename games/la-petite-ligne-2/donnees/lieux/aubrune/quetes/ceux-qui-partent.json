@@ -349,7 +349,7 @@
           "id": "nuit-du-train",
           "objective": "Le train des cinq est annoncé pour demain: va dormir.",
           "target": {
-            "point": "hd"
+            "point": "maison-lit-g"
           },
           "done": [
             {
