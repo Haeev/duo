@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "colette-cadeau-chapeau",
+  "villager": "colette",
+  "priority": 58,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.fini"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Le grand-père trempé, sur la photo du mur, il avait un chapeau de paille. Il en perdait un par saison dans le bief. J'en ai retrouvé deux.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_piece",
+          "piece": "hat-straw"
+        }
+      ],
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Tiens, le tien. Au bord de l'eau, à l'affût, il garde la tête au frais. Et s'il tombe dans le bief, c'est la tradition.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

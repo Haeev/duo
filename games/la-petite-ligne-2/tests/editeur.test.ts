@@ -160,8 +160,8 @@ describe('éditeur de personnage: simulation', () => {
   it('set_look règle l’apparence, le prénom et le genre, et les synchronise', () => {
     const sim = newSim(content);
     const before = sim.revisions.players;
-    // Comme l'éditeur du jeu: le hasard ne tire que dans la garde-robe du duo (pas de pièce à gagner).
-    const owned = { ...data, catalogue: wardrobeOf(content.catalogue, sim.world) };
+    // Comme l'éditeur du jeu: le hasard ne tire que dans la garde-robe du joueur (pas de pièce à gagner).
+    const owned = { ...data, catalogue: wardrobeOf(content.catalogue, sim.world, 1) };
     const look = randomDraft(draft(), 'sim', owned).look;
     send(sim, 1, { type: 'set_look', name: 'Lou', look, gender: 'f' });
     const player = sim.world.players[1];

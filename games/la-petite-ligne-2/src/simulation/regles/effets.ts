@@ -67,7 +67,7 @@ export function applyEffect(sim: SimContext, actor: PlayerIndex, effect: Effect)
       giveEntry(sim, actor, effect.entry);
       return;
     case 'give_piece':
-      givePiece(sim, actor, effect.piece);
+      for (const p of effectTargets(actor, effect.to)) givePiece(sim, p, effect.piece);
       return;
     case 'choose':
       choose(sim, actor, effect.decision, effect.option);

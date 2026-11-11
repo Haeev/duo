@@ -55,7 +55,7 @@ function coreIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void 
     actor.selected = intent.slot;
     sim.touch('players');
   } else if (intent.type === 'set_look') {
-    const locked = lockedPieceOf(sim.world, sim.content.pieces, intent.look);
+    const locked = lockedPieceOf(sim.world, sim.content.pieces, intent.look, player);
     if (locked !== null) {
       sim.emit({ type: 'refused', player, reason: 'piece-locked', target: locked });
       return;

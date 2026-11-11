@@ -8,15 +8,15 @@
 - `reglages.ts`: réglages du lot L3 que les fichiers de données n'ont pas encore (à migrer dans `reglages.json`).
 - `apparence.ts`: apparence révélée ou non (`lookRevealed`, fait `joueurs.apparence.j<n>`), retenue par l'effet `reveal_look` (`to: "duo"` pour les deux) ou par la validation de l'éditeur (`set_look`). Une partie neuve ne commence cachée que si le lieu de départ sait révéler (`placeReveals`). Avant: silhouette dans le monde et les portraits, miroir refusé (`no-face-yet`), onglet Tenues fermé. Test: `tests/photo-prologue.test.ts`.
 - `souvenirs.ts`: faits de souvenirs écrits par le moteur (première prise, nuit blanche, pluie dehors ensemble), réglages `RULES.memories`.
-- `recompenses.ts`: récompenses qui ne sont pas des objets (recette, plan, entrée de collection, pièce de tenue), garde-robe gagnée (`isPieceOwned`, `wardrobeOf`).
+- `recompenses.ts`: récompenses qui ne sont pas des objets (recette, plan, entrée de collection, pièce de tenue), garde-robe de chaque joueur (`hasPiece`, `isPieceOwned`, `wardrobeOf`, `lockedPieceOf`: un index de joueur).
 
 ## Donner une récompense (recette)
 
-1. Dans `onDone` d'une étape (ou une option de dialogue, un temps de scène): `{ "type": "give_recipe", "recipe": "<id>" }`, `give_plan` (`plan`), `give_entry` (`entry`) ou `give_piece` (`piece`).
+1. Dans `onDone` d'une étape (ou une option de dialogue, un temps de scène): `{ "type": "give_recipe", "recipe": "<id>" }`, `give_plan` (`plan`), `give_entry` (`entry`) ou `give_piece` (`piece`, `to: "duo"` facultatif pour chacun des deux).
 2. La recette est `known: "learned"`, le plan a une `source` autre que `start`, l'entrée existe au carnet, la pièce porte l'étiquette `a-gagner` du catalogue: le chargement refuse le reste.
-3. Tout s'écrit dans la mémoire commune (`cuisine.recette.<id>`, `fabrication.plan.<id>`, `garde-robe.piece.<id>`) ou l'album: sauvegarde et réseau sans changement.
-4. Annonce aux deux joueurs: événement `reward_given` (`kind`, `id`), ou `collection_found` pour une entrée. Déjà acquise: sans effet.
-5. Une pièce à gagner reste hors de l'éditeur et refusée par `set_look` (`piece-locked`) tant qu'elle n'est pas donnée.
+3. Tout s'écrit dans la mémoire des faits (`cuisine.recette.<id>`, `fabrication.plan.<id>` pour le duo; `garde-robe.piece.<id>.j<n>` pour le joueur qui reçoit la pièce, cahier 2.1: chacun ses tenues; l'ancienne clé sans `.j<n>` vaut pour les deux) ou l'album: sauvegarde et réseau sans changement.
+4. Annonce: événement `reward_given` (`kind`, `id`; pour une pièce, `by` est le joueur qui la reçoit et lui seul la voit annoncée), ou `collection_found` pour une entrée. Déjà acquise: sans effet. Cadeau d'un habitant: un dialogue `once: "player"` de priorité 58 avec `give_piece` (exemple: `lieux/aubrune/dialogues/solange-cadeau-foulard.json`).
+5. Une pièce à gagner reste hors de l'éditeur de ce joueur et refusée par `set_look` (`piece-locked`) tant qu'il ne l'a pas. Vente en boutique: `pieces` d'un commerce (`simulation/commerces/README.md`).
 6. Test court: `tests/recompenses.test.ts`.
 
 ## Faits par joueur, durées, compteurs (recette)

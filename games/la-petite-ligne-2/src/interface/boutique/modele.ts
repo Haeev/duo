@@ -12,24 +12,33 @@ import {
   isUnlocked,
   knownPrices,
   offerFor,
+  piecesOnSale,
   shopDef,
   stockLeft,
 } from '../../simulation/commerces/prix';
+import { hasPiece } from '../../simulation/regles/recompenses';
 import { SHOP_TUNING } from '../../simulation/commerces/reglages';
 
 export type ShopTab = 'buy' | 'sell';
 
 export interface ShopTile {
+  /** Objet (dans les poches) ou pièce de tenue (dans la garde-robe, ligne `pieces`). */
+  readonly kind: 'item' | 'piece';
+  /** Identifiant de l'objet, ou de la pièce de tenue. */
   readonly item: string;
   readonly name: string;
+  /** Une ligne de description (pièce de tenue), sinon `null`. */
+  readonly description: string | null;
+  /** Emplacement de la pièce de tenue (`top`, `hat`...), sinon `null`. */
+  readonly slot: string | null;
   /** Prix de l'unité (centimes); `null`: il n'en veut pas (onglet Vendre). */
   readonly unit: number | null;
   /** Exemplaires dans les poches du joueur (onglet Vendre). */
   readonly owned: number;
   /** Encore en rayon (`null`: sans limite), onglet Acheter. */
   readonly stock: number | null;
-  /** Pourquoi ce n'est pas possible: grisé, barré ou en pointillé. */
-  readonly state: 'ok' | 'too-expensive' | 'out-of-stock' | 'refused';
+  /** Pourquoi ce n'est pas possible: grisé, barré ou en pointillé; `owned`: pièce déjà à toi. */
+  readonly state: 'ok' | 'too-expensive' | 'out-of-stock' | 'refused' | 'owned';
   readonly need: boolean;
 }
 
@@ -118,9 +127,9 @@ function buyTiles(
 ): ShopTile[] {
   const look = { content, world };
   const purse = world.players[me].money;
-  return shop.sells
+  const items = shop.sells
     .filter((line) => isUnlocked(look, line, me))
-    .map((line) => {
+    .map((line): ShopTile => {
       const left = stockLeft(look, shop, line);
       const canChest =
         (line.payment ?? 'purse') === 'household' || (line.payment === 'purse-or-chest' && chest);
@@ -128,8 +137,11 @@ function buyTiles(
       const state: ShopTile['state'] =
         left <= 0 ? 'out-of-stock' : wallet < line.price ? 'too-expensive' : 'ok';
       return {
+        kind: 'item',
         item: line.item,
         name: itemName(content, line.item),
+        description: null,
+        slot: null,
         unit: line.price,
         owned: pockets(world, me).get(line.item) ?? 0,
         stock: Number.isFinite(left) ? left : null,
@@ -137,6 +149,24 @@ function buyTiles(
         need: false,
       };
     });
+  // Les pièces de tenue après les objets: une seule, pour soi, de la bourse seule.
+  const pieces = piecesOnSale(look, shop, me).map((line): ShopTile => {
+    const def = content.pieces[line.piece];
+    const mine = hasPiece(world, line.piece, me);
+    return {
+      kind: 'piece',
+      item: line.piece,
+      name: def?.name ?? line.piece,
+      description: def?.description ?? null,
+      slot: def?.slot ?? null,
+      unit: line.price,
+      owned: mine ? 1 : 0,
+      stock: null,
+      state: mine ? 'owned' : purse < line.price ? 'too-expensive' : 'ok',
+      need: false,
+    };
+  });
+  return [...items, ...pieces];
 }
 
 function sellTiles(
@@ -151,8 +181,11 @@ function sellTiles(
   for (const [item, owned] of pockets(world, me)) {
     const offer = offerFor(look, shop, item, me);
     const tile: ShopTile = {
+      kind: 'item',
       item,
       name: itemName(content, item),
+      description: null,
+      slot: null,
       unit: offer?.unit ?? null,
       owned,
       stock: null,
@@ -198,7 +231,20 @@ export function shopModel(
   const focus = tiles.length === 0 ? 0 : Math.min(Math.max(0, ui.focus), tiles.length - 1);
   const tile = tiles[focus] ?? null;
   let detail: ShopDetail | null = null;
-  if (tile !== null) {
+  if (tile?.kind === 'piece') {
+    // Une pièce de tenue: une seule, de la bourse; « déjà à toi » ou trop chère, rien à acheter.
+    const quantity = tile.state === 'ok' ? 1 : 0;
+    detail = {
+      tile,
+      hunger: null,
+      quantity,
+      max: quantity,
+      total: tile.unit ?? 0,
+      chest: 'never',
+      chestPart: 0,
+      known: [],
+    };
+  } else if (tile !== null) {
     const line = ui.tab === 'buy' ? shop.sells.find((l) => l.item === tile.item) : undefined;
     const payment = line?.payment ?? 'purse';
     const chest: ShopDetail['chest'] =

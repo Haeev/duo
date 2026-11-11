@@ -45,6 +45,19 @@ export const ShopSellSchema = v.strictObject({
 });
 export type ShopSell = v.InferOutput<typeof ShopSellSchema>;
 
+/**
+ * Pièce de tenue en vente (brique « vendre une tenue »): une pièce du catalogue des personnages
+ * étiquetée `a-gagner`. L'achat, payé de la bourse, l'ajoute à la garde-robe de l'acheteur seul
+ * (cahier 2.1: les tenues sont à chacun); déjà à lui, elle ne se rachète pas. Sans stock.
+ */
+export const ShopPieceSchema = v.strictObject({
+  piece: IdSchema,
+  price: Price,
+  /** La pièce n'apparaît qu'une fois la condition vraie pour ce joueur (fait d'histoire, amitié). */
+  unlock: v.exactOptional(ConditionSchema),
+});
+export type ShopPiece = v.InferOutput<typeof ShopPieceSchema>;
+
 /** Le commerçant ne rachète cette ligne qu'une fois la condition vraie pour ce joueur (fait d'histoire, amitié). */
 const BuyUnlock = { unlock: v.exactOptional(ConditionSchema) } as const;
 
@@ -77,6 +90,8 @@ export const ShopSchema = v.strictObject({
    */
   when: v.exactOptional(v.pipe(v.array(ConditionSchema), v.minLength(1), v.maxLength(8))),
   sells: v.array(ShopSellSchema),
+  /** Pièces de tenue en vente, après les objets dans l'écran de boutique. Absent: aucune. */
+  pieces: v.exactOptional(v.pipe(v.array(ShopPieceSchema), v.maxLength(40))),
   /** Le plus précis l'emporte: objet, puis famille. Rien d'autre n'est racheté. */
   buys: v.array(ShopBuySchema),
   /** Ce que le commerçant dépense au plus par jour en rachats, en centimes. Absent: sans plafond. */

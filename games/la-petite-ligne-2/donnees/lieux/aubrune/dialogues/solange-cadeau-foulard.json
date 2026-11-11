@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "solange-cadeau-foulard",
+  "villager": "solange",
+  "priority": 58,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.fini"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Une fanfare sans costume, c'est une répétition. Pendant le trac du chef, j'ai cousu des foulards: il fallait bien garder son sang-froid.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_piece",
+          "piece": "accessory-neckerchief"
+        }
+      ],
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Tiens, le tien, aux couleurs de la halte. Noué au cou, tu entres en scène. Les grenouilles en sont vertes de jalousie.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

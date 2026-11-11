@@ -4,8 +4,9 @@
  * plafond du jour, mémoire des prix. Aucun contenu nommé: tout vient des données du commerce.
  */
 import type { Content } from '../../donnees/charger';
-import type { ShopBuy, ShopDef, ShopSell } from '../../donnees/schemas/commerce';
+import type { ShopBuy, ShopDef, ShopPiece, ShopSell } from '../../donnees/schemas/commerce';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
+import type { Condition } from '../../donnees/schemas/regles';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { bondKey } from '../../etat/progression';
 import { modifiersOf } from '../besoins/jauges';
@@ -177,9 +178,23 @@ export function stockLeft(look: ShopLook, shop: ShopDef, line: ShopSell): number
   return sold?.[0] !== period ? line.dailyStock : Math.max(0, line.dailyStock - sold[1]);
 }
 
-/** L'article est débloqué pour ce joueur (fait d'histoire, amitié). */
-export function isUnlocked(look: ShopLook, line: ShopSell, player: PlayerIndex): boolean {
+/** L'article (objet ou pièce de tenue) est débloqué pour ce joueur (fait d'histoire, amitié). */
+export function isUnlocked(
+  look: ShopLook,
+  line: { readonly unlock?: Condition },
+  player: PlayerIndex,
+): boolean {
   return line.unlock === undefined || evaluate({ ...look, actor: player }, line.unlock);
+}
+
+/** La pièce de tenue en vente dans ce commerce, ou `null`. */
+export function pieceLine(shop: ShopDef, piece: string): ShopPiece | null {
+  return shop.pieces?.find((line) => line.piece === piece) ?? null;
+}
+
+/** Les pièces de tenue que ce joueur voit en rayon (débloquées), dans l'ordre de la fiche. */
+export function piecesOnSale(look: ShopLook, shop: ShopDef, player: PlayerIndex): ShopPiece[] {
+  return (shop.pieces ?? []).filter((line) => isUnlocked(look, line, player));
 }
 
 /** Centimes que le commerçant peut encore dépenser aujourd'hui en rachats (`Infinity`: sans plafond). */

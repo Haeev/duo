@@ -484,6 +484,8 @@ export function createKitchen(
       case 'scene_started':
       case 'chapter_ended':
       case 'shop_bought':
+      case 'shop_piece_bought':
+      case 'clock_struck':
       case 'shop_opened':
       case 'shop_sold':
       case 'sleep_waiting':

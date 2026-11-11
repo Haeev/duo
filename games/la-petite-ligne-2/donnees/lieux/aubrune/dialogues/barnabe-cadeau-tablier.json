@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "barnabe-cadeau-tablier",
+  "villager": "barnabe",
+  "priority": 58,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.fini"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Achille m'a donné un tablier. Deux, en fait. Un pour moi. Un pour qui a marché à côté. Par la Grand-Route.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_piece",
+          "piece": "accessory-apron"
+        }
+      ],
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Tiens. Il est propre. Enfin, il a de la farine. C'est pareil, au fournil.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

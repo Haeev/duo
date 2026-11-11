@@ -31,11 +31,13 @@ describe('catalogue des personnages', () => {
       (p) => p.slot === 'hat' && p.tags.includes(WARDROBE.lockedTag),
     );
     if (hat === undefined) throw new Error('aucun chapeau à gagner');
-    const shown = (): string[] =>
-      piecesFor(wardrobeOf(content.catalogue, sim.world), 'hat').map((p) => p.id);
-    expect(shown()).not.toContain(hat.id);
-    sim.world.progress.memory[pieceKey(hat.id)] = { v: true, by: 0, day: 1 };
-    expect(shown()).toContain(hat.id);
+    const shown = (player: 0 | 1): string[] =>
+      piecesFor(wardrobeOf(content.catalogue, sim.world, player), 'hat').map((p) => p.id);
+    expect(shown(0)).not.toContain(hat.id);
+    // Chacun sa garde-robe: la pièce du joueur 1 ne paraît pas chez le joueur 0.
+    sim.world.progress.memory[pieceKey(hat.id, 1)] = { v: true, by: 1, day: 1 };
+    expect(shown(1)).toContain(hat.id);
+    expect(shown(0)).not.toContain(hat.id);
     for (const index of [0, 1] as const) {
       for (const gender of ['f', 'm'] as const) {
         const look = defaultPlayerLook(

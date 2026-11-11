@@ -59,7 +59,10 @@ export function noteSale(
 export function shopFacts(content: Content, shop: ShopDef): Map<string, Set<FactValue> | null> {
   const facts = new Map<string, Set<FactValue> | null>();
   const sold = Object.keys(content.items).filter((item) => basePrice(content, shop, item) !== null);
-  const bought = new Set<FactValue>(shop.sells.map((line) => line.item));
+  const bought = new Set<FactValue>([
+    ...shop.sells.map((line) => line.item),
+    ...(shop.pieces ?? []).map((line) => line.piece),
+  ]);
   for (const p of [0, 1] as const) {
     facts.set(firstBuyKey(shop.id, p), bought);
     facts.set(firstSaleKey(shop.id, p), new Set(sold));

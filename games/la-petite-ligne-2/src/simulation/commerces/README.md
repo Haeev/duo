@@ -31,7 +31,20 @@ La première écoute du jour d'une réplique d'histoire ou de quête n'est pas s
 
 ## Refus (`refused`, `target` = identifiant du commerce)
 
-`gone`, `too-far`, `shop-closed`, `not-sold`, `locked` (article pas encore débloqué), `out-of-stock`, `pockets-full`, `not-enough-money`, `chest-not-allowed`, `not-wanted` (pas dans son métier), `not-enough-items`, `shop-cap-reached` (plafond d'achat du jour), `purse-full`. Textes: `interface/boutique/textes.ts`.
+`gone`, `too-far`, `shop-closed`, `not-sold`, `locked` (article pas encore débloqué), `out-of-stock`, `pockets-full`, `not-enough-money`, `chest-not-allowed`, `not-wanted` (pas dans son métier), `not-enough-items`, `shop-cap-reached` (plafond d'achat du jour), `purse-full`, `already-owned` (pièce de tenue déjà à lui). Textes: `interface/boutique/textes.ts`.
+
+## Vendre une tenue (brique `pieces`)
+
+Une pièce de tenue s'achète comme un article, mais n'entre ni dans les poches ni dans un stock: elle va dans la garde-robe de l'acheteur seul (cahier 2.1, « chacun ses tenues »), qui la porte ensuite au miroir (brique `mirror`) ou par le carnet (onglet Tenues, « Changer de tenue »). Intention `shop_buy_piece` (`shop`, `piece`), de la bourse seule; événement `shop_piece_bought`, plus l'annonce `reward_given` (`kind: piece`, `by`: l'acheteur). Garde-robe: faits `garde-robe.piece.<id>.j<n>` (`regles/recompenses.ts`, `hasPiece`), sauvegarde et réseau inchangés. L'écran montre nom, description, emplacement et la vignette 3D de l'éditeur (à défaut un picto par emplacement); une pièce déjà à lui dit « À toi » et ne se rachète pas.
+
+Recette d'ajout:
+
+1. Vérifie que la pièce est au catalogue (`donnees/commun/personnages/catalogue.json`) avec l'étiquette `a-gagner` (sinon elle est déjà à tous: le chargement refuse).
+2. Dans la fiche du commerce, ajoute à `pieces`: `{ "piece": "<id>", "price": <centimes> }` (modèle commenté: `donnees/_gabarits/commerce.jsonc`).
+3. Facultatif: `"unlock": <condition>` pour ne la montrer qu'après un fait d'histoire ou une amitié.
+4. `pnpm exec vitest run tests/tenues-boutique.test.ts`: l'échoppe factice du test prouve la brique; le chargement refuse une pièce inconnue, en double ou sans `a-gagner`.
+
+Rien à toucher au moteur ni à l'interface. Une pièce de récompense (quête, cadeau d'un habitant) passe par l'effet `{ "type": "give_piece", "piece": "<id>" }` (`"to": "duo"` pour chacun des deux).
 
 ## Faits retenus (`faits.ts`)
 

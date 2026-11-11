@@ -14,6 +14,8 @@ export const SHOP_INTENTS = [
     count: Count,
     chest: v.boolean(),
   }),
+  /** Acheter une pièce de tenue (ligne `pieces` du commerce), de sa bourse, pour soi. */
+  v.strictObject({ type: v.literal('shop_buy_piece'), shop: IdSchema, piece: IdSchema }),
   v.strictObject({ type: v.literal('shop_sell'), shop: IdSchema, item: IdSchema, count: Count }),
   /** « Parler » de l'écran de boutique: la conversation avec le commerçant, s'il est là. */
   v.strictObject({ type: v.literal('shop_talk'), shop: IdSchema }),

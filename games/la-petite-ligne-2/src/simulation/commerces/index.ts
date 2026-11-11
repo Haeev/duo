@@ -11,6 +11,7 @@ import type { Intent } from '../noyau/entrees';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { talkBehaviour } from '../briques/parler';
 import { RULES } from '../regles/reglages';
+import { givePiece, hasPiece } from '../regles/recompenses';
 import { earn } from '../sac/argent';
 import { addItem, countItem, removeItem, roomFor } from '../sac/inventaire';
 import {
@@ -18,6 +19,7 @@ import {
   isTrading,
   isUnlocked,
   offerFor,
+  pieceLine,
   restockPeriod,
   shopDef,
   stockLeft,
@@ -39,7 +41,8 @@ export type ShopRefusal =
   | 'not-wanted'
   | 'not-enough-items'
   | 'shop-cap-reached'
-  | 'purse-full';
+  | 'purse-full'
+  | 'already-owned';
 
 function refuse(sim: SimContext, player: PlayerIndex, reason: ShopRefusal, target: string): void {
   sim.emit({ type: 'refused', player, reason, target });
@@ -209,6 +212,53 @@ function buy(
   });
 }
 
+/**
+ * Achat d'une pièce de tenue (ligne `pieces`): de la bourse seule (cahier 4.6, « vêtement:
+ * bourse »), pour l'acheteur seul (cahier 2.1). Une pièce qu'il a déjà ne se rachète pas.
+ */
+function buyPiece(
+  sim: SimContext,
+  player: PlayerIndex,
+  intent: Extract<Intent, { type: 'shop_buy_piece' }>,
+): void {
+  const shop = access(sim, player, intent.shop);
+  if (shop === null) return;
+  const line = pieceLine(shop, intent.piece);
+  if (line === null) {
+    refuse(sim, player, 'not-sold', shop.id);
+    return;
+  }
+  if (!isUnlocked(sim, line, player)) {
+    refuse(sim, player, 'locked', shop.id);
+    return;
+  }
+  if (hasPiece(sim.world, line.piece, player)) {
+    refuse(sim, player, 'already-owned', shop.id);
+    return;
+  }
+  const state = sim.world.players[player];
+  if (state.money < line.price) {
+    refuse(sim, player, 'not-enough-money', shop.id);
+    return;
+  }
+  // La pièce d'abord: une mémoire des faits pleine (borne `maxFacts`) la refuserait, sans débiter.
+  if (!givePiece(sim, player, line.piece)) {
+    refuse(sim, player, 'not-sold', shop.id);
+    return;
+  }
+  state.money -= line.price;
+  sim.emit({ type: 'money_changed', who: player, delta: -line.price });
+  noteBuy(sim, player, shop.id, line.piece);
+  sim.touch('players');
+  sim.emit({
+    type: 'shop_piece_bought',
+    player,
+    shop: shop.id,
+    piece: line.piece,
+    cents: line.price,
+  });
+}
+
 function sell(
   sim: SimContext,
   player: PlayerIndex,
@@ -284,6 +334,9 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
   switch (intent.type) {
     case 'shop_buy':
       buy(sim, player, intent);
+      return;
+    case 'shop_buy_piece':
+      buyPiece(sim, player, intent);
       return;
     case 'shop_sell':
       sell(sim, player, intent);

@@ -774,3 +774,10 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `InkKit` ne se construit pas dans Node (couches dessinées sur un canevas 2D): `vi.mock` de `encre/textures` (`createInkLayers`, `createNoise` en textures d'un point) et un faux `WebGLRenderer` suffisent pour tester création et libération.
 - La démonstration de l'éditeur en `#miroir` ne s'ouvre pas (apparence non révélée): rouvrir par `window.editeur.mirror()` après une première validation sur la page normale. Thème sombre: poser `dataset.lplStyle = 'encre'` après le chargement (dans `addInitScript`, `documentElement` est nul).
 - Capture d'une page de jeu en rendu logiciel: `page.screenshot` dépasse 120 s; lire `canvas.toDataURL()` juste après un `renderer.frame` dans la page (et recommencer si l'image est vide: le souffle du rendu encré saute des images).
+
+## Garde-robe par joueur et vente de tenues (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Tenues à chacun (cahier 2.1): fait `garde-robe.piece.<id>.j<n>` (`hasPiece`); l'ancienne clé sans `.j<n>` vaut pour les deux, aucune migration. `wardrobeOf`, `isPieceOwned`, `lockedPieceOf` prennent l'index du joueur.
+- Cadeau d'un habitant en fin de suite: dialogue `once: "player"`, priorité 58, `when` sur `aubrune.<suite>.fini`, nœud `effects` avec `give_piece` (comme `achille-canne-fine`): aucune quête à toucher.
+- Vignettes 3D hors éditeur: la fabrique `characterPreview` sur un canevas détaché, `thumbnail(look, 'piece')`, puis `dispose` aussitôt; démonstration de la boutique: `#mercerie` (départ réglé sur Aubrune par `settings.start`, `editorAtStart: false`, boutique ouverte par un faux `shop_opened`: le comptoir tenu donne d'abord la parole à Solange).
+- `src/interface/cuisine/index.ts` avait un `switch` incomplet (`clock_struck`) laissé par un autre lot: lint seul, `tsc` ne le voit pas.
