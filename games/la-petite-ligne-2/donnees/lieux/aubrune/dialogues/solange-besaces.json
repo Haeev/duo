@@ -6,8 +6,14 @@
   "when": [
     {
       "type": "remembered",
-      "key": "aubrune.acte1.besaces",
-      "equals": "ouvert"
+      "key": "aubrune.acte1.besaces"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bag_slots_at_least",
+        "slots": 4
+      }
     }
   ],
   "once": "player",

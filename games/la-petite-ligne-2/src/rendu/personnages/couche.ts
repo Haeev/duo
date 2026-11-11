@@ -586,10 +586,17 @@ export class AssembledCharacters implements CharacterLayer {
     const placed =
       this.view.content.places[placeId]?.map.objects.find((o) => o.id === object) ??
       frame.place.placed.find((p) => p.id === object);
-    const model = placed === undefined ? undefined : this.view.content.props[placed.type]?.model;
-    const seat =
+    const def = placed === undefined ? undefined : this.view.content.props[placed.type];
+    const model = def?.model;
+    const measured =
       (model === undefined ? undefined : this.settings.seat.byModel[model]) ??
       this.settings.seat.standIn;
+    // Réglage par meuble dans ses données (brique `sit`), prioritaire sur le modèle.
+    const brick = def?.bricks.find((b) => b.brick === 'sit');
+    const seat =
+      brick?.brick === 'sit'
+        ? { height: brick.height ?? measured.height, front: brick.front ?? measured.front }
+        : measured;
     const shape = model === undefined ? undefined : DECOR_MANIFEST.models[model];
     const clear = shape === undefined ? undefined : this.settings.seat.sideClear[shape.family];
     if (placed === undefined || shape === undefined || clear === undefined) return seat;

@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "baquet-de-lessive",
+  "name": "Baquet de lessive",
+  "model": "tub",
+  "size": {
+    "w": 2,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

@@ -6,6 +6,7 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Intent } from '../noyau/entrees';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { HOOKS } from './crochets';
+import { payWaitingGifts } from './dons';
 import { checkQuests, trackQuest } from './moteur';
 import { STORY } from './reglages';
 
@@ -29,6 +30,7 @@ export const questSystem: GameSystem = {
     if (sim.world.common.phase !== 'day') return;
     if (sim.world.tick % STORY.checkEveryTicks !== 0) return;
     checkQuests(sim, HOOKS);
+    payWaitingGifts(sim);
   },
   intent: onIntent,
 };

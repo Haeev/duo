@@ -10,5 +10,15 @@
   "solid": true,
   "placeable": false,
   "series": null,
-  "bricks": []
+  "bricks": [
+    {
+      "brick": "relieve",
+      "verb": "Faire sa toilette",
+      "clip": "wash",
+      "seconds": 4,
+      "need": "hygiene",
+      "amount": 100,
+      "cap": 100
+    }
+  ]
 }

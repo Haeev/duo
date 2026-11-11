@@ -89,6 +89,22 @@ export function checkCondition(
         if (!found) problems.push(`${at}: aucun objet récoltable « ${id} » dans les cartes`);
       }
       return;
+    case 'bag_slots_at_least':
+      return;
+    case 'sown':
+      if (c.crop !== undefined && !(c.crop in content.crops))
+        problems.push(`${at}: culture inconnue « ${c.crop} »`);
+      for (const id of c.objects) {
+        const found = Object.values(content.places).some((p) =>
+          p.map.objects.some(
+            (o) =>
+              o.id === id &&
+              (content.props[o.type]?.bricks.some((b) => b.brick === 'field') ?? false),
+          ),
+        );
+        if (!found) problems.push(`${at}: aucune terre cultivable « ${id} » dans les cartes`);
+      }
+      return;
     case 'place_is':
       if (!(c.place in content.places)) problems.push(`${at}: lieu inconnu « ${c.place} »`);
       return;

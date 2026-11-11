@@ -15,6 +15,7 @@ import type { OrderLineDef } from '../../donnees/schemas/commande';
 import type { Intent } from '../noyau/entrees';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { evaluateAll } from '../regles/conditions';
+import { applyWithGifts } from '../quetes/dons';
 import { applyEffects } from '../regles/effets';
 import { bump, forget, recall, remember } from '../regles/memoire';
 import { RULES } from '../regles/reglages';
@@ -202,7 +203,17 @@ export function takeMail(sim: SimContext, player: PlayerIndex): string | null {
   if (letters.length === 0) return 'mail-none';
   for (const letter of letters) {
     remember(sim, mailKey(place, letter.id), ORDERS.mailTaken, player);
-    if (letter.attach.length > 0) applyEffects(sim, player, letter.attach);
+    // Le colis ne tombe jamais au sol: poches pleines, il attend la place (`quetes/dons.ts`).
+    if (letter.attach.length > 0)
+      applyWithGifts(
+        sim,
+        player,
+        letter.attach,
+        { place, source: letter.id, beat: null },
+        (rest) => {
+          applyEffects(sim, player, rest);
+        },
+      );
   }
   sim.emit({ type: 'mail_taken', player, place, letters: letters.map((l) => l.id) });
   return null;

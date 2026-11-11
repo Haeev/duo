@@ -147,6 +147,13 @@
       "rotation": 0
     },
     {
+      "id": "maison-rdc-baquet",
+      "type": "baquet",
+      "x": 7.5,
+      "y": 4,
+      "rotation": 3
+    },
+    {
       "id": "maison-rdc-tapis-de-sol",
       "type": "tapis-long",
       "x": 7.5,

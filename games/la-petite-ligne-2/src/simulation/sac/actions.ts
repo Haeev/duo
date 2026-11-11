@@ -57,12 +57,16 @@ export function giveItem(
 
 /**
  * Change de sac (cahier 4.5: un sac remplace le précédent). Le contenu passe dans le nouveau; ce
- * qui n'y tient plus tombe au sol. Le rachat à moitié prix relève du commerce (jalon 2).
+ * qui n'y tient plus tombe au sol. Le rachat à moitié prix relève du commerce (jalon 2). Un sac
+ * offert plus petit que celui qu'on porte ne le remplace jamais (`false`): on garderait moins de
+ * cases (la besace de Solange donnée à qui a déjà le sac à dos).
  */
 export function equipBag(sim: SimContext, player: PlayerIndex, bagId: string): boolean {
   const def = sim.content.bags.bags.find((bag) => bag.id === bagId);
   if (def === undefined) return false;
   const state: PlayerState = sim.world.players[player];
+  const worn = sim.content.bags.bags.find((bag) => bag.id === state.bag?.id);
+  if (worn !== undefined && worn.slots > def.slots) return false;
   const old = state.bag?.slots ?? [];
   state.bag = { id: def.id, slots: Array.from({ length: def.slots }, () => null) };
   for (const stack of old) {

@@ -111,6 +111,21 @@ export function evaluate(ctx: RuleContext, condition: Condition): boolean {
         return back !== null && world.common.day < back;
       });
     }
+    case 'bag_slots_at_least':
+      return forActor(ctx, (p) => {
+        const worn = world.players[p].bag;
+        const def = ctx.content.bags.bags.find((bag) => bag.id === worn?.id);
+        return (def?.slots ?? 0) >= condition.slots;
+      });
+    case 'sown': {
+      const objects = world.places[world.common.place]?.objects;
+      let sown = 0;
+      for (const id of condition.objects)
+        for (const plot of objects?.[id]?.field?.cells ?? [])
+          if (plot !== null && plot.crop !== null && (condition.crop ?? plot.crop) === plot.crop)
+            sown++;
+      return sown >= condition.count;
+    }
     case 'instrument_out_of_tune':
       return forActor(ctx, (p) => worstTune(ctx.content, world, p) !== 'just');
     case 'money_at_least':

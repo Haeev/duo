@@ -14,6 +14,7 @@ import type { SimContext } from '../noyau/systemes';
 import type { RuleContext } from '../regles/conditions';
 import { remember } from '../regles/memoire';
 import { evaluateStepAll, playersTogether } from '../quetes/conditions';
+import { applyWithGifts } from '../quetes/dons';
 import { applyStepEffects, type StoryHooks } from '../quetes/effets';
 import { sceneKey, sceneSeenOn, storyOf } from '../quetes/faits';
 import { STORY } from '../quetes/reglages';
@@ -397,7 +398,16 @@ function beatDone(sim: SimContext, run: SceneRun, beat: BeatDef, hooks: StoryHoo
       return beat.parts.every((_, i) => run.parts[i] === true);
     }
     case 'effects':
-      applyStepEffects(sim, run.roleA, beat.effects, hooks);
+      // Les dons ne tombent jamais au sol: poches pleines, ils attendent la place (`quetes/dons.ts`).
+      applyWithGifts(
+        sim,
+        run.roleA,
+        beat.effects,
+        { place: run.place, source: run.id, beat: run.beat },
+        (rest) => {
+          applyStepEffects(sim, run.roleA, rest, hooks);
+        },
+      );
       return true;
   }
 }

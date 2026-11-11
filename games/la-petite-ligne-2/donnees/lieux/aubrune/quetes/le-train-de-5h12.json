@@ -308,9 +308,8 @@
           "after": ["outils"],
           "done": [
             {
-              "type": "talked",
-              "dialogue": "solange-besaces",
-              "node": "fin"
+              "type": "bag_slots_at_least",
+              "slots": 4
             }
           ],
           "together": false,
@@ -408,10 +407,10 @@
           },
           "done": [
             {
-              "type": "reach",
-              "point": "jd",
-              "who": "one",
-              "radius": 4
+              "type": "sown",
+              "objects": ["potager"],
+              "crop": "radis",
+              "count": 1
             }
           ],
           "together": false,

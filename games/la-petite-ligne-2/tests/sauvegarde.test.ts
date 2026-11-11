@@ -255,6 +255,9 @@ describe('déclencheur', () => {
 
   it('écrit à l’aube et à chaque arrivée, hors du pas, une écriture à la fois', async () => {
     expect(wantsSave(dawn) && wantsSave(arrived)).toBe(true);
+    // Au coucher (cahier 4.11): se mettre au lit, pas s'asseoir.
+    expect(wantsSave({ type: 'brick_used', player: 0, target: 'lit', brick: 'sleep' })).toBe(true);
+    expect(wantsSave({ type: 'brick_used', player: 0, target: 'banc', brick: 'sit' })).toBe(false);
     const h = harness();
     h.trigger.notify([{ type: 'unstuck', player: 0 }]);
     expect(h.deferred).toHaveLength(0);

@@ -14,6 +14,12 @@ Une fiche par meuble (`<id>.json`, gabarit `donnees/_gabarits/meuble.jsonc`, rec
 8. Le mode déco des joueurs garde sa propre règle `deco.surface` (`src/simulation/logement/pose.ts`). Au rendu, un meuble de la couche `top` posé par un joueur sur une surface se dessine sur le plateau du porteur (`top` de sa fiche, sinon la hauteur de son modèle), et sa lampe éclaire de là (`describeDynamic`, `src/rendu/lieu/description.ts`).
 9. Test court: `tests/poses.test.ts` (une table et une lampe factices).
 
+## Un siège (brique `sit`)
+
+1. `{ "brick": "sit", "seats": 1, "restPerMinute": 6 }`: les places se partagent la largeur du meuble (`size.w`), corps tourné vers la façade.
+2. Hauteur et avancée de l'assise au rendu, dans cet ordre: `height` et `front` de la brique (m, facultatifs), puis l'assise mesurée du modèle (`seat` de `decors.json`), puis le dessus du modèle et sa mi-profondeur. Un tabouret ou un banc sans réglage s'assoit donc sur son dessus, au milieu.
+3. Test court: `tests/rendu/personnages.test.ts` (« assise sur le meuble »).
+
 ## Ajouter un meuble obtenable (fabriqué, acheté ou reçu, puis posé chez soi)
 
 1. `pnpm nouveau meuble-obtenable pouf-bleu` crée `commun/meubles/pouf-bleu.json` (le meuble posé) et `commun/objets/pouf-bleu.json` (l'objet du sac, dont le champ `prop` nomme la fiche). Gabarits commentés: `_gabarits/meuble-obtenable/`.

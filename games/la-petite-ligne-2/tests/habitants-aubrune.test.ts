@@ -178,6 +178,8 @@ function satisfy(sim: Sim, conditions: readonly Condition[]): void {
       case 'weekday_is':
       case 'item_owned':
       case 'harvested':
+      case 'sown':
+      case 'bag_slots_at_least':
         break;
     }
   }

@@ -60,6 +60,12 @@ export const BRICK_SCHEMAS = [
     seats: v.pipe(IntSchema, v.minValue(1), v.maxValue(4)),
     /** Points de sommeil rendus par minute réelle assise. */
     restPerMinute: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(20)),
+    /**
+     * Réglage du rendu, facultatif: dessus de l'assise (m) et bord avant depuis le milieu du
+     * meuble (m). Absents: l'assise mesurée du modèle, sinon son dessus et sa mi-profondeur.
+     */
+    height: v.optional(v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1.5))),
+    front: v.optional(v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1))),
   }),
   /** Dormir: à deux au lit après l'heure permise, on passe au lendemain. */
   v.strictObject({

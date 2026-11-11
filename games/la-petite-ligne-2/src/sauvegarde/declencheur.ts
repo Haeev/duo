@@ -1,6 +1,7 @@
 /**
- * Déclencheur des sauvegardes de l'hôte: à l'aube (`day_started`), à chaque arrivée en train
- * (`train_arrived`) et sur demande. Les sauvegardes périodiques, de pause et de sortie passent par
+ * Déclencheur des sauvegardes de l'hôte: au coucher (un joueur se met au lit, `brick_used` de la
+ * brique `sleep`), à l'aube (`day_started`), à chaque arrivée en train (`train_arrived`) et sur
+ * demande (cahier 4.11). Les sauvegardes périodiques, de pause et de sortie passent par
  * le fournisseur du SDK (`saves.provide`), pas par ici.
  *
  * L'écriture ne se lance jamais dans le pas de simulation: les événements sont notés, l'écriture
@@ -34,6 +35,7 @@ export interface SaveTrigger {
 
 /** Événements qui déclenchent une sauvegarde automatique. */
 export function wantsSave(event: GameEvent): boolean {
+  if (event.type === 'brick_used') return event.brick === 'sleep';
   return event.type === 'day_started' || event.type === 'train_arrived';
 }
 
