@@ -84,6 +84,20 @@ export const INK_SETTINGS = {
     margin: 6,
     /** Rayon maximal couvert (m): au-delà (vue haute de contrôle), l'ombre s'arrête au cadre. */
     maxRadius: 34,
+    /**
+     * Volumes écartés de la passe (`StageSort`): ceux dont l'ombre ne peut tomber nulle part dans
+     * le champ. On suit les rayons du soleil jusqu'à `cullFloor` (m, sous le fond de l'eau), et
+     * jamais moins raide que `cullMinSine` (sinus de la hauteur du soleil): au ras de l'horizon,
+     * la longueur est bornée par le cadre de la carte.
+     */
+    cullFloor: -0.7,
+    cullMinSine: 0.05,
+    /**
+     * Rayon (m) de la sphère d'un personnage autour de la racine de son squelette, pour l'écarter
+     * des passes quand il est hors du champ (Three.js le dessine sinon toujours, partout dans le
+     * lieu): tout le corps y tient, debout, assis ou couché.
+     */
+    characterRadius: 1.6,
   },
 
   /**
@@ -188,6 +202,11 @@ export const INK_SETTINGS = {
      * le nuanceur, sans texture ni passe. Rien dedans, ni sur un sol au soleil.
      */
     ticks: { cell: 1.1, share: 0.45, length: 0.42, gap: 0.075, strength: 0.85 },
+    /**
+     * Fond des joints d'un dallage à l'ombre: part relevée vers le demi-ton (0: noir comme le
+     * reste de l'ombre). Les joints restaient presque noirs et mangeaient les hachures courtes.
+     */
+    jointLift: 0.6,
   },
 
   /**
@@ -337,6 +356,23 @@ export const INK_SETTINGS = {
     referenceWidth: 1366,
     /** Rendu logiciel (tests, banc de captures): l'échelle ne s'adapte pas, elle reste à 1. */
     softwareFixed: true as boolean,
+    /**
+     * Départ sur un processeur graphique intégré (nom lu par `WEBGL_debug_renderer_info`, Intel
+     * chez le client): l'échelle adaptative part d'au plus `maxPixels` points internes au lieu
+     * de la pleine définition du canevas (le PC de référence affichait 1920 x 1080 internes pour
+     * un écran de 1536 x 864 points). Ses paliers s'appliquent ensuite à ce départ. Rien ne
+     * change ailleurs (Mac, rendu logiciel), ni quand l'échelle est figée.
+     */
+    integrated: { match: 'intel', maxPixels: 1366 * 768 },
+  },
+
+  /**
+   * Contexte du canevas en rendu encré (`inkContext`): préférence de processeur graphique, et
+   * `desynchronized` (faible latence) laissé à faux: il change la composition selon le système.
+   */
+  canvas: {
+    powerPreference: 'high-performance' as WebGLPowerPreference,
+    desynchronized: false,
   },
 
   /**

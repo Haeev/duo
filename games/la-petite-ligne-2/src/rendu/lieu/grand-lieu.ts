@@ -55,7 +55,7 @@ import {
   type BuildingShape,
   buildingsByTile,
   type GroundField,
-  groundField,
+  placeGroundField,
   kindAt,
   surfaceAt,
 } from './terrain-rendu';
@@ -145,6 +145,8 @@ interface RoomView {
 
 const NO_LIGHTS: PlaceLights = { lamps: [], windows: [] };
 const DARK: BuildingLight = { ground: 0, upper: 0 };
+/** Clé d'un houppier en fondu: `tuile * CROWN_KEY + index` (moins de CROWN_KEY arbres par tuile). */
+const CROWN_KEY = 1 << 16;
 
 /** Un bâtiment livré et ce qui s'allume avec lui: ses vitres, ses rectangles de lumière dehors. */
 interface LitBuilding {
@@ -184,7 +186,10 @@ export class TiledPlace {
   private readonly plants: TilePlants | null;
   private farDirty = true;
   private readonly shadowed = new Map<number, boolean>();
-  private readonly crownFades = new Map<string, CrownFade>();
+  /** Houppiers en fondu, par clé `tuile * CROWN_KEY + index` (un nombre: rien à allouer par image). */
+  private readonly crownFades = new Map<number, CrownFade>();
+  /** Houppiers vus à cette image (réutilisé d'une image à l'autre). */
+  private readonly crownSeen = new Set<number>();
   private readonly time = { value: 0 };
   private readonly glass: Material & { emissiveIntensity: number };
   private readonly fadeBase: FadeMaterial;
@@ -225,7 +230,7 @@ export class TiledPlace {
     this.root.name = 'grand-lieu';
     this.outside.name = 'dehors';
     this.root.add(this.outside);
-    this.field = groundField(map, settings);
+    this.field = placeGroundField(map, settings);
     // Le relief est une affaire du rendu encré: l'ancien rendu garde son sol plan.
     this.relief = ink === null ? null : createRelief(this.field, map);
     this.ring = new TileRing(map, settings.ring);
@@ -482,9 +487,11 @@ export class TiledPlace {
             }
           const look = field.looks[best];
           if (look === undefined || look.hidden === true) continue;
-          const name = field.names[best] ?? '';
           c.set(look.water === true ? settings.water.color : look.color);
-          const dense = name === 'hors-jeu' || wild / (step * step) > settings.decor.wildFull - 3;
+          // Un bois vu de loin: nature hors du couloir, ou nature boisée loin de tout aménagement.
+          const dense =
+            look.outside === true ||
+            ((look.trees?.wild ?? 0) > 0 && wild / (step * step) > settings.decor.wildFull - 3);
           if (dense) c.multiplyScalar(settings.far.woodShade);
           const level =
             look.water !== true
@@ -961,7 +968,8 @@ export class TiledPlace {
   private updateCrowns(dt: number, subjects: readonly Vec3[], toCamera: Vec3): void {
     const s = RENDER_SETTINGS.occlusion;
     const reach = 10;
-    const seen = new Set<string>();
+    const seen = this.crownSeen;
+    seen.clear();
     for (const feet of subjects) {
       for (const view of this.views.values()) {
         if (view.crownSlots.length === 0) continue;
@@ -973,9 +981,13 @@ export class TiledPlace {
           feet.z > y1 + reach
         )
           continue;
-        view.crownBoxes.forEach((box, index) => {
-          if (Math.abs(box.min.x - feet.x) > reach || Math.abs(box.min.z - feet.z) > reach) return;
-          const key = `${String(view.tile)}:${String(index)}`;
+        const boxes = view.crownBoxes;
+        for (let index = 0; index < boxes.length; index += 1) {
+          const box = boxes[index];
+          if (box === undefined) continue;
+          if (Math.abs(box.min.x - feet.x) > reach || Math.abs(box.min.z - feet.z) > reach)
+            continue;
+          const key = view.tile * CROWN_KEY + index;
           const fade = this.crownFades.get(key);
           const margin = fade?.hidden === true ? s.margin + s.hysteresis : s.margin;
           let hit = false;
@@ -988,11 +1000,11 @@ export class TiledPlace {
               break;
             }
           }
-          if (!hit && fade === undefined) return;
+          if (!hit && fade === undefined) continue;
           seen.add(key);
           if (fade === undefined) this.startCrownFade(key, view, index);
           else fade.hidden = hit;
-        });
+        }
       }
     }
     for (const [key, fade] of this.crownFades) {
@@ -1009,7 +1021,7 @@ export class TiledPlace {
     }
   }
 
-  private startCrownFade(key: string, view: TileView, index: number): void {
+  private startCrownFade(key: number, view: TileView, index: number): void {
     const part = view.crownSlots[index];
     if (part === undefined) return;
     const saved = new Matrix4();
@@ -1038,7 +1050,7 @@ export class TiledPlace {
     });
   }
 
-  private dropCrownFade(key: string, fade: CrownFade): void {
+  private dropCrownFade(key: number, fade: CrownFade): void {
     fade.source.setMatrixAt(fade.slot, fade.matrix);
     fade.source.instanceMatrix.needsUpdate = true;
     fade.mesh.removeFromParent();

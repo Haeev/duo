@@ -24,6 +24,36 @@ export interface GroundLook {
    * Dessinées sur le sol des petits lieux (`floor` de la carte, `sol.ts`).
    */
   readonly planks?: { readonly width: number; readonly shade: number };
+  /**
+   * Arbres semés (part des cases qui en portent un): `near` au bord de ce qui est aménagé, `wild`
+   * à `decor.wildFull` cases et au-delà (le bois s'épaissit loin des chemins). `stumps`: part
+   * des places tirées qui ne portent qu'une souche (modèle `stump` de l'essence). `bushes`:
+   * buissons au bord des chemins. Absent: aucun arbre.
+   */
+  readonly trees?: {
+    readonly near: number;
+    readonly wild?: number;
+    readonly stumps?: number;
+    readonly bushes?: boolean;
+  };
+  /**
+   * Hors du couloir de jeu (on ne s'y promène pas loin des sentiers): ses arbres prennent leur
+   * version allégée à plus de `semis.light.beyond` cases d'une nature qui ne l'est pas, et le sol
+   * lointain s'y assombrit comme un bois.
+   */
+  readonly outside?: boolean;
+  /**
+   * Ce qui couvre le sol (rendu encré), à la place du semis de sa surface: `litter` (feuilles
+   * mortes: cailloux aplatis, par case), `tufts` (part des cases), `tuftSize` (largeur et
+   * hauteur en multiples de la touffe d'herbe: une fougère est plus large que haute).
+   */
+  readonly cover?: {
+    readonly litter?: number;
+    readonly litterColors?: readonly string[];
+    readonly tufts?: number;
+    readonly tuftColors?: readonly string[];
+    readonly tuftSize?: readonly [number, number];
+  };
 }
 
 /**
@@ -31,9 +61,82 @@ export interface GroundLook {
  * le rendu les déduit (parcelles selon leur taille, bord de l'eau), voir `terrain-rendu.ts`.
  */
 export const GROUND_LOOKS: Readonly<Record<string, GroundLook>> = {
-  'hors-jeu': { color: '#6f8f4e', surface: 'herbe' },
-  herbe: { color: '#8fae5b', surface: 'herbe' },
-  pre: { color: '#a3b865', surface: 'herbe' },
+  // Le bois hors des zones: forêt serrée où l'on ne va pas (arbres allégés loin du couloir).
+  'hors-jeu': {
+    color: '#6f8f4e',
+    surface: 'herbe',
+    trees: { near: 0.16 },
+    outside: true,
+  },
+  herbe: { color: '#8fae5b', surface: 'herbe', trees: { near: 0.006, wild: 0.09, bushes: true } },
+  pre: { color: '#a3b865', surface: 'herbe', trees: { near: 0.006 } },
+  // Natures des zones du plan (section 15 de `plan.md`): densités d'arbres du tableau
+  // « Végétation par zones » (arbres pour 100 m², soit des centièmes par case).
+  // La Côte: bois de coteau, 4 arbres pour 100 m² en moyenne, plus clair au bord des sentiers et
+  // des clairières; sol de feuilles mortes et de fougères, quelques souches. Hors des sentiers,
+  // on n'y va pas: ses arbres s'allègent à distance du couloir comme ceux du bois hors jeu.
+  'sous-bois': {
+    color: '#71804a',
+    surface: 'herbe',
+    trees: { near: 0.03, wild: 0.075, stumps: 0.08, bushes: true },
+    outside: true,
+    cover: {
+      litter: 0.7,
+      litterColors: ['#9c6a3c', '#b07c45', '#86603a', '#a08a55'],
+      tufts: 0.22,
+      tuftColors: ['#566f37', '#5f7a3c', '#4d6a33'],
+      tuftSize: [2.8, 0.9],
+    },
+  },
+  // Le tunnel: friche rocheuse au-dessus de la ligne morte, pins et bouleaux épars (1,2 pour
+  // 100 m²), herbe sèche entre les pierres.
+  'friche-rocheuse': {
+    color: '#a39b78',
+    surface: 'gravier',
+    trees: { near: 0.004, wild: 0.012, stumps: 0.15 },
+    cover: { tufts: 0.22, tuftColors: ['#a49a5c', '#8f8f52', '#b3a66a'], tuftSize: [1.1, 0.8] },
+  },
+  // Le bourg: herbe rase des abords, tondue par les moutons et les passages (0,2 pour 100 m²).
+  'herbe-rase': {
+    color: '#9cb662',
+    surface: 'herbe',
+    trees: { near: 0.002 },
+    cover: { tufts: 0.14, tuftColors: ['#8fa44e', '#9cb05a'], tuftSize: [1, 0.6] },
+  },
+  // Les talus de la voie et la clairière du poste: herbes hautes et ronces, sureaux épars.
+  friche: {
+    color: '#98a25c',
+    surface: 'herbe',
+    trees: { near: 0.003, wild: 0.006, bushes: true },
+    cover: { tufts: 0.65, tuftColors: ['#8f9447', '#a3a052', '#74863f'], tuftSize: [1.3, 1.3] },
+  },
+  // La rivière: prairie humide, joncs et iris, une ripisylve (1,5 pour 100 m²).
+  'prairie-humide': {
+    color: '#7da464',
+    surface: 'herbe',
+    trees: { near: 0.01, wild: 0.02 },
+    cover: { tufts: 0.7, tuftColors: ['#6f9a5a', '#86a862', '#5f8a55'], tuftSize: [0.9, 1.5] },
+  },
+  // La crête aux myrtilles: lande rase de bruyère et de myrtilliers, sans arbre (voulu).
+  lande: {
+    color: '#8f8067',
+    surface: 'herbe',
+    cover: { tufts: 0.6, tuftColors: ['#8a6a7a', '#6f7a48', '#9a7a8a'], tuftSize: [1.8, 0.75] },
+  },
+  // Le cimetière: herbe entretenue entre les tombes, rien n'y est semé.
+  cimetiere: {
+    color: '#93ab62',
+    surface: 'herbe',
+    cover: { tufts: 0.12, tuftColors: ['#8fa44e'], tuftSize: [1, 0.6] },
+  },
+  // Le verger communal: herbe haute qu'on fauche en juillet (coquelicots); le pommier est posé.
+  verger: {
+    color: '#a2b663',
+    surface: 'herbe',
+    cover: { tufts: 0.45, tuftColors: ['#8fa44e', '#9fb35a', '#74863f'], tuftSize: [1, 1.2] },
+  },
+  // La place et le parvis: pavés comme la rue (profil `place` de `reglages-relief.ts`).
+  place: { color: '#c4b496', surface: 'pave', verge: 0.88 },
   cour: { color: '#c9b48c', surface: 'terre' },
   labour: { color: '#9a7b55', surface: 'terre' },
   champ: { color: '#c9b48c', surface: 'terre' },
@@ -114,13 +217,9 @@ export const TILE_SETTINGS = {
     /** Distance (cases) au chemin, au bâtiment ou à l'eau au-delà de laquelle le bois s'épaissit. */
     wildStart: 3,
     wildFull: 11,
-    /** Arbres par case: isolés près du bourg, bois loin des chemins, forêt hors des zones. */
-    treeSparse: 0.006,
-    treeWild: 0.09,
-    treeOutside: 0.16,
-    /** Natures hors du couloir de jeu: on n'y va jamais, le bois s'y allège (`GroundField.away`). */
-    outside: ['hors-jeu'],
-    /** Buissons près des chemins (part des cases d'herbe à 1 à 4 cases d'un chemin). */
+    // Arbres par case et natures hors du couloir de jeu: `trees` et `outside` de chaque nature
+    // (`GROUND_LOOKS`), lus par `tileDecor` et `groundField`.
+    /** Buissons près des chemins (part des cases à 1 à 4 cases d'un chemin, natures à `bushes`). */
     bushNear: 0.035,
     trunkColor: '#6e5440',
     crownColors: ['#5f8a4a', '#6c9650', '#557d45', '#7b9f57'],
@@ -177,7 +276,9 @@ export const TILE_SETTINGS = {
     } as Readonly<Partial<Record<SurfaceKind, readonly string[]>>>,
     tuftHeight: [0.16, 0.38] as const,
     tuftWidth: 0.11,
-    tuftColors: ['#74863f', '#8fa44e', '#6f8f4e'] as const,
+    tuftColors: ['#74863f', '#8fa44e', '#6f8f4e'] as readonly string[],
+    /** Feuilles mortes (`cover.litter` d'une nature): largeur tirée (m) et épaisseur. */
+    litter: { size: [0.08, 0.15] as const, height: 0.012 },
     /** Les touffes s'espacent loin de tout aménagement (cases), pour tenir le budget. */
     wildThin: 14,
     maxPerTile: 1200,

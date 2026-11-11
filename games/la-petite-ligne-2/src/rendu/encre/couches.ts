@@ -62,6 +62,8 @@ export const KIND = {
   stem: 4,
   ground: 5,
   water: 6,
+  /** Fond des joints d'un dallage: relevé à l'ombre, pour que les hachures courtes s'y lisent. */
+  joint: 7,
 } as const;
 export const SWAP = 8;
 

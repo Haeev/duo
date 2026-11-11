@@ -90,6 +90,9 @@ const VIEWS: readonly View[] = [
   { name: 'tunnel', x: 361, y: 59, minutes: 16 * 60, yaw: 0, width: 30 },
   // Le bois le plus dense du lieu (végétation semée): la vue du budget.
   { name: 'bois', x: 48, y: 16, minutes: 16 * 60, width: 18 },
+  // La Côte depuis son chemin: sous-bois semé (arbres entiers au bord, allégés au fond), feuilles
+  // mortes, fougères et souches.
+  { name: 'cote', x: 162, y: 56, minutes: 16 * 60, width: 18 },
 ];
 
 async function stats(side: Side): Promise<Stats> {

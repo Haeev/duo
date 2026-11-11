@@ -2,6 +2,7 @@
 // conversion automatique des géométries, hiérarchie du trait, carte du sol, lampes, mise en route
 // étalée des programmes, pose assise. Logique pure: aucun contexte WebGL.
 import {
+  Bone,
   BoxGeometry,
   type BufferGeometry,
   Color,
@@ -11,6 +12,9 @@ import {
   Mesh,
   MeshStandardMaterial,
   Object3D,
+  OrthographicCamera,
+  Skeleton,
+  SkinnedMesh,
   Vector3,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -500,6 +504,60 @@ describe('mise en route étalée', () => {
     plain.castShadow = false;
     stages.sort(root);
     expect(shown(plain, SUN_LAYER)).toBe(false);
+  });
+
+  it('écarte des passes ce qui ne se voit pas: ombre hors du champ, personnage hors du champ', () => {
+    const root = new Group();
+    const material = new InkMaterial(createInkUniforms());
+    // Vue de dessus: le champ couvre x et z de -5 à 5. Soleil à 45 degrés, venu de l'est (+x).
+    const camera = new OrthographicCamera(-5, 5, 5, -5, 0.1, 100);
+    camera.position.set(0, 20, 0);
+    camera.lookAt(0, 0, 0);
+    camera.updateMatrixWorld();
+    const view = { camera, toSun: new Vector3(1, 1, 0).normalize(), sun: true };
+    const box = (x: number, height: number): Mesh => {
+      const mesh = new Mesh(new BoxGeometry(1, height, 1).translate(0, height / 2, 0), material);
+      mesh.position.set(x, 0, 0);
+      mesh.castShadow = true;
+      mesh.geometry.computeBoundingSphere();
+      root.add(mesh);
+      return mesh;
+    };
+    const inside = box(0, 1);
+    // Hors du champ, mais assez haut pour que son ombre (vers l'ouest) y entre: gardé.
+    const tall = box(9, 8);
+    // Hors du champ, bas et loin: son ombre n'y tombe pas.
+    const far = box(30, 1);
+    const figure = (x: number): SkinnedMesh => {
+      const pelvis = new Bone();
+      pelvis.position.set(x, 1, 0);
+      const mesh = new SkinnedMesh(new BoxGeometry(0.5, 1.8, 0.5), material);
+      mesh.add(pelvis);
+      mesh.bind(new Skeleton([pelvis]));
+      mesh.frustumCulled = false;
+      mesh.castShadow = true;
+      root.add(mesh);
+      return mesh;
+    };
+    const near = figure(2);
+    const away = figure(40);
+    const stages = new StageSort();
+    const shown = (o: Object3D, layer: number): boolean => (o.layers.mask & (1 << layer)) !== 0;
+    for (let i = 0; i < 12; i++) stages.sort(root, view);
+    expect(stages.pending).toBe(false);
+    expect(shown(inside, SUN_LAYER)).toBe(true);
+    expect(shown(tall, SUN_LAYER)).toBe(true);
+    expect(shown(far, SUN_LAYER)).toBe(false);
+    // Hors du champ, un volume reste dans la passe principale (Three.js l'écarte lui-même).
+    expect(shown(far, 0)).toBe(true);
+    expect(shown(near, 0)).toBe(true);
+    expect(shown(away, 0)).toBe(false);
+    expect(shown(away, SUN_LAYER)).toBe(false);
+    // Sans carte du soleil (dedans): les ombres de la lampe restent, rien n'est écarté au soleil.
+    view.sun = false;
+    stages.sort(root, view);
+    expect(shown(far, SUN_LAYER)).toBe(true);
+    expect(shown(far, LAMP_LAYER)).toBe(true);
   });
 });
 

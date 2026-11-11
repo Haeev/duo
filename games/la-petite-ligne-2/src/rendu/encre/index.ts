@@ -10,7 +10,7 @@ import {
   type DataArrayTexture,
   type DataTexture,
   type Material,
-  type OrthographicCamera,
+  OrthographicCamera,
   type Scene,
   type ShaderMaterial,
   type Texture,
@@ -42,7 +42,7 @@ import {
 import type { RenderSnapshot } from './mesure';
 import { InkMeter } from './panneau-mesure';
 import { createMotes, type Motes } from './particules';
-import { LampShadow, StageSort, SunShadow } from './ombres';
+import { LampShadow, StageSort, SunShadow, type ViewCull } from './ombres';
 import { INK_SETTINGS } from './reglages';
 import { createInkLayers, createNoise } from './textures';
 
@@ -108,6 +108,42 @@ const CHART_EXPECTED: readonly number[] = COLOR_CHART.flat();
 const distances: number[] = [];
 
 /**
+ * Contexte WebGL2 du canevas en rendu encré. Three.js demande toujours un canevas transparent,
+ * avec profondeur et pochoir: le navigateur doit alors mêler chaque image à la page. En encre,
+ * seul un triangle plein écran atteint le canevas: opaque (rien ne se voit à travers), ni
+ * profondeur ni pochoir, ni anticrénelage. `undefined`: pas de WebGL2 (le moteur se replie).
+ */
+export function inkContext(canvas: HTMLCanvasElement): WebGL2RenderingContext | undefined {
+  const s = INK_SETTINGS.canvas;
+  return (
+    canvas.getContext('webgl2', {
+      alpha: false,
+      depth: false,
+      stencil: false,
+      antialias: false,
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: false,
+      powerPreference: s.powerPreference,
+      desynchronized: s.desynchronized,
+    }) ?? undefined
+  );
+}
+
+/**
+ * Plafond de l'échelle interne au départ (adaptative seulement): sur un processeur graphique
+ * intégré reconnu à son nom, pas plus de `maxPixels` points internes; ailleurs, 1.
+ */
+export function startCap(
+  gpu: string,
+  width: number,
+  height: number,
+  settings: typeof INK_SETTINGS.resolution.integrated = INK_SETTINGS.resolution.integrated,
+): number {
+  if (!new RegExp(settings.match, 'i').test(gpu) || width * height <= 0) return 1;
+  return Math.min(1, Math.sqrt(settings.maxPixels / (width * height)));
+}
+
+/**
  * Garde dans `out` les `max` éléments de `all` les plus proches de (x, z), du plus proche au plus
  * loin. `keep`: seuls ces éléments comptent (une lampe éteinte ne prend la place d'aucune autre).
  */
@@ -162,6 +198,15 @@ export class InkKit {
   private readonly lamps: Lamp[] = [];
   private readonly windows: WindowLight[] = [];
   private readonly stages = new StageSort();
+  /** Réutilisé à chaque image (la direction du soleil est celle de l'uniforme). */
+  private readonly cull: ViewCull;
+  /** Teinte des lampes du lieu (réécrite en place à chaque image) et sa source en `#rrggbb`. */
+  private readonly lampColor: [number, number, number] = [0, 0, 0];
+  private lampHex = '';
+  private lampRgb: readonly [number, number, number] = [0, 0, 0];
+  /** Force des lampes de l'image, lue par `lampLit` (une seule fonction, pas une par image). */
+  private lampAmount = 0;
+  private readonly lampLit = (lamp: Lamp): boolean => lampPower(this.lampAmount, lamp) > 0;
   private indoorShare = 0;
   private lastFrameAt = 0;
   /** Heure de la dernière image vraiment dessinée (les images sautées ne comptent pas). */
@@ -175,6 +220,9 @@ export class InkKit {
   private readonly scaler = new InkScale();
   private readonly meter = new InkMeter();
   private software: boolean | null = null;
+  /** Nom du processeur graphique, et plafond de l'échelle interne qui en découle (1: aucun). */
+  private gpu = '';
+  private cap = 1;
   private renderer: WebGLRenderer | null = null;
   private canvasWidth = 1;
   private canvasHeight = 1;
@@ -190,6 +238,11 @@ export class InkKit {
   constructor(book: AmbianceBook = gameAmbiances()) {
     this.book = book;
     this.uniforms = createInkUniforms();
+    this.cull = {
+      camera: new OrthographicCamera(),
+      toSun: this.uniforms.uSunDir.value,
+      sun: false,
+    };
     this.layers = createInkLayers();
     this.noise = createNoise();
     this.uniforms.uLayers.value = this.layers;
@@ -233,7 +286,8 @@ export class InkKit {
       canvasHeight: this.canvasHeight,
       innerWidth: this.innerWidth,
       innerHeight: this.innerHeight,
-      scale: this.scaler.scale(),
+      scale: this.scaler.scale() * this.cap,
+      scaleCap: this.cap,
       scaleMode: this.scaler.fixedScale() === null ? 'auto' : 'figée',
       scaleChanges: this.scaler.changeCount(),
       programs: renderer?.info.programs?.length ?? 0,
@@ -245,6 +299,15 @@ export class InkKit {
       indoor: this.lastIndoor,
       chart: this.chartDone ? { expected: CHART_EXPECTED, read: Array.from(this.chartRead) } : null,
     };
+  }
+
+  /** Teinte `#rrggbb` des lampes du lieu, relue seulement quand elle change. */
+  private placeLamps(color: string): readonly [number, number, number] {
+    if (color !== this.lampHex) {
+      this.lampHex = color;
+      this.lampRgb = hex(color);
+    }
+    return this.lampRgb;
   }
 
   /** Bouton « Échelle » du panneau: adaptative, puis chaque palier figé, puis adaptative. */
@@ -331,7 +394,7 @@ export class InkKit {
     const layers = image.width * image.height * image.depth * 4 * (4 / 3);
     const s = INK_SETTINGS;
     const shadows = (s.sunShadow.size ** 2 + s.lampShadow.size ** 2) * 4;
-    const scale = this.scaler.scale();
+    const scale = this.scaler.scale() * this.cap;
     // Deux sorties et la profondeur (12 octets par point), plus l'image finie avant sa mise à l'échelle.
     const inner = width * height * scale * scale * (this.pass.scaled ? 16 : 12);
     return Math.round(layers + 128 * 128 * 4 + shadows + inner);
@@ -357,6 +420,13 @@ export class InkKit {
     out.set(out.x * reach, top, out.z * reach);
   }
 
+  /** Caméra de la vue et soleil: ce que les passes écartent (personnages hors champ, ombres inutiles). */
+  private viewCull(camera: OrthographicCamera, sun: boolean): ViewCull {
+    this.cull.camera = camera;
+    this.cull.sun = sun;
+    return this.cull;
+  }
+
   /** Une image entière, du calcul de l'ambiance au contour sur le canevas. */
   frame(renderer: WebGLRenderer, scene: Scene, camera: OrthographicCamera, frame: InkFrame): void {
     const u = this.uniforms;
@@ -376,9 +446,14 @@ export class InkKit {
     });
     if (frame.place !== null) {
       // Le lieu donne la teinte de ses lampes et celle du dehors (vitres, vide autour).
-      const lamps = hex(frame.place.lamps);
+      const lamps = this.placeLamps(frame.place.lamps);
       const gain = s.placeLamps.gain;
-      ambiance.lampColor = [lamps[0] * gain, lamps[1] * gain, lamps[2] * gain];
+      // Réécrit en place: aucun tableau neuf par image (l'ambiance rendue partage ceux du livre).
+      const color = this.lampColor;
+      color[0] = lamps[0] * gain;
+      color[1] = lamps[1] * gain;
+      color[2] = lamps[2] * gain;
+      ambiance.lampColor = color;
       ambiance.lamps = Math.max(ambiance.lamps, s.placeLamps.minimum);
       ambiance.background = hex(frame.place.outside);
     }
@@ -393,7 +468,7 @@ export class InkKit {
       const power = lampPower(amount, lamp);
       lamp.glass.set(2, power, power, 0);
     }
-    const lampLit = (lamp: Lamp): boolean => lampPower(amount, lamp) > 0;
+    this.lampAmount = amount;
     nearest(
       lights.lamps,
       frame.focusX,
@@ -401,7 +476,7 @@ export class InkKit {
       MAX_LAMPS,
       s.lights.reach,
       this.lamps,
-      lampLit,
+      this.lampLit,
     );
     nearest(
       lights.windows,
@@ -419,8 +494,8 @@ export class InkKit {
       this.renderer = renderer;
       const gl = renderer.getContext();
       const info = gl.getExtension('WEBGL_debug_renderer_info');
-      this.software =
-        info !== null && SOFTWARE.test(String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)));
+      this.gpu = info === null ? '' : String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL));
+      this.software = info !== null && SOFTWARE.test(this.gpu);
       this.meter.attach(renderer, {
         snapshot: () => this.snapshot(),
         cycleScale: () => this.cycleScale(),
@@ -456,7 +531,13 @@ export class InkKit {
     }
     this.resting = false;
     u.uViewDir.value.set(frame.toCamera.x, frame.toCamera.y, frame.toCamera.z);
-    const scale = this.scaler.scale();
+    // Plafond de départ sur un processeur graphique intégré (adaptative seulement): les paliers
+    // de l'échelle s'appliquent à partir de lui.
+    this.cap =
+      this.scaler.fixedScale() === null && this.software !== true
+        ? startCap(this.gpu, frame.width, frame.height)
+        : 1;
+    const scale = this.scaler.scale() * this.cap;
     const innerWidth = scale >= 1 ? frame.width : Math.max(1, Math.round(frame.width * scale));
     const innerHeight = scale >= 1 ? frame.height : Math.max(1, Math.round(frame.height * scale));
     this.canvasWidth = frame.width;
@@ -491,7 +572,7 @@ export class InkKit {
     const background = scene.background;
     scene.background = null;
     camera.updateMatrixWorld();
-    this.stages.sort(scene);
+    this.stages.sort(scene, this.viewCull(camera, ambiance.sunShadow > 0));
     this.focus.set(frame.focusX, 0, frame.focusZ);
     if (ambiance.sunShadow > 0) {
       meter.begin(0);

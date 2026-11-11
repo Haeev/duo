@@ -67,6 +67,21 @@ interface Batch {
   readonly volumes: readonly SceneVolume[];
 }
 
+/** Même volume décrit (données simples: la comparaison se fait sur leur texte). */
+function sameVolume(a: SceneVolume, b: SceneVolume): boolean {
+  return a === b || JSON.stringify(a) === JSON.stringify(b);
+}
+
+function sameVolumes(a: readonly SceneVolume[], b: readonly SceneVolume[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    const x = a[i];
+    const y = b[i];
+    if (x === undefined || y === undefined || !sameVolume(x, y)) return false;
+  }
+  return true;
+}
+
 /** Matériaux communs à tous les lieux, créés et libérés par le moteur. */
 export interface PlaceMaterials {
   readonly ground: Material;
@@ -247,11 +262,13 @@ export class PlaceScene {
       this.tracker.release(view.object.geometry);
   }
 
-  /** Remplace les volumes dynamiques (meubles posés, objets au sol): appelé quand l'état change. */
+  /**
+   * Remplace les volumes dynamiques (meubles posés, objets au sol, cases du potager): appelé
+   * quand l'état change. Seuls ceux qui changent sont refaits (revue de code mi3): une récolte
+   * à l'autre bout du lieu ne reconstruit pas tout, et l'objet visé garde son liseré.
+   */
   setDynamic(volumes: readonly SceneVolume[]): void {
-    for (const view of this.dynamic.values()) this.drop(view);
-    this.dynamic.clear();
-    this.dropBatches();
+    const wanted = new Map<string, SceneVolume>();
     const grouped = new Map<string, SceneVolume[]>();
     for (const volume of volumes) {
       // Un identifiant de la carte gagne: les instances posées ne les croisent jamais (`pose-<n>`).
@@ -262,15 +279,39 @@ export class PlaceScene {
         grouped.set(volume.model, list);
         continue;
       }
-      this.dynamic.set(volume.id, this.build(volume));
+      wanted.set(volume.id, volume);
     }
+    // Lots: gardés tels quels si leurs volumes n'ont pas bougé.
+    const kept: Batch[] = [];
+    for (const batch of this.batches) {
+      const model = batch.mesh.name.slice('lot-'.length);
+      const list = grouped.get(model);
+      if (list !== undefined && sameVolumes(list, batch.volumes)) {
+        kept.push(batch);
+        grouped.delete(model);
+        continue;
+      }
+      batch.mesh.removeFromParent();
+      // Libère les tampons d'instances; la géométrie et le matériau restent à la source.
+      batch.mesh.dispose();
+    }
+    this.batches = kept;
     for (const [model, list] of grouped) {
       const batch = this.batch(model, list);
       // Modèle absent ou en plusieurs morceaux: chaque volume garde son objet.
-      if (batch === null)
-        for (const volume of list) this.dynamic.set(volume.id, this.build(volume));
+      if (batch === null) for (const volume of list) wanted.set(volume.id, volume);
       else this.batches.push(batch);
     }
+    for (const [id, view] of this.dynamic) {
+      const next = wanted.get(id);
+      if (next !== undefined && sameVolume(next, view.volume)) {
+        wanted.delete(id);
+        continue;
+      }
+      this.drop(view);
+      this.dynamic.delete(id);
+    }
+    for (const [id, volume] of wanted) this.dynamic.set(id, this.build(volume));
   }
 
   /**

@@ -52,6 +52,8 @@ export interface RenderSnapshot {
   readonly innerWidth: number;
   readonly innerHeight: number;
   readonly scale: number;
+  /** Plafond de départ de l'échelle (processeur graphique intégré, adaptative); 1: aucun. */
+  readonly scaleCap?: number;
   readonly scaleMode: 'auto' | 'figée';
   readonly scaleChanges: number;
   readonly programs: number;
@@ -168,6 +170,13 @@ export class FrameLog {
     return this.worst;
   }
 
+  /** Chaque case de l'histogramme: durée au milieu de la case (ms) et nombre d'images. */
+  forEachBin(visit: (ms: number, count: number) => void): void {
+    this.bins.forEach((count, i) => {
+      if (count > 0) visit((i + 0.5) * this.binMs, count);
+    });
+  }
+
   summary(): FrameSummary {
     const frames = this.frames;
     const averageMs = frames === 0 ? 0 : this.totalMs / frames;
@@ -184,6 +193,33 @@ export class FrameLog {
       cpuMs: frames === 0 ? 0 : this.cpuTotal / frames,
     };
   }
+}
+
+/**
+ * Ce que le relevé ne voit pas dans les passes: la page autour du canevas (lue par le panneau).
+ * `opaque`: le canevas n'a pas d'alpha (le navigateur n'a pas à le mêler à la page);
+ * `blurs`: éléments affichés avec un flou d'arrière-plan CSS (`backdrop-filter`), recalculé à
+ * chaque image du canevas qu'ils recouvrent; `refreshHz`: cadence de l'écran estimée.
+ */
+export interface PageInfo {
+  readonly opaque: boolean;
+  readonly blurs: number;
+  readonly refreshHz: number;
+}
+
+/**
+ * Rythme des images: part des écarts tombant sur un, deux, trois battements de l'écran, ou plus.
+ * Une image qui rate un battement attend le suivant: à 60 Hz, 25 ms de travail en coûtent 33,3.
+ */
+export function rhythm(log: FrameLog, refreshHz: number): number[] {
+  const beat = 1000 / Math.max(1, refreshHz);
+  const counts = [0, 0, 0, 0];
+  log.forEachBin((ms, n) => {
+    const k = Math.min(3, Math.max(0, Math.round(ms / beat) - 1));
+    counts[k] = (counts[k] ?? 0) + n;
+  });
+  const total = counts.reduce((a, b) => a + b, 0);
+  return counts.map((n) => (total === 0 ? 0 : n / total));
 }
 
 /** Heure du jeu lisible (« 17 h 05 »). */
@@ -213,7 +249,12 @@ export function liveLines(log: FrameLog, snap: RenderSnapshot): string[] {
 }
 
 /** Le relevé complet, en texte, à coller au studio. */
-export function reportText(log: FrameLog, snap: RenderSnapshot, machine: MachineInfo): string {
+export function reportText(
+  log: FrameLog,
+  snap: RenderSnapshot,
+  machine: MachineInfo,
+  page: PageInfo | null = null,
+): string {
   const s = log.summary();
   const budget = INK_SETTINGS.budget;
   const lines = [
@@ -225,6 +266,10 @@ export function reportText(log: FrameLog, snap: RenderSnapshot, machine: Machine
     `Temps du jeu pour dessiner (processeur): ${one(s.cpuMs)} ms par image`,
     `Échelle interne: ${whole(snap.scale * 100)} % (${snap.scaleMode}), ${String(snap.scaleChanges)} changements`,
   ];
+  if ((snap.scaleCap ?? 1) < 1)
+    lines.push(
+      `Départ plafonné (processeur graphique intégré): ${whole((snap.scaleCap ?? 1) * 100)} % du côté du canevas`,
+    );
   if (log.scaleLog.length > 0)
     lines.push(
       `Paliers: ${log.scaleLog.map((c) => `${String(c.at)} s: ${whole(c.scale * 100)} %`).join(', ')}`,
@@ -246,6 +291,26 @@ export function reportText(log: FrameLog, snap: RenderSnapshot, machine: Machine
         : `  ${PASSES[i] ?? ''}: ${String(pass.calls)} appels, ${thousands(pass.triangles)} triangles, ${thousands(pass.pixels)} points, processeur graphique ${gpu}`,
     );
   });
+  // Ce que les passes ne disent pas: le reste du temps par image (présentation, composition de
+  // la page, attente du battement de l'écran, travail du navigateur).
+  let gpu = 0;
+  let timed = 0;
+  for (const pass of log.passes)
+    if (pass.pixels > 0 && pass.gpuMs >= 0) {
+      gpu += pass.gpuMs;
+      timed += 1;
+    }
+  if (timed > 0)
+    lines.push(
+      `Somme des passes sur le processeur graphique: ${one(gpu)} ms; reste du temps par image: ${one(Math.max(0, s.averageMs - gpu))} ms (présentation, composition de la page, attente de l'écran, navigateur)`,
+    );
+  if (page !== null) {
+    const [one1 = 0, two = 0, three = 0, more = 0] = rhythm(log, page.refreshHz);
+    lines.push(
+      `Rythme (écran à ${whole(page.refreshHz)} Hz): ${whole(one1 * 100)} % des images en un battement, ${whole(two * 100)} % en deux, ${whole(three * 100)} % en trois, ${whole(more * 100)} % au-delà`,
+      `Page: canevas ${page.opaque ? 'opaque' : 'transparent (mêlé à la page à chaque image)'}, flous d'arrière-plan CSS affichés: ${String(page.blurs)}`,
+    );
+  }
   lines.push(
     `Total: ${String(calls)} appels (budget ${String(budget.calls)}), ${thousands(triangles)} triangles (budget ${thousands(budget.triangles)}); pics ${String(log.peak.calls)} et ${thousands(log.peak.triangles)}`,
     `Programmes: ${String(snap.programs)} (budget ${String(budget.programs)}), textures ${String(snap.textures)}, géométries ${String(snap.geometries)}, mémoire de l'encre ${whole(snap.textureMegabytes)} Mo`,

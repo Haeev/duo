@@ -6,13 +6,16 @@ import * as v from 'valibot';
 import { describe, expect, it } from 'vitest';
 import { tileGrid } from '../../src/donnees/carte';
 import { MapSchema, type MapDef } from '../../src/donnees/schemas/lieu';
-import { TILE_SETTINGS } from '../../src/rendu/lieu/reglages-tuiles';
+import { HARVEST_LOOK } from '../../src/rendu/lieu/reglages-recoltes';
+import { GROUND_LOOKS, type GroundLook, TILE_SETTINGS } from '../../src/rendu/lieu/reglages-tuiles';
 import {
   buildingShape,
   groundField,
+  placeGroundField,
   railPieces,
   surfaceAt,
   tileDecor,
+  tileSemis,
 } from '../../src/rendu/lieu/terrain-rendu';
 import { TileRing } from '../../src/rendu/lieu/tuiles';
 import { planToMap } from '../../outils/plan-vers-lieu';
@@ -116,5 +119,54 @@ describe('Aubrune par tuiles', () => {
     }
     expect(worst).toBeLessThan(TILE_SETTINGS.budget.tileTriangles);
     expect(tileDecor(field, map, 34)).toEqual(tileDecor(field, map, 34));
+  });
+
+  it('calcule le champ du sol une fois par carte (moteur, grand lieu, objets au sol)', () => {
+    const once = placeGroundField(map);
+    expect(placeGroundField(map)).toBe(once);
+    expect(once.cells).toEqual(field.cells);
+  });
+});
+
+describe('natures de sol en données (gabarit)', () => {
+  it('chaque nature de la légende d’Aubrune a son aspect (aucune n’est peinte par repli)', () => {
+    for (const name of aubrune().terrain?.legend ?? [])
+      expect(GROUND_LOOKS[name], name).toBeDefined();
+  });
+
+  it('une nature factice sème ses arbres, ses souches et son tapis par une seule entrée', () => {
+    const factice: GroundLook = {
+      color: '#556b2f',
+      surface: 'herbe',
+      trees: { near: 0.2, wild: 0.4, stumps: 0.5 },
+      outside: true,
+      cover: {
+        litter: 1,
+        litterColors: ['#aa7744'],
+        tufts: 0.5,
+        tuftColors: ['#336633'],
+        tuftSize: [3, 1.2],
+      },
+    };
+    // Un chemin de deux cases à l'ouest, le bois factice ailleurs.
+    const runs: number[] = [];
+    for (let y = 0; y < 32; y++) runs.push(1, 2, 2, 30);
+    const legend = ['herbe', 'chemin', 'bois-factice'];
+    const map = { width: 32, height: 32, terrain: { legend, runs } };
+    const field = groundField(map, TILE_SETTINGS, { ...GROUND_LOOKS, 'bois-factice': factice });
+    const decor = tileDecor(field, map, 0);
+    expect(decor.trees.length).toBeGreaterThan(50);
+    expect(decor.trees.some((t) => t.stump === true)).toBe(true);
+    expect(decor.trees.some((t) => t.stump !== true)).toBe(true);
+    // Hors du couloir de jeu: loin du chemin, les arbres prennent leur version allégée.
+    const beyond = HARVEST_LOOK.semis.light?.beyond ?? 0;
+    expect(decor.trees.some((t) => (t.away ?? 0) > beyond)).toBe(true);
+    const semis = tileSemis(field, map, 0);
+    // Feuilles mortes couchées à plat, fougères plus larges que les touffes d'herbe.
+    expect(semis.tufts.some((t) => t.color === '#aa7744' && t.h < 0.05)).toBe(true);
+    const fern = semis.tufts.find((t) => t.color === '#336633');
+    expect(fern?.w ?? 0).toBeGreaterThan(TILE_SETTINGS.semis.tuftWidth * 2);
+    // Sans l'entrée: le repli (de l'herbe sans arbre), rien ne casse.
+    expect(tileDecor(groundField(map), map, 0).trees).toHaveLength(0);
   });
 });

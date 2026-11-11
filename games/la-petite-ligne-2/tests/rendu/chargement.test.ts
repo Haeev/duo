@@ -193,6 +193,28 @@ describe('scène d’un lieu', () => {
     expect(scene.occlusion.size).toBe(occluders);
     scene.dispose();
   });
+
+  it('ne refait que les volumes dynamiques qui changent (la cible garde son objet)', () => {
+    const place = Object.values(content.places)[0];
+    const type = Object.keys(content.props)[0];
+    if (place === undefined || type === undefined) throw new Error('données d’essai absentes');
+    const scene = new PlaceScene(describePlace(content, place), materials(), null);
+    const state = createPlaceState(content, place);
+    state.placed.push({ id: 'pose-0', type, x: 6, y: 7, rotation: 0 });
+    state.placed.push({ id: 'pose-1', type, x: 9, y: 7, rotation: 0 });
+    scene.setDynamic(describeDynamic(content, state));
+    const kept = scene.aimable('pose-0')?.object;
+    const moved = scene.aimable('pose-1')?.object;
+    expect(kept).toBeDefined();
+    // L'autre joueur déplace un meuble ailleurs: seul celui-là est refait.
+    const other = state.placed[1];
+    if (other !== undefined) other.x = 12;
+    scene.setDynamic(describeDynamic(content, state));
+    expect(scene.aimable('pose-0')?.object).toBe(kept);
+    expect(scene.aimable('pose-1')?.object).not.toBe(moved);
+    expect(kept?.parent).not.toBeNull();
+    scene.dispose();
+  });
 });
 
 describe('fondu', () => {
