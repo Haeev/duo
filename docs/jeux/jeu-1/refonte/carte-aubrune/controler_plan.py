@@ -200,12 +200,26 @@ def modele_de(m):
     return fiches_meubles()[m['type']]['model']
 
 
+def taille_de(m):
+    """Taille (w, d, h en m) du modèle dessiné. Un modèle absent du manifeste (retiré, pas encore refait) est dessiné
+    en forme provisoire sur l'emprise de sa fiche: hauteur de son plateau, sinon 1 m."""
+    s = manifeste().get(modele_de(m))
+    if s is not None:
+        return s['size']
+    f = fiches_meubles()[m['type']]
+    return dict(w=f['size']['w'], d=f['size']['h'], h=f.get('top', 1.0))
+
+
 def boite_modele(m):
     """Boîte au sol (x0, y0, x1, y1) du modèle d'un meuble posé, dans le repère de la pièce (origine du modèle au
     centre de l'objet; gx le long du meuble, gz vers sa façade)."""
     a = m['rotation'] * math.pi / 2
     ca, sa = round(math.cos(a)), round(math.sin(a))
-    xmin, zmin, xmax, zmax = bornes_glb(modele_de(m))
+    if modele_de(m) in manifeste():
+        xmin, zmin, xmax, zmax = bornes_glb(modele_de(m))
+    else:
+        t = taille_de(m)
+        xmin, zmin, xmax, zmax = -t['w'] / 2, -t['d'] / 2, t['w'] / 2, t['d'] / 2
     coins = [(xmin, zmin), (xmax, zmax)]
     pts = [(m['x'] + gx * ca + gz * sa, m['y'] - gx * sa + gz * ca) for gx in (coins[0][0], coins[1][0]) for gz in (coins[0][1], coins[1][1])]
     return (min(p[0] for p in pts), min(p[1] for p in pts), max(p[0] for p in pts), max(p[1] for p in pts))
@@ -255,11 +269,11 @@ def controler_poses(it):
             x0, y0, x1, y1 = boite_modele(p)
             if not (x0 <= m['x'] <= x1 and y0 <= m['y'] <= y1):
                 err.append("%s: centre (%.2f, %.2f) hors du plateau de %s (%.2f..%.2f, %.2f..%.2f)" % (quoi, m['x'], m['y'], p['id'], x0, x1, y0, y1))
-        total = base + M[modele_de(m)]['size']['h']
+        total = base + taille_de(m)['h']
         if total >= HAUT_FENETRE:
             pres = murs(m['x'] - 0.5, m['y'] - 0.5, m['x'] + 0.5, m['y'] + 0.5)
             if pres:
-                couvert = p is not None and M[modele_de(p)]['size']['h'] >= HAUT_FENETRE
+                couvert = p is not None and taille_de(p)['h'] >= HAUT_FENETRE
                 if couvert:
                     t = F[p['type']]['size']
                     w, h = (t['w'], t['h']) if p['rotation'] % 2 == 0 else (t['h'], t['w'])
@@ -270,8 +284,8 @@ def controler_poses(it):
         for b in poses[i + 1:]:
             if a['on'] != b['on']:
                 continue
-            ra = max(M[modele_de(a)]['size']['w'], M[modele_de(a)]['size']['d']) / 2
-            rb = max(M[modele_de(b)]['size']['w'], M[modele_de(b)]['size']['d']) / 2
+            ra = max(taille_de(a)['w'], taille_de(a)['d']) / 2
+            rb = max(taille_de(b)['w'], taille_de(b)['d']) / 2
             if math.hypot(a['x'] - b['x'], a['y'] - b['y']) < 0.8 * (ra + rb):
                 err.append("intérieur %s: %s et %s se chevauchent sur %s" % (it['id'], a['id'], b['id'], a['on']))
     return err
@@ -1180,6 +1194,50 @@ def controler_gabarit_interieurs(L, prives=frozenset()):
     return sorted(set(err))
 
 
+def tient(conds, faits):
+    """Une liste de conditions (`when`) tient-elle avec ces faits retenus ({clé: True} ou {clé: valeur})? Seuls les
+    faits (`remembered`) et leurs combinaisons sont lus; toute autre condition (heure, agenda...) compte comme vraie."""
+    def une(c):
+        t = c['type']
+        if t == 'remembered':
+            v = faits.get(c['key'])
+            return bool(v) if 'equals' not in c else v == c['equals']
+        if t == 'not':
+            return not une(c['condition'])
+        if t == 'all':
+            return all(une(x) for x in c['conditions'])
+        if t == 'any':
+            return any(une(x) for x in c['conditions'])
+        return True
+    return all(une(c) for c in conds)
+
+
+def gabarit_par_etat(carte, interieurs, types, prives):
+    """Gabarit des intérieurs (`controler_gabarit_interieurs`) dans chaque combinaison des faits que citent les meubles
+    conditionnés des intérieurs: deux meubles qui ne se montrent jamais ensemble (l'ardoise du chantier de la cuisine,
+    puis le plan de travail qui la remplace) ne se comptent plus comme posés à la fois. Faits à valeur: une valeur
+    citée, ou aucune."""
+    def cles(c, out):
+        if c['type'] == 'remembered':
+            out.setdefault(c['key'], set()).add(c.get('equals', True))
+        for x in [c.get('condition')] + c.get('conditions', []):
+            if x:
+                cles(x, out)
+    cites = {}
+    for it in interieurs:
+        for o in it['objects']:
+            for c in o.get('when', []):
+                cles(c, cites)
+    noms = sorted(cites)
+    choix = [sorted(cites[k], key=str) + [None] for k in noms]
+    err = set()
+    for combi in __import__('itertools').product(*choix):
+        faits = {k: v for k, v in zip(noms, combi) if v is not None}
+        filtres = [dict(it, objects=[o for o in it['objects'] if tient(o.get('when', []), faits)]) for it in interieurs]
+        err.update(controler_gabarit_interieurs(Lieu(carte, filtres, types), prives))
+    return sorted(err)
+
+
 def controler_acces(d, carte, fiches, interieurs=None, types=None, lieu=LIEU):
     """Règle d'accès: dans chaque état de l'histoire, tout élément que le graphe du plan dit ouvert (le nœud le plus
     proche, dans la même salle ou dehors, est atteint par le graphe) s'atteint à pied sur la grille, portes et escaliers
@@ -1226,7 +1284,8 @@ def controler_acces(d, carte, fiches, interieurs=None, types=None, lieu=LIEU):
                 fautifs[lib] = "accès, état %s: %s, %s (%g; %g), n'est pas atteignable à pied depuis le quai" % (
                     nom, lib, ('dans « %s »' % salle) if salle else 'dehors', x - (L.salles[salle][0] if salle else 0), y - (L.salles[salle][1] if salle else 0))
     err += list(fautifs.values())
-    err += controler_gabarit_interieurs(L, lits_d_habitants(d))
+    err += gabarit_par_etat(carte, lire_interieurs(lieu) if interieurs is None else interieurs,
+                            lire_meubles(lieu) if types is None else types, lits_d_habitants(d))
     info.append("accès: %d éléments (portes, escaliers, meubles à brique, points cités) dans %d intérieurs et le dehors, %d états; %d inaccessibles" % (
         len(elts), len(L.salles), len(liste), len(fautifs)))
     return err, info

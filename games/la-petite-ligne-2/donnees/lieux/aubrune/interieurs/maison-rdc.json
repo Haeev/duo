@@ -202,9 +202,9 @@
     {
       "id": "maison-chantier-salle",
       "type": "ardoise-de-chantier",
-      "x": 7.5,
-      "y": 3.5,
-      "rotation": 0,
+      "x": 5.5,
+      "y": 5.5,
+      "rotation": 1,
       "when": [
         {
           "type": "not",
@@ -214,7 +214,7 @@
           }
         }
       ],
-      "pourquoi": "au milieu de la salle, tournée vers le sud: on lit le devis depuis le bas de la pièce; hors de l'axe de la porte d'entrée et de l'escalier, des chaises de la table, et un côté du lit reste libre; elle part quand la salle est faite"
+      "pourquoi": "contre la cloison ouest de la salle, au sud de l'escalier de l'étage, tournée vers l'est: on lit le devis depuis toute la salle, et le passage de 2 m reste libre de la porte au lit et aux escaliers (au milieu, elle le coupait); elle part quand la salle est faite"
     },
     {
       "id": "maison-chantier-cuisine",

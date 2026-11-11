@@ -27,8 +27,8 @@
       "y": 4.5
     },
     "mercerie-cabine": {
-      "x": 5,
-      "y": 4.5
+      "x": 5.5,
+      "y": 3.5
     }
   },
   "objects": [
@@ -52,6 +52,13 @@
       "x": 5.5,
       "y": 5.5,
       "rotation": 0
+    },
+    {
+      "id": "mercerie-miroir",
+      "type": "miroir",
+      "x": 5.5,
+      "y": 4.5,
+      "rotation": 2
     },
     {
       "id": "mercerie-rubans",
