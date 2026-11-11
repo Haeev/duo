@@ -516,6 +516,68 @@
               "key": "aubrune.lettres.remise",
               "value": "fait",
               "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "aller",
+          "objective": "Sortez la draisine à la porte de la remise, montez chacun d'un côté et pompez à tour de rôle jusqu'au passage de l'Église.",
+          "target": {
+            "point": "pne"
+          },
+          "done": [
+            {
+              "type": "remembered",
+              "key": "aubrune.draisine.aller",
+              "equals": true
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.aller",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.aller",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "retour",
+          "objective": "Ramenez la draisine à la halte: frein serré, sens inversé, et l'on repart en cadence.",
+          "target": {
+            "point": "trav"
+          },
+          "done": [
+            {
+              "type": "remembered",
+              "key": "aubrune.draisine.retour",
+              "equals": true
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.retour",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.retour",
+              "value": "fait",
+              "by": "duo"
             },
             {
               "type": "give_money",

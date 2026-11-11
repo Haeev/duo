@@ -71,6 +71,7 @@ describe('pas de simulation vide', () => {
     expect(SYSTEMS.map((s) => s.id)).toEqual([
       'voyage',
       'lieux',
+      'vehicules',
       'briques',
       'sac',
       'commerces',

@@ -257,6 +257,22 @@
       "audience": "both",
       "placed": false
     },
-    { "on": "train_arrived", "sound": "train-arrive", "audience": "both", "placed": false }
+    { "on": "train_arrived", "sound": "train-arrive", "audience": "both", "placed": false },
+    {
+      "on": "vehicle_seat",
+      "where": { "seat": { "notNull": true } },
+      "sound": "asseoir",
+      "audience": "both",
+      "placed": true
+    },
+    { "on": "vehicle_out", "sound": "porte", "audience": "both", "placed": true },
+    {
+      "on": "vehicle_in",
+      "where": { "reason": "player" },
+      "sound": "porte",
+      "audience": "both",
+      "placed": false
+    },
+    { "on": "vehicle_warning", "sound": "passage-a-niveau", "audience": "both", "placed": false }
   ]
 }

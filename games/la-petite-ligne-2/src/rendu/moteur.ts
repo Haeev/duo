@@ -87,6 +87,7 @@ import { fenceRuns, groundField } from './lieu/terrain-rendu';
 import { ROOM_SETTINGS } from './lieu/reglages-pieces';
 import { RELIEF_SETTINGS } from './lieu/reglages-relief';
 import { TrainLayer, type TrainStats } from './lieu/trains';
+import { RailVehicleLayer } from './lieu/vehicules';
 import type { TilePlants } from './lieu/tuile';
 import { TILE_SETTINGS, type SurfaceKind } from './lieu/reglages-tuiles';
 import { Daylight, nightShare } from './lumiere';
@@ -292,6 +293,8 @@ class Engine implements GameRenderer {
   private tiled: TiledPlace | null = null;
   /** Trains des événements du lieu (grand lieu dont un événement amène un train), `null` sinon. */
   private trains: TrainLayer | null = null;
+  /** Véhicules de voie des joueurs (`lieu/vehicules.ts`), `null` dans un lieu qui n'en a pas. */
+  private vehicles: RailVehicleLayer | null = null;
   private readonly fog = new Fog(0x000000, 1e4, 2e4);
   private overview: number | null = null;
   private signature = Number.NaN;
@@ -320,7 +323,7 @@ class Engine implements GameRenderer {
   /** Hauteur du sol affiché sous un point de la carte (relief d'un grand lieu), 0 ailleurs. */
   private readonly groundAt = (x: number, y: number): number => this.tiled?.heightAt(x, y) ?? 0;
   private readonly resolveAim = (id: string): Aimable | null =>
-    this.place?.aimable(id) ?? this.characters.aimable(id);
+    this.place?.aimable(id) ?? this.vehicles?.aimable(id) ?? this.characters.aimable(id);
   private frameMs = 0;
   private readonly subjects: { x: number; y: number; z: number }[] = [{ x: 0, y: 0, z: 0 }];
   private readonly toCamera = { x: 0, y: 1, z: 0 };
@@ -455,7 +458,11 @@ class Engine implements GameRenderer {
     this.applyProfile(this.governor.currentProfile());
     this.offEvent = options.view.onEvent((event) => {
       if (event.type === 'unstuck') this.characters.snap(event.player);
-      else if (event.type === 'day_started' && event.slept)
+      else if (event.type === 'vehicle_stroke') {
+        // Le balancier bascule au pas même du coup, sans attendre l'état du lieu.
+        if (event.kind === 'push' || event.kind === 'jam')
+          this.vehicles?.stroke(event.vehicle, event.player);
+      } else if (event.type === 'day_started' && event.slept)
         this.sleepFade = RENDER_SETTINGS.sleepFade.seconds;
     });
   }
@@ -500,6 +507,7 @@ class Engine implements GameRenderer {
     if (cast === null) return false;
     if (this.place !== null) this.place.root.visible = false;
     if (this.trains !== null) this.trains.root.visible = false;
+    if (this.vehicles !== null) this.vehicles.root.visible = false;
     this.table.visible = false;
     this.trip.root.visible = true;
 
@@ -699,6 +707,8 @@ class Engine implements GameRenderer {
     this.tiled = null;
     this.trains?.dispose();
     this.trains = null;
+    this.vehicles?.dispose();
+    this.vehicles = null;
     this.signature = Number.NaN;
     this.harvested = Number.NaN;
     this.mapped = Number.NaN;
@@ -785,6 +795,15 @@ class Engine implements GameRenderer {
       );
       this.scene.add(this.trains.root);
     }
+    if (RailVehicleLayer.wanted(place)) {
+      this.vehicles = new RailVehicleLayer(
+        place,
+        this.options.models ?? null,
+        { standIn: this.standInMaterial, ink: this.ink?.volume ?? null },
+        this.groundAt,
+      );
+      this.scene.add(this.vehicles.root);
+    }
     this.ink?.setGround(
       this.tiled?.groundMap ?? this.place.groundMap,
       place.map.width,
@@ -861,6 +880,8 @@ class Engine implements GameRenderer {
         this.tiled = null;
         this.trains?.dispose();
         this.trains = null;
+        this.vehicles?.dispose();
+        this.vehicles = null;
       } else this.loadPlace(placeId);
     }
     // Dans le train: la scène du trajet à la place du lieu (qui se construit derrière).
@@ -930,6 +951,11 @@ class Engine implements GameRenderer {
     // En encre la table est le sol du dehors: une pièce a son plancher, et rien autour.
     this.table.visible = room === null;
 
+    // Les véhicules de voie d'abord: qui est à bord se pose sur le véhicule tel qu'il est affiché.
+    if (this.vehicles !== null) {
+      this.vehicles.root.visible = room === null;
+      this.vehicles.advance(dt, world);
+    }
     this.characters.update({
       dt,
       world,
@@ -938,6 +964,7 @@ class Engine implements GameRenderer {
       visibleAt: this.visibleAt,
       hidden: this.hidden,
       ground: (this.tiled?.relief ?? null) === null ? null : this.groundAt,
+      ...(this.vehicles === null ? {} : { riders: this.vehicles.riders }),
     });
 
     const shown = this.characters.playerPosition(local) ?? body;
@@ -945,6 +972,8 @@ class Engine implements GameRenderer {
     this.target.y = shown.y;
     this.target.speed = body.speed;
     this.target.facing = body.facing;
+    // À bord, la vue anticipe dans le sens de la voie, à la vitesse du véhicule.
+    this.vehicles?.motion(local, this.target);
     this.rig.update(dt, this.input, this.target, this.bounds);
     this.input.dragPixels = 0;
     this.input.wheel = 0;
@@ -990,6 +1019,8 @@ class Engine implements GameRenderer {
       this.trains.root.visible = room === null;
       if (room === null) this.trains.update(dt, world, this.subjects, this.toCamera);
     }
+    if (this.vehicles !== null && room === null)
+      this.vehicles.occlude(dt, this.subjects, this.toCamera, this.vehicles.carrying(local));
     this.updateFog(pose.width);
     if (this.overview !== null) this.poseOverview(pose.x, pose.y, this.overview);
 
@@ -1208,6 +1239,8 @@ class Engine implements GameRenderer {
     this.tiled = null;
     this.trains?.dispose();
     this.trains = null;
+    this.vehicles?.dispose();
+    this.vehicles = null;
     this.characters.dispose();
     this.daylight.dispose();
     this.table.geometry.dispose();

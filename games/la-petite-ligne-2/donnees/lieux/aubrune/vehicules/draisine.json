@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "id": "draisine",
+  "name": "la draisine",
+  "pourquoi": "La draisine no 2 d'Émile Lacombe, confiée par la sixième lettre aux deux gardes de la halte: une plateforme à quatre roues et un balancier, faite pour visiter la voie à deux. Elle dort dans sa remise au bout du quai, sort par la porte de l'ouest et se pose sur la ligne à la traversée de service. Raccourci le long de la voie, du poste au tunnel, là où les ronces et la grille le permettent.",
+  "model": "draisine",
+  "fallback": "luggage-van",
+  "body": { "front": 1.3, "back": 1.3, "halfWidth": 0.85, "height": 1.55, "deck": 0.5 },
+  "seats": [
+    {
+      "name": "Au balancier avant",
+      "along": 0.85,
+      "side": 0,
+      "height": 0.42,
+      "front": 0.18,
+      "faces": "back",
+      "exit": "right"
+    },
+    {
+      "name": "Au balancier arrière",
+      "along": -0.85,
+      "side": 0,
+      "height": 0.42,
+      "front": 0.18,
+      "faces": "front",
+      "exit": "right"
+    }
+  ],
+  "track": "ligne",
+  "garage": { "track": "remise", "inside": 3 },
+  "launch": { "point": "trav" },
+  "range": {
+    "from": { "point": "tw5", "shift": -6 },
+    "to": { "point": "portail", "shift": -4 }
+  },
+  "available": [{ "type": "remembered", "key": "aubrune.draisine.sortie", "equals": true }],
+  "speed": { "max": 8, "roll": 0.12, "drag": 0.07, "brake": 4, "endBrake": 2.5 },
+  "drive": {
+    "brick": "pump",
+    "beat": 0.45,
+    "tolerance": 0.15,
+    "jam": 0.1,
+    "lost": 1.6,
+    "push": 0.55,
+    "offBeat": 0.5
+  },
+  "trains": { "warnMinutes": 20 },
+  "stopReach": 5,
+  "stops": [
+    {
+      "id": "poste",
+      "name": "poste d'aiguillage",
+      "at": { "point": "tw5" },
+      "pourquoi": "La clairière du poste d'aiguillage, à l'ouest: à pied, c'est tout le défilé de la tranchée."
+    },
+    {
+      "id": "halte",
+      "name": "halte",
+      "at": { "point": "trav" },
+      "pourquoi": "La traversée de service entre le quai et la remise: on y monte, on y descend, on l'y range.",
+      "arrive": [
+        {
+          "when": [{ "type": "remembered", "key": "aubrune.draisine.aller", "equals": true }],
+          "effects": [
+            { "type": "remember", "key": "aubrune.draisine.retour", "value": true, "by": "duo" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eglise",
+      "name": "passage de l'Église",
+      "at": { "point": "pne" },
+      "pourquoi": "Le passage à niveau de la rue de l'Église: de là on monte au bourg haut sans traverser la place.",
+      "arrive": [
+        {
+          "when": [],
+          "effects": [
+            { "type": "remember", "key": "aubrune.draisine.aller", "value": true, "by": "duo" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tunnel",
+      "name": "portail du tunnel",
+      "at": { "point": "portail", "shift": -4 },
+      "pourquoi": "Le bout de la ligne morte, devant le portail muré: la butée est là, le tunnel reste fermé aux roues."
+    }
+  ],
+  "lines": {
+    "rollOut": "Sortir la draisine",
+    "rollIn": "Rentrer la draisine",
+    "board": "Monter",
+    "trainDue": "Un train est attendu sur la ligne: la draisine reste où elle est.",
+    "trainWarning": "Un train s'annonce: ramenez la draisine à la halte, ou descendez.",
+    "putAway": "Le train arrive: la draisine est rentrée à la remise, personne n'a rien.",
+    "needsTwo": "Le balancier se pompe à deux: il manque ta moitié à bord.",
+    "endOfLine": "Bout de voie: elle ne va pas plus loin de ce côté."
+  }
+}

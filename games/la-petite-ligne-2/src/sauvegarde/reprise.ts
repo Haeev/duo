@@ -6,6 +6,7 @@ import type { Content } from '../donnees/charger';
 import type { WorldState } from '../etat/monde';
 import { MINUTES_PER_DAY } from '../simulation/noyau/constantes';
 import type { Member } from '../simulation/noyau/monde';
+import { restVehicles } from '../simulation/vehicules/etat';
 import { fillText, SAVE_TEXTS } from './textes';
 
 export type MemberMatch =
@@ -57,7 +58,7 @@ export function seatMembers(
 
 /**
  * Ce qui n'a pas de sens après un rechargement: gestes et dialogues en cours, cible visée, voyage
- * interrompu. Le trajet en train se termine (heures comprises); un départ sur le marchepied s'annule.
+ * interrompu, place tenue à bord d'un véhicule de voie. Le trajet en train se termine (heures comprises); un départ sur le marchepied s'annule.
  */
 export function settleForResume(content: Content, world: WorldState): void {
   const { common } = world;
@@ -71,5 +72,7 @@ export function settleForResume(content: Content, world: WorldState): void {
   }
   for (const villager of Object.values(world.places[common.place]?.villagers ?? {}))
     villager.talkingWith = null;
+  // Un véhicule de voie reste où il était (rangé ou posé), à l'arrêt, les joueurs descendus.
+  restVehicles(world);
   if (world.minutes >= MINUTES_PER_DAY) world.minutes = 0;
 }

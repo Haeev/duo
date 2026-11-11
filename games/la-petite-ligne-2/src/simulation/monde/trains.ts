@@ -47,7 +47,7 @@ export interface TrainPose {
 }
 
 /** Voie prête à parcourir: points et longueurs cumulées. */
-interface Track {
+export interface Track {
   readonly xs: Float64Array;
   readonly ys: Float64Array;
   /** Distance du premier point à chaque point. */
@@ -57,7 +57,8 @@ interface Track {
 
 const tracks = new WeakMap<RailTrack, Track>();
 
-function trackOf(place: PlaceContent, id: string): Track | null {
+/** La voie `id` de la carte du lieu, prête à parcourir (gardée d'un appel à l'autre); `null`: inconnue. */
+export function trackOf(place: PlaceContent, id: string): Track | null {
   const rail = place.map.rails?.find((r) => r.id === id);
   if (rail === undefined) return null;
   let track = tracks.get(rail);
@@ -78,7 +79,7 @@ function trackOf(place: PlaceContent, id: string): Track | null {
 }
 
 /** Le point de la voie à la distance `s` de son début; au-delà d'un bout, son prolongement droit. */
-function pointOn(track: Track, s: number, out: { x: number; y: number }): void {
+export function pointOn(track: Track, s: number, out: { x: number; y: number }): void {
   const last = track.at.length - 1;
   let i = 0;
   while (i < last - 1 && (track.at[i + 1] ?? 0) < s) i++;
@@ -92,7 +93,7 @@ function pointOn(track: Track, s: number, out: { x: number; y: number }): void {
 }
 
 /** Distance, depuis le début de la voie, du point de la voie le plus proche de (x, y). */
-function project(track: Track, x: number, y: number): number {
+export function project(track: Track, x: number, y: number): number {
   let best = Number.POSITIVE_INFINITY;
   let bestS = 0;
   for (let i = 0; i + 1 < track.xs.length; i++) {
@@ -163,6 +164,29 @@ const moment: TrainMoment = { phase: 'stopped', run: 0 };
 const front = { x: 0, y: 0 };
 const rear = { x: 0, y: 0 };
 
+/**
+ * Pose un véhicule sur la voie: son centre à `center` mètres du début, l'avant du modèle vers la
+ * fin de la voie (`heading` 1) ou vers son début (-1), retourné bout pour bout si `reversed`. La
+ * caisse suit la corde entre ses deux bogies, courbes comprises. Écrit `x`, `y` et `yaw` de
+ * `pose`, dont `front` et `back` sont déjà posés. Sert aux rames des événements et aux véhicules
+ * de voie des joueurs (`simulation/vehicules/`).
+ */
+export function poseOnTrack(
+  track: Track,
+  center: number,
+  heading: 1 | -1,
+  reversed: boolean,
+  pose: VehiclePose,
+  settings: TrainSettings = TRAINS,
+): void {
+  const half = ((pose.front + pose.back) / 2) * settings.bogieShare;
+  pointOn(track, center + heading * half, front);
+  pointOn(track, center - heading * half, rear);
+  pose.x = (front.x + rear.x) / 2;
+  pose.y = (front.y + rear.y) / 2;
+  pose.yaw = Math.atan2(front.x - rear.x, front.y - rear.y) + (reversed ? Math.PI : 0);
+}
+
 /** Ce qui précède le centre du véhicule dans le sens de marche de la rame (m). */
 function lead(vehicle: TrainDef['consist'][number]): number {
   return vehicle.reversed === true ? vehicle.back : vehicle.front;
@@ -187,7 +211,7 @@ export function poseTrain(
   const now = trainMoment(event, train, minutes, moment);
   if (now === null) return false;
   // Sens de marche à l'arrivée (+1: vers la fin de la voie), puis au départ.
-  const arriving = train.comesFrom === 'start' ? 1 : -1;
+  const arriving: 1 | -1 = train.comesFrom === 'start' ? 1 : -1;
   const leaving = train.leavesTo === 'end' ? 1 : -1;
   const travel = now.phase === 'leaving' ? leaving * now.run : -arriving * now.run;
   // Distance de la tête au centre de chaque véhicule, comptée vers la queue.
@@ -208,18 +232,11 @@ export function poseTrain(
   train.consist.forEach((vehicle, i) => {
     const center = head - arriving * (behind + lead(vehicle));
     behind += vehicle.front + vehicle.back;
-    const half = ((vehicle.front + vehicle.back) / 2) * settings.bogieShare;
-    pointOn(track, center + arriving * half, front);
-    pointOn(track, center - arriving * half, rear);
-    const dx = front.x - rear.x;
-    const dy = front.y - rear.y;
     const pose = (out.vehicles[i] ??= { model: '', x: 0, y: 0, yaw: 0, front: 0, back: 0 });
     pose.model = vehicle.model;
-    pose.x = (front.x + rear.x) / 2;
-    pose.y = (front.y + rear.y) / 2;
-    pose.yaw = Math.atan2(dx, dy) + (vehicle.reversed === true ? Math.PI : 0);
     pose.front = vehicle.front;
     pose.back = vehicle.back;
+    poseOnTrack(track, center, arriving, vehicle.reversed === true, pose, settings);
   });
   return true;
 }
@@ -373,6 +390,25 @@ export function touchesTrain(
     }
   }
   return false;
+}
+
+/**
+ * Minutes de jeu avant qu'un train d'événement n'occupe la voie `track` du lieu: 0 s'il y est
+ * (arrivée, quai ou départ), l'infini si aucun n'est prévu d'ici la fin du jour. Pur: l'hôte et
+ * l'invité lisent la même annonce. Sert aux véhicules de voie des joueurs, qui lui cèdent la voie.
+ */
+export function minutesToTrain(look: Look, placeId: string, track: string): number {
+  const minutes = look.world.minutes;
+  let soonest = Number.POSITIVE_INFINITY;
+  for (const event of trainEvents(look, placeId, look.world.common.day)) {
+    const train = event.train;
+    if (train?.track !== track) continue;
+    if (trainMoment(event, train, minutes, moment) !== null) return 0;
+    const wait = wrap(event.hours.from - train.arrival.minutes - minutes);
+    // Au-delà de minuit, c'est le calendrier de demain qui dira s'il vient.
+    if (minutes + wait < MINUTES_PER_DAY && wait < soonest) soonest = wait;
+  }
+  return soonest;
 }
 
 /** Un train est-il là (arrivée, quai ou départ) dans ce lieu, à l'heure de l'état ? */

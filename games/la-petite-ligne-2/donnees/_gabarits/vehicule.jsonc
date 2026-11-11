@@ -1,0 +1,116 @@
+// GABARIT: un véhicule de voie à deux places (la draisine d'Aubrune en est un).
+// Créer: pnpm nouveau vehicule velorail aubrune   -> donnees/lieux/<lieu>/vehicules/<id>.json
+// Schéma: src/donnees/schemas/vehicule.ts. Moteur: src/simulation/vehicules/ (rien à y toucher).
+// Rendu: src/rendu/lieu/vehicules.ts (posé sur les rails comme les trains, fondu devant un joueur).
+// Jeu: il dort dans sa remise; une fois `available` vrai, on le sort à la porte (touche d'action),
+// chacun monte de son côté, la touche d'action donne un coup de balancier, la touche de course
+// freine et, à l'arrêt, inverse le sens; une direction à l'arrêt fait descendre. Il cède toujours
+// la voie aux trains des événements (annonce, puis rangé d'office).
+{
+  "schema": 1,
+  "id": "exemple-vehicule",
+  // Nom avec son article, montré dans les messages.
+  "name": "le vélorail",
+  // D'où il vient, à quoi il sert, pourquoi cette voie et ces arrêts (règle « cohérence du monde »).
+  "pourquoi": "Pourquoi ce véhicule existe ici, d'où il sort et où il mène.",
+  // Modèle du manifeste des décors. Nœuds animés par le rendu s'ils existent: `balancier` (bascule
+  // autour de x), `roue-avant` et `roue-arriere` (tournent autour de x). Origine: centre, au sol de
+  // la voie; avant vers +z.
+  "model": "exemple-vehicule",
+  // Facultatif, tant que le modèle n'est pas livré: un modèle existant du manifeste, ramené par le
+  // rendu au gabarit du plancher; bancs et balancier provisoires sont posés aux mesures ci-dessous.
+  "fallback": "luggage-van",
+  // Gabarit (m): du centre aux tampons, demi-largeur, hauteur hors tout, dessus du plancher.
+  "body": { "front": 1.3, "back": 1.3, "halfWidth": 0.85, "height": 1.55, "deck": 0.5 },
+  // Deux places, dans le repère du modèle: `along` vers l'avant (+z), `side` vers +x (la gauche);
+  // `height`: dessus de l'assise au-dessus du plancher; `front`: bord avant de l'assise;
+  // `faces`: front ou back (face au balancier, face à l'autre); `exit`: côté de la descente (left, right).
+  "seats": [
+    {
+      "name": "À l'avant",
+      "along": 0.85,
+      "side": 0,
+      "height": 0.42,
+      "front": 0.18,
+      "faces": "back",
+      "exit": "right",
+    },
+    {
+      "name": "À l'arrière",
+      "along": -0.85,
+      "side": 0,
+      "height": 0.42,
+      "front": 0.18,
+      "faces": "front",
+      "exit": "right",
+    },
+  ],
+  // Voie parcourue: un tracé de `rails` de la carte du lieu.
+  "track": "ligne",
+  // Remise: la voie de garage au bout de laquelle il dort, `inside` mètres après son dernier point
+  // (dans le bâtiment). Ce dernier point est la porte: c'est là qu'on le sort et qu'on le rentre.
+  "garage": { "track": "remise", "inside": 3 },
+  // Un endroit de la voie = un point de la carte (`points`), décalé de `shift` m vers la fin de la voie.
+  // `launch`: où il est posé quand on le sort. `range`: ses butées. Il ne passe jamais non plus une
+  // case fermée de la voie (bord de la carte, verrou d'histoire fermé): rien à écrire pour cela.
+  "launch": { "point": "trav" },
+  "range": { "from": { "point": "pn", "shift": 4 }, "to": { "point": "pnh", "shift": -4 } },
+  // Conditions pour le sortir (mêmes conditions que les dialogues); [] = toujours.
+  "available": [],
+  // Vitesse de pointe (m/s), ralentissement en roue libre (constant en m/s², et par m/s de vitesse),
+  // frein serré et freinage de lui-même devant une butée (m/s²).
+  "speed": { "max": 6, "roll": 0.12, "drag": 0.07, "brake": 4, "endBrake": 2.5 },
+  // Ce qui le fait avancer. Brique `pump`: coups alternés des deux joueurs. `beat`: écart idéal
+  // entre deux coups (s); `tolerance`: écart toléré pour un coup plein; `jam`: en deçà, les deux
+  // ont appuyé ensemble (le coup est perdu); `lost`: au-delà, le rythme retombe; `push`: vitesse
+  // gagnée par un coup plein (m/s); `offBeat`: part gardée par un coup trop lent.
+  "drive": {
+    "brick": "pump",
+    "beat": 0.45,
+    "tolerance": 0.15,
+    "jam": 0.1,
+    "lost": 1.6,
+    "push": 0.45,
+    "offBeat": 0.5,
+  },
+  // Trains des événements sur la même voie: annonce tant de minutes de jeu avant leur arrivée.
+  "trains": { "warnMinutes": 20 },
+  // Arrêté à moins de `stopReach` m du repère d'un arrêt, on y est.
+  "stopReach": 5,
+  // Arrêts: où descendre a un sens. `name`: sans article ni majuscule (« Halte, puis passage de
+  // l'Église à 45 m »). `arrive` (facultatif): effets quand il s'y arrête avec quelqu'un
+  // à bord, sous conditions (un fait pour une suite: « allez jusqu'au passage et revenez »).
+  "stops": [
+    {
+      "id": "depart",
+      "name": "halte",
+      "at": { "point": "trav" },
+      "pourquoi": "Pourquoi l'on monte et l'on descend ici.",
+    },
+    {
+      "id": "bout",
+      "name": "passage de l'Église",
+      "at": { "point": "pne" },
+      "pourquoi": "Ce que l'on rejoint à pied depuis cet arrêt.",
+      "arrive": [
+        {
+          "when": [],
+          "effects": [
+            { "type": "remember", "key": "exemple.vehicule.aller", "value": true, "by": "duo" },
+          ],
+        },
+      ],
+    },
+  ],
+  // Verbes de la bulle d'action (40 caractères) et mots d'explication (120 caractères), tutoiement.
+  "lines": {
+    "rollOut": "Sortir le vélorail",
+    "rollIn": "Rentrer le vélorail",
+    "board": "Monter",
+    "trainDue": "Un train est attendu sur la ligne: le vélorail reste où il est.",
+    "trainWarning": "Un train s'annonce: ramenez le vélorail, ou descendez.",
+    "putAway": "Le train arrive: le vélorail est rentré, personne n'a rien.",
+    "needsTwo": "Il se pompe à deux: il manque ta moitié à bord.",
+    "endOfLine": "Bout de voie: il ne va pas plus loin de ce côté.",
+  },
+}

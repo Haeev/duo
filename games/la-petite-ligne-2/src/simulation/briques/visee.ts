@@ -1,6 +1,6 @@
 /**
  * Visée de la touche d'action: une seule cible à la fois, toujours un objet visible (meuble,
- * objet au sol, habitant), montrée avant l'appui avec son verbe. Fonction pure de l'état transmis
+ * objet au sol, habitant, véhicule de voie), montrée avant l'appui avec son verbe. Fonction pure de l'état transmis
  * (ADR 0020): l'hôte s'en sert pour agir, l'invité et l'interface pour montrer la cible.
  *
  * Choix: parmi ce qui est à portée et dans le cône devant le personnage, d'abord ce qui sert
@@ -21,6 +21,8 @@ import {
   type ReadPlace,
 } from '../noyau/obstacles';
 import { CORE_TUNING } from '../noyau/reglages-noyau';
+import { eachVehicleAim } from '../vehicules/cible';
+import { riddenBy } from '../vehicules/places';
 import { postureOf } from './postures';
 import { groundAimId } from './ramasser';
 import { BRICK_BEHAVIOURS, ENTITY_BEHAVIOURS } from './registre';
@@ -123,7 +125,7 @@ export function aimOf(
   const place = world.places[world.common.place];
   const blockers = currentBlockers(content, world);
   if (placeContent === undefined || place === undefined || blockers === null) return null;
-  if (postureOf(place, player) !== null) return null;
+  if (postureOf(place, player) !== null || riddenBy(place, player) !== null) return null;
 
   const { x: px, y: py, facing } = actor.body;
   const reach = content.settings.reach.action;
@@ -180,6 +182,12 @@ export function aimOf(
   for (const placed of place.placed) considerProp(placed);
 
   if (boarded) return best;
+  eachVehicleAim(look, placeContent, px, py, (id, x, y, offer) => {
+    consider('vehicle', id, x, y, () => {
+      const offered = offer();
+      return offered === null ? null : { action: 'vehicle', ...offered, tool: false };
+    });
+  });
   const { pickup, talk } = ENTITY_BEHAVIOURS;
   for (const item of place.ground) {
     const id = groundAimId(item.id);

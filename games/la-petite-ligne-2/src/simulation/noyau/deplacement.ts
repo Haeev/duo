@@ -14,6 +14,7 @@ import type { ReadonlyWorld } from '../../etat/monde';
 import { canRun } from '../besoins/endurance';
 import { modifiersOf, neutralModifiers } from '../besoins/jauges';
 import { postureOf, standUp } from '../briques/postures';
+import { riddenBy } from '../vehicules/places';
 import { freePlayer } from './deblocage';
 import { bodyCollides, moveBody, type Blockers } from './grille';
 import { currentBlockers } from './obstacles';
@@ -52,7 +53,7 @@ export function stopPlayer(sim: SimContext, player: PlayerIndex): void {
 
 /**
  * Le joueur marche librement: ni wagon, ni geste, ni dialogue, ni marchepied, ni place assise ou
- * couchée. (Chez l'hôte, une direction relève d'abord le joueur assis et coupe un geste long.)
+ * couchée, ni place à bord d'un véhicule de voie. (Chez l'hôte, une direction relève d'abord le joueur assis et coupe un geste long.)
  */
 export function canWalk(world: ReadonlyWorld, player: PlayerIndex): boolean {
   const { phase, travel } = world.common;
@@ -60,7 +61,8 @@ export function canWalk(world: ReadonlyWorld, player: PlayerIndex): boolean {
   if (phase === 'travel' || actor.gesture !== null || actor.talk !== null) return false;
   if (travel?.boarded[player] === true) return false;
   const place = world.places[world.common.place];
-  return place !== undefined && postureOf(place, player) === null;
+  if (place === undefined || riddenBy(place, player) !== null) return false;
+  return postureOf(place, player) === null;
 }
 
 /**

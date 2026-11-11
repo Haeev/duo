@@ -587,10 +587,12 @@ export class AssembledCharacters implements CharacterLayer {
 
   private follow(
     figure: Figure,
-    body: DeepReadonly<Body>,
+    body: Pick<DeepReadonly<Body>, 'x' | 'y' | 'facing'>,
     posture: Posture,
     seat: Seat | null,
     dt: number,
+    /** Porté par un véhicule: hauteur de son plancher. Le personnage le suit d'un bloc. */
+    carried: number | null = null,
   ): void {
     let x = body.x;
     let y = body.y;
@@ -612,7 +614,7 @@ export class AssembledCharacters implements CharacterLayer {
     // Le bassin pose sur l'assise à sa vraie hauteur, quelle que soit celle du clip (0,50 m pour
     // le gabarit adulte): les jambes sont ensuite ramenées au sol une à une (`groundLegs`).
     const lift = seat === null ? 0 : seat.height - this.settings.seat.clipSeat * figure.legScale;
-    const ground = this.ground?.(x, y) ?? 0;
+    const ground = carried ?? this.ground?.(x, y) ?? 0;
     if (!figure.placed) {
       figure.animated = false;
       figure.x = x;
@@ -623,12 +625,15 @@ export class AssembledCharacters implements CharacterLayer {
       figure.lean = 0;
       figure.placed = true;
     } else {
-      const k = approach(dt, this.settings.smoothHalfLife);
+      // À bord d'un véhicule qui roule, tout lissage laisserait le personnage derrière son banc.
+      const k = carried === null ? approach(dt, this.settings.smoothHalfLife) : 1;
       figure.x += (x - figure.x) * k;
       figure.y += (y - figure.y) * k;
       figure.lift += (lift - figure.lift) * approach(dt, this.settings.locomotion.fadeHalfLife);
       // Une marche (bordure, quai) se monte en douceur: la hauteur ne saute pas d'une image à l'autre.
-      figure.ground += (ground - figure.ground) * approach(dt, RELIEF_SETTINGS.stepHalfLife);
+      figure.ground +=
+        (ground - figure.ground) *
+        (carried === null ? approach(dt, RELIEF_SETTINGS.stepHalfLife) : 1);
       const turn = Math.atan2(
         Math.sin(body.facing - figure.facing),
         Math.cos(body.facing - figure.facing),
@@ -856,7 +861,10 @@ export class AssembledCharacters implements CharacterLayer {
         lying,
       );
       figure.face.hold(lies === null ? held : this.settings.lie.expression);
+      const ride = frame.riders?.[index] ?? null;
       if (lies !== null) this.lie(figure, lies, frame.dt);
+      else if (ride !== null)
+        this.follow(figure, ride, { kind: 'sit' }, ride, frame.dt, ride.floor);
       else
         this.follow(figure, player.body, this.playerPosture(player, seat !== null), seat, frame.dt);
       figure.object.visible =

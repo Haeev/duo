@@ -73,6 +73,81 @@ export interface TrainStats {
   triangles: number;
 }
 
+export interface VehicleMaterials {
+  readonly standIn: Material;
+  readonly ink: Material | null;
+}
+
+/**
+ * Le corps d'un véhicule posé sur la voie: le modèle livré (encré s'il le faut), sinon une caisse
+ * provisoire à ses mesures, jamais un trou. `delivered` dit lequel. Sert aux rames des événements
+ * et aux véhicules de voie des joueurs (`vehicules.ts`).
+ */
+export function buildVehicleBody(
+  models: ModelSource | null,
+  materials: VehicleMaterials,
+  tracker: ResourceTracker,
+  key: string,
+  vehicle: { readonly model: string; readonly front: number; readonly back: number },
+  standIn: { readonly width: number; readonly height: number } = {
+    width: TRAIN_LOOK.standInWidth,
+    height: TRAIN_LOOK.standInHeight,
+  },
+): { object: Object3D; delivered: boolean } {
+  const model = models?.instantiate(vehicle.model, key) ?? null;
+  if (model !== null)
+    return {
+      object: materials.ink === null ? model : inkifyModel(model, materials.ink),
+      delivered: true,
+    };
+  const length = vehicle.front + vehicle.back;
+  const geometry = tracker.track(new BoxGeometry(standIn.width, standIn.height, length));
+  geometry.translate(0, standIn.height / 2, (vehicle.front - vehicle.back) / 2);
+  if (materials.ink !== null) inkTag(geometry, { layer: LAYER.plain });
+  return { object: new Mesh(geometry, materials.standIn), delivered: false };
+}
+
+interface Box3Like {
+  x: number;
+  y: number;
+  z: number;
+}
+
+/**
+ * Boîte d'occultation d'un véhicule posé: son emprise tournée (`halfWidth` de part et d'autre de
+ * son axe), du sol à `height`. Écrit `min` et `max`.
+ */
+export function vehicleBox(
+  vehicle: VehiclePose,
+  halfWidth: number,
+  ground: number,
+  height: number,
+  min: Box3Like,
+  max: Box3Like,
+): void {
+  const sin = Math.sin(vehicle.yaw);
+  const cos = Math.cos(vehicle.yaw);
+  let x0 = Number.POSITIVE_INFINITY;
+  let x1 = Number.NEGATIVE_INFINITY;
+  let z0 = Number.POSITIVE_INFINITY;
+  let z1 = Number.NEGATIVE_INFINITY;
+  for (const along of [vehicle.front, -vehicle.back])
+    for (const side of [halfWidth, -halfWidth]) {
+      const x = vehicle.x + sin * along + cos * side;
+      const z = vehicle.y + cos * along - sin * side;
+      x0 = Math.min(x0, x);
+      x1 = Math.max(x1, x);
+      z0 = Math.min(z0, z);
+      z1 = Math.max(z1, z);
+    }
+  min.x = x0;
+  min.y = ground;
+  min.z = z0;
+  max.x = x1;
+  max.y = ground + height;
+  max.z = z1;
+}
+
 /** Clé d'un véhicule: l'événement et son rang dans la rame. */
 function vehicleKey(event: string, index: number): string {
   return `${event}#${String(index)}`;
@@ -97,7 +172,7 @@ export class TrainLayer {
     private readonly place: PlaceContent,
     content: Content,
     private readonly models: ModelSource | null,
-    private readonly materials: { readonly standIn: Material; readonly ink: Material | null },
+    private readonly materials: VehicleMaterials,
     private readonly heightAt: (x: number, y: number) => number,
     private readonly manifest: DecorManifest = DECOR_MANIFEST,
   ) {
@@ -117,22 +192,16 @@ export class TrainLayer {
   }
 
   private build(key: string, vehicle: { model: string; front: number; back: number }): void {
-    const model = this.models?.instantiate(vehicle.model, key) ?? null;
     const sheet = this.manifest.models[vehicle.model];
-    let object: Object3D;
-    if (model !== null) {
-      object = this.materials.ink === null ? model : inkifyModel(model, this.materials.ink);
-    } else {
-      // Sans modèle livré: une caisse provisoire aux mesures de la rame, jamais un trou.
-      const length = vehicle.front + vehicle.back;
-      const geometry = this.tracker.track(
-        new BoxGeometry(TRAIN_LOOK.standInWidth, TRAIN_LOOK.standInHeight, length),
-      );
-      geometry.translate(0, TRAIN_LOOK.standInHeight / 2, (vehicle.front - vehicle.back) / 2);
-      if (this.materials.ink !== null) inkTag(geometry, { layer: LAYER.plain });
-      object = new Mesh(geometry, this.materials.standIn);
-    }
-    const light = model === null ? undefined : sheet?.light;
+    // Sans modèle livré: une caisse provisoire aux mesures de la rame, jamais un trou.
+    const { object, delivered } = buildVehicleBody(
+      this.models,
+      this.materials,
+      this.tracker,
+      key,
+      vehicle,
+    );
+    const light = delivered ? sheet?.light : undefined;
     const glass =
       light === undefined || this.materials.ink === null ? null : new Vector4(2, 0, 0, 0);
     object.traverse((child) => {
@@ -253,26 +322,7 @@ export class TrainLayer {
       view.lamp.z = vehicle.y + az * cos - ax * sin;
     }
     // Boîte d'occultation: l'emprise tournée de la caisse, de la voie au toit.
-    const half = TRAINS.halfWidth;
-    let x0 = Number.POSITIVE_INFINITY;
-    let x1 = Number.NEGATIVE_INFINITY;
-    let z0 = Number.POSITIVE_INFINITY;
-    let z1 = Number.NEGATIVE_INFINITY;
-    for (const along of [vehicle.front, -vehicle.back])
-      for (const side of [half, -half]) {
-        const x = vehicle.x + sin * along + cos * side;
-        const z = vehicle.y + cos * along - sin * side;
-        x0 = Math.min(x0, x);
-        x1 = Math.max(x1, x);
-        z0 = Math.min(z0, z);
-        z1 = Math.max(z1, z);
-      }
-    view.min.x = x0;
-    view.min.y = ground;
-    view.min.z = z0;
-    view.max.x = x1;
-    view.max.y = ground + view.height;
-    view.max.z = z1;
+    vehicleBox(vehicle, TRAINS.halfWidth, ground, view.height, view.min, view.max);
     if (!view.occluding) {
       this.occlusion.add({ id: view.key, min: view.min, max: view.max });
       view.occluding = true;

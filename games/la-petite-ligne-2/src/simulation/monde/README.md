@@ -44,6 +44,8 @@ Un événement: `pnpm nouveau evenement <id> <lieu>`. Un climat: copier `default
 
 Un événement peut amener un train (champ `train`): il arrive en freinant pour s'arrêter à `hours.from`, reste à quai jusqu'à `hours.to`, puis repart en accélérant, le long d'une voie de la carte (`rails`), courbes comprises. Sa pose ne dépend que de l'heure, du jour et des conditions de l'événement: rien n'est sauvegardé ni transmis, l'hôte et l'invité le voient au même endroit, aussi après un chargement ou une nuit sautée. Tant qu'il est là, son emprise barre la voie (`noyau/obstacles.ts`); un joueur surpris dessus est posé sur la case libre la plus proche (événement `unstuck`, sans dommage). Le rendu: `rendu/lieu/trains.ts`.
 
+La pose le long des rails (`trackOf`, `poseOnTrack`) et l'annonce d'un train sur une voie (`minutesToTrain`) servent aussi aux véhicules de voie des joueurs (`simulation/vehicules/`: la draisine cède toujours la voie).
+
 Ajouter un train (aucun code):
 
 1. `pnpm nouveau evenement <id> <lieu>`, ou un événement existant: heures d'arrêt (`from`) et de départ (`to`).

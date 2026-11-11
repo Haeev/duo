@@ -21,7 +21,8 @@ export function gestureOf(
 ): GestureSpec | null {
   if (kind === 'ground') return ENTITY_BEHAVIOURS.pickup.gesture?.(look, player, id) ?? null;
   if (kind === 'villager') return ENTITY_BEHAVIOURS.talk.gesture?.(look, player, id) ?? null;
-  if (action === 'pickup' || action === 'talk') return null;
+  if (kind === 'vehicle' || action === 'pickup' || action === 'talk' || action === 'vehicle')
+    return null;
   const placeContent = look.content.places[look.world.common.place];
   const place = look.world.places[look.world.common.place];
   if (placeContent === undefined || place === undefined) return null;
