@@ -13,7 +13,7 @@
   "entry": "index.html",
   "thumbnail": "vignette.png",
   "description": "À deux, de lieu en lieu par le train: une histoire à suivre, une maison à refaire, des voisins à aider. Version d'essai de la refonte.",
-  "whatsNew": "Le chantier de la maison se paie enfin: une ardoise devant chaque pièce à refaire. Les meubles se rangent et se posent, et 45 sont à trouver. Nouveau à deux: la draisine, la pêche de la Baronne, la musique jouée et son accordage. Le train du samedi prend vos commandes et apporte le courrier. Trouvailles de berge, tenues à la mercerie, portraits des habitants, secondes confidences, décor des fêtes. Image plus légère sur les petites cartes graphiques, et le carnet de l'invité se remplit comme celui de l'hôte. Vos deux ordinateurs doivent avoir cette version; pour tout voir dans l'ordre, commencez une partie neuve.",
+  "whatsNew": "Le chantier de la maison se paie enfin (une ardoise devant chaque pièce) et les meubles se posent. À deux: la draisine, la pêche de la Baronne, la musique. Le train du samedi prend vos commandes. Tenues à la mercerie, trouvailles de berge, portraits des habitants. Image plus légère sur les petites cartes graphiques. Mettez à jour les deux ordinateurs et commencez une partie neuve.",
   "actions": [
     { "id": "up", "label": "Avancer", "keys": ["KeyW"] },
     { "id": "down", "label": "Reculer", "keys": ["KeyS"] },
