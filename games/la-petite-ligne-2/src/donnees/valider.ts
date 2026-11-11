@@ -77,6 +77,11 @@ export function checkCondition(
     case 'decision_is':
       checkDecision(content, c.decision, c.option, at, problems);
       return;
+    case 'event_is':
+      for (const id of c.events)
+        if (!Object.values(content.time.events).some((list) => list.some((e) => e.id === id)))
+          problems.push(`${at}: événement inconnu « ${id} »`);
+      return;
     case 'remembered':
     case 'fact_at_least':
       checkOwnedKey(c.key, c.of, at, problems);
@@ -488,6 +493,53 @@ function checkLook(content: Content, look: Look, at: string, problems: string[])
   }
 }
 
+/** Événements cités (`event_is`) dans ces conditions, à toute profondeur. */
+function citedEvents(conditions: readonly Condition[]): string[] {
+  return conditions.flatMap((c): string[] => {
+    if (c.type === 'all' || c.type === 'any') return citedEvents(c.conditions);
+    if (c.type === 'not') return citedEvents([c.condition]);
+    return c.type === 'event_is' ? c.events : [];
+  });
+}
+
+/**
+ * Conditions des événements du calendrier: références connues, et aucun événement qui dépende de
+ * lui-même par `event_is` (la veillée qui s'efface un jour de fête, oui; la fête qui attend la
+ * veillée qui attend la fête, non). Décisions rejouables: événements connus du lieu.
+ */
+function checkEvents(content: Content, problems: string[]): void {
+  for (const [placeId, list] of Object.entries(content.time.events)) {
+    const cites = new Map(list.map((e) => [e.id, citedEvents(e.conditions)]));
+    for (const event of list) {
+      const at = `lieux/${placeId}/evenements/${event.id}.json`;
+      for (const c of event.conditions) checkCondition(content, c, at, problems);
+      const seen = new Set<string>();
+      const queue = [...(cites.get(event.id) ?? [])];
+      while (queue.length > 0) {
+        const id = queue.pop() ?? '';
+        if (id === event.id) {
+          problems.push(`${at}: conditions en boucle, l'événement dépend de lui-même (event_is)`);
+          break;
+        }
+        if (seen.has(id)) continue;
+        seen.add(id);
+        queue.push(...(cites.get(id) ?? []));
+      }
+    }
+  }
+  for (const place of Object.values(content.places)) {
+    const events = new Set((content.time.events[place.def.id] ?? []).map((e) => e.id));
+    for (const line of Object.values(place.quests))
+      for (const chapter of line.chapters)
+        for (const step of chapter.steps)
+          for (const id of step.decision?.reopens ?? [])
+            if (!events.has(id))
+              problems.push(
+                `lieu ${place.def.id}, quête ${line.id}, étape ${step.id}: décision rouverte par un événement inconnu du lieu « ${id} »`,
+              );
+  }
+}
+
 export function validateContent(content: Content): string[] {
   const problems: string[] = [];
   const { settings, needs, bags } = content;
@@ -591,6 +643,7 @@ export function validateContent(content: Content): string[] {
       if (!(place in content.places)) problems.push(`${at}: lieu inconnu « ${place} »`);
   }
   for (const place of Object.values(content.places)) checkPlace(content, place, problems);
+  checkEvents(content, problems);
   // Accords de genre des répliques (cahier 1.5): balise complète, aucun accord au joueur hors balise.
   problems.push(...validateDialogueTexts(content));
   problems.push(...validateHarvestContent(content));

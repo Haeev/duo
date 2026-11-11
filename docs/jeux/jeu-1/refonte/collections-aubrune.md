@@ -198,7 +198,7 @@ Effets ajoutés à la fin (`onDone`) d'étapes existantes; ils ne changent ni le
 | La Baronne, `epilogue` | recette « Perche meunière » | la fin de l'histoire de la perche, racontée à Colette |
 | Les lettres en retard, `odette` | 2 plants de violette | la lettre de Basile, trente ans de retard |
 | Les lettres en retard, `oeufs` | recette « Omelette aux herbes » | Colette refait la tarte de sa mère avec tes œufs |
-| Ceux qui partent, `honorine-prix` | recette « Pot-au-feu du dimanche » | Honorine réclame un vrai pot-au-feu |
+| Ceux qui partent, `repas` (dialogue `colette-repas`) | recette « Pot-au-feu du dimanche » | Honorine réclame un vrai pot-au-feu; Colette en donne la recette (légumes des Delmas, bœuf d'Odette) |
 | Ceux qui partent, `marthe-manque` | 1 bouture de rosier | une rose pour la dalle des Lacombe |
 | Ceux qui partent, `tunnel` | trésor « Lampe de mineur » | la première niche du tunnel (plan: `niche`) |
 | Ceux qui partent, `cachette` | trésor « Horaire de 1987 » | la boîte d'Émile: le verre roulé dans un horaire de 1987 |

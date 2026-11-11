@@ -20,7 +20,7 @@ import { checkAgreementTags } from '../dialogues/accords';
 import { housingFacts } from '../logement/faits';
 import { playerFactKey } from '../regles/memoire';
 import { isStoryCondition } from './conditions';
-import { decisionKey } from './decisions';
+import { decisionKey, previousDecisionKey } from './decisions';
 import { prerequisites } from './moteur';
 
 /** Les contrôles de référence des conditions et effets communs (`donnees/valider.ts`). */
@@ -66,8 +66,9 @@ type FactValues = ReadonlySet<FactValue> | null;
 
 /**
  * Faits que le jeu peut écrire: effets `remember` et `bump` des données (avec `of: "actor"`, la clé
- * de chacun des deux joueurs), et faits du moteur qui se déduisent des données: pièces et confort
- * des logements, décisions à deux déclarées par les étapes, achats et ventes des commerces.
+ * de chacun des deux joueurs), et faits du moteur qui se déduisent des données: faits écrits par
+ * les événements du calendrier, pièces et confort des logements, décisions à deux déclarées par
+ * les étapes (et le souvenir de la précédente si elle se rouvre), achats et ventes des commerces.
  */
 function collectFacts(content: Content): Map<string, FactValues> {
   const facts = new Map<string, FactValues>();
@@ -88,6 +89,10 @@ function collectFacts(content: Content): Map<string, FactValues> {
     if (node.of === 'actor') for (const p of [0, 1] as const) add(playerFactKey(key, p), values);
     else add(key, values);
   });
+  // Faits écrits par le calendrier au début de chaque événement (`activates.facts`).
+  for (const list of Object.values(content.time.events))
+    for (const event of list)
+      for (const fact of event.activates.facts) add(fact.key, new Set([fact.value]));
   for (const place of Object.values(content.places)) {
     for (const def of Object.values(place.housings))
       for (const [key, values] of housingFacts(place.def.id, def)) add(key, values);
@@ -100,6 +105,8 @@ function collectFacts(content: Content): Map<string, FactValues> {
           const options = new Set<FactValue>(step.decision.options);
           add(decisionKey(step.decision.id), options);
           for (const p of [0, 1] as const) add(decisionKey(step.decision.id, p), options);
+          if (step.decision.reopens !== undefined)
+            add(previousDecisionKey(step.decision.id), options);
         }
   }
   return facts;

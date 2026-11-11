@@ -6,9 +6,9 @@
   "giver": "honorine",
   "requires": [
     {
-      "type": "remembered",
-      "key": "aubrune.fete.jour",
-      "equals": "soupe"
+      "type": "event_is",
+      "events": ["concours-de-la-soupe"],
+      "when": "begun"
     }
   ],
   "chapters": [
@@ -61,9 +61,9 @@
               "villager": "honorine"
             },
             {
-              "type": "remembered",
-              "key": "aubrune.fete.jour",
-              "equals": "soupe"
+              "type": "event_is",
+              "events": ["concours-de-la-soupe"],
+              "when": "begun"
             }
           ],
           "together": false,
@@ -105,7 +105,8 @@
           ],
           "decision": {
             "id": "louche-des-gardes",
-            "options": ["meres", "moulin"]
+            "options": ["meres", "moulin"],
+            "reopens": ["concours-de-la-soupe"]
           },
           "together": false,
           "onStart": [

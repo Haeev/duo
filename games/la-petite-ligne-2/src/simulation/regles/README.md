@@ -27,4 +27,4 @@
 4. Faits du moteur à lire: commerces (`commerces/faits.ts`: `commerces.<commerce>.premier-achat`, `premiere-vente`, `ventes.<commerce>.<objet>` par joueur et pour le duo), dernier jour de conversation `amitie.<habitant>.jour` (avec `of`, pour « trois jours sans te voir »), souvenirs (`souvenirs.ts`, clés dans `RULES.memories`): première prise, nuit blanche (aube arrivée sans dormir), pluie passée dehors ensemble.
 5. Rien d'autre à toucher: gabarits `donnees/_gabarits/dialogue.jsonc` et `quete.jsonc`. Test court: `tests/faits-briques.test.ts` (dialogues factices de la cheffe de gare).
 
-Condition `money_at_least` (`amount` en centimes): la bourse de celui qui agit (dialogue, article, étape). Condition `decision_is` et effet `choose`: `quetes/README.md`.
+Condition `money_at_least` (`amount` en centimes): la bourse de celui qui agit (dialogue, article, étape). Condition `decision_is` et effet `choose`: `quetes/README.md`. Condition `event_is` (un événement du calendrier en cours, commencé aujourd'hui, prévu aujourd'hui ou demain): `monde/README.md`.

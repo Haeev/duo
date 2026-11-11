@@ -11,9 +11,9 @@
     "at": null,
     "when": [
       {
-        "type": "remembered",
-        "key": "aubrune.fete.jour",
-        "equals": "premier-train"
+        "type": "event_is",
+        "events": ["veillee-du-premier-train"],
+        "when": "begun"
       },
       {
         "type": "time_is",
@@ -115,17 +115,6 @@
       "sound": null,
       "to": "both",
       "seconds": null
-    },
-    {
-      "do": "effects",
-      "effects": [
-        {
-          "type": "remember",
-          "key": "aubrune.fete.jour",
-          "value": "premier-train",
-          "by": "duo"
-        }
-      ]
     }
   ]
 }

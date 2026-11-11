@@ -4,7 +4,13 @@
  * veille. Fonctions pures, valables chez l'hôte comme chez l'invité.
  */
 import type { Content } from '../../donnees/charger';
-import { SEASONS, WEEKDAYS, type Season, type Weekday } from '../../donnees/schemas/temps';
+import {
+  SEASONS,
+  WEEKDAYS,
+  type CalendarEventDef,
+  type Season,
+  type Weekday,
+} from '../../donnees/schemas/temps';
 
 export interface CalendarDay {
   /** Année, à partir de 1. */
@@ -33,6 +39,33 @@ export function calendarOf(content: Content, day: number): CalendarDay {
 export function minutesSinceDawn(content: Content, minutes: number): number {
   const dawn = content.settings.clock.dayStart;
   return (((Math.floor(minutes) - dawn) % 1440) + 1440) % 1440;
+}
+
+/** L'événement a lieu ce jour-là (date ou règle, durée comprise), sans regarder ses conditions. */
+export function occursOn(content: Content, event: CalendarEventDef, day: number): boolean {
+  for (let back = 0; back < event.days && day - back >= 1; back++) {
+    const date = calendarOf(content, day - back);
+    const when = event.when;
+    if (when.type === 'date' && date.season === when.season && date.dayOfSeason === when.day)
+      return true;
+    if (
+      when.type === 'weekly' &&
+      date.weekday === when.weekday &&
+      (when.seasons.length === 0 || when.seasons.includes(date.season))
+    )
+      return true;
+  }
+  return false;
+}
+
+/**
+ * Fait écrit par le moteur quand un événement commence au lieu courant: le jour de jeu de ce
+ * début. Il fait durer l'événement « commencé » jusqu'à l'aube suivante, même si ses conditions
+ * changent entre-temps (la première veillée vécue n'efface pas la soirée en cours), et il tient
+ * dans la sauvegarde et chez l'invité.
+ */
+export function eventDayKey(place: string, event: string): string {
+  return `agenda.${place}.${event}`;
 }
 
 /** Plage d'heures (elle peut passer minuit), `from` inclus, `to` exclu; `from === to`: toute la journée. */

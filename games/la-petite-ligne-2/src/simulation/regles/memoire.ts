@@ -46,6 +46,14 @@ export function remember(sim: SimContext, key: string, value: FactValue, by: Fac
   return true;
 }
 
+/** Efface un fait (décision rejouable qui se rouvre). Absent: rien. */
+export function forget(sim: SimContext, key: string): void {
+  const memory = sim.world.progress.memory;
+  if (!(key in memory)) return;
+  Reflect.deleteProperty(memory, key);
+  sim.touch('progress');
+}
+
 /** Compteur: ajoute `amount` à la valeur numérique retenue (0 si absente ou d'un autre type). */
 export function bump(sim: SimContext, key: string, by: FactAuthor, amount = 1): number {
   const before = recall(sim.world, key)?.v;

@@ -58,11 +58,13 @@
   "refusal": "Ça ? Je n'en saurais que faire, moi.",
   // Facultatif: ses répliques de comptoir, dites dans l'écran de boutique après un achat du
   // joueur (bought), après une vente (sold), quand l'argent manque (noMoney). 150 caractères au
-  // plus chacune; absente, l'écran dit son texte commun (« Merci ! »).
+  // plus chacune; absente, l'écran dit son texte commun (« Merci ! »). closed: dite à la place
+  // de l'offre (talk) un jour où un événement ferme le commerce ("closes" de l'événement).
   "lines": {
     "bought": "Et avec ça ?",
     "sold": "Voilà qui fera mon affaire.",
     "noMoney": "Ah. Il manque quelques sous, je crois.",
+    "closed": "Fermé pour la fête ! Tout le monde est là-bas, moi aussi tout à l'heure.",
   },
   // Recommandé: le choix offert à la fin d'une conversation ordinaire avec le commerçant,
   // boutique ouverte (open: ouvre la boutique, leave: clôt). Jamais après un dialogue qui a

@@ -22,9 +22,7 @@
   "announce": true,
   "activates": {
     "facts": [],
-    "villagers": ["cheffe-de-gare"],
     "shop": null,
-    "scene": null,
     "tune": null
   }
 }

@@ -768,10 +768,6 @@
               "key": "aubrune.acte3.honorine-prix",
               "value": "fait",
               "by": "duo"
-            },
-            {
-              "type": "give_recipe",
-              "recipe": "pot-au-feu-du-dimanche"
             }
           ]
         },

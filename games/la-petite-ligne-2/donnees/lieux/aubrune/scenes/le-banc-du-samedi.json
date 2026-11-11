@@ -8,9 +8,14 @@
     "at": null,
     "when": [
       {
-        "type": "remembered",
-        "key": "aubrune.fete.jour",
-        "equals": "veillee"
+        "type": "event_is",
+        "events": [
+          "veillee-du-quai-printemps",
+          "veillee-du-quai-ete",
+          "veillee-du-quai-automne",
+          "veillee-du-quai-hiver"
+        ],
+        "when": "begun"
       },
       {
         "type": "time_is",
@@ -48,12 +53,6 @@
     {
       "do": "effects",
       "effects": [
-        {
-          "type": "remember",
-          "key": "aubrune.fete.jour",
-          "value": "veillee",
-          "by": "duo"
-        },
         {
           "type": "give_item",
           "item": "soupe-de-legumes",

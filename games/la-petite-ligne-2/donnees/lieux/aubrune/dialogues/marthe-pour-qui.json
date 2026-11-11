@@ -6,13 +6,20 @@
   "when": [
     {
       "type": "remembered",
-      "key": "aubrune.lumignons.pour-qui",
-      "equals": "ouvert"
+      "key": "aubrune.lumignons.pour-qui"
     },
     {
-      "type": "remembered",
-      "key": "aubrune.fete.jour",
-      "equals": "lumignons"
+      "type": "event_is",
+      "events": ["nuit-des-lumignons"],
+      "when": "begun"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "decision_is",
+        "decision": "lumignon-des-gardes",
+        "state": "agreed"
+      }
     }
   ],
   "once": null,

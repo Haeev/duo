@@ -14,6 +14,7 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { DialogueDef } from '../../donnees/schemas/dialogue';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { isTrading } from '../commerces/prix';
+import { closedByEvent } from '../monde/agenda';
 import { DIALOGUES } from './reglages';
 
 /** Le dialogue contient-il, quelque part, un effet qui ouvre ce commerce ? */
@@ -72,4 +73,21 @@ export function shopOffered(
   const shop = talkingShop(look, villager);
   if (shop === null || !isTrading(look, shop) || opensItself(dialogue, shop.id)) return null;
   return shop;
+}
+
+/**
+ * Ce que dit le commerçant à la place de l'offre, un jour où un événement ferme son commerce
+ * (`closes`): sa réplique `lines.closed`, aux mêmes moments que l'offre, ou `null`.
+ */
+export function shopClosedLine(
+  look: TalkLook,
+  villager: string,
+  dialogue: DialogueDef,
+  again: boolean,
+): string | null {
+  if (dialogue.priority >= DIALOGUES.pendingPriority && !again) return null;
+  const shop = talkingShop(look, villager);
+  const line = shop?.lines?.closed;
+  if (shop === null || line === undefined || opensItself(dialogue, shop.id)) return null;
+  return closedByEvent(look, shop.id) ? line : null;
 }

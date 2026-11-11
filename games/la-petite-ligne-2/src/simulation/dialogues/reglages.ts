@@ -7,6 +7,11 @@ export interface DialogueTuning {
    */
   readonly shopOffer: { readonly node: string; readonly open: string; readonly leave: string };
   /**
+   * Page dite à la place de l'offre quand un événement ferme le commerce (`lines.closed` de la
+   * fiche: « Fermé pour la fête »): nœud réservé, une réplique du commerçant, puis la fin.
+   */
+  readonly shopClosed: { readonly node: string };
+  /**
    * Priorité à partir de laquelle un dialogue a quelque chose à dire (histoire, quête, souvenir,
    * première rencontre, remarque sur l'hygiène): au comptoir tenu, il passe avant la boutique, et
    * l'offre de la boutique ne le suit pas. En dessous: conversation ordinaire (quotidien).
@@ -23,6 +28,7 @@ export interface DialogueTuning {
 
 export const DIALOGUES: DialogueTuning = {
   shopOffer: { node: 'offre-du-commerce', open: 'voir-le-commerce', leave: 'au-revoir' },
+  shopClosed: { node: 'commerce-ferme' },
   pendingPriority: 10,
   heardPrefix: 'entendu',
 };

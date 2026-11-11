@@ -8,7 +8,7 @@ import type { GameEvent } from '../src/simulation/noyau/evenements';
 import { step } from '../src/simulation/noyau/pas';
 import { idleInput } from '../src/simulation/noyau/entrees';
 import { calendarOf } from '../src/simulation/monde/calendrier';
-import { eventVillagers } from '../src/simulation/monde/agenda';
+
 import { morningWeather, weatherAt, wateredOn } from '../src/simulation/monde/meteo';
 import { evaluate } from '../src/simulation/regles/conditions';
 import { gameContent, newSim } from './aides';
@@ -120,7 +120,7 @@ describe('temps du monde', () => {
     tick(sim);
     const started: string[] = [];
     const announced: string[] = [];
-    let villagersAtFete: string[] = [];
+    let feteOn = false;
     for (let day = 2; day <= 56; day++) {
       sim.world.common.day = day;
       sim.world.minutes = 400;
@@ -130,7 +130,11 @@ describe('temps du monde', () => {
       sim.world.minutes = 900;
       for (const e of tick(sim, 2))
         if (e.type === 'calendar_started') started.push(`${String(day)}:${e.event}`);
-      if (day === 3) villagersAtFete = eventVillagers(sim);
+      if (day === 3)
+        feteOn = evaluate(
+          { world: sim.world, content, actor: null },
+          { type: 'event_is', events: ['fete-d-essai'], when: 'on' },
+        );
       sim.world.minutes = 1400;
       tick(sim, 2);
     }
@@ -148,7 +152,7 @@ describe('temps du monde', () => {
     ]);
     expect(announced[0]).toBe('3:fete-d-essai');
     expect(announced).toContain('13:visiteur-du-samedi');
-    expect(villagersAtFete).toEqual(['cheffe-de-gare']);
+    expect(feteOn).toBe(true);
     expect(sim.world.progress.memory['essai-gare.fete.vue']?.v).toBe(true);
     // L'air de la fête est entendu par les deux joueurs.
     const tune = sim.world.progress.album?.f['air-de-la-fete'];

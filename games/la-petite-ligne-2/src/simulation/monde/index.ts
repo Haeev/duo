@@ -1,13 +1,16 @@
 /**
  * Système « temps du monde »: tient `common.weather` et `common.outlook` à jour pour le lieu
  * courant, annonce la pluie aux cultures, ouvre et ferme les événements du calendrier (faits
- * écrits au nom du duo). Tout le reste se lit par les fonctions pures de ce dossier.
+ * écrits au nom du duo, jour du début `agenda.<lieu>.<événement>` que lit `event_is`, décisions
+ * rejouables rouvertes). Tout le reste se lit par les fonctions pures de ce dossier.
  */
 import type { WorldState } from '../../etat/monde';
 import type { GameSystem, SimContext } from '../noyau/systemes';
+import { decisionsReopenedBy, reopenDecision } from '../quetes/decisions';
 import { remember } from '../regles/memoire';
 import { noteMemories } from '../regles/souvenirs';
 import { activeEvents, announcedFor } from './agenda';
+import { eventDayKey } from './calendrier';
 import { stepBell } from './cloche';
 import { morningWeather, weatherAt } from './meteo';
 
@@ -77,6 +80,13 @@ function step(sim: SimContext): void {
   for (const id of memo.active)
     if (!now.has(id)) sim.emit({ type: 'calendar_ended', place, event: id });
   for (const event of active) {
+    // Début de l'occurrence du jour (une fois, même après une reprise): `event_is` le lit, et
+    // les décisions rejouables de cet événement se rouvrent.
+    const key = eventDayKey(place, event.id);
+    if (world.progress.memory[key]?.v !== day) {
+      for (const decision of decisionsReopenedBy(content, event.id)) reopenDecision(sim, decision);
+      remember(sim, key, day, 'duo');
+    }
     if (memo.active.has(event.id)) continue;
     for (const fact of event.activates.facts) remember(sim, fact.key, fact.value, 'duo');
     sim.emit({ type: 'calendar_started', place, event: event.id });

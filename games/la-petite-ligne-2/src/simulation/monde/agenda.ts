@@ -1,30 +1,15 @@
 /**
  * Événements du calendrier (cahier 4.7, R35): fêtes, visiteurs du train, concours, anniversaires.
  * Fonctions pures de l'état transmis et du contenu: l'interface, le rendu et les habitants de
- * l'invité lisent la même chose que l'hôte.
+ * l'invité lisent la même chose que l'hôte. Les données lisent un événement par la condition
+ * `event_is` (`regles/conditions.ts`), sans fait à écrire ni à effacer.
  */
 import type { CalendarEventDef } from '../../donnees/schemas/temps';
 import type { Look } from '../briques/types';
-import { evaluateAll } from '../regles/conditions';
-import { calendarOf, inHours } from './calendrier';
-import type { Content } from '../../donnees/charger';
+import { evaluate, evaluateAll } from '../regles/conditions';
+import { inHours, occursOn } from './calendrier';
 
-/** L'événement a lieu ce jour-là (date ou règle, durée comprise), sans regarder ses conditions. */
-export function occursOn(content: Content, event: CalendarEventDef, day: number): boolean {
-  for (let back = 0; back < event.days && day - back >= 1; back++) {
-    const date = calendarOf(content, day - back);
-    const when = event.when;
-    if (when.type === 'date' && date.season === when.season && date.dayOfSeason === when.day)
-      return true;
-    if (
-      when.type === 'weekly' &&
-      date.weekday === when.weekday &&
-      (when.seasons.length === 0 || when.seasons.includes(date.season))
-    )
-      return true;
-  }
-  return false;
-}
+export { occursOn };
 
 /** Événements d'un lieu ce jour-là, conditions d'histoire réunies (état présent). */
 export function eventsOn(look: Look, place: string, day: number): CalendarEventDef[] {
@@ -44,14 +29,26 @@ export function activeEvents(look: Look): CalendarEventDef[] {
   );
 }
 
-/** Habitants présents grâce à un événement en cours (visiteurs du train compris). */
-export function eventVillagers(look: Look): string[] {
-  return [...new Set(activeEvents(look).flatMap((e) => e.activates.villagers))];
-}
-
 /** Commerces spéciaux ouverts par un événement en cours. */
 export function eventShops(look: Look): string[] {
   return activeEvents(look).flatMap((e) => (e.activates.shop === null ? [] : [e.activates.shop]));
+}
+
+/**
+ * Ce commerce du lieu courant est-il fermé par un événement (`closes`) ? Du début de l'événement
+ * jusqu'à l'aube suivante (`event_is` à l'état `begun`): le matin, le commerçant tient encore
+ * boutique; dès que la fête commence, il y est, et le reste de la journée est à elle.
+ */
+export function closedByEvent(look: Look, shop: string): boolean {
+  const list = look.content.time.events[look.world.common.place] ?? [];
+  return list.some((event) => {
+    const shops = event.closes?.shops;
+    if (shops === undefined || (shops !== 'all' && !shops.includes(shop))) return false;
+    return evaluate(
+      { world: look.world, content: look.content, actor: null },
+      { type: 'event_is', events: [event.id], when: 'begun' },
+    );
+  });
 }
 
 /** Ce qu'annonce la veille: les événements de demain au lieu courant (champ `announce`). */

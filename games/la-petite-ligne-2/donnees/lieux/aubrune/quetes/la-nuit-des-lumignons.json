@@ -6,9 +6,9 @@
   "giver": "marthe",
   "requires": [
     {
-      "type": "remembered",
-      "key": "aubrune.fete.jour",
-      "equals": "lumignons"
+      "type": "event_is",
+      "events": ["nuit-des-lumignons"],
+      "when": "begun"
     }
   ],
   "chapters": [
@@ -61,9 +61,9 @@
               "villager": "marthe"
             },
             {
-              "type": "remembered",
-              "key": "aubrune.fete.jour",
-              "equals": "lumignons"
+              "type": "event_is",
+              "events": ["nuit-des-lumignons"],
+              "when": "begun"
             }
           ],
           "together": false,
@@ -105,7 +105,8 @@
           ],
           "decision": {
             "id": "lumignon-des-gardes",
-            "options": ["partent", "reviennent"]
+            "options": ["partent", "reviennent"],
+            "reopens": ["nuit-des-lumignons"]
           },
           "together": false,
           "onStart": [

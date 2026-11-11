@@ -95,3 +95,10 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Trace d'essai: `JSON.stringify` d'un tableau où l'on a poussé `player.talk` montre l'état final partout (même objet muté); copier le champ lu.
 - Ajouter un effet aux données: schéma (`regles.ts`), `effets.ts`, `donnees/valider.ts` et `quetes/valider.ts` (deux `switch` exhaustifs).
 
+## La Petite Ligne 2: agenda et données (vérifié le 2026-11-11)
+
+- Un état « du jour » se lit, ne s'écrit pas: condition `event_is` (`on`, `begun`, `today`, `tomorrow`). `begun` repose sur le fait moteur `agenda.<lieu>.<événement>` = jour du début, car les conditions d'un événement, évaluées sur l'état présent, changent dans la soirée (la première veillée vécue efface son propre événement).
+- `remember` n'efface rien: `forget` (`regles/memoire.ts`); le réseau transmet les clés retirées de la mémoire (`drop` de `reseau/progression.ts`).
+- L'interface ignore `outlook_ready` et ne lit pas `common.outlook` (état juste, rien d'affiché au 2026-11-11).
+- Sonde dans un test long: script Python de remplacement sur le fichier de test, lancement filtré (`-t`), puis `git checkout` du fichier. Une commande qui enchaîne `mkdir` puis `cp` hors du scratchpad échoue en bloc: créer les dossiers à part.
+

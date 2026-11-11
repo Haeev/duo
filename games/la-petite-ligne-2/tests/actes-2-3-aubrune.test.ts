@@ -372,6 +372,10 @@ describe('écriture des actes 2 et 3 d’Aubrune', () => {
     playScene(sim, 'la-dalle-des-lacombe');
     talk(sim, 0, 'marthe');
     talk(sim, 0, 'honorine', 'oeuf');
+    // Honorine réclame le plat; c'est Colette qui en donne la recette (légumes, bœuf).
+    expect(fact(sim, 'cuisine.recette.pot-au-feu-du-dimanche')).toBeUndefined();
+    expect(talk(sim, 0, 'colette')).toContain('colette-repas#c2');
+    expect(fact(sim, 'cuisine.recette.pot-au-feu-du-dimanche')).toBe(0);
     carry(sim, 0, { 'pot-au-feu': 1 });
     // Sans la cuisine payée, Colette renvoie chez Basile et la marmite reste au joueur.
     expect(talk(sim, 0, 'colette')).toContain('colette-repas#s2');

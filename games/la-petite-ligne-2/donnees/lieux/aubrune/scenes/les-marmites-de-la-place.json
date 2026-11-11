@@ -11,9 +11,9 @@
     "at": null,
     "when": [
       {
-        "type": "remembered",
-        "key": "aubrune.fete.jour",
-        "equals": "soupe"
+        "type": "event_is",
+        "events": ["concours-de-la-soupe"],
+        "when": "begun"
       },
       {
         "type": "time_is",
@@ -123,17 +123,6 @@
       "sound": null,
       "to": "both",
       "seconds": null
-    },
-    {
-      "do": "effects",
-      "effects": [
-        {
-          "type": "remember",
-          "key": "aubrune.fete.jour",
-          "value": "soupe",
-          "by": "duo"
-        }
-      ]
     }
   ]
 }

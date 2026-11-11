@@ -23,17 +23,11 @@
   "activates": {
     "facts": [
       {
-        "key": "aubrune.fete.jour",
-        "value": "aucune"
-      },
-      {
         "key": "aubrune.barrieres.lisses",
         "value": "levees"
       }
     ],
-    "villagers": [],
     "shop": null,
-    "scene": null,
     "tune": null
   }
 }

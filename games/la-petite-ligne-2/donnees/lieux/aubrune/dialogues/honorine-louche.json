@@ -6,13 +6,20 @@
   "when": [
     {
       "type": "remembered",
-      "key": "aubrune.concours.louche",
-      "equals": "ouvert"
+      "key": "aubrune.concours.louche"
     },
     {
-      "type": "remembered",
-      "key": "aubrune.fete.jour",
-      "equals": "soupe"
+      "type": "event_is",
+      "events": ["concours-de-la-soupe"],
+      "when": "begun"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "decision_is",
+        "decision": "louche-des-gardes",
+        "state": "agreed"
+      }
     }
   ],
   "once": null,

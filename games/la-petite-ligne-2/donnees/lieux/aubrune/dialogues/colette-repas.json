@@ -63,6 +63,16 @@
       "speaker": "colette",
       "text": "Firmin et Ambroise à ma table ? J'ai servi des noces qui finissaient plus mal.",
       "emote": null,
+      "next": "recette"
+    },
+    "recette": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_recipe",
+          "recipe": "pot-au-feu-du-dimanche"
+        }
+      ],
       "next": "tri-n"
     },
     "tri-n": {

@@ -164,8 +164,18 @@ describe('collections d’Aubrune', () => {
   });
 
   it('chaque recette s’apprend (début, essai, livre en rayon, habitant) et ses ingrédients s’obtiennent', () => {
+    // Un habitant l'apprend: étape de suite, ou réplique de dialogue (nœud d'effets, option).
+    const spoken: Record<string, unknown>[] = aubrune().dialogues.flatMap((d) =>
+      Object.values(d.nodes).flatMap((n) =>
+        n.kind === 'effects'
+          ? n.effects
+          : n.kind === 'choice'
+            ? n.options.flatMap((o) => o.effects)
+            : [],
+      ),
+    );
     const taught = new Set(
-      questEffects()
+      [...questEffects(), ...spoken]
         .filter((e) => e.type === 'give_recipe')
         .map((e) => String(e.recipe)),
     );
