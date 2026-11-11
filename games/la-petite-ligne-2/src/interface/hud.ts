@@ -1,12 +1,13 @@
 /**
  * HUD en jeu (interface.md, section 3): horloge et bourse en permanence; médaillons des besoins,
- * barre d'outils, bulle d'action, avis et coup d'œil seulement quand ils servent.
+ * jauge d'endurance, barre d'outils, bulle d'action, avis et coup d'œil seulement quand ils servent.
  */
 import type { Content } from '../donnees/charger';
 import type { PlayerIndex } from '../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../etat/monde';
 import { lookRevealed } from '../simulation/regles/apparence';
 import { el, icon, setAttr, setText, show, toggle } from './dom';
+import { createStaminaGauge } from './endurance';
 import {
   clockModel,
   GlanceTimer,
@@ -145,6 +146,8 @@ export function createHud(
   for (const token of shadowTokens) token.hidden = true;
 
   root.append(...shadowTokens, clock, needs, toolbar, prompt, notice, glanceLayer);
+  // Endurance: sous l'horloge, la sienne seulement (`endurance.ts`).
+  const stamina = createStaminaGauge(root, content);
 
   const watcher = new NeedsWatcher();
   const fold = new ToolbarFold();
@@ -237,6 +240,8 @@ export function createHud(
         node.style.setProperty('--val', String(Math.round(n.value)));
         setAttr(node, 'aria-label', `${TEXTS.needs[n.need]} : ${TEXTS.needs.state[n.state]}`);
       });
+
+      stamina.frame(now, world, local, menu);
 
       const signature = toolbarSignature(world, local);
       fold.update(now, signature);
@@ -343,6 +348,7 @@ export function createHud(
       for (const token of shadowTokens) token.remove();
       clock.remove();
       needs.remove();
+      stamina.dispose();
       toolbar.remove();
       prompt.remove();
       notice.remove();

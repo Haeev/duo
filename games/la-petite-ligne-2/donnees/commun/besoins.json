@@ -4,6 +4,11 @@
   "hysteresis": 0,
   "maxBonus": 1.25,
   "allBonusRareLuck": 1.25,
+  "stamina": {
+    "runSeconds": 55,
+    "recoverAt": 0.3,
+    "refillSeconds": { "walk": 90, "still": 30, "seated": 15, "lying": 8 }
+  },
   "needs": [
     {
       "id": "hunger",

@@ -110,6 +110,7 @@ function playerFrom(
     ...slow,
     body: { x: mover[0], y: mover[1], facing: mover[2], speed: mover[3] },
     needs: { hunger: gauges[0], sleep: gauges[1], hygiene: gauges[2] },
+    stamina: fast.stamina[index],
   };
 }
 

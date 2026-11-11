@@ -1,7 +1,8 @@
 /**
  * Démonstration de l'interface seule, sur une vraie partie neuve et un état factice choisi par
  * l'ancre de l'adresse (`#repos`, `#bulle`, `#coup-d-oeil`, `#dialogue-ecriture`,
- * `#dialogue-choix`, `#carnet-sans-sac`, `#carnet-sac`, `#rangement`, et un onglet du carnet:
+ * `#dialogue-choix`, `#endurance`, `#endurance-renfort`, `#endurance-essouffle`,
+ * `#carnet-sans-sac`, `#carnet-sac`, `#rangement`, et un onglet du carnet:
  * `#carnet-quetes`, `-habitants`, `-collections`, `-carte`, `-tenues`, `-reglages`, chacun avec le
  * suffixe `-long` pour un contenu très long; le sac en objet: `#carnet-sac-equiper`, `-refus`,
  * `-malle`). Sert aux captures.
@@ -135,6 +136,18 @@ if (state === 'coup-d-oeil') {
   me.needs.sleep = 82;
   me.tiers.sleep = 'bonus';
   me.needs.hygiene = 44;
+}
+// `#endurance`: jauge à moitié; `#endurance-renfort`: après un pot-au-feu (capacité et recharge);
+// `#endurance-essouffle`: vidée, le souffle revient.
+if (state === 'endurance') me.stamina = 0.5;
+if (state === 'endurance-essouffle') {
+  me.stamina = 0.12;
+  me.staminaMods.winded = true;
+}
+if (state === 'endurance-renfort') {
+  me.stamina = 0.9;
+  me.staminaMods.capacity = { extra: 0.5, until: world.tick + 10_000 };
+  me.staminaMods.recovery = { factor: 1.5, until: world.tick + 10_000 };
 }
 if (state === 'dialogue-ecriture')
   me.talk = { villager: 'cheffe-de-gare', dialogue: 'accueil', node: 'bonjour' };

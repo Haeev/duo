@@ -11,6 +11,7 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Settings } from '../../donnees/schemas/reglages';
 import type { Body } from '../../etat/joueur';
 import type { ReadonlyWorld } from '../../etat/monde';
+import { canRun } from '../besoins/endurance';
 import { modifiersOf, neutralModifiers } from '../besoins/jauges';
 import { postureOf, standUp } from '../briques/postures';
 import { freePlayer } from './deblocage';
@@ -155,7 +156,9 @@ export function movePlayers(sim: SimContext): void {
       continue;
     }
     const factor = speedFactorOf(content, world, index);
-    walkStep(b, player.body, input.moveX, input.moveY, input.run, movement, sim.dt, factor);
+    // Essoufflé, la touche de course ne fait que marcher (`besoins/endurance.ts`).
+    const run = input.run && canRun(world, index);
+    walkStep(b, player.body, input.moveX, input.moveY, run, movement, sim.dt, factor);
     const pushing = wants && player.body.speed < movement.walkSpeed * factor * 0.05;
     if (pushing && bodyCollides(b, player.body.x, player.body.y, movement.radius)) {
       stuck[index] += 1;

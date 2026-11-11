@@ -66,6 +66,7 @@ export function fastMessage(world: WorldState, content: Content, ack: number): F
       [a.needs.hunger, a.needs.sleep, a.needs.hygiene],
       [b.needs.hunger, b.needs.sleep, b.needs.hygiene],
     ],
+    stamina: [a.stamina, b.stamina],
     villagers,
   };
 }

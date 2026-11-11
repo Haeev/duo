@@ -1,6 +1,7 @@
 /** `donnees/commun/besoins.json`: jauges, paliers et effets (cahier 4.4, réponses 23 à 26). */
 import * as v from 'valibot';
 import { FileVersionSchema, FiniteSchema, GaugeSchema, NeedIdSchema } from './communs';
+import { StaminaSettingsSchema } from './endurance';
 
 export const NEED_STATES = ['blocked', 'low', 'neutral', 'bonus'] as const;
 export const NeedStateSchema = v.picklist(NEED_STATES);
@@ -51,5 +52,7 @@ export const NeedsFileSchema = v.strictObject({
   /** Multiplicateur de chance de rare quand les trois jauges sont en bonus. */
   allBonusRareLuck: v.pipe(FiniteSchema, v.minValue(1), v.maxValue(1.5)),
   needs: v.pipe(v.array(NeedSchema), v.length(3)),
+  /** Endurance: course, recharge selon la posture, seuil de reprise (`schemas/endurance.ts`). */
+  stamina: StaminaSettingsSchema,
 });
 export type NeedsFile = v.InferOutput<typeof NeedsFileSchema>;
