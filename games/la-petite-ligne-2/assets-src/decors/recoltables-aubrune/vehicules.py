@@ -16,8 +16,11 @@ est éclairée. Les vitres de cabine restent `vitre` (on ne roule pas cabine éc
 
 from __future__ import annotations
 
-from amenagements import _lumiere, _modele, barre, boite, colonne
+import math
+
+from amenagements import _lanterne, _lumiere, _modele, barre, boite, colonne
 from formes import Atelier, at, ton
+from mobilier import revolution
 
 RAIL_HAUT = 0.26
 DEMI_ECART = 0.72
@@ -292,7 +295,100 @@ def _fourgon(s: Atelier, ctx, entree):
     return {"pourquoi": entree.get("pourquoi")}
 
 
-SORTES = {"autorail": _autorail, "locomotive": _locomotive, "voiture": _voiture, "fourgon": _fourgon}
+# ====================================================================== draisine
+# Draisine à bras de cheminot (`donnees/lieux/aubrune/vehicules/draisine.json`). Mêmes mesures de
+# voie que les trains: les roues se posent sur le rail (dessus à 0,26 m). Les roues de 25 cm de
+# rayon passent sous le plancher (dessus à 0,82 m): de là, bancs à 42 cm, pivot du balancier à
+# 72 cm, comme la fiche les compte depuis le plancher.
+DRAISINE = {"essieu": RAIL_HAUT + 0.25, "rayon": 0.25, "plancher": 0.82, "bout": 1.3, "demi": 0.85, "essieux": 0.8}
+
+
+def _roue(s: Atelier, ctx, cote: int, z: float):
+    """Roue à boudin de fonte, boudin du côté de la voie (dedans), bandage sur le rail; un sommet
+    tout en bas, posé sur le rail. Pans de deux tons: on la voit tourner."""
+    fer = ctx.tons("fer")
+    e, r = DRAISINE["essieu"], DRAISINE["rayon"]
+    # Repère local: y = axe de la roue vers le dehors (côté `cote`).
+    profil = [(-0.06, r + 0.015), (-0.04, r + 0.015), (-0.04, r), (0.04, r)]
+    with s.groupe(at(cote * DEMI_ECART, e, z, 0.0, 0.0, -cote * math.pi / 2)):
+        revolution(s, profil, 10, "metal", [fer[0], fer[1]], haut=ctx.un("fer_clair"), bas=fer[1], phase=0.0)
+
+
+def _draisine(s: Atelier, ctx, entree):
+    """Plateforme de bois sur un châssis à deux essieux, deux bancs face à face, le balancier au
+    milieu sur son chevalet de fer, levier de frein, lanterne à l'avant. Nœuds mobiles:
+    `balancier` (bascule autour de x, au pivot), `roue-avant`, `roue-arriere` (roulent autour de x,
+    à l'essieu): chacun est un nœud enfant du GLB, à son pivot."""
+    d = DRAISINE
+    e, pl, bout, demi = d["essieu"], d["plancher"], d["bout"], d["demi"]
+    fer = ctx.tons("fer")
+    bois = ctx.tons("bois_meuble")
+    # Essieux et roues: un nœud par essieu (les deux roues et l'arbre tournent ensemble).
+    for nom, z in (("roue-avant", d["essieux"]), ("roue-arriere", -d["essieux"])):
+        with s.noeud(nom, (0.0, e, z), axe="x", rayon=d["rayon"]):
+            for cote in (-1, 1):
+                _roue(s, ctx, cote, z)
+            barre(s, (-0.7, e, z), (0.7, e, z), 0.035, 8, "metal", fer[0])
+    # Châssis: longerons de chêne peints au rouge des wagons de service, dehors des roues, boîtes
+    # d'essieu de fonte, traverses de tête.
+    sous = pl - 0.036
+    rouge = ctx.un("peint_rouge")
+    for c in (-1, 1):
+        xa, xb = sorted((c * 0.8, c * demi))
+        boite(s, xa, xb, 0.6, sous - 0.001, -bout + 0.06, bout - 0.06, "bois", rouge, tremble=0.0, sans="")
+        for z in (-d["essieux"], d["essieux"]):
+            xa, xb = sorted((c * 0.763, c * 0.83))
+            boite(s, xa, xb, e - 0.07, 0.61, z - 0.07, z + 0.07, "metal", fer[1], tremble=0.0, sans="")
+    for c in (-1, 1):
+        za, zb = sorted((c * (bout - 0.12), c * (bout - 0.06)))
+        boite(s, -0.799, 0.799, 0.6, sous - 0.001, za, zb, "bois", rouge, tremble=0.0, sans="")
+        za, zb = sorted((c * (bout - 0.059), c * bout))
+        for x in (-0.52, 0.52):
+            boite(s, x - 0.1, x + 0.1, 0.62, 0.75, za, zb, "bois", ctx.un("bois_coupe", 1), tremble=0.0, sans="")
+    boite(s, -0.799, 0.799, 0.7, sous - 0.001, -0.04, 0.04, "bois", ctx.un("bois_sombre"), tremble=0.0, sans="")
+    # Plancher: sept planches le long de la voie, un jour de 6 mm entre elles.
+    n, jour = 7, 0.006
+    large = (2 * demi - (n - 1) * jour) / n
+    grise = ctx.tons("bois_grise")
+    for k in range(n):
+        x0 = -demi + k * (large + jour)
+        boite(s, x0, x0 + large, sous, pl, -bout + 0.06, bout - 0.06, "bois", grise[k % len(grise)], tremble=0.0, sans="")
+    # Bancs face à face (dessus à 42 cm du plancher), dossier du côté du bout.
+    for c in (-1, 1):
+        za, zb = sorted((c * 0.67, c * 1.03))
+        boite(s, -0.5, 0.5, pl + 0.37, pl + 0.42, za, zb, "bois", bois[0], tremble=0.0, sans="", dessus=ctx.un("bois_clair", 1))
+        for x in (-0.45, 0.45):
+            za, zb = sorted((c * 0.7, c * 1.0))
+            boite(s, x - 0.02, x + 0.02, pl + 0.001, pl + 0.369, za, zb, "bois", bois[1], tremble=0.0, sans="")
+            za, zb = sorted((c * 1.031, c * 1.07))
+            boite(s, x - 0.025, x + 0.025, pl + 0.001, pl + 0.7, za, zb, "bois", bois[1], tremble=0.0, sans="", dessus=ctx.un("bois_coupe"))
+        za, zb = sorted((c * 1.0, c * 1.03))
+        boite(s, -0.49, 0.49, pl + 0.56, pl + 0.66, za, zb, "bois", bois[2 % len(bois)], tremble=0.0, sans="")
+    # Chevalet du balancier: deux jambes de fer, deux flasques, les bouts d'axe dans le moyeu.
+    p = pl + 0.72
+    for c in (-1, 1):
+        barre(s, (c * 0.17, pl - 0.01, 0.0), (c * 0.085, p - 0.07, 0.0), 0.03, 6, "metal", fer[0])
+        xa, xb = sorted((c * 0.066, c * 0.096))
+        boite(s, xa, xb, p - 0.1, p + 0.06, -0.07, 0.07, "metal", fer[1], tremble=0.0, sans="")
+        barre(s, (c * 0.092, p, 0.0), (c * 0.045, p, 0.0), 0.015, 6, "metal", ctx.un("fer_clair"))
+    # Balancier: moyeu de fonte, fléau de chêne en deux bras, poignées en travers à 0,5 m du pivot.
+    with s.noeud("balancier", (0.0, p, 0.0), axe="x", debattement=14):
+        barre(s, (-0.06, p, 0.0), (0.06, p, 0.0), 0.05, 8, "metal", fer[0])
+        for c in (-1, 1):
+            za, zb = sorted((c * 0.02, c * 0.53))
+            boite(s, -0.035, 0.035, p - 0.03, p + 0.03, za, zb, "bois", bois[0], tremble=0.0, sans="", dessus=ctx.un("bois_clair"))
+            for x in (-1, 1):
+                barre(s, (x * 0.03, p, c * 0.5), (x * 0.35, p, c * 0.5), 0.022, 6, "bois", ctx.un("bois_clair", 2))
+    # Levier de frein sur le flanc droit, devant le chevalet: secteur de fer, levier, poignée.
+    boite(s, 0.6, 0.7, pl + 0.001, pl + 0.08, 0.3, 0.4, "metal", fer[1], tremble=0.0, sans="")
+    barre(s, (0.65, pl + 0.04, 0.35), (0.65, pl + 0.5, 0.24), 0.018, 6, "metal", fer[0])
+    barre(s, (0.65, pl + 0.48, 0.245), (0.65, pl + 0.6, 0.215), 0.024, 6, "bois", ctx.un("bois_meuble", 1))
+    # Lanterne à l'avant, posée sur le plancher derrière le dossier du banc avant.
+    _lanterne(s, ctx, 0.0, pl + 0.042, 1.15, 0.13, 0.17, fer)
+    return {"pourquoi": entree.get("pourquoi")}
+
+
+SORTES = {"autorail": _autorail, "locomotive": _locomotive, "voiture": _voiture, "fourgon": _fourgon, "draisine": _draisine}
 
 
 def vehicule(entree: dict, ctx) -> list[dict]:

@@ -1,2031 +1,935 @@
 {
- "schema": 1,
- "objects": {
-  "pomme": {
-   "file": "fruit.glb",
-   "node": "pomme",
-   "family": "fruit",
-   "size": [
-    0.085,
-    0.0782,
-    0.085
-   ],
-   "grip": [
-    0.0,
-    0.0391,
-    -0.0
-   ],
-   "triangles": 300,
-   "colors": [
-    "chocolat",
-    "coquelicot",
-    "herbe"
-   ],
-   "atlas": 1024
-  },
-  "pomme-verte": {
-   "file": "fruit.glb",
-   "node": "pomme-verte",
-   "family": "fruit",
-   "size": [
-    0.08,
-    0.0736,
-    0.08
-   ],
-   "grip": [
-    0.0,
-    0.0368,
-    -0.0
-   ],
-   "triangles": 300,
-   "colors": [
-    "chocolat",
-    "herbe",
-    "olive"
-   ],
-   "atlas": 1024
-  },
-  "poire": {
-   "file": "fruit.glb",
-   "node": "poire",
-   "family": "fruit",
-   "size": [
-    0.0726,
-    0.11,
-    0.0726
-   ],
-   "grip": [
-    0.0,
-    0.055,
-    -0.0
-   ],
-   "triangles": 300,
-   "colors": [
-    "chocolat",
-    "herbe",
-    "moutarde"
-   ],
-   "atlas": 1024
-  },
-  "prune": {
-   "file": "fruit.glb",
-   "node": "prune",
-   "family": "fruit",
-   "size": [
-    0.0345,
-    0.05,
-    0.0305
-   ],
-   "grip": [
-    0.0,
-    0.025,
-    -0.0
-   ],
-   "triangles": 232,
-   "colors": [
-    "chocolat",
-    "herbe",
-    "prune"
-   ],
-   "atlas": 1024
-  },
-  "peche": {
-   "file": "fruit.glb",
-   "node": "peche",
-   "family": "fruit",
-   "size": [
-    0.075,
-    0.0709,
-    0.075
-   ],
-   "grip": [
-    0.0,
-    0.0355,
-    -0.0
-   ],
-   "triangles": 200,
-   "colors": [
-    "chocolat",
-    "herbe",
-    "rose_ancien"
-   ],
-   "atlas": 1024
-  },
-  "cerises": {
-   "file": "fruit.glb",
-   "node": "cerises",
-   "family": "fruit",
-   "size": [
-    0.0574,
-    0.07,
-    0.0468
-   ],
-   "grip": [
-    0.0,
-    0.035,
-    -0.0
-   ],
-   "triangles": 420,
-   "colors": [
-    "brique",
-    "chocolat",
-    "herbe"
-   ],
-   "atlas": 1024
-  },
-  "mures": {
-   "file": "fruit.glb",
-   "node": "mures",
-   "family": "fruit",
-   "size": [
-    0.05,
-    0.0362,
-    0.0456
-   ],
-   "grip": [
-    0.0,
-    0.0181,
-    -0.0
-   ],
-   "triangles": 456,
-   "colors": [
-    "chocolat",
-    "encre",
-    "herbe"
-   ],
-   "atlas": 1024
-  },
-  "framboises": {
-   "file": "fruit.glb",
-   "node": "framboises",
-   "family": "fruit",
-   "size": [
-    0.045,
-    0.0326,
-    0.0411
-   ],
-   "grip": [
-    0.0,
-    0.0163,
-    -0.0
-   ],
-   "triangles": 456,
-   "colors": [
-    "chocolat",
-    "coquelicot",
-    "herbe"
-   ],
-   "atlas": 1024
-  },
-  "noisettes": {
-   "file": "fruit.glb",
-   "node": "noisettes",
-   "family": "fruit",
-   "size": [
-    0.04,
-    0.0223,
-    0.0332
-   ],
-   "grip": [
-    0.0,
-    0.0111,
-    -0.0
-   ],
-   "triangles": 300,
-   "colors": [
-    "herbe",
-    "lin",
-    "noisette"
-   ],
-   "atlas": 1024
-  },
-  "radis": {
-   "file": "legume.glb",
-   "node": "radis",
-   "family": "legume",
-   "size": [
-    0.0464,
-    0.11,
-    0.0453
-   ],
-   "grip": [
-    0.0,
-    0.055,
-    -0.0
-   ],
-   "triangles": 500,
-   "colors": [
-    "coquelicot",
-    "craie",
-    "herbe"
-   ],
-   "atlas": 1024
-  },
-  "radis-croquant": {
-   "file": "legume.glb",
-   "node": "radis-croquant",
-   "family": "legume",
-   "size": [
-    0.0549,
-    0.13,
-    0.0535
-   ],
-   "grip": [
-    0.0,
-    0.065,
-    -0.0
-   ],
-   "triangles": 500,
-   "colors": [
-    "craie",
-    "rose_ancien",
-    "sauge_aubrune"
-   ],
-   "atlas": 1024
-  },
-  "navet": {
-   "file": "legume.glb",
-   "node": "navet",
-   "family": "legume",
-   "size": [
-    0.0633,
-    0.15,
-    0.0617
-   ],
-   "grip": [
-    0.0,
-    0.075,
-    -0.0
-   ],
-   "triangles": 500,
-   "colors": [
-    "craie",
-    "herbe",
-    "lilas"
-   ],
-   "atlas": 1024
-  },
-  "carotte": {
-   "file": "legume.glb",
-   "node": "carotte",
-   "family": "legume",
-   "size": [
-    0.0409,
-    0.2,
-    0.0409
-   ],
-   "grip": [
-    0.0,
-    0.1,
-    -0.0
-   ],
-   "triangles": 480,
-   "colors": [
-    "craie",
-    "herbe",
-    "ocre"
-   ],
-   "atlas": 1024
-  },
-  "tomate": {
-   "file": "legume.glb",
-   "node": "tomate",
-   "family": "legume",
-   "size": [
-    0.075,
-    0.0616,
-    0.0748
-   ],
-   "grip": [
-    0.0,
-    0.0308,
-    -0.0
-   ],
-   "triangles": 524,
-   "colors": [
-    "coquelicot",
-    "craie",
-    "herbe"
-   ],
-   "atlas": 1024
-  },
-  "potiron": {
-   "file": "legume.glb",
-   "node": "potiron",
-   "family": "legume",
-   "size": [
-    0.3,
-    0.1798,
-    0.3
-   ],
-   "grip": [
-    0.0,
-    0.0899,
-    -0.0
-   ],
-   "triangles": 324,
-   "colors": [
-    "craie",
-    "ocre",
-    "olive"
-   ],
-   "atlas": 1024
-  },
-  "chou": {
-   "file": "legume.glb",
-   "node": "chou",
-   "family": "legume",
-   "size": [
-    0.1996,
-    0.1602,
-    0.2
-   ],
-   "grip": [
-    0.0,
-    0.0801,
-    -0.0
-   ],
-   "triangles": 696,
-   "colors": [
-    "herbe",
-    "sauge",
-    "sauge_aubrune"
-   ],
-   "atlas": 1024
-  },
-  "poireau": {
-   "file": "legume.glb",
-   "node": "poireau",
-   "family": "legume",
-   "size": [
-    0.1953,
-    0.45,
-    0.2369
-   ],
-   "grip": [
-    0.0,
-    0.225,
-    -0.0
-   ],
-   "triangles": 348,
-   "colors": [
-    "bouteille",
-    "craie"
-   ],
-   "atlas": 1024
-  },
-  "pomme-de-terre": {
-   "file": "legume.glb",
-   "node": "pomme-de-terre",
-   "family": "legume",
-   "size": [
-    0.08,
-    0.0458,
-    0.0518
-   ],
-   "grip": [
-    0.0,
-    0.0229,
-    -0.0
-   ],
-   "triangles": 324,
-   "colors": [
-    "craie",
-    "herbe",
-    "terre_claire"
-   ],
-   "atlas": 1024
-  },
-  "oignon": {
-   "file": "legume.glb",
-   "node": "oignon",
-   "family": "legume",
-   "size": [
-    0.0783,
-    0.09,
-    0.0771
-   ],
-   "grip": [
-    0.0,
-    0.045,
-    -0.0
-   ],
-   "triangles": 268,
-   "colors": [
-    "herbe",
-    "lin",
-    "rouille"
-   ],
-   "atlas": 1024
-  },
-  "gardon": {
-   "file": "poisson.glb",
-   "node": "gardon",
-   "family": "poisson",
-   "size": [
-    0.0272,
-    0.0769,
-    0.22
-   ],
-   "grip": [
-    0.0018,
-    0.0295,
-    -0.0554
-   ],
-   "triangles": 472,
-   "colors": [
-    "ardoise",
-    "chocolat",
-    "coquelicot",
-    "craie",
-    "oeil",
-    "perle"
-   ],
-   "atlas": 768
-  },
-  "truite": {
-   "file": "poisson.glb",
-   "node": "truite",
-   "family": "poisson",
-   "size": [
-    0.038,
-    0.0839,
-    0.32
-   ],
-   "grip": [
-    0.0029,
-    0.0339,
-    -0.0847
-   ],
-   "triangles": 592,
-   "colors": [
-    "brique",
-    "craie",
-    "ficelle",
-    "lin",
-    "oeil",
-    "olive"
-   ],
-   "atlas": 768
-  },
-  "perche": {
-   "file": "poisson.glb",
-   "node": "perche",
-   "family": "poisson",
-   "size": [
-    0.0344,
-    0.0938,
-    0.25
-   ],
-   "grip": [
-    0.0018,
-    0.036,
-    -0.063
-   ],
-   "triangles": 472,
-   "colors": [
-    "bouteille",
-    "coquelicot",
-    "craie",
-    "moutarde",
-    "oeil"
-   ],
-   "atlas": 768
-  },
-  "brochet": {
-   "file": "poisson.glb",
-   "node": "brochet",
-   "family": "poisson",
-   "size": [
-    0.0664,
-    0.1298,
-    0.65
-   ],
-   "grip": [
-    0.0068,
-    0.0476,
-    -0.1943
-   ],
-   "triangles": 592,
-   "colors": [
-    "blond_paille",
-    "bouteille",
-    "lin",
-    "ocre",
-    "oeil",
-    "olive"
-   ],
-   "atlas": 768
-  },
-  "carpe": {
-   "file": "poisson.glb",
-   "node": "carpe",
-   "family": "poisson",
-   "size": [
-    0.0726,
-    0.1703,
-    0.45
-   ],
-   "grip": [
-    0.0023,
-    0.0744,
-    -0.1081
-   ],
-   "triangles": 472,
-   "colors": [
-    "chocolat",
-    "lin",
-    "noisette",
-    "ocre",
-    "oeil"
-   ],
-   "atlas": 768
-  },
-  "goujon": {
-   "file": "poisson.glb",
-   "node": "goujon",
-   "family": "poisson",
-   "size": [
-    0.0147,
-    0.0314,
-    0.12
-   ],
-   "grip": [
-    0.001,
-    0.0116,
-    -0.0319
-   ],
-   "triangles": 592,
-   "colors": [
-    "chocolat",
-    "craie",
-    "ficelle",
-    "noisette",
-    "oeil"
-   ],
-   "atlas": 768
-  },
-  "confiture": {
-   "file": "bocal.glb",
-   "node": "confiture",
-   "family": "bocal",
-   "size": [
-    0.0925,
-    0.11,
-    0.084
-   ],
-   "grip": [
-    0.0,
-    0.055,
-    -0.0
-   ],
-   "triangles": 460,
-   "colors": [
-    "brique",
-    "coquelicot",
-    "craie",
-    "ficelle"
-   ],
-   "atlas": 512
-  },
-  "miel": {
-   "file": "bocal.glb",
-   "node": "miel",
-   "family": "bocal",
-   "size": [
-    0.09,
-    0.0794,
-    0.0818
-   ],
-   "grip": [
-    0.0,
-    0.0397,
-    -0.0
-   ],
-   "triangles": 460,
-   "colors": [
-    "craie",
-    "ficelle",
-    "moutarde"
-   ],
-   "atlas": 512
-  },
-  "lait": {
-   "file": "bouteille.glb",
-   "node": "lait",
-   "family": "bouteille",
-   "size": [
-    0.0806,
-    0.26,
-    0.0833
-   ],
-   "grip": [
-    0.0,
-    0.0806,
-    -0.0013
-   ],
-   "triangles": 316,
-   "colors": [
-    "bleu_de_travail",
-    "ciel",
-    "craie"
-   ],
-   "atlas": 512
-  },
-  "jus-de-pomme": {
-   "file": "bouteille.glb",
-   "node": "jus-de-pomme",
-   "family": "bouteille",
-   "size": [
-    0.0868,
-    0.28,
-    0.0897
-   ],
-   "grip": [
-    0.0,
-    0.0868,
-    -0.0014
-   ],
-   "triangles": 316,
-   "colors": [
-    "craie",
-    "noisette",
-    "ocre"
-   ],
-   "atlas": 512
-  },
-  "sirop": {
-   "file": "bouteille.glb",
-   "node": "sirop",
-   "family": "bouteille",
-   "size": [
-    0.0712,
-    0.18,
-    0.074
-   ],
-   "grip": [
-    0.0,
-    0.0837,
-    -0.0014
-   ],
-   "triangles": 316,
-   "colors": [
-    "lin",
-    "noisette",
-    "prune"
-   ],
-   "atlas": 512
-  },
-  "pain": {
-   "file": "pain.glb",
-   "node": "pain",
-   "family": "pain",
-   "size": [
-    0.22,
-    0.1035,
-    0.2
-   ],
-   "grip": [
-    0.0,
-    0.0518,
-    -0.0
-   ],
-   "triangles": 504,
-   "colors": [
-    "lin",
-    "ocre"
-   ],
-   "atlas": 768
-  },
-  "baguette": {
-   "file": "pain.glb",
-   "node": "baguette",
-   "family": "pain",
-   "size": [
-    0.0661,
-    0.0604,
-    0.6
-   ],
-   "grip": [
-    0.0,
-    0.0302,
-    -0.0
-   ],
-   "triangles": 312,
-   "colors": [
-    "blond_miel",
-    "lin"
-   ],
-   "atlas": 768
-  },
-  "brioche": {
-   "file": "pain.glb",
-   "node": "brioche",
-   "family": "pain",
-   "size": [
-    0.12,
-    0.0953,
-    0.12
-   ],
-   "grip": [
-    0.0,
-    0.0477,
-    -0.0
-   ],
-   "triangles": 272,
-   "colors": [
-    "moutarde",
-    "ocre"
-   ],
-   "atlas": 768
-  },
-  "croissant": {
-   "file": "pain.glb",
-   "node": "croissant",
-   "family": "pain",
-   "size": [
-    0.14,
-    0.0545,
-    0.0877
-   ],
-   "grip": [
-    0.0,
-    0.0272,
-    -0.0
-   ],
-   "triangles": 220,
-   "colors": [
-    "blond_miel",
-    "ocre"
-   ],
-   "atlas": 768
-  },
-  "soupe-aux-herbes": {
-   "file": "plat.glb",
-   "node": "soupe-aux-herbes",
-   "family": "plat",
-   "size": [
-    0.15,
-    0.0739,
-    0.15
-   ],
-   "grip": [
-    0.0,
-    0.0369,
-    -0.0
-   ],
-   "triangles": 760,
-   "colors": [
-    "bleu_de_travail",
-    "craie",
-    "herbe",
-    "sauge"
-   ],
-   "atlas": 1024
-  },
-  "tourte-du-quai": {
-   "file": "plat.glb",
-   "node": "tourte-du-quai",
-   "family": "plat",
-   "size": [
-    0.24,
-    0.0641,
-    0.2306
-   ],
-   "grip": [
-    0.0,
-    0.032,
-    -0.0
-   ],
-   "triangles": 672,
-   "colors": [
-    "bleu_de_travail",
-    "blond_miel",
-    "ocre",
-    "rouille"
-   ],
-   "atlas": 1024
-  },
-  "omelette": {
-   "file": "plat.glb",
-   "node": "omelette",
-   "family": "plat",
-   "size": [
-    0.22,
-    0.0354,
-    0.22
-   ],
-   "grip": [
-    0.0,
-    0.0177,
-    -0.0
-   ],
-   "triangles": 636,
-   "colors": [
-    "bleu_de_travail",
-    "craie",
-    "herbe",
-    "moutarde"
-   ],
-   "atlas": 1024
-  },
-  "salade": {
-   "file": "plat.glb",
-   "node": "salade",
-   "family": "plat",
-   "size": [
-    0.17,
-    0.0943,
-    0.17
-   ],
-   "grip": [
-    0.0,
-    0.0472,
-    -0.0
-   ],
-   "triangles": 728,
-   "colors": [
-    "canard",
-    "coquelicot",
-    "craie",
-    "herbe"
-   ],
-   "atlas": 1024
-  },
-  "ragout": {
-   "file": "plat.glb",
-   "node": "ragout",
-   "family": "plat",
-   "size": [
-    0.16,
-    0.0822,
-    0.16
-   ],
-   "grip": [
-    0.0,
-    0.0411,
-    -0.0
-   ],
-   "triangles": 652,
-   "colors": [
-    "chocolat",
-    "ocre",
-    "rouille",
-    "terre_claire"
-   ],
-   "atlas": 1024
-  },
-  "tarte-aux-pommes": {
-   "file": "plat.glb",
-   "node": "tarte-aux-pommes",
-   "family": "plat",
-   "size": [
-    0.24,
-    0.038,
-    0.24
-   ],
-   "grip": [
-    0.0,
-    0.019,
-    -0.0
-   ],
-   "triangles": 720,
-   "colors": [
-    "bleu_de_travail",
-    "blond_miel",
-    "craie",
-    "moutarde"
-   ],
-   "atlas": 1024
-  },
-  "poisson-grille": {
-   "file": "plat.glb",
-   "node": "poisson-grille",
-   "family": "plat",
-   "size": [
-    0.26,
-    0.0405,
-    0.26
-   ],
-   "grip": [
-    0.0,
-    0.0203,
-    -0.0
-   ],
-   "triangles": 752,
-   "colors": [
-    "canard",
-    "craie",
-    "moutarde",
-    "noisette"
-   ],
-   "atlas": 1024
-  },
-  "hache": {
-   "file": "outil.glb",
-   "node": "hache",
-   "family": "outil",
-   "size": [
-    0.0489,
-    0.7,
-    0.1741
-   ],
-   "grip": [
-    0.0,
-    0.179,
-    -0.0409
-   ],
-   "triangles": 260,
-   "colors": [
-    "acier",
-    "cuir",
-    "noisette"
-   ],
-   "atlas": 1024
-  },
-  "hache-forgee": {
-   "file": "outil.glb",
-   "node": "hache-forgee",
-   "family": "outil",
-   "size": [
-    0.0524,
-    0.75,
-    0.1865
-   ],
-   "grip": [
-    0.0,
-    0.1918,
-    -0.0438
-   ],
-   "triangles": 404,
-   "colors": [
-    "anthracite",
-    "chocolat",
-    "cuir",
-    "laiton"
-   ],
-   "atlas": 1024
-  },
-  "beche": {
-   "file": "outil.glb",
-   "node": "beche",
-   "family": "outil",
-   "size": [
-    0.1269,
-    1.0,
-    0.0329
-   ],
-   "grip": [
-    0.0,
-    0.3659,
-    -0.0
-   ],
-   "triangles": 392,
-   "colors": [
-    "acier",
-    "cuir",
-    "noisette"
-   ],
-   "atlas": 1024
-  },
-  "beche-forgee": {
-   "file": "outil.glb",
-   "node": "beche-forgee",
-   "family": "outil",
-   "size": [
-    0.1333,
-    1.05,
-    0.0345
-   ],
-   "grip": [
-    0.0,
-    0.3842,
-    -0.0
-   ],
-   "triangles": 456,
-   "colors": [
-    "anthracite",
-    "chocolat",
-    "cuir",
-    "laiton"
-   ],
-   "atlas": 1024
-  },
-  "pioche": {
-   "file": "outil.glb",
-   "node": "pioche",
-   "family": "outil",
-   "size": [
-    0.587,
-    0.8,
-    0.0744
-   ],
-   "grip": [
-    -0.0009,
-    0.2046,
-    -0.0
-   ],
-   "triangles": 292,
-   "colors": [
-    "acier",
-    "cuir",
-    "noisette"
-   ],
-   "atlas": 1024
-  },
-  "pioche-forgee": {
-   "file": "outil.glb",
-   "node": "pioche-forgee",
-   "family": "outil",
-   "size": [
-    0.6237,
-    0.85,
-    0.0791
-   ],
-   "grip": [
-    -0.0009,
-    0.2174,
-    -0.0
-   ],
-   "triangles": 436,
-   "colors": [
-    "anthracite",
-    "chocolat",
-    "cuir",
-    "laiton"
-   ],
-   "atlas": 1024
-  },
-  "canne": {
-   "file": "outil.glb",
-   "node": "canne",
-   "family": "outil",
-   "size": [
-    0.0819,
-    1.5,
-    0.0557
-   ],
-   "grip": [
-    -0.03,
-    0.3783,
-    -0.0
-   ],
-   "triangles": 272,
-   "colors": [
-    "acier",
-    "blond_miel",
-    "cuir"
-   ],
-   "atlas": 1024
-  },
-  "canne-fine": {
-   "file": "outil.glb",
-   "node": "canne-fine",
-   "family": "outil",
-   "size": [
-    0.0886,
-    1.55,
-    0.0575
-   ],
-   "grip": [
-    -0.0291,
-    0.391,
-    -0.0
-   ],
-   "triangles": 416,
-   "colors": [
-    "chocolat",
-    "cuir",
-    "laiton"
-   ],
-   "atlas": 1024
-  },
-  "filet": {
-   "file": "outil.glb",
-   "node": "filet",
-   "family": "outil",
-   "size": [
-    0.2406,
-    0.9,
-    0.1633
-   ],
-   "grip": [
-    0.0,
-    0.1717,
-    0.0676
-   ],
-   "triangles": 388,
-   "colors": [
-    "acier",
-    "craie",
-    "cuir",
-    "noisette"
-   ],
-   "atlas": 1024
-  },
-  "filet-forge": {
-   "file": "outil.glb",
-   "node": "filet-forge",
-   "family": "outil",
-   "size": [
-    0.254,
-    0.95,
-    0.177
-   ],
-   "grip": [
-    0.0,
-    0.1812,
-    0.0691
-   ],
-   "triangles": 532,
-   "colors": [
-    "chocolat",
-    "ciel",
-    "cuir",
-    "laiton"
-   ],
-   "atlas": 1024
-  },
-  "arrosoir": {
-   "file": "outil.glb",
-   "node": "arrosoir",
-   "family": "outil",
-   "size": [
-    0.1879,
-    0.3365,
-    0.42
-   ],
-   "grip": [
-    0.0,
-    0.3065,
-    -0.1607
-   ],
-   "triangles": 374,
-   "colors": [
-    "acier",
-    "cuir",
-    "sauge_aubrune"
-   ],
-   "atlas": 1024
-  },
-  "arrosoir-cuivre": {
-   "file": "outil.glb",
-   "node": "arrosoir-cuivre",
-   "family": "outil",
-   "size": [
-    0.2119,
-    0.3605,
-    0.45
-   ],
-   "grip": [
-    0.0,
-    0.3284,
-    -0.1722
-   ],
-   "triangles": 662,
-   "colors": [
-    "cuir",
-    "laiton",
-    "rouille"
-   ],
-   "atlas": 1024
-  },
-  "serpe": {
-   "file": "outil.glb",
-   "node": "serpe",
-   "family": "outil",
-   "size": [
-    0.0818,
-    0.4,
-    0.0355
-   ],
-   "grip": [
-    -0.0219,
-    0.0458,
-    -0.0
-   ],
-   "triangles": 288,
-   "colors": [
-    "acier",
-    "cuir",
-    "noisette"
-   ],
-   "atlas": 1024
-  },
-  "besace": {
-   "file": "sac.glb",
-   "node": "besace",
-   "family": "sac",
-   "size": [
-    0.2721,
-    0.32,
-    0.1092
-   ],
-   "grip": [
-    0.0,
-    0.315,
-    -0.0108
-   ],
-   "triangles": 432,
-   "colors": [
-    "cuir",
-    "laiton",
-    "lin",
-    "noisette"
-   ],
-   "atlas": 512
-  },
-  "sacoche": {
-   "file": "sac.glb",
-   "node": "sacoche",
-   "family": "sac",
-   "size": [
-    0.4,
-    0.3953,
-    0.1405
-   ],
-   "grip": [
-    0.0,
-    0.389,
-    -0.0162
-   ],
-   "triangles": 672,
-   "colors": [
-    "cuir",
-    "laiton",
-    "sauge"
-   ],
-   "atlas": 512
-  },
-  "sac-a-dos": {
-   "file": "sac.glb",
-   "node": "sac-a-dos",
-   "family": "sac",
-   "size": [
-    0.3417,
-    0.5,
-    0.2946
-   ],
-   "grip": [
-    0.0,
-    0.4784,
-    0.0209
-   ],
-   "triangles": 612,
-   "colors": [
-    "bleu_de_travail",
-    "cuir",
-    "cuir_sombre",
-    "laiton"
-   ],
-   "atlas": 512
-  },
-  "graines-radis": {
-   "file": "graine.glb",
-   "node": "graines-radis",
-   "family": "graine",
-   "size": [
-    0.0876,
-    0.12,
-    0.0215
-   ],
-   "grip": [
-    0.0,
-    0.0571,
-    -0.0031
-   ],
-   "triangles": 412,
-   "colors": [
-    "coquelicot",
-    "herbe",
-    "lin",
-    "rose_ancien"
-   ],
-   "atlas": 512
-  },
-  "graines-tomate": {
-   "file": "graine.glb",
-   "node": "graines-tomate",
-   "family": "graine",
-   "size": [
-    0.0876,
-    0.12,
-    0.0215
-   ],
-   "grip": [
-    0.0,
-    0.0571,
-    -0.0031
-   ],
-   "triangles": 412,
-   "colors": [
-    "brique",
-    "coquelicot",
-    "herbe",
-    "lin"
-   ],
-   "atlas": 512
-  },
-  "graines-carotte": {
-   "file": "graine.glb",
-   "node": "graines-carotte",
-   "family": "graine",
-   "size": [
-    0.0876,
-    0.12,
-    0.0225
-   ],
-   "grip": [
-    0.0,
-    0.0571,
-    -0.0036
-   ],
-   "triangles": 336,
-   "colors": [
-    "herbe",
-    "lin",
-    "moutarde",
-    "ocre"
-   ],
-   "atlas": 512
-  },
-  "graines-fleurs": {
-   "file": "graine.glb",
-   "node": "graines-fleurs",
-   "family": "graine",
-   "size": [
-    0.0876,
-    0.12,
-    0.0222
-   ],
-   "grip": [
-    0.0,
-    0.0571,
-    -0.0035
-   ],
-   "triangles": 456,
-   "colors": [
-    "ciel",
-    "herbe",
-    "lilas",
-    "lin"
-   ],
-   "atlas": 512
-  },
-  "coquelicot": {
-   "file": "fleur.glb",
-   "node": "coquelicot",
-   "family": "fleur",
-   "size": [
-    0.1065,
-    0.3,
-    0.0626
-   ],
-   "grip": [
-    -0.0062,
-    0.0814,
-    -0.0
-   ],
-   "triangles": 564,
-   "colors": [
-    "coquelicot",
-    "encre",
-    "herbe"
-   ],
-   "atlas": 512
-  },
-  "marguerite": {
-   "file": "fleur.glb",
-   "node": "marguerite",
-   "family": "fleur",
-   "size": [
-    0.1086,
-    0.28,
-    0.0695
-   ],
-   "grip": [
-    -0.0063,
-    0.0829,
-    -0.0
-   ],
-   "triangles": 548,
-   "colors": [
-    "craie",
-    "herbe",
-    "moutarde"
-   ],
-   "atlas": 512
-  },
-  "tournesol": {
-   "file": "fleur.glb",
-   "node": "tournesol",
-   "family": "fleur",
-   "size": [
-    0.1714,
-    0.5,
-    0.06
-   ],
-   "grip": [
-    0.0,
-    0.128,
-    -0.01
-   ],
-   "triangles": 656,
-   "colors": [
-    "chocolat",
-    "herbe",
-    "moutarde"
-   ],
-   "atlas": 512
-  },
-  "pierre": {
-   "file": "caillou.glb",
-   "node": "pierre",
-   "family": "caillou",
-   "size": [
-    0.12,
-    0.0767,
-    0.0874
-   ],
-   "grip": [
-    0.0,
-    0.0383,
-    -0.0
-   ],
-   "triangles": 324,
-   "colors": [
-    "acier",
-    "pierre_creme"
-   ],
-   "atlas": 768
-  },
-  "minerai-de-fer": {
-   "file": "caillou.glb",
-   "node": "minerai-de-fer",
-   "family": "caillou",
-   "size": [
-    0.12,
-    0.0821,
-    0.0877
-   ],
-   "grip": [
-    0.0,
-    0.041,
-    -0.0
-   ],
-   "triangles": 468,
-   "colors": [
-    "lauze",
-    "rouille"
-   ],
-   "atlas": 768
-  },
-  "minerai-de-cuivre": {
-   "file": "caillou.glb",
-   "node": "minerai-de-cuivre",
-   "family": "caillou",
-   "size": [
-    0.12,
-    0.0821,
-    0.0877
-   ],
-   "grip": [
-    0.0,
-    0.041,
-    -0.0
-   ],
-   "triangles": 468,
-   "colors": [
-    "canard",
-    "pierre_creme"
-   ],
-   "atlas": 768
-  },
-  "fossile-coquille": {
-   "file": "caillou.glb",
-   "node": "fossile-coquille",
-   "family": "caillou",
-   "size": [
-    0.1,
-    0.0552,
-    0.0788
-   ],
-   "grip": [
-    0.0,
-    0.0276,
-    -0.0
-   ],
-   "triangles": 728,
-   "colors": [
-    "ficelle",
-    "pierre_creme"
-   ],
-   "atlas": 768
-  },
-  "planche": {
-   "file": "bois.glb",
-   "node": "planche",
-   "family": "bois",
-   "size": [
-    0.9,
-    0.025,
-    0.16
-   ],
-   "grip": [
-    0.0,
-    0.0125,
-    -0.0
-   ],
-   "triangles": 280,
-   "colors": [
-    "blond_miel",
-    "lin"
-   ],
-   "atlas": 512
-  },
-  "buche": {
-   "file": "bois.glb",
-   "node": "buche",
-   "family": "bois",
-   "size": [
-    0.1293,
-    0.1326,
-    0.4
-   ],
-   "grip": [
-    0.0,
-    0.0663,
-    -0.0
-   ],
-   "triangles": 244,
-   "colors": [
-    "chocolat",
-    "terre_claire"
-   ],
-   "atlas": 512
-  },
-  "lettre": {
-   "file": "courrier.glb",
-   "node": "lettre",
-   "family": "courrier",
-   "size": [
-    0.18,
-    0.013,
-    0.12
-   ],
-   "grip": [
-    0.0,
-    0.0065,
-    -0.0
-   ],
-   "triangles": 232,
-   "colors": [
-    "coquelicot",
-    "craie",
-    "ficelle",
-    "lin"
-   ],
-   "atlas": 512
-  },
-  "colis": {
-   "file": "courrier.glb",
-   "node": "colis",
-   "family": "courrier",
-   "size": [
-    0.3,
-    0.1498,
-    0.2265
-   ],
-   "grip": [
-    0.0,
-    0.0749,
-    -0.0
-   ],
-   "triangles": 320,
-   "colors": [
-    "coquelicot",
-    "ficelle",
-    "lin",
-    "terre_claire"
-   ],
-   "atlas": 512
-  },
-  "cle": {
-   "file": "cle.glb",
-   "node": "cle",
-   "family": "cle",
-   "size": [
-    0.09,
-    0.0144,
-    0.0363
-   ],
-   "grip": [
-    -0.0269,
-    0.0093,
-    -0.0
-   ],
-   "triangles": 320,
-   "colors": [
-    "laiton"
-   ],
-   "atlas": 512
-  },
-  "cle-rouillee": {
-   "file": "cle.glb",
-   "node": "cle-rouillee",
-   "family": "cle",
-   "size": [
-    0.1,
-    0.0161,
-    0.0403
-   ],
-   "grip": [
-    -0.0298,
-    0.0104,
-    -0.0
-   ],
-   "triangles": 320,
-   "colors": [
-    "rouille"
-   ],
-   "atlas": 512
-  },
-  "vieille-piece": {
-   "file": "piece.glb",
-   "node": "vieille-piece",
-   "family": "piece",
-   "size": [
-    0.03,
-    0.0036,
-    0.03
-   ],
-   "grip": [
-    0.0,
-    0.0018,
-    -0.0
-   ],
-   "triangles": 260,
-   "colors": [
-    "laiton"
-   ],
-   "atlas": 512
-  },
-  "piece-d-argent": {
-   "file": "piece.glb",
-   "node": "piece-d-argent",
-   "family": "piece",
-   "size": [
-    0.025,
-    0.003,
-    0.025
-   ],
-   "grip": [
-    0.0,
-    0.0015,
-    -0.0
-   ],
-   "triangles": 260,
-   "colors": [
-    "perle"
-   ],
-   "atlas": 512
-  },
-  "boeuf": {
-   "file": "provision.glb",
-   "node": "boeuf",
-   "family": "provision",
-   "size": [
-    0.15,
-    0.0786,
-    0.122
-   ],
-   "grip": [
-    0.0,
-    0.0393,
-    -0.0
-   ],
-   "triangles": 356,
-   "colors": [
-    "brique",
-    "craie",
-    "ficelle"
-   ],
-   "atlas": 512
-  },
-  "farine": {
-   "file": "provision.glb",
-   "node": "farine",
-   "family": "provision",
-   "size": [
-    0.1549,
-    0.2,
-    0.1373
-   ],
-   "grip": [
-    0.0008,
-    0.1561,
-    -0.0095
-   ],
-   "triangles": 480,
-   "colors": [
-    "craie",
-    "ficelle",
-    "lin"
-   ],
-   "atlas": 512
-  },
-  "livre-de-cuisine": {
-   "file": "provision.glb",
-   "node": "livre-de-cuisine",
-   "family": "provision",
-   "size": [
-    0.1594,
-    0.0366,
-    0.2
-   ],
-   "grip": [
-    0.0,
-    0.0183,
-    -0.0
-   ],
-   "triangles": 280,
-   "colors": [
-    "canard",
-    "craie",
-    "moutarde"
-   ],
-   "atlas": 512
-  },
-  "appareil-photo": {
-   "file": "provision.glb",
-   "node": "appareil-photo",
-   "family": "provision",
-   "size": [
-    0.13,
-    0.095,
-    0.095
-   ],
-   "grip": [
-    0.0,
-    0.0475,
-    -0.0
-   ],
-   "triangles": 348,
-   "colors": [
-    "anthracite",
-    "cuir_sombre",
-    "laiton"
-   ],
-   "atlas": 512
-  },
-  "ablette": {
-   "file": "poisson.glb",
-   "node": "ablette",
-   "family": "poisson",
-   "size": [
-    0.0173,
-    0.0489,
-    0.14
-   ],
-   "grip": [
-    0.0012,
-    0.0188,
-    -0.0353
-   ],
-   "triangles": 472,
-   "colors": [
-    "ardoise",
-    "chocolat",
-    "craie",
-    "oeil",
-    "perle"
-   ],
-   "atlas": 768
-  },
-  "tanche": {
-   "file": "poisson.glb",
-   "node": "tanche",
-   "family": "poisson",
-   "size": [
-    0.0564,
-    0.1324,
-    0.35
-   ],
-   "grip": [
-    0.0018,
-    0.0579,
-    -0.0841
-   ],
-   "triangles": 472,
-   "colors": [
-    "bouteille",
-    "chocolat",
-    "moutarde",
-    "oeil",
-    "olive"
-   ],
-   "atlas": 768
-  },
-  "oeuf": {
-   "file": "fruit.glb",
-   "node": "oeuf",
-   "family": "fruit",
-   "size": [
-    0.0465,
-    0.055,
-    0.0465
-   ],
-   "grip": [
-    0.0,
-    0.0275,
-    -0.0
-   ],
-   "triangles": 240,
-   "colors": [
-    "chocolat",
-    "herbe",
-    "lin"
-   ],
-   "atlas": 1024
-  },
-  "tartine": {
-   "file": "pain.glb",
-   "node": "tartine",
-   "family": "pain",
-   "size": [
-    0.16,
-    0.022,
-    0.1
-   ],
-   "grip": [
-    0.0,
-    0.011,
-    -0.0
-   ],
-   "triangles": 232,
-   "colors": [
-    "blond_paille",
-    "ocre"
-   ],
-   "atlas": 768
-  },
-  "oeuf-au-plat": {
-   "file": "plat.glb",
-   "node": "oeuf-au-plat",
-   "family": "plat",
-   "size": [
-    0.24,
-    0.03,
-    0.24
-   ],
-   "grip": [
-    0.0,
-    0.015,
-    -0.0
-   ],
-   "triangles": 444,
-   "colors": [
-    "craie",
-    "lin",
-    "moutarde",
-    "rouille"
-   ],
-   "atlas": 1024
-  },
-  "pomme-cuite": {
-   "file": "plat.glb",
-   "node": "pomme-cuite",
-   "family": "plat",
-   "size": [
-    0.24,
-    0.0911,
-    0.24
-   ],
-   "grip": [
-    0.0,
-    0.0456,
-    -0.0
-   ],
-   "triangles": 532,
-   "colors": [
-    "bleu_de_travail",
-    "brique",
-    "craie",
-    "ocre"
-   ],
-   "atlas": 1024
-  },
-  "pommes-sautees": {
-   "file": "plat.glb",
-   "node": "pommes-sautees",
-   "family": "plat",
-   "size": [
-    0.24,
-    0.042,
-    0.24
-   ],
-   "grip": [
-    0.0,
-    0.021,
-    -0.0
-   ],
-   "triangles": 492,
-   "colors": [
-    "bouteille",
-    "craie",
-    "moutarde"
-   ],
-   "atlas": 1024
-  },
-  "pot-au-feu": {
-   "file": "plat.glb",
-   "node": "pot-au-feu",
-   "family": "plat",
-   "size": [
-    0.17,
-    0.0873,
-    0.17
-   ],
-   "grip": [
-    0.0,
-    0.0437,
-    -0.0
-   ],
-   "triangles": 652,
-   "colors": [
-    "bouteille",
-    "brique",
-    "craie",
-    "noisette"
-   ],
-   "atlas": 1024
-  },
-  "soupe-de-legumes": {
-   "file": "plat.glb",
-   "node": "soupe-de-legumes",
-   "family": "plat",
-   "size": [
-    0.15,
-    0.0739,
-    0.15
-   ],
-   "grip": [
-    0.0,
-    0.0369,
-    -0.0
-   ],
-   "triangles": 760,
-   "colors": [
-    "coquelicot",
-    "craie",
-    "ocre",
-    "rouille"
-   ],
-   "atlas": 1024
-  },
-  "tarte-doree": {
-   "file": "plat.glb",
-   "node": "tarte-doree",
-   "family": "plat",
-   "size": [
-    0.24,
-    0.038,
-    0.24
-   ],
-   "grip": [
-    0.0,
-    0.019,
-    -0.0
-   ],
-   "triangles": 720,
-   "colors": [
-    "craie",
-    "moutarde",
-    "ocre",
-    "rouille"
-   ],
-   "atlas": 1024
-  },
-  "fossile-d-essai": {
-   "file": "caillou.glb",
-   "node": "fossile-d-essai",
-   "family": "caillou",
-   "size": [
-    0.09,
-    0.0497,
-    0.0709
-   ],
-   "grip": [
-    0.0,
-    0.0249,
-    -0.0
-   ],
-   "triangles": 728,
-   "colors": [
-    "lauze",
-    "lin"
-   ],
-   "atlas": 768
+  "schema": 1,
+  "objects": {
+    "pomme": {
+      "file": "fruit.glb",
+      "node": "pomme",
+      "family": "fruit",
+      "size": [0.085, 0.0782, 0.085],
+      "grip": [0.0, 0.0391, -0.0],
+      "triangles": 300,
+      "colors": ["chocolat", "coquelicot", "herbe"],
+      "atlas": 1024
+    },
+    "pomme-verte": {
+      "file": "fruit.glb",
+      "node": "pomme-verte",
+      "family": "fruit",
+      "size": [0.08, 0.0736, 0.08],
+      "grip": [0.0, 0.0368, -0.0],
+      "triangles": 300,
+      "colors": ["chocolat", "herbe", "olive"],
+      "atlas": 1024
+    },
+    "poire": {
+      "file": "fruit.glb",
+      "node": "poire",
+      "family": "fruit",
+      "size": [0.0726, 0.11, 0.0726],
+      "grip": [0.0, 0.055, -0.0],
+      "triangles": 300,
+      "colors": ["chocolat", "herbe", "moutarde"],
+      "atlas": 1024
+    },
+    "prune": {
+      "file": "fruit.glb",
+      "node": "prune",
+      "family": "fruit",
+      "size": [0.0345, 0.05, 0.0305],
+      "grip": [0.0, 0.025, -0.0],
+      "triangles": 232,
+      "colors": ["chocolat", "herbe", "prune"],
+      "atlas": 1024
+    },
+    "peche": {
+      "file": "fruit.glb",
+      "node": "peche",
+      "family": "fruit",
+      "size": [0.075, 0.0709, 0.075],
+      "grip": [0.0, 0.0355, -0.0],
+      "triangles": 200,
+      "colors": ["chocolat", "herbe", "rose_ancien"],
+      "atlas": 1024
+    },
+    "cerises": {
+      "file": "fruit.glb",
+      "node": "cerises",
+      "family": "fruit",
+      "size": [0.0574, 0.07, 0.0468],
+      "grip": [0.0, 0.035, -0.0],
+      "triangles": 420,
+      "colors": ["brique", "chocolat", "herbe"],
+      "atlas": 1024
+    },
+    "mures": {
+      "file": "fruit.glb",
+      "node": "mures",
+      "family": "fruit",
+      "size": [0.05, 0.0362, 0.0456],
+      "grip": [0.0, 0.0181, -0.0],
+      "triangles": 456,
+      "colors": ["chocolat", "encre", "herbe"],
+      "atlas": 1024
+    },
+    "framboises": {
+      "file": "fruit.glb",
+      "node": "framboises",
+      "family": "fruit",
+      "size": [0.045, 0.0326, 0.0411],
+      "grip": [0.0, 0.0163, -0.0],
+      "triangles": 456,
+      "colors": ["chocolat", "coquelicot", "herbe"],
+      "atlas": 1024
+    },
+    "noisettes": {
+      "file": "fruit.glb",
+      "node": "noisettes",
+      "family": "fruit",
+      "size": [0.04, 0.0223, 0.0332],
+      "grip": [0.0, 0.0111, -0.0],
+      "triangles": 300,
+      "colors": ["herbe", "lin", "noisette"],
+      "atlas": 1024
+    },
+    "radis": {
+      "file": "legume.glb",
+      "node": "radis",
+      "family": "legume",
+      "size": [0.0464, 0.11, 0.0453],
+      "grip": [0.0, 0.055, -0.0],
+      "triangles": 500,
+      "colors": ["coquelicot", "craie", "herbe"],
+      "atlas": 1024
+    },
+    "radis-croquant": {
+      "file": "legume.glb",
+      "node": "radis-croquant",
+      "family": "legume",
+      "size": [0.0549, 0.13, 0.0535],
+      "grip": [0.0, 0.065, -0.0],
+      "triangles": 500,
+      "colors": ["craie", "rose_ancien", "sauge_aubrune"],
+      "atlas": 1024
+    },
+    "navet": {
+      "file": "legume.glb",
+      "node": "navet",
+      "family": "legume",
+      "size": [0.0633, 0.15, 0.0617],
+      "grip": [0.0, 0.075, -0.0],
+      "triangles": 500,
+      "colors": ["craie", "herbe", "lilas"],
+      "atlas": 1024
+    },
+    "carotte": {
+      "file": "legume.glb",
+      "node": "carotte",
+      "family": "legume",
+      "size": [0.0409, 0.2, 0.0409],
+      "grip": [0.0, 0.1, -0.0],
+      "triangles": 480,
+      "colors": ["craie", "herbe", "ocre"],
+      "atlas": 1024
+    },
+    "tomate": {
+      "file": "legume.glb",
+      "node": "tomate",
+      "family": "legume",
+      "size": [0.075, 0.0616, 0.0748],
+      "grip": [0.0, 0.0308, -0.0],
+      "triangles": 524,
+      "colors": ["coquelicot", "craie", "herbe"],
+      "atlas": 1024
+    },
+    "potiron": {
+      "file": "legume.glb",
+      "node": "potiron",
+      "family": "legume",
+      "size": [0.3, 0.1798, 0.3],
+      "grip": [0.0, 0.0899, -0.0],
+      "triangles": 324,
+      "colors": ["craie", "ocre", "olive"],
+      "atlas": 1024
+    },
+    "chou": {
+      "file": "legume.glb",
+      "node": "chou",
+      "family": "legume",
+      "size": [0.1996, 0.1602, 0.2],
+      "grip": [0.0, 0.0801, -0.0],
+      "triangles": 696,
+      "colors": ["herbe", "sauge", "sauge_aubrune"],
+      "atlas": 1024
+    },
+    "poireau": {
+      "file": "legume.glb",
+      "node": "poireau",
+      "family": "legume",
+      "size": [0.1953, 0.45, 0.2369],
+      "grip": [0.0, 0.225, -0.0],
+      "triangles": 348,
+      "colors": ["bouteille", "craie"],
+      "atlas": 1024
+    },
+    "pomme-de-terre": {
+      "file": "legume.glb",
+      "node": "pomme-de-terre",
+      "family": "legume",
+      "size": [0.08, 0.0458, 0.0518],
+      "grip": [0.0, 0.0229, -0.0],
+      "triangles": 324,
+      "colors": ["craie", "herbe", "terre_claire"],
+      "atlas": 1024
+    },
+    "oignon": {
+      "file": "legume.glb",
+      "node": "oignon",
+      "family": "legume",
+      "size": [0.0783, 0.09, 0.0771],
+      "grip": [0.0, 0.045, -0.0],
+      "triangles": 268,
+      "colors": ["herbe", "lin", "rouille"],
+      "atlas": 1024
+    },
+    "gardon": {
+      "file": "poisson.glb",
+      "node": "gardon",
+      "family": "poisson",
+      "size": [0.0272, 0.0769, 0.22],
+      "grip": [0.0018, 0.0295, -0.0554],
+      "triangles": 472,
+      "colors": ["ardoise", "chocolat", "coquelicot", "craie", "oeil", "perle"],
+      "atlas": 768
+    },
+    "truite": {
+      "file": "poisson.glb",
+      "node": "truite",
+      "family": "poisson",
+      "size": [0.038, 0.0839, 0.32],
+      "grip": [0.0029, 0.0339, -0.0847],
+      "triangles": 592,
+      "colors": ["brique", "craie", "ficelle", "lin", "oeil", "olive"],
+      "atlas": 768
+    },
+    "perche": {
+      "file": "poisson.glb",
+      "node": "perche",
+      "family": "poisson",
+      "size": [0.0344, 0.0938, 0.25],
+      "grip": [0.0018, 0.036, -0.063],
+      "triangles": 472,
+      "colors": ["bouteille", "coquelicot", "craie", "moutarde", "oeil"],
+      "atlas": 768
+    },
+    "brochet": {
+      "file": "poisson.glb",
+      "node": "brochet",
+      "family": "poisson",
+      "size": [0.0664, 0.1298, 0.65],
+      "grip": [0.0068, 0.0476, -0.1943],
+      "triangles": 592,
+      "colors": ["blond_paille", "bouteille", "lin", "ocre", "oeil", "olive"],
+      "atlas": 768
+    },
+    "carpe": {
+      "file": "poisson.glb",
+      "node": "carpe",
+      "family": "poisson",
+      "size": [0.0726, 0.1703, 0.45],
+      "grip": [0.0023, 0.0744, -0.1081],
+      "triangles": 472,
+      "colors": ["chocolat", "lin", "noisette", "ocre", "oeil"],
+      "atlas": 768
+    },
+    "goujon": {
+      "file": "poisson.glb",
+      "node": "goujon",
+      "family": "poisson",
+      "size": [0.0147, 0.0314, 0.12],
+      "grip": [0.001, 0.0116, -0.0319],
+      "triangles": 592,
+      "colors": ["chocolat", "craie", "ficelle", "noisette", "oeil"],
+      "atlas": 768
+    },
+    "confiture": {
+      "file": "bocal.glb",
+      "node": "confiture",
+      "family": "bocal",
+      "size": [0.0925, 0.11, 0.084],
+      "grip": [0.0, 0.055, -0.0],
+      "triangles": 460,
+      "colors": ["brique", "coquelicot", "craie", "ficelle"],
+      "atlas": 512
+    },
+    "miel": {
+      "file": "bocal.glb",
+      "node": "miel",
+      "family": "bocal",
+      "size": [0.09, 0.0794, 0.0818],
+      "grip": [0.0, 0.0397, -0.0],
+      "triangles": 460,
+      "colors": ["craie", "ficelle", "moutarde"],
+      "atlas": 512
+    },
+    "lait": {
+      "file": "bouteille.glb",
+      "node": "lait",
+      "family": "bouteille",
+      "size": [0.0806, 0.26, 0.0833],
+      "grip": [0.0, 0.0806, -0.0013],
+      "triangles": 316,
+      "colors": ["bleu_de_travail", "ciel", "craie"],
+      "atlas": 512
+    },
+    "jus-de-pomme": {
+      "file": "bouteille.glb",
+      "node": "jus-de-pomme",
+      "family": "bouteille",
+      "size": [0.0868, 0.28, 0.0897],
+      "grip": [0.0, 0.0868, -0.0014],
+      "triangles": 316,
+      "colors": ["craie", "noisette", "ocre"],
+      "atlas": 512
+    },
+    "sirop": {
+      "file": "bouteille.glb",
+      "node": "sirop",
+      "family": "bouteille",
+      "size": [0.0712, 0.18, 0.074],
+      "grip": [0.0, 0.0837, -0.0014],
+      "triangles": 316,
+      "colors": ["lin", "noisette", "prune"],
+      "atlas": 512
+    },
+    "pain": {
+      "file": "pain.glb",
+      "node": "pain",
+      "family": "pain",
+      "size": [0.22, 0.1035, 0.2],
+      "grip": [0.0, 0.0518, -0.0],
+      "triangles": 504,
+      "colors": ["lin", "ocre"],
+      "atlas": 768
+    },
+    "baguette": {
+      "file": "pain.glb",
+      "node": "baguette",
+      "family": "pain",
+      "size": [0.0661, 0.0604, 0.6],
+      "grip": [0.0, 0.0302, -0.0],
+      "triangles": 312,
+      "colors": ["blond_miel", "lin"],
+      "atlas": 768
+    },
+    "brioche": {
+      "file": "pain.glb",
+      "node": "brioche",
+      "family": "pain",
+      "size": [0.12, 0.0953, 0.12],
+      "grip": [0.0, 0.0477, -0.0],
+      "triangles": 272,
+      "colors": ["moutarde", "ocre"],
+      "atlas": 768
+    },
+    "croissant": {
+      "file": "pain.glb",
+      "node": "croissant",
+      "family": "pain",
+      "size": [0.14, 0.0545, 0.0877],
+      "grip": [0.0, 0.0272, -0.0],
+      "triangles": 220,
+      "colors": ["blond_miel", "ocre"],
+      "atlas": 768
+    },
+    "soupe-aux-herbes": {
+      "file": "plat.glb",
+      "node": "soupe-aux-herbes",
+      "family": "plat",
+      "size": [0.15, 0.0739, 0.15],
+      "grip": [0.0, 0.0369, -0.0],
+      "triangles": 760,
+      "colors": ["bleu_de_travail", "craie", "herbe", "sauge"],
+      "atlas": 1024
+    },
+    "tourte-du-quai": {
+      "file": "plat.glb",
+      "node": "tourte-du-quai",
+      "family": "plat",
+      "size": [0.24, 0.0641, 0.2306],
+      "grip": [0.0, 0.032, -0.0],
+      "triangles": 672,
+      "colors": ["bleu_de_travail", "blond_miel", "ocre", "rouille"],
+      "atlas": 1024
+    },
+    "omelette": {
+      "file": "plat.glb",
+      "node": "omelette",
+      "family": "plat",
+      "size": [0.22, 0.0354, 0.22],
+      "grip": [0.0, 0.0177, -0.0],
+      "triangles": 636,
+      "colors": ["bleu_de_travail", "craie", "herbe", "moutarde"],
+      "atlas": 1024
+    },
+    "salade": {
+      "file": "plat.glb",
+      "node": "salade",
+      "family": "plat",
+      "size": [0.17, 0.0943, 0.17],
+      "grip": [0.0, 0.0472, -0.0],
+      "triangles": 728,
+      "colors": ["canard", "coquelicot", "craie", "herbe"],
+      "atlas": 1024
+    },
+    "ragout": {
+      "file": "plat.glb",
+      "node": "ragout",
+      "family": "plat",
+      "size": [0.16, 0.0822, 0.16],
+      "grip": [0.0, 0.0411, -0.0],
+      "triangles": 652,
+      "colors": ["chocolat", "ocre", "rouille", "terre_claire"],
+      "atlas": 1024
+    },
+    "tarte-aux-pommes": {
+      "file": "plat.glb",
+      "node": "tarte-aux-pommes",
+      "family": "plat",
+      "size": [0.24, 0.038, 0.24],
+      "grip": [0.0, 0.019, -0.0],
+      "triangles": 720,
+      "colors": ["bleu_de_travail", "blond_miel", "craie", "moutarde"],
+      "atlas": 1024
+    },
+    "poisson-grille": {
+      "file": "plat.glb",
+      "node": "poisson-grille",
+      "family": "plat",
+      "size": [0.26, 0.0405, 0.26],
+      "grip": [0.0, 0.0203, -0.0],
+      "triangles": 752,
+      "colors": ["canard", "craie", "moutarde", "noisette"],
+      "atlas": 1024
+    },
+    "hache": {
+      "file": "outil.glb",
+      "node": "hache",
+      "family": "outil",
+      "size": [0.0489, 0.7, 0.1741],
+      "grip": [0.0, 0.179, -0.0409],
+      "triangles": 260,
+      "colors": ["acier", "cuir", "noisette"],
+      "atlas": 1024
+    },
+    "hache-forgee": {
+      "file": "outil.glb",
+      "node": "hache-forgee",
+      "family": "outil",
+      "size": [0.0524, 0.75, 0.1865],
+      "grip": [0.0, 0.1918, -0.0438],
+      "triangles": 404,
+      "colors": ["anthracite", "chocolat", "cuir", "laiton"],
+      "atlas": 1024
+    },
+    "beche": {
+      "file": "outil.glb",
+      "node": "beche",
+      "family": "outil",
+      "size": [0.1269, 1.0, 0.0329],
+      "grip": [0.0, 0.3659, -0.0],
+      "triangles": 392,
+      "colors": ["acier", "cuir", "noisette"],
+      "atlas": 1024
+    },
+    "beche-forgee": {
+      "file": "outil.glb",
+      "node": "beche-forgee",
+      "family": "outil",
+      "size": [0.1333, 1.05, 0.0345],
+      "grip": [0.0, 0.3842, -0.0],
+      "triangles": 456,
+      "colors": ["anthracite", "chocolat", "cuir", "laiton"],
+      "atlas": 1024
+    },
+    "pioche": {
+      "file": "outil.glb",
+      "node": "pioche",
+      "family": "outil",
+      "size": [0.587, 0.8, 0.0744],
+      "grip": [-0.0009, 0.2046, -0.0],
+      "triangles": 292,
+      "colors": ["acier", "cuir", "noisette"],
+      "atlas": 1024
+    },
+    "pioche-forgee": {
+      "file": "outil.glb",
+      "node": "pioche-forgee",
+      "family": "outil",
+      "size": [0.6237, 0.85, 0.0791],
+      "grip": [-0.0009, 0.2174, -0.0],
+      "triangles": 436,
+      "colors": ["anthracite", "chocolat", "cuir", "laiton"],
+      "atlas": 1024
+    },
+    "canne": {
+      "file": "outil.glb",
+      "node": "canne",
+      "family": "outil",
+      "size": [0.0819, 1.5, 0.0557],
+      "grip": [-0.03, 0.3783, -0.0],
+      "triangles": 272,
+      "colors": ["acier", "blond_miel", "cuir"],
+      "atlas": 1024
+    },
+    "canne-fine": {
+      "file": "outil.glb",
+      "node": "canne-fine",
+      "family": "outil",
+      "size": [0.0886, 1.55, 0.0575],
+      "grip": [-0.0291, 0.391, -0.0],
+      "triangles": 416,
+      "colors": ["chocolat", "cuir", "laiton"],
+      "atlas": 1024
+    },
+    "filet": {
+      "file": "outil.glb",
+      "node": "filet",
+      "family": "outil",
+      "size": [0.2406, 0.9, 0.1633],
+      "grip": [0.0, 0.1717, 0.0676],
+      "triangles": 388,
+      "colors": ["acier", "craie", "cuir", "noisette"],
+      "atlas": 1024
+    },
+    "filet-forge": {
+      "file": "outil.glb",
+      "node": "filet-forge",
+      "family": "outil",
+      "size": [0.254, 0.95, 0.177],
+      "grip": [0.0, 0.1812, 0.0691],
+      "triangles": 532,
+      "colors": ["chocolat", "ciel", "cuir", "laiton"],
+      "atlas": 1024
+    },
+    "arrosoir": {
+      "file": "outil.glb",
+      "node": "arrosoir",
+      "family": "outil",
+      "size": [0.1879, 0.3365, 0.42],
+      "grip": [0.0, 0.3065, -0.1607],
+      "triangles": 374,
+      "colors": ["acier", "cuir", "sauge_aubrune"],
+      "atlas": 1024
+    },
+    "arrosoir-cuivre": {
+      "file": "outil.glb",
+      "node": "arrosoir-cuivre",
+      "family": "outil",
+      "size": [0.2119, 0.3605, 0.45],
+      "grip": [0.0, 0.3284, -0.1722],
+      "triangles": 662,
+      "colors": ["cuir", "laiton", "rouille"],
+      "atlas": 1024
+    },
+    "serpe": {
+      "file": "outil.glb",
+      "node": "serpe",
+      "family": "outil",
+      "size": [0.0818, 0.4, 0.0355],
+      "grip": [-0.0219, 0.0458, -0.0],
+      "triangles": 288,
+      "colors": ["acier", "cuir", "noisette"],
+      "atlas": 1024
+    },
+    "besace": {
+      "file": "sac.glb",
+      "node": "besace",
+      "family": "sac",
+      "size": [0.2721, 0.32, 0.1092],
+      "grip": [0.0, 0.315, -0.0108],
+      "triangles": 432,
+      "colors": ["cuir", "laiton", "lin", "noisette"],
+      "atlas": 512
+    },
+    "sacoche": {
+      "file": "sac.glb",
+      "node": "sacoche",
+      "family": "sac",
+      "size": [0.4, 0.3953, 0.1405],
+      "grip": [0.0, 0.389, -0.0162],
+      "triangles": 672,
+      "colors": ["cuir", "laiton", "sauge"],
+      "atlas": 512
+    },
+    "sac-a-dos": {
+      "file": "sac.glb",
+      "node": "sac-a-dos",
+      "family": "sac",
+      "size": [0.3417, 0.5, 0.2946],
+      "grip": [0.0, 0.4784, 0.0209],
+      "triangles": 612,
+      "colors": ["bleu_de_travail", "cuir", "cuir_sombre", "laiton"],
+      "atlas": 512
+    },
+    "graines-radis": {
+      "file": "graine.glb",
+      "node": "graines-radis",
+      "family": "graine",
+      "size": [0.0876, 0.12, 0.0215],
+      "grip": [0.0, 0.0571, -0.0031],
+      "triangles": 412,
+      "colors": ["coquelicot", "herbe", "lin", "rose_ancien"],
+      "atlas": 512
+    },
+    "graines-tomate": {
+      "file": "graine.glb",
+      "node": "graines-tomate",
+      "family": "graine",
+      "size": [0.0876, 0.12, 0.0215],
+      "grip": [0.0, 0.0571, -0.0031],
+      "triangles": 412,
+      "colors": ["brique", "coquelicot", "herbe", "lin"],
+      "atlas": 512
+    },
+    "graines-carotte": {
+      "file": "graine.glb",
+      "node": "graines-carotte",
+      "family": "graine",
+      "size": [0.0876, 0.12, 0.0225],
+      "grip": [0.0, 0.0571, -0.0036],
+      "triangles": 336,
+      "colors": ["herbe", "lin", "moutarde", "ocre"],
+      "atlas": 512
+    },
+    "graines-fleurs": {
+      "file": "graine.glb",
+      "node": "graines-fleurs",
+      "family": "graine",
+      "size": [0.0876, 0.12, 0.0222],
+      "grip": [0.0, 0.0571, -0.0035],
+      "triangles": 456,
+      "colors": ["ciel", "herbe", "lilas", "lin"],
+      "atlas": 512
+    },
+    "coquelicot": {
+      "file": "fleur.glb",
+      "node": "coquelicot",
+      "family": "fleur",
+      "size": [0.1065, 0.3, 0.0626],
+      "grip": [-0.0062, 0.0814, -0.0],
+      "triangles": 564,
+      "colors": ["coquelicot", "encre", "herbe"],
+      "atlas": 512
+    },
+    "marguerite": {
+      "file": "fleur.glb",
+      "node": "marguerite",
+      "family": "fleur",
+      "size": [0.1086, 0.28, 0.0695],
+      "grip": [-0.0063, 0.0829, -0.0],
+      "triangles": 548,
+      "colors": ["craie", "herbe", "moutarde"],
+      "atlas": 512
+    },
+    "tournesol": {
+      "file": "fleur.glb",
+      "node": "tournesol",
+      "family": "fleur",
+      "size": [0.1714, 0.5, 0.06],
+      "grip": [0.0, 0.128, -0.01],
+      "triangles": 656,
+      "colors": ["chocolat", "herbe", "moutarde"],
+      "atlas": 512
+    },
+    "pierre": {
+      "file": "caillou.glb",
+      "node": "pierre",
+      "family": "caillou",
+      "size": [0.12, 0.0767, 0.0874],
+      "grip": [0.0, 0.0383, -0.0],
+      "triangles": 324,
+      "colors": ["acier", "pierre_creme"],
+      "atlas": 768
+    },
+    "minerai-de-fer": {
+      "file": "caillou.glb",
+      "node": "minerai-de-fer",
+      "family": "caillou",
+      "size": [0.12, 0.0821, 0.0877],
+      "grip": [0.0, 0.041, -0.0],
+      "triangles": 468,
+      "colors": ["lauze", "rouille"],
+      "atlas": 768
+    },
+    "minerai-de-cuivre": {
+      "file": "caillou.glb",
+      "node": "minerai-de-cuivre",
+      "family": "caillou",
+      "size": [0.12, 0.0821, 0.0877],
+      "grip": [0.0, 0.041, -0.0],
+      "triangles": 468,
+      "colors": ["canard", "pierre_creme"],
+      "atlas": 768
+    },
+    "fossile-coquille": {
+      "file": "caillou.glb",
+      "node": "fossile-coquille",
+      "family": "caillou",
+      "size": [0.1, 0.0552, 0.0788],
+      "grip": [0.0, 0.0276, -0.0],
+      "triangles": 728,
+      "colors": ["ficelle", "pierre_creme"],
+      "atlas": 768
+    },
+    "planche": {
+      "file": "bois.glb",
+      "node": "planche",
+      "family": "bois",
+      "size": [0.9, 0.025, 0.16],
+      "grip": [0.0, 0.0125, -0.0],
+      "triangles": 280,
+      "colors": ["blond_miel", "lin"],
+      "atlas": 512
+    },
+    "buche": {
+      "file": "bois.glb",
+      "node": "buche",
+      "family": "bois",
+      "size": [0.1293, 0.1326, 0.4],
+      "grip": [0.0, 0.0663, -0.0],
+      "triangles": 244,
+      "colors": ["chocolat", "terre_claire"],
+      "atlas": 512
+    },
+    "lettre": {
+      "file": "courrier.glb",
+      "node": "lettre",
+      "family": "courrier",
+      "size": [0.18, 0.013, 0.12],
+      "grip": [0.0, 0.0065, -0.0],
+      "triangles": 232,
+      "colors": ["coquelicot", "craie", "ficelle", "lin"],
+      "atlas": 512
+    },
+    "colis": {
+      "file": "courrier.glb",
+      "node": "colis",
+      "family": "courrier",
+      "size": [0.3, 0.1498, 0.2265],
+      "grip": [0.0, 0.0749, -0.0],
+      "triangles": 320,
+      "colors": ["coquelicot", "ficelle", "lin", "terre_claire"],
+      "atlas": 512
+    },
+    "cle": {
+      "file": "cle.glb",
+      "node": "cle",
+      "family": "cle",
+      "size": [0.09, 0.0144, 0.0363],
+      "grip": [-0.0269, 0.0093, -0.0],
+      "triangles": 320,
+      "colors": ["laiton"],
+      "atlas": 512
+    },
+    "cle-rouillee": {
+      "file": "cle.glb",
+      "node": "cle-rouillee",
+      "family": "cle",
+      "size": [0.1, 0.0161, 0.0403],
+      "grip": [-0.0298, 0.0104, -0.0],
+      "triangles": 320,
+      "colors": ["rouille"],
+      "atlas": 512
+    },
+    "vieille-piece": {
+      "file": "piece.glb",
+      "node": "vieille-piece",
+      "family": "piece",
+      "size": [0.03, 0.0036, 0.03],
+      "grip": [0.0, 0.0018, -0.0],
+      "triangles": 260,
+      "colors": ["laiton"],
+      "atlas": 512
+    },
+    "piece-d-argent": {
+      "file": "piece.glb",
+      "node": "piece-d-argent",
+      "family": "piece",
+      "size": [0.025, 0.003, 0.025],
+      "grip": [0.0, 0.0015, -0.0],
+      "triangles": 260,
+      "colors": ["perle"],
+      "atlas": 512
+    },
+    "boeuf": {
+      "file": "provision.glb",
+      "node": "boeuf",
+      "family": "provision",
+      "size": [0.15, 0.0786, 0.122],
+      "grip": [0.0, 0.0393, -0.0],
+      "triangles": 356,
+      "colors": ["brique", "craie", "ficelle"],
+      "atlas": 512
+    },
+    "farine": {
+      "file": "provision.glb",
+      "node": "farine",
+      "family": "provision",
+      "size": [0.1549, 0.2, 0.1373],
+      "grip": [0.0008, 0.1561, -0.0095],
+      "triangles": 480,
+      "colors": ["craie", "ficelle", "lin"],
+      "atlas": 512
+    },
+    "livre-de-cuisine": {
+      "file": "provision.glb",
+      "node": "livre-de-cuisine",
+      "family": "provision",
+      "size": [0.1594, 0.0366, 0.2],
+      "grip": [0.0, 0.0183, -0.0],
+      "triangles": 280,
+      "colors": ["canard", "craie", "moutarde"],
+      "atlas": 512
+    },
+    "appareil-photo": {
+      "file": "provision.glb",
+      "node": "appareil-photo",
+      "family": "provision",
+      "size": [0.13, 0.095, 0.095],
+      "grip": [0.0, 0.0475, -0.0],
+      "triangles": 348,
+      "colors": ["anthracite", "cuir_sombre", "laiton"],
+      "atlas": 512
+    },
+    "ablette": {
+      "file": "poisson.glb",
+      "node": "ablette",
+      "family": "poisson",
+      "size": [0.0173, 0.0489, 0.14],
+      "grip": [0.0012, 0.0188, -0.0353],
+      "triangles": 472,
+      "colors": ["ardoise", "chocolat", "craie", "oeil", "perle"],
+      "atlas": 768
+    },
+    "tanche": {
+      "file": "poisson.glb",
+      "node": "tanche",
+      "family": "poisson",
+      "size": [0.0564, 0.1324, 0.35],
+      "grip": [0.0018, 0.0579, -0.0841],
+      "triangles": 472,
+      "colors": ["bouteille", "chocolat", "moutarde", "oeil", "olive"],
+      "atlas": 768
+    },
+    "oeuf": {
+      "file": "fruit.glb",
+      "node": "oeuf",
+      "family": "fruit",
+      "size": [0.0465, 0.055, 0.0465],
+      "grip": [0.0, 0.0275, -0.0],
+      "triangles": 240,
+      "colors": ["chocolat", "herbe", "lin"],
+      "atlas": 1024
+    },
+    "tartine": {
+      "file": "pain.glb",
+      "node": "tartine",
+      "family": "pain",
+      "size": [0.16, 0.022, 0.1],
+      "grip": [0.0, 0.011, -0.0],
+      "triangles": 232,
+      "colors": ["blond_paille", "ocre"],
+      "atlas": 768
+    },
+    "oeuf-au-plat": {
+      "file": "plat.glb",
+      "node": "oeuf-au-plat",
+      "family": "plat",
+      "size": [0.24, 0.03, 0.24],
+      "grip": [0.0, 0.015, -0.0],
+      "triangles": 444,
+      "colors": ["craie", "lin", "moutarde", "rouille"],
+      "atlas": 1024
+    },
+    "pomme-cuite": {
+      "file": "plat.glb",
+      "node": "pomme-cuite",
+      "family": "plat",
+      "size": [0.24, 0.0911, 0.24],
+      "grip": [0.0, 0.0456, -0.0],
+      "triangles": 532,
+      "colors": ["bleu_de_travail", "brique", "craie", "ocre"],
+      "atlas": 1024
+    },
+    "pommes-sautees": {
+      "file": "plat.glb",
+      "node": "pommes-sautees",
+      "family": "plat",
+      "size": [0.24, 0.042, 0.24],
+      "grip": [0.0, 0.021, -0.0],
+      "triangles": 492,
+      "colors": ["bouteille", "craie", "moutarde"],
+      "atlas": 1024
+    },
+    "pot-au-feu": {
+      "file": "plat.glb",
+      "node": "pot-au-feu",
+      "family": "plat",
+      "size": [0.17, 0.0873, 0.17],
+      "grip": [0.0, 0.0437, -0.0],
+      "triangles": 652,
+      "colors": ["bouteille", "brique", "craie", "noisette"],
+      "atlas": 1024
+    },
+    "soupe-de-legumes": {
+      "file": "plat.glb",
+      "node": "soupe-de-legumes",
+      "family": "plat",
+      "size": [0.15, 0.0739, 0.15],
+      "grip": [0.0, 0.0369, -0.0],
+      "triangles": 760,
+      "colors": ["coquelicot", "craie", "ocre", "rouille"],
+      "atlas": 1024
+    },
+    "tarte-doree": {
+      "file": "plat.glb",
+      "node": "tarte-doree",
+      "family": "plat",
+      "size": [0.24, 0.038, 0.24],
+      "grip": [0.0, 0.019, -0.0],
+      "triangles": 720,
+      "colors": ["craie", "moutarde", "ocre", "rouille"],
+      "atlas": 1024
+    },
+    "fossile-d-essai": {
+      "file": "caillou.glb",
+      "node": "fossile-d-essai",
+      "family": "caillou",
+      "size": [0.09, 0.0497, 0.0709],
+      "grip": [0.0, 0.0249, -0.0],
+      "triangles": 728,
+      "colors": ["lauze", "lin"],
+      "atlas": 768
+    },
+    "cornet": {
+      "file": "instrument.glb",
+      "node": "cornet",
+      "family": "instrument",
+      "size": [0.1067, 0.1117, 0.36],
+      "grip": [0.0, 0.04, -0.0255],
+      "triangles": 760,
+      "colors": ["acier", "craie", "encre", "laiton"],
+      "atlas": 512
+    },
+    "clarinette": {
+      "file": "instrument.glb",
+      "node": "clarinette",
+      "family": "instrument",
+      "size": [0.0567, 0.66, 0.0539],
+      "grip": [0.0, 0.2742, -0.0],
+      "triangles": 772,
+      "colors": ["acier", "chocolat", "encre", "ficelle"],
+      "atlas": 512
+    }
   }
- }
 }

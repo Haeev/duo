@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "clarinette",
   "name": "Clarinette",
+  "model": "clarinette",
   "family": "supply",
   "stack": 1,
   "food": null,

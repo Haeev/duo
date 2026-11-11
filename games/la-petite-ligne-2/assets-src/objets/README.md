@@ -11,7 +11,7 @@ Sorties: `assets/commun/objets/<famille>.glb` (un nœud par objet, nommé par so
 
 ## Ajouter un objet (aucun code)
 
-1. Ouvre `gabarits.toml`, repère une entrée `[[objets]]` de la même `famille` (fruit, legume, poisson, bocal, bouteille, pain, plat, outil, sac, graine, fleur, caillou, bois, courrier, cle, piece, provision).
+1. Ouvre `gabarits.toml`, repère une entrée `[[objets]]` de la même `famille` (fruit, legume, poisson, bocal, bouteille, pain, plat, outil, sac, graine, fleur, caillou, bois, courrier, cle, piece, provision, instrument).
 2. Copie-la juste en dessous; change `id`, `forme` (liste en tête de chaque famille), `taille` (plus grande dimension, m) et `couleurs` (noms du nuancier de la bible 2.4 ou des couleurs d'Aubrune, 7.1).
 3. Lance `construire.sh`.
 4. Dans la fiche du jeu `donnees/commun/objets/<id>.json`, mets `"model": "<id du gabarit>"`. Sans ce champ, le sac et la boutique montrent une vignette générique marquée « provisoire » (test `tests/rendu/objets.test.ts`).
@@ -21,16 +21,16 @@ Preuve du 2026-11-10: les 27 objets apportés par les lots pêche et cuisine en 
 
 ## Fichiers
 
-| Fichier | Rôle |
-|---|---|
-| `gabarits.toml` | familles (bornes de taille, couleurs par défaut), triangles permis, couleurs d'Aubrune, objets |
-| `formes.py` | bibliothèque de formes en Python pur: révolution, superquadrique, tube balayé, feuille, spirale |
-| `familles.py` | un constructeur par famille, paramétré par `forme` et `couleurs` |
-| `construire_objets.py` | Blender: mise à l échelle, origine au centre du dessous, normales lisses (arêtes vives au-delà de 70 degrés), UV, atlas de la famille, export |
-| `verifier_objets.py` | contrôle sans Blender: nœud, prise, matériau `objet`, attributs, 200 à 800 triangles, taille à 12 % et dans les bornes de la famille, origine, couleurs du nuancier |
-| `planche_objets.py` | planche Cycles de tous les objets depuis les GLB livrés |
-| `meshy/` | essai Meshy du 2026-11-10 et sa fiche |
-| `planches/` | planche des objets et capture de la page de la visionneuse |
+| Fichier                | Rôle                                                                                                                                                                |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gabarits.toml`        | familles (bornes de taille, couleurs par défaut), triangles permis, couleurs d'Aubrune, objets                                                                      |
+| `formes.py`            | bibliothèque de formes en Python pur: révolution, superquadrique, tube balayé, feuille, spirale                                                                     |
+| `familles.py`          | un constructeur par famille, paramétré par `forme` et `couleurs`                                                                                                    |
+| `construire_objets.py` | Blender: mise à l échelle, origine au centre du dessous, normales lisses (arêtes vives au-delà de 70 degrés), UV, atlas de la famille, export                       |
+| `verifier_objets.py`   | contrôle sans Blender: nœud, prise, matériau `objet`, attributs, 200 à 800 triangles, taille à 12 % et dans les bornes de la famille, origine, couleurs du nuancier |
+| `planche_objets.py`    | planche Cycles de tous les objets depuis les GLB livrés                                                                                                             |
+| `meshy/`               | essai Meshy du 2026-11-10 et sa fiche                                                                                                                               |
+| `planches/`            | planche des objets et capture de la page de la visionneuse                                                                                                          |
 
 ## Conventions
 

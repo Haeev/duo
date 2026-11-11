@@ -59,13 +59,32 @@ def _lineaire(c: np.ndarray) -> np.ndarray:
 
 
 def objet(s: Atelier, nom: str):
-    """Un objet Blender depuis un atelier. Repère: Blender (x, y, z) = jeu (x, -z, y)."""
-    employes = [m for m in MATERIAUX if any(t[0] == m for t in s.tris)]
+    """Un objet Blender depuis un atelier. Repère: Blender (x, y, z) = jeu (x, -z, y).
+
+    Les parties mobiles de l'atelier (`Atelier.noeud`) deviennent des objets enfants, nommés et
+    posés à leur pivot: l'export en fait des nœuds enfants du modèle, que le jeu fait tourner."""
+    dans = set()
+    for _, debut, fin, _, _ in s.noeuds:
+        dans.update(range(debut, fin))
+    ob = _objet([t for i, t in enumerate(s.tris) if i not in dans], nom)
+    for nom_noeud, debut, fin, pivot, _ in s.noeuds:
+        enfant = _objet(s.tris[debut:fin], nom_noeud, decale=np.array(pivot))
+        if enfant.name != nom_noeud:
+            raise SystemExit(f"{nom}: nom de partie mobile « {nom_noeud} » déjà pris par un autre objet")
+        enfant.parent = ob
+        enfant.location = (pivot[0], -pivot[2], pivot[1])
+    return ob
+
+
+def _objet(tris, nom: str, decale=None):
+    employes = [m for m in MATERIAUX if any(t[0] == m for t in tris)]
     rang = {m: i for i, m in enumerate(employes)}
-    n = len(s.tris)
-    pos = np.concatenate([t[1] for t in s.tris])
-    nor = np.concatenate([t[2] for t in s.tris])
-    col = np.concatenate([t[3] for t in s.tris])
+    n = len(tris)
+    pos = np.concatenate([t[1] for t in tris])
+    if decale is not None:
+        pos = pos - decale
+    nor = np.concatenate([t[2] for t in tris])
+    col = np.concatenate([t[3] for t in tris])
     sommets = np.stack([pos[:, 0], -pos[:, 2], pos[:, 1]], axis=1)
     normales = np.stack([nor[:, 0], -nor[:, 2], nor[:, 1]], axis=1)
     # Coins identiques (même place, même normale, même teinte): un seul sommet. Le GLB s'allège
@@ -75,7 +94,7 @@ def objet(s: Atelier, nom: str):
     indices = np.asarray(indices).reshape(-1)
     me = bpy.data.meshes.new(nom)
     me.from_pydata(sommets[premiers].tolist(), [], indices.reshape(n, 3).tolist())
-    me.polygons.foreach_set("material_index", [rang[t[0]] for t in s.tris])
+    me.polygons.foreach_set("material_index", [rang[t[0]] for t in tris])
     me.polygons.foreach_set("use_smooth", [True] * n)
     attribut = me.color_attributes.new("Col", "FLOAT_COLOR", "CORNER")
     rgba = np.ones((3 * n, 4), dtype=np.float32)
@@ -95,6 +114,8 @@ def exporter(objets, chemin: str):
     bpy.ops.object.select_all(action="DESELECT")
     for ob in objets:
         ob.select_set(True)
+        for enfant in ob.children:
+            enfant.select_set(True)
     bpy.ops.export_scene.gltf(
         filepath=chemin, export_format="GLB", use_selection=True, export_extras=False, export_yup=True,
         export_apply=True, export_vertex_color="MATERIAL", export_normals=True, export_texcoords=False,
@@ -156,6 +177,9 @@ def fiche_de(m: dict) -> dict:
 
         if m.get(cle):
             fiche[cle] = m[cle]
+    # Parties mobiles: nœuds enfants du modèle dans le GLB (nom, pivot, réglages pour le jeu).
+    if s.noeuds:
+        fiche["nodes"] = {nom: {"pivot": [round(c, 4) for c in pivot], **reglages} for nom, _, _, pivot, reglages in s.noeuds}
     if "etat" in m:
         fiche["stateOf"] = {"model": m["de"], "state": m["etat"]}
     if m.get("case"):
