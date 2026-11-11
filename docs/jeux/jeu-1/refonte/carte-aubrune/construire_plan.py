@@ -1023,8 +1023,8 @@ interieur('cafe', 'cafe', 'le café de la Halte', 6, 5,
           [('cafe-cuisiniere', 'cuisiniere', 'stove', 0.5, 0.5, 0), ('cafe-plan', 'plan-de-travail', 'plan-de-travail', 2, 0.5, 0),
            ('cafe-comptoir', 'comptoir-cafe', 'comptoir', 4.5, 1.5, 0), ('cafe-table-1', 'table-a-manger', 'table-farm', 0.5, 3, 1),
            ('cafe-chaise-1', 'chaise', 'chair-farm', 1.5, 2.5, 3), ('cafe-chaise-2', 'chaise', 'chair-farm', 1.5, 3.5, 3),
-           ('cafe-table-2', 'table-a-manger', 'table-farm', 5.5, 3, 1), ('cafe-chaise-3', 'chaise', 'chair-farm', 4.5, 2.5, 1),
-           ('cafe-chaise-4', 'chaise', 'chair-farm', 4.5, 3.5, 1)],
+           ('cafe-table-2', 'table-a-manger', 'table-farm', 5.5, 4, 3), ('cafe-chaise-3', 'chaise', 'chair-farm', 4.5, 4.5, 1),
+           ('cafe-chaise-4', 'chaise', 'chair-farm', 5.5, 2.5, 0)],
           [('colette-comptoir', 4.5, 0.5, 'comptoir', 'Colette')],
           porte=(3.5, 4.5, 2), note="salle sur la rue (porte au sud, côté terrasse), comptoir et coin cuisine au nord; allée de 2 m de la porte au comptoir, passage derrière le comptoir à l'est")
 interieur('ecole', 'ecole', "l'école-mairie", 6, 5,
@@ -1089,7 +1089,7 @@ REPERES.append(dict(id='grue_eau', nom='la grue à eau', x=189, y=95.3, h=3.6, n
 #    le mur ouest, au fond, loin de la rue; la table contre le mur sud, sous la fenêtre au soleil. Ni cuisinière ni
 #    armoire: on ne cuisine ni ne range chez une voisine.
 interieur('marthe', 'marthe', 'la maison de Marthe', 5, 5, [('salle', [0, 0, 5, 5])], [],
-          [('marthe-lit', 'lit-simple', 'bed-single', 0.5, 1, 0), ('marthe-table', 'table-a-manger', 'table-farm', 1, 4.5, 0),
+          [('marthe-lit', 'lit-simple', 'bed-single', 0.5, 1, 0), ('marthe-table', 'table-a-manger', 'table-farm', 1, 4.5, 2),
            ('marthe-chaise', 'chaise', 'chair-farm', 1.5, 3.5, 0)],
           [('marthe-lit-p', 1.5, 1.5, 'lit', 'Marthe')],
           porte=(4.5, 2.5, 3), note="la maison de la sonneuse: une salle, le lit au fond contre le mur ouest, la table au midi; 1,5 m libres devant la porte, à l'est sur la rue de l'Église")

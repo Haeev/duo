@@ -63,22 +63,22 @@
       "id": "cafe-table-2",
       "type": "table-a-manger",
       "x": 5.5,
-      "y": 3,
-      "rotation": 1
+      "y": 4,
+      "rotation": 3
     },
     {
       "id": "cafe-chaise-3",
       "type": "chaise",
       "x": 4.5,
-      "y": 2.5,
+      "y": 4.5,
       "rotation": 1
     },
     {
       "id": "cafe-chaise-4",
       "type": "chaise",
-      "x": 4.5,
-      "y": 3.5,
-      "rotation": 1
+      "x": 5.5,
+      "y": 2.5,
+      "rotation": 0
     }
   ],
   "doors": {

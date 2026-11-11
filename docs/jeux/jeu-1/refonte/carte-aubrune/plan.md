@@ -737,9 +737,9 @@ Pièces: atelier (9 x 7). Meubles: basile-etabli (plan-de-travail), basile-bois 
 ```text
 C P P . * .
 . . . . C .
-T C . . C T
-T C . . C T
-. . . P . .
+T C . . . C
+T C . . . T
+. . . P C T
 ```
 
 Pièces: cuisine et comptoir (6 x 2); salle (6 x 3). Meubles: cafe-cuisiniere (cuisiniere), cafe-plan (plan-de-travail), cafe-comptoir (comptoir-cafe), cafe-table-1 (table-a-manger), cafe-chaise-1 (chaise), cafe-chaise-2 (chaise), cafe-table-2 (table-a-manger), cafe-chaise-3 (chaise), cafe-chaise-4 (chaise). Points: colette-comptoir (comptoir, Colette).
