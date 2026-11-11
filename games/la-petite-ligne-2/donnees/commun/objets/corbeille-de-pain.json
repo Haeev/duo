@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "corbeille-de-pain",
+  "name": "Corbeille à pain",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "corbeille-de-pain"
+}

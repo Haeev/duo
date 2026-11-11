@@ -29,6 +29,36 @@
       "item": "ficelle",
       "price": 100,
       "dailyStock": 6
+    },
+    {
+      "item": "tapis-rond",
+      "price": 1800,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "tapis-long",
+      "price": 1400,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "rideau-de-porte",
+      "price": 1000,
+      "dailyStock": 2,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "panier-a-linge",
+      "price": 700,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "bouquet",
+      "price": 400,
+      "dailyStock": 2,
+      "payment": "purse-or-chest"
     }
   ],
   "pieces": [

@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "pots-de-gres",
+  "name": "Pots de grès",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "pots-de-gres"
+}

@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "bocaux-de-confiture",
+  "name": "Bocaux de confiture",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "bocaux-de-confiture"
+}

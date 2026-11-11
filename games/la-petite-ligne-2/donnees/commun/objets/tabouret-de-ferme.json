@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "tabouret-de-ferme",
+  "name": "Tabouret de ferme",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "tabouret-de-ferme"
+}

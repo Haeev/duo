@@ -25,6 +25,47 @@
       "price": 800,
       "dailyStock": 1,
       "restockDays": 7
+    },
+    {
+      "item": "lampe-a-petrole",
+      "price": 1600,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "lampe-de-table",
+      "price": 1400,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "patere",
+      "price": 900,
+      "dailyStock": 2,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "boites-a-provisions",
+      "price": 800,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "seau",
+      "price": 400,
+      "dailyStock": 2,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "poele",
+      "price": 5600,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte2.train"
+      },
+      "payment": "purse-or-chest"
     }
   ],
   "buys": [

@@ -18,6 +18,12 @@
       "item": "tarte-aux-pommes",
       "price": 450,
       "dailyStock": 2
+    },
+    {
+      "item": "corbeille-de-pain",
+      "price": 400,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
     }
   ],
   "buys": [

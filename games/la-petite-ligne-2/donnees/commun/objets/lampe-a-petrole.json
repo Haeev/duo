@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "lampe-a-petrole",
+  "name": "Lampe à pétrole",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "lampe-a-petrole"
+}

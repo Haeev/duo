@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "miroir",
+  "name": "Miroir sur pied",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "miroir"
+}

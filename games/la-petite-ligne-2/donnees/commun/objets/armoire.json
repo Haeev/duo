@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "armoire",
+  "name": "Armoire",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "armoire"
+}

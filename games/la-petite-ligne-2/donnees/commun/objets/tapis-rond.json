@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "tapis-rond",
+  "name": "Tapis rond tressé",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "tapis-rond"
+}

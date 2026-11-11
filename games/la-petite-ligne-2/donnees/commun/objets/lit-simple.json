@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "lit-simple",
+  "name": "Lit simple",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "lit-simple"
+}

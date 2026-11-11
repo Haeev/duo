@@ -384,6 +384,11 @@
               "type": "give_item",
               "item": "griffes-de-muguet",
               "count": 2
+            },
+            {
+              "type": "give_item",
+              "item": "cadre-portrait",
+              "count": 1
             }
           ]
         }

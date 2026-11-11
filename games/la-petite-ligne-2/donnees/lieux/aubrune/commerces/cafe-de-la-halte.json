@@ -32,6 +32,18 @@
         "type": "remembered",
         "key": "aubrune.acte2.train"
       }
+    },
+    {
+      "item": "journal",
+      "price": 400,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
+    },
+    {
+      "item": "pile-de-livres",
+      "price": 600,
+      "dailyStock": 1,
+      "payment": "purse-or-chest"
     }
   ],
   "buys": [
