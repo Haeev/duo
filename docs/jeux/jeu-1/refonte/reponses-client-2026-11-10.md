@@ -614,3 +614,10 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - q34, Duo 0.4.0: « Ce soir avec le jeu ». Accord explicite du client pour publier l'application ce soir.
 - q35, jupe longue et robe en course: « Raccourcir l'ourlet au genou ». Contre la recommandation du manager. À produire.
 - Le client, le même après-midi: « oublie pas de toujours garder à jour le suivi c'est important » (inscrit au manuel) et « garde cette vignette c'est bien ».
+
+## Publications du 11 novembre au soir
+
+- Duo 0.4.0 publiée à 16 h 30 et marquée « Latest » (accord du client par q34: « Ce soir avec le jeu »). Vérifiée ici par les types, 129 tests, 32 tests du SDK et 27 essais Electron sur 28 (le carnet de séance dans Deux Tabliers plante ici sous charge, sans lien établi avec les changements). Le flux `publication.yml` a reçu une option « finale ». Recette du client: `docs/plateforme/recette-client-duo-0.4.0.md`.
+- La Petite Ligne (refonte) 0.22.0 publiée à 19 h 14. Avant publication: suite rapide 1 058 tests, tous les paquets du dépôt verts, copie sans documentation verte, recette entière à deux joueurs 30 sur 32. Les deux rouges (maison, décision à deux) passent seuls et échouent rejoués dans la même session, sur une étape de marche ou de visée du robot: cause non établie, à chercher. Publiée quand même parce que la 0.21.0 en ligne avait des défauts certains (cuisine impayable, carnet de l'invité vide).
+- Première fabrication échouée à 18 h 41 (numpy absent de la machine de GitHub pour le contrôle des façades, durci le matin): étape ajoutée à `jeux.yml`. Leçon: surveiller l'exécution du flux, pas seulement le catalogue.
+- Check-list de séance: `recette-client-0.22.0.md`. Attendu du client: cinq relevés F9 du PC.
