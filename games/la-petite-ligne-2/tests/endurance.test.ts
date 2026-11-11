@@ -264,6 +264,12 @@ describe('endurance', () => {
       });
       sim.revisions.players += 1;
       await turn(21, 40);
+      // Sous charge, l'instantané peut tarder: on attend l'état réel plutôt qu'un nombre de pas.
+      const wanted = JSON.stringify(sim.world.players[1].staminaMods);
+      for (let at = 40; at < 400; at += 10) {
+        if (JSON.stringify(guest.view.world()?.players[1].staminaMods) === wanted) break;
+        await turn(at + 1, at + 10);
+      }
       const seen = guest.view.world();
       if (seen === null) throw new Error('invité sans état');
       const truth = sim.world.players[1];

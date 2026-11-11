@@ -166,6 +166,7 @@ function satisfy(sim: Sim, conditions: readonly Condition[]): void {
       case 'not':
       case 'decision_is':
       case 'event_is':
+      case 'instrument_out_of_tune':
       case 'money_at_least':
       case 'place_is':
       case 'season_is':
