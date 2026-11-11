@@ -621,3 +621,21 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - La Petite Ligne (refonte) 0.22.0 publiée à 19 h 14. Avant publication: suite rapide 1 058 tests, tous les paquets du dépôt verts, copie sans documentation verte, recette entière à deux joueurs 30 sur 32. Les deux rouges (maison, décision à deux) passent seuls et échouent rejoués dans la même session, sur une étape de marche ou de visée du robot: cause non établie, à chercher. Publiée quand même parce que la 0.21.0 en ligne avait des défauts certains (cuisine impayable, carnet de l'invité vide).
 - Première fabrication échouée à 18 h 41 (numpy absent de la machine de GitHub pour le contrôle des façades, durci le matin): étape ajoutée à `jeux.yml`. Leçon: surveiller l'exécution du flux, pas seulement le catalogue.
 - Check-list de séance: `recette-client-0.22.0.md`. Attendu du client: cinq relevés F9 du PC.
+
+## Défauts trouvés par le client en séance, le 11 novembre au soir (0.22.0)
+
+Studio à l'arrêt à la demande du client depuis 20 h 49 (« ne fait plus rien, explique moi juste »): chaque défaut est vérifié en lecture seule, classé, noté au suivi, sans correction lancée. Question q36 posée: corriger et publier une 0.22.1 ce soir, demain matin, ou pas encore.
+
+Urgence 1, l'histoire s'arrête:
+
+- **Ronces de la maison (bloquant)**: l'étape `debroussailler` de `le-train-de-5h12.json` dit « Arrache les ronces » mais attend deux `mures` dans le sac; la ressource `ronces` ne donne des mûres qu'en été et en automne, la partie commence au printemps (14 jours par saison), aucun commerce n'en vend. Du jour 1 au jour 14 l'étape est infranchissable, et `toit` et `graines` avec elle. `tests/acte-1-aubrune.test.ts` ne le voit pas: il donne les mûres par `giveItem`. À faire: un vrai arrachage (brique en données, les ronces disparaissent), sans saison; relire toutes les étapes que les tests franchissent en offrant l'objet.
+- **« Dors à la pension »**: l'objectif dit « à côté de l'épicerie » et le repère pointe `pl-o`; les lits sont à l'étage de l'épicerie, par l'escalier au fond de la cuisine. Texte et repère à corriger, tous les objectifs qui désignent un lieu à relire.
+- **Outils de Basile**: sac plein, la hache et la bêche tombent au sol et le dialogue (`once: player`) ne revient pas. Un objet d'histoire ne doit jamais tomber au sol: Basile les garde et les redonne.
+- Leçon: les tests prouvent les règles, pas la partie. Il faut un parcours de l'histoire principale joué par un robot qui fait les gestes, sans objet offert.
+
+Urgence 2, le jeu n'est pas au niveau:
+
+- **Animations**: `body.glb` n'a que cinq clips (`run`, `walk`, `idle`, `sit`, `carry`); les données demandent `pickup`, `dig`, `wash`, `shake`, `pick-low`, `chop`, `reach-up`, `reach` (31 usages), jamais animés. Aucun outil dessiné en main. Le cahier promet « chaque geste a un son, un mouvement, une particule ».
+- **Mode déco**: plan 2D de rectangles nommés, jugé « affreux » sur capture (libellés qui se chevauchent, portes et ardoise dessinées comme des meubles). À refaire: la vraie pièce vue du dessus, meubles saisis à la souris (cahier, mode déco).
+- **Assises**: le personnage s'assoit à côté du tabouret (aucune position ni hauteur d'assise déclarée par meuble).
+- **Hygiène**: plafonnée à 60 à Aubrune (pompes seulement; ni baquet posé dans la maison ni salle d'eau).
