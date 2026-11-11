@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-savon",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.rosalie-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.rosalie-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Tiens, tu sens le propre ! L'autre fois, j'ai cru que la fumée venait de chez vous. Et je m'y connais, en fumée.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

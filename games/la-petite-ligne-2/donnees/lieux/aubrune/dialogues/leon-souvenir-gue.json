@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-gue",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.decor.gue-refait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Le gué, je l'ai traversé le premier. Enfin, après papa. Enfin, après la charrette. Mais le premier à cloche-pied.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

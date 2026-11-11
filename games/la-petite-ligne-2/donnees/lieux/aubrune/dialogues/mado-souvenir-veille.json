@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-veille",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.mado-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.mado-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Tu ne dors pas ? Moi, je dors d'un œil: le foyer couve. S'il s'éteint, demain je perds une heure. Et je déteste perdre une heure.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ta moitié est venue l'autre nuit. On a regardé les braises sans rien dire. Ça me plaît, les gens qui savent se taire devant un feu.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

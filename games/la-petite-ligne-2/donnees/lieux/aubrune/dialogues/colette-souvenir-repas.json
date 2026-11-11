@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-repas",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.repas.dos-a-dos"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Le pot-au-feu des deux ânes, dos à dos... Ils ont saucé leurs assiettes. On ne sauce pas quand on est fâché. Je sais lire une assiette.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-ami",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "armand",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Tu sais, avec toi, je ne compte plus mes mots avant de les dire. Hier, j'ai même fini une phrase sans « enfin ». Enfin, presque.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-savon",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.paulin-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.paulin-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Tiens. Tu sens le savon. Mes bêtes ont arrêté de te regarder de travers. Elles ont du nez. Moi aussi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

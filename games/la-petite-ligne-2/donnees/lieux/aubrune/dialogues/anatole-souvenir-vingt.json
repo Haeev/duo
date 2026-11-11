@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-vingt",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.registre-plein",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Vingt âmes au registre. La Compagnie exige vingt âmes pour un arrêt. Vous les avez. Je ne ralentis plus en cachette: je m'arrête.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

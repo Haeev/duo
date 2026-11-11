@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-registre",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.registre-plein",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "« Meunière », avec un grand M, dans ton registre. Je suis allée vérifier. Il y est. Firmin écrit droit, je lui accorde ça.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-savon",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.solange-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.solange-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ah ! Voilà une entrée qui sent bon. L'autre fois, j'ai dit la vérité la première. Quelqu'un devait le faire. C'est toujours moi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

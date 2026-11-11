@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-fanfare",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.fondee"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "La fanfare sur le quai ! Paulin a battu la mesure du pied. Il jure que c'était une crampe. Une crampe à trois temps.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

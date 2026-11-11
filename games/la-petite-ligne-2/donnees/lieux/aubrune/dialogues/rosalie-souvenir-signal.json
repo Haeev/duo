@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-signal",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.fini"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.halte.signal"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Votre signal penche toujours. Ne le redressez pas: c'est à ça que je reconnais Aubrune de loin.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

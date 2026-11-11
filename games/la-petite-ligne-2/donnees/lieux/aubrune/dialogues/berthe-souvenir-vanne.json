@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-vanne",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.decor.moulin-tourne"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "La vanne, c'est toi. Trente ans de silence, et un tour de volant. Ma meule a mis une heure à se dérouiller. Moi, une minute.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

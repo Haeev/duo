@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-veille",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.barnabe-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.barnabe-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Chut. Mado dort. Elle dort comme elle forge: fort. Moi, la nuit, j'écoute le bois de la charpente. Il raconte sa journée.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Ta moitié est passée l'autre nuit, sur la pointe des pieds. Chez vous, on est poli jusque dans le noir.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

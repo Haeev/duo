@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-pluie",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.achille-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.achille-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Il pleut... La pâte lève mieux, les gens marchent plus vite, et moi je reste pareil. Viens près du four: tu fumes comme une miche.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Ta moitié a séché ici, ce matin. Ou hier. On sentait le pain chaud en repartant. C'est le plus beau parfum que je connaisse.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

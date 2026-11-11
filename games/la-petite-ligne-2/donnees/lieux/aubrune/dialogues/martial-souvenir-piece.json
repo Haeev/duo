@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-piece",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.etage",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Un étage chez les gardes ! Je bénis les maisons finies. Les pas finies aussi, remarque: ce sont elles qui en ont besoin.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

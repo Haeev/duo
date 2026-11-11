@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-adore",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.berthe.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.berthe.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Du pain ! Avec ma farine dedans: je la reconnais. C'est comme revoir un enfant qui a réussi. Je le mange quand même.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

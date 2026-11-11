@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-adore",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.firmin.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.firmin.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Une vieille pièce. C'est avec ça qu'on payait le billet pour Hautefonte: quarante centimes, aller simple. J'ai encore la grille des tarifs.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

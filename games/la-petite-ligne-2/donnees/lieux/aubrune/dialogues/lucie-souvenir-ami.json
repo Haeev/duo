@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-ami",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "lucie",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Je ne m'assois jamais, tu sais. Mais pour toi, je ralentis. Regarde: là, je ralentis. C'est énorme.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

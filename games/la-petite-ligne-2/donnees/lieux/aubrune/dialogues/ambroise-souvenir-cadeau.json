@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-cadeau",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.ambroise.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.ambroise.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.ambroise-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.ambroise-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Qu'est-ce que c'est ? Un cadeau. Je n'en veux pas. Pose-le sur l'établi. Pas là. Là. Bon. Merci. N'en parlons plus.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Ta moitié, et maintenant toi. Je vais devoir ranger. J'ai horreur de ranger. Je le ferai avec soin.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

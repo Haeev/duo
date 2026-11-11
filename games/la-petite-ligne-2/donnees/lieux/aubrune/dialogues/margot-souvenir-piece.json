@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-piece",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.cuisine",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Une cuisine chez vous ! Je te garde les légumes moches: ce sont les meilleurs en soupe. Ne le dis pas aux beaux.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -60,7 +60,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b1": {
       "kind": "line",
@@ -79,7 +79,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b2": {
       "kind": "line",
@@ -98,7 +98,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b3": {
       "kind": "line",
@@ -117,6 +117,134 @@
           "by": "duo"
         }
       ],
+      "next": "moment"
+    },
+    "moment": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.leon",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.leon",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.leon",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.leon",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
+              "type": "not",
+              "condition": {
+                "type": "remembered",
+                "key": "aubrune.verrou.v3"
+              }
+            }
+          ],
+          "next": "gue"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 420,
+              "to": 840
+            }
+          ],
+          "next": "foin"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 840,
+              "to": 1140
+            }
+          ],
+          "next": "place"
+        }
+      ],
+      "otherwise": "lit"
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "La pluie ? Même pas mouillé. Enfin, un peu. Enfin, maman dit que je dois changer de chaussettes.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Dans la brume, j'ai vu un cerf. Enfin, une forme. Enfin, c'était la brouette. Mais elle avait l'air d'un cerf.",
+      "emote": null,
+      "next": null
+    },
+    "gue": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "On attend que le gué soit refait. Moi, je l'aurais traversé à la nage. Enfin, à pied. Enfin, s'il y avait le gué.",
+      "emote": null,
+      "next": null
+    },
+    "foin": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Le matin, je saute dans le foin de la grange. C'est du travail: il faut le tasser. Enfin, c'est ce que je dis à papa.",
+      "emote": null,
+      "next": null
+    },
+    "place": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "L'après-midi, je viens sur la place. Jeanne connaît tous les coins. Moi aussi. Enfin, elle me les a montrés.",
+      "emote": null,
+      "next": null
+    },
+    "lit": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Je dors pas, je me repose les yeux. À la ferme, on se couche avec les poules. Enfin, pas avec. En même temps.",
+      "emote": null,
       "next": null
     }
   }

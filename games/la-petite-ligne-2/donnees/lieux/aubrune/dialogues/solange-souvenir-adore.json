@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-adore",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.solange.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.solange.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Un coquelicot ! À la boutonnière, tout de suite. Rouge sur gris: j'ai l'air d'avoir un secret. J'en ai douze.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

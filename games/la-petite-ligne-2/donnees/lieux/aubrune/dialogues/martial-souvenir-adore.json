@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-adore",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.martial.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.martial.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Oh ! C'est encore tiède. Je mange debout, à côté du vélo, comme au ravitaillement d'une course. Je n'en ai jamais couru. J'en rêve beaucoup.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

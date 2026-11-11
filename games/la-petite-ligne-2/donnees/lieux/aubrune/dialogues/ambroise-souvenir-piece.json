@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-piece",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.chambre",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Une chambre. Il vous faut un réveil. J'en ai un, réglé. Il sonne doucement. Je déteste les réveils qui crient.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

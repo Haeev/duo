@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-jaloux",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.colette.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.colette.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "colette",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ta moitié a son rond de serviette chez moi. Toi, pas encore. Ce n'est pas un reproche. Si, un peu.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

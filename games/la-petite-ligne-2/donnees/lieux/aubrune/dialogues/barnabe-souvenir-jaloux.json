@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-jaloux",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.barnabe.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.barnabe.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "barnabe",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Ta moitié connaît déjà le refrain. Toi, tu en es au premier couplet. Monte me voir à la coupe: ça s'apprend en fendant.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

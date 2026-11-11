@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-pluie",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.martial-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.martial-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Tu sors par ce temps ? Moi aussi, mais j'ai une excuse: six clochers. Toi, tu n'as que du courage. C'est mieux.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Ta moitié m'a croisé sous l'averse. On s'est salués comme deux coureurs dans un col. Tu complètes le peloton.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

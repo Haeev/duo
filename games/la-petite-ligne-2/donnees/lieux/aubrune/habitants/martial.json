@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "id": "martial",
+  "name": "Martial Roques",
+  "temper": "chatty",
+  "look": {
+    "shape": "adult-m-medium",
+    "skin": 2,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [9, 0]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-short",
+        "colors": [9]
+      },
+      {
+        "slot": "top",
+        "id": "top-sweater",
+        "colors": [23]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [22]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-pebble",
+        "colors": [1, 0]
+      }
+    ]
+  },
+  "stands": "pv-o",
+  "voice": "medium",
+  "life": {
+    "home": "pv-o",
+    "schedule": [
+      {
+        "from": 570,
+        "to": 880,
+        "days": ["sat"],
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fanfare.fondee"
+          }
+        ],
+        "at": {
+          "point": "quai-o"
+        },
+        "activity": "attendre-le-train-en-fanfare",
+        "gesture": null
+      },
+      {
+        "from": 540,
+        "to": 690,
+        "days": ["sun"],
+        "at": {
+          "point": "pv-o"
+        },
+        "activity": "accueillir-pour-la-messe",
+        "gesture": null
+      },
+      {
+        "from": 390,
+        "to": 420,
+        "at": {
+          "point": "pv"
+        },
+        "activity": "ouvrir-l-eglise",
+        "gesture": null
+      },
+      {
+        "from": 420,
+        "to": 540,
+        "at": {
+          "point": "ci"
+        },
+        "activity": "arroser-le-cimetiere",
+        "gesture": null
+      },
+      {
+        "from": 540,
+        "to": 720,
+        "at": {
+          "point": "gr9"
+        },
+        "activity": "tournee-a-velo",
+        "gesture": null
+      },
+      {
+        "from": 720,
+        "to": 810,
+        "at": {
+          "point": "gr6"
+        },
+        "activity": "dejeuner-au-cafe",
+        "gesture": null
+      },
+      {
+        "from": 810,
+        "to": 990,
+        "at": {
+          "point": "croix"
+        },
+        "activity": "mediter-a-la-croix",
+        "gesture": null
+      },
+      {
+        "from": 990,
+        "to": 1140,
+        "at": {
+          "point": "pl"
+        },
+        "activity": "saluer-sur-la-place",
+        "gesture": null
+      },
+      {
+        "from": 1140,
+        "to": 1230,
+        "at": {
+          "point": "pv"
+        },
+        "activity": "fermer-l-eglise",
+        "gesture": null
+      },
+      {
+        "from": 1230,
+        "to": 390,
+        "at": {
+          "point": "pv-o"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "joy"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["pomme-cuite", "omelette"],
+      "liked": ["pain", "pomme", "coquelicot"],
+      "disliked": ["tanche"]
+    },
+    "arrives": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte3.fini"
+      }
+    ],
+    "leaves": null
+  }
+}

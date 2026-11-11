@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-pose",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.developpement",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "La photo de 5 h 12, je l'ai tirée en trois exemplaires. Un pour Firmin, un pour moi, un que je regarde quand personne ne me voit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

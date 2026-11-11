@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-veillee",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.decor.veillee"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Les lampions du quai. Depuis la Veillée, je les vois de la courbe. Avant, j'arrivais dans le noir. On s'y habitue. Pas tant que ça.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

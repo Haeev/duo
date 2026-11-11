@@ -60,7 +60,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b1": {
       "kind": "line",
@@ -79,7 +79,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b2": {
       "kind": "line",
@@ -98,7 +98,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b3": {
       "kind": "line",
@@ -117,6 +117,134 @@
           "by": "duo"
         }
       ],
+      "next": "moment"
+    },
+    "moment": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.paulin",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.paulin",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.paulin",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.paulin",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
+              "type": "not",
+              "condition": {
+                "type": "remembered",
+                "key": "aubrune.verrou.v3"
+              }
+            }
+          ],
+          "next": "gue"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 420,
+              "to": 780
+            }
+          ],
+          "next": "matin"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 780,
+              "to": 1200
+            }
+          ],
+          "next": "apres-midi"
+        }
+      ],
+      "otherwise": "nuit"
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Pluie. Bon pour les poireaux. Mauvais pour le foin. Je ne suis jamais content en entier. C'est un métier.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Brume. On ne voit pas le bout du rang. Je sais où il est. Enfin. Je sais où il devrait être.",
+      "emote": null,
+      "next": null
+    },
+    "gue": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Je ne bouge pas d'ici tant que le gué n'est pas refait. Non. Même pour manger. Margot m'apporte la soupe. C'est différent.",
+      "emote": null,
+      "next": null
+    },
+    "matin": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Le matin, je suis aux champs. Je bine. Un rang, puis l'autre. Ne me demande pas si ça avance: ça pousse, c'est tout.",
+      "emote": null,
+      "next": null
+    },
+    "apres-midi": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "L'après-midi, je regarde lever ce que j'ai semé. Il ne se passe rien. C'est exactement ce qu'il faut.",
+      "emote": null,
+      "next": null
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "La journée est finie. Je ne parle pas après la soupe. Enfin, si. Mais moins.",
+      "emote": null,
       "next": null
     }
   }

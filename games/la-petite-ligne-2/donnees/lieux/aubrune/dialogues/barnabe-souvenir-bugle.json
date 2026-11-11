@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-bugle",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.fondee"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "J'ai soufflé dans le bugle de papa devant tout le monde. Il a fait un canard. Un seul. Papa en faisait trois: je progresse.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-jaloux",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.marthe.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.marthe.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "marthe",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ta moitié sait où je range la clé du clocher. Toi, non. Ce n'est pas un secret. C'est une confiance. Ça vient par l'usage.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

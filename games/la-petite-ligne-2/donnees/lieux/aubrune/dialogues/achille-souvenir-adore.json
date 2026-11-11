@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-adore",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.achille.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.achille.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Un œuf. Encore tiède, ou c'est ma main. Avec un œuf, je dore douze brioches. Tu viens d'offrir douze sourires. Presque treize.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

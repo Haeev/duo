@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-veille",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.leon-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.leon-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Je dors pas ! Je garde la ferme. J'ai entendu un bruit, j'ai même pas eu peur. Enfin, c'était toi. Ouf.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Encore un bruit ! L'autre nuit, c'était ta moitié. J'ai failli sortir avec un bâton. Enfin, j'ai regardé le bâton.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-adore",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.colette.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.colette.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Une truite ! Fraîche, l'œil clair. Je la fais ce soir, au beurre, sans rien. Quand c'est bon, on se tait et on mange.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "anatole-hygiene",
+  "villager": "anatole",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Article 22: « le voyageur ne doit pas se sentir de loin ». La place a une pompe. Je patiente. Brièvement.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

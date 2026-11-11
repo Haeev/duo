@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-piece",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.chambre",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "La chambre du garde est refaite. C'était celle de mon... du garde d'avant. La fenêtre donne sur la barrière. C'est fait exprès.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

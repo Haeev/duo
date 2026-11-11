@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-ami",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "martial",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Tiens-moi le vélo. ... Voilà. Tu ne mesures pas: je ne le confie à personne. Même l'évêque a dû le regarder de loin.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

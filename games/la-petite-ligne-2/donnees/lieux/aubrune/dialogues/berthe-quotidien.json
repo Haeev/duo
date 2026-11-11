@@ -60,7 +60,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b1": {
       "kind": "line",
@@ -79,7 +79,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b2": {
       "kind": "line",
@@ -98,7 +98,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b3": {
       "kind": "line",
@@ -117,6 +117,132 @@
           "by": "duo"
         }
       ],
+      "next": "moment"
+    },
+    "moment": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.berthe",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.berthe",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.berthe",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.berthe",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 420,
+              "to": 720
+            }
+          ],
+          "next": "matin"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 720,
+              "to": 1080
+            }
+          ],
+          "next": "apres-midi"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1080,
+              "to": 1260
+            }
+          ],
+          "next": "soir"
+        }
+      ],
+      "otherwise": "nuit"
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Il pleut, le bief est plein, la roue galope. Ma meule est de bonne humeur. Profites-en, ça ne dure pas.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Brume sur le bief. On n'y voit rien. La roue tourne quand même: elle n'a jamais eu besoin de voir où elle va.",
+      "emote": null,
+      "next": null
+    },
+    "matin": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Le matin, je mouds. La cour est blanche à huit heures. À neuf, moi aussi. C'est l'uniforme.",
+      "emote": null,
+      "next": null
+    },
+    "apres-midi": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "L'après-midi, j'ensache. Un sac se pèse deux fois: une pour le client, une pour ma meule, qui vérifie.",
+      "emote": null,
+      "next": null
+    },
+    "soir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Le soir, je ferme la vanne à moitié. La roue ralentit, la meule bâille. Ne ris pas: une pierre de deux tonnes, ça bâille.",
+      "emote": null,
+      "next": null
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Je dors au grenier, au-dessus de la meule. Si elle s'arrête, je me réveille. C'est le silence qui fait du bruit.",
+      "emote": null,
       "next": null
     }
   }

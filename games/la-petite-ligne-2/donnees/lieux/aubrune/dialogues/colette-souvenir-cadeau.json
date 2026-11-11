@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-cadeau",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.colette.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.colette.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.colette-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.colette-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Un cadeau à la patronne ? Franchement: ça me fait plaisir. Et franchement: ça ne te paie pas un café. Presque.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ta moitié m'a gâtée, et toi maintenant. Dites-le tout de suite, si vous voulez une table à vie. C'est oui.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

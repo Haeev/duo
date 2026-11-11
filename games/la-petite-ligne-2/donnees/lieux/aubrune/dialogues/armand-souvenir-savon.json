@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-savon",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.armand-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.armand-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Ah. Tu sens le savon. J'ai fait une leçon sur l'hygiène, l'autre jour. Je n'ai cité personne. J'ai regardé le plafond.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

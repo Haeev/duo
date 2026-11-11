@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-pluie",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.honorine-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.honorine-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Tu viens me voir sous la pluie ? En 1932, il a plu des grenouilles. Si, si. Aujourd'hui, il pleut de la visite. Je préfère.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié est venue sous la pluie avant toi. Je lui ai dit que tu ne viendrais pas. J'ai menti. J'adore avoir tort.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

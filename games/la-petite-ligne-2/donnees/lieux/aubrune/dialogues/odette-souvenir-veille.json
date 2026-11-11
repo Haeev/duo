@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-veille",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.odette-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.odette-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "À cette heure-ci ? Dis-moi juste une chose avant que je dorme: tu as vu de la lumière chez qui ? Bon. Bonne nuit.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ta moitié aussi fait des rondes de nuit. Vous surveillez le bourg, ou vous n'avez pas sommeil ? Les deux m'intéressent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

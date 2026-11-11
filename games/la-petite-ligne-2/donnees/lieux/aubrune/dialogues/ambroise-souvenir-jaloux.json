@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-jaloux",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.ambroise.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.ambroise.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "ambroise",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Ta moitié sait remonter la comtoise. Toi, pas encore. Ce n'est pas une préférence. C'est une question d'assiduité.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

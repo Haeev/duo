@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-jaloux",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.berthe.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.berthe.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "berthe",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Ta moitié, ma meule la reconnaît au pas. Toi, elle hésite encore. Viens plus souvent: une pierre, ça apprend lentement.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-soupe",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Honorine voulait « de quoi réconcilier deux têtes de mule ». Ça a marché. J'en garde un cageot pour la maison, on ne sait jamais.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

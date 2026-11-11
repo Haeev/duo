@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-adore",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.marthe.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.marthe.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "De la soupe aux herbes. Chaude. Salée juste. Ma mère la faisait pareil. Je ne dis pas ça souvent. Je le dis une fois.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-piece",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.etage",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Un étage ! De là-haut, tu verras chez moi. Je te ferai signe à huit heures. Si je ne fais pas signe, c'est que je te fais marcher.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

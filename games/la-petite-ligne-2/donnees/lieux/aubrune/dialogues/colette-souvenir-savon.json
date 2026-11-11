@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-savon",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.colette-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.colette-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Tu sens bon, dis donc. L'autre fois, j'ai failli servir quelqu'un de chez vous en terrasse. Sous la pluie. Franchement.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-veille",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.margot-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.margot-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "À cette heure ? Tout dort, mon chou, même le coq, et lui se lève à quatre heures. Rentre, ou je te borde dans le foin.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Vous faites des rondes ? Ta moitié est passée l'autre soir. Mes poules vont finir par vous prendre pour le renard.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

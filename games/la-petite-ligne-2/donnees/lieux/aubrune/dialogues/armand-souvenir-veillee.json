@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-veillee",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "La nuit de l'autorail, j'ai tout noté pour les archives de l'école. Puis j'ai relu: on dirait une rédaction de Jeanne. J'ai mis dix sur dix.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

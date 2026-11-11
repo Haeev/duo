@@ -183,6 +183,64 @@
         {
           "when": [
             {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.armand",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.armand",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.armand",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.armand",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.armand",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.armand",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
               "type": "time_is",
               "from": 360,
               "to": 720
@@ -238,6 +296,20 @@
       "kind": "line",
       "speaker": "armand",
       "text": "La nuit, je corrige. Jeanne a écrit: « 5 h 12 est un nombre premier. » C'est faux, mais c'est joliment dit.",
+      "emote": null,
+      "next": null
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Jour de pluie: leçon en classe. Je préfère. Dehors, les phrases s'envolent. Dedans, elles restent au tableau.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "La brume, c'est de l'eau qui n'ose pas tomber. Je... je la comprends assez bien.",
       "emote": null,
       "next": null
     }

@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-veille",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.achille-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.achille-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Tu es debout ? Moi aussi, mais c'est mon heure: je pétris à trois heures. La nuit, la farine écoute mieux.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Ta moitié est passée l'autre nuit. On a regardé le four sans parler. C'est ma définition d'une bonne soirée.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

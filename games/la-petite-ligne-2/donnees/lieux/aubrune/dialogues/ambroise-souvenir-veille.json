@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-veille",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.ambroise-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.ambroise-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "À cette heure ? Les honnêtes gens dorment. Moi, j'écoute. ... Puisque tu es là: tu entends celle du fond ? Elle hésite. Comme moi.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Ta moitié est passée l'autre nuit. Nous avons écouté onze minutes sans parler. C'est la visite la plus agréable de l'année.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

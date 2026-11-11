@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-savon",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.honorine-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.honorine-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Tu embaumes ! L'autre jour, j'ai dit à mes géraniums de retenir leur souffle. Ils ont tenu. Ce sont de braves plantes.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

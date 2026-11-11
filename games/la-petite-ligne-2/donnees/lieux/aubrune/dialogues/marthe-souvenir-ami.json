@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-ami",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "marthe",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Tiens la corde. Non, plus bas. Tire. ... Un coup. Net. Personne n'avait sonné ma cloche à ma place depuis 1975. Ne recommence pas.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

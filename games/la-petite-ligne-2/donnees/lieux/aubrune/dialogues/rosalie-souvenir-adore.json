@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-adore",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.rosalie.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.rosalie.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Du pain d'Aubrune ! Au dépôt, on a du pain de gare: il fait le même bruit que le ballast. Celui-là, je le cache à Georgette.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

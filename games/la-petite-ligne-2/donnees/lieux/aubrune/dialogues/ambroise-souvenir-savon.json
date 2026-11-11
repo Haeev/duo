@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-savon",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.ambroise-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.ambroise-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Bien. Aujourd'hui, on peut respirer. L'autre jour, j'ai arrêté trois pendules pour qu'elles ne voient pas ça.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

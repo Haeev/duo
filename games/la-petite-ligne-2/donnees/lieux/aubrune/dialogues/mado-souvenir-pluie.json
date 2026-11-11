@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-pluie",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.mado-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.mado-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Tu fumes ! Viens près du foyer: tu vas sécher en deux minutes. Trois si tu arrêtes de gigoter.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ta moitié a séché là tout à l'heure. J'ai une forge, pas une buanderie ! ... Allez, approche.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

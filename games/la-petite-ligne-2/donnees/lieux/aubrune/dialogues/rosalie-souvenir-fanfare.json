@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-fanfare",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.fondee"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Une fanfare pour mon arrivée ! Georgette a sifflé faux exprès, pour s'accorder. Elle a de l'oreille, cette machine.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

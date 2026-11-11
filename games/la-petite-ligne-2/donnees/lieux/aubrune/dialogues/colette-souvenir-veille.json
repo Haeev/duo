@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-veille",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.colette-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.colette-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Je ferme, là. Mais tu as une tête à vouloir une soupe. Reviens demain: la nuit, mes fourneaux boudent.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ta moitié aussi traîne tard. Chez vous, on ne dort jamais ? Dites à votre lit que je compatis.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

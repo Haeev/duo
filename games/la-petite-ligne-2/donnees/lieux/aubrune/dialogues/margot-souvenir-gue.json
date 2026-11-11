@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-gue",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.decor.gue-refait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Le gué refait, j'ai enfin vu la ferme. Paulin a fait le tour des champs sans un mot. Chez lui, c'est une ovation.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

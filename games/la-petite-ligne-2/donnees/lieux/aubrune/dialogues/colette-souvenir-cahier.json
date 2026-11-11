@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-cahier",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Le cahier de ma mère, c'est toi qui l'as, maintenant. Si la tarte brûle, ne me dis rien. Si elle est réussie, apporte-m'en une part.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

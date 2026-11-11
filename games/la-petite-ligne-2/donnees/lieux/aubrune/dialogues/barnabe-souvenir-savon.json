@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-savon",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.barnabe-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.barnabe-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Ah, tu sens la lavande. L'autre jour, j'ai cru qu'un blaireau était passé à la forge. Je ne l'ai dit à personne. Sauf à Mado.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

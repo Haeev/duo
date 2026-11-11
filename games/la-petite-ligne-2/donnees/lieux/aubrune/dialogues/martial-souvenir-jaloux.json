@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-jaloux",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.martial.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.martial.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "martial",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Ta moitié connaît déjà mon raccourci par le cimetière. Toi, tu prends encore la grande côte. Viens, je te montrerai. Ça descend.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

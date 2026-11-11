@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-registre",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.registre-plein",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "J'ai signé ton registre. Ne t'y habitue pas: c'est ma troisième signature en vingt ans. Les deux autres, c'était pour Margot.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

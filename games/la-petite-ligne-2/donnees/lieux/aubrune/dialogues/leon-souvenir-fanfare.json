@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-fanfare",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.fondee"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "À la fanfare, j'aurais pu jouer du bugle. Enfin, tenir le bugle. Enfin, on m'a donné les programmes à distribuer.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

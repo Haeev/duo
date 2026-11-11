@@ -5,12 +5,209 @@
   "priority": 0,
   "when": [],
   "once": null,
-  "start": "n1",
+  "start": "tour",
   "nodes": {
-    "n1": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.anatole",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.anatole",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.anatole",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
       "kind": "line",
       "speaker": "anatole",
       "text": "Pas de conversation avec le personnel pendant l'arrêt. Article 9. ... Jolie lanterne, cela dit.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.anatole",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "moment"
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Billet, s'il te plaît. ... Non, rien. L'habitude. Sur ce quai, il n'y a rien à contrôler. Je contrôle donc le quai.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.anatole",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "moment"
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Article 12: polyvalence. Je fais le contrôle et le chariot. La conversation n'y figure pas. Je la fais en supplément.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.anatole",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": "moment"
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "5 h 12. À l'heure. Je le dis chaque nuit à voix haute, en descendant. Cette fois, quelqu'un l'entend.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.anatole",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "moment"
+    },
+    "moment": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.anatole",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.anatole",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.anatole",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.anatole",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 335,
+              "to": 346
+            }
+          ],
+          "next": "portieres"
+        }
+      ],
+      "otherwise": "arret"
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Il pleut sur le quai. Le règlement ne prévoit pas d'abri pour le personnel. Seulement pour les colis. Je l'ai relu.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Brume. L'autorail y entre comme dans du lait. C'est sa couleur. On ne nous voit pas arriver. Cela convient.",
+      "emote": null,
+      "next": null
+    },
+    "portieres": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Il reste moins de dix minutes. C'est le moment où je vérifie les portières. Elles sont fermées. Je vérifie quand même.",
+      "emote": null,
+      "next": null
+    },
+    "arret": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "L'autorail repart à 5 h 45. D'ici là, je fais les cent pas. Soixante-six, exactement: le quai est court.",
       "emote": null,
       "next": null
     }

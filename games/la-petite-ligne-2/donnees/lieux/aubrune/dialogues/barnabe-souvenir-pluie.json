@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-pluie",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.barnabe-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.barnabe-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Il pleut. Je ne coupe pas sous la pluie: le manche glisse, et les arbres ont l'air de pleurer. Ça me coupe la chanson.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Ta moitié est passée sous la pluie. Je lui ai tenu ma veste au-dessus de la tête. Elle fait un bon toit, ma veste.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

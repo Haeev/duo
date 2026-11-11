@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-savon",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.jeanne-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.jeanne-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Tu sens le savon ! J'avais parié que t'irais pas à la pompe. Solange a gagné. Elle gagne tout le temps, c'est louche.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

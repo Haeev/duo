@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-piece",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.chambre",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Une chambre neuve ! Il vous faut une boîte aux lettres à la hauteur. Écris-moi de là-bas: je te répondrai en personne.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

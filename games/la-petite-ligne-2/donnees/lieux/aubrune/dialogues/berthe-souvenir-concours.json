@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-concours",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Une soupe à quatre mains sur la place. Il n'y manquait que du pain pour tremper. J'en ai porté. Personne n'avait demandé. Tout a disparu.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

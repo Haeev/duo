@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-veille",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.basile-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.basile-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Tard. Pipe finie. Étoiles pas finies. Regarde avec moi. Chut.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Ta moitié l'autre nuit. Toi ce soir. Même seuil. Même silence. Bien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

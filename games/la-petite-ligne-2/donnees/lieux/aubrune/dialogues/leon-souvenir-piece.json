@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-piece",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.etage",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Vous avez un étage ? Moi, j'ai déjà sauté d'un étage. Enfin, d'une marche. Mais c'était la marche du haut.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-veille",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.martial-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.martial-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Qui va là ? Ah. À cette heure, je ne confesse pas: je me bats avec une chambre à air. Tiens la lampe. Non, ne regarde pas. Tiens la lampe.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Ta moitié a tenu la lampe l'autre nuit. Toi ce soir. À ce rythme, toute votre maison saura que je perds contre un pneu.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

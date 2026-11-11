@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "martial-hygiene",
+  "villager": "martial",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Oh là. Je roule au grand air, d'habitude, et là, il m'en faudrait davantage. La pompe est sur la place. Va: je te bénis de loin.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

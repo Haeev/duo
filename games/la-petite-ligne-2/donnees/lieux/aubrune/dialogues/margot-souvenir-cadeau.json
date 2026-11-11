@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-cadeau",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.margot.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.margot.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.margot-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.margot-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Oh, pour moi ? Tu es un amour. Paulin dira que ça ne sert à rien. Ça veut dire qu'il est jaloux. Je traduis.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ta moitié, puis toi ! Paulin a compté: « ça fait deux ». Dans sa bouche, c'est un discours de remerciement.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

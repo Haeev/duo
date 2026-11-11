@@ -60,7 +60,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b1": {
       "kind": "line",
@@ -79,7 +79,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b2": {
       "kind": "line",
@@ -98,7 +98,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b3": {
       "kind": "line",
@@ -117,6 +117,136 @@
           "by": "duo"
         }
       ],
+      "next": "moment"
+    },
+    "moment": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.barnabe",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.barnabe",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.barnabe",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.barnabe",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.fantome.apprenti"
+            },
+            {
+              "type": "time_is",
+              "from": 300,
+              "to": 480
+            }
+          ],
+          "next": "fournil"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 480,
+              "to": 1080
+            }
+          ],
+          "next": "coupe"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1080,
+              "to": 1320
+            }
+          ],
+          "next": "soir"
+        }
+      ],
+      "otherwise": "nuit"
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Il pleut. Les arbres boivent, je les laisse tranquilles. On ne dérange pas quelqu'un qui boit.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "La brume dans les bois, c'est comme chanter dans une église: tout résonne doux. J'en profite.",
+      "emote": null,
+      "next": null
+    },
+    "fournil": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Cinq heures, le fournil. Je pétris, Achille rêve debout. La pâte, c'est comme le bois vert: il ne faut pas la brusquer.",
+      "emote": null,
+      "next": null
+    },
+    "coupe": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Le jour, je suis à la coupe. Je chante un couplet par arbre. Les gros ont droit au refrain.",
+      "emote": null,
+      "next": null
+    },
+    "soir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Le soir, je rentre à la forge. Mado tape encore. Je m'assois, j'écoute. Elle tape en mesure: on s'est mariés pour ça.",
+      "emote": null,
+      "next": null
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "La nuit, la forge craque en refroidissant. Mado dit que c'est le métal. Moi, je dis que la maison s'étire.",
+      "emote": null,
       "next": null
     }
   }

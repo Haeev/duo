@@ -50,7 +50,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b1": {
       "kind": "line",
@@ -69,7 +69,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b2": {
       "kind": "line",
@@ -88,6 +88,107 @@
           "by": "duo"
         }
       ],
+      "next": "moment"
+    },
+    "moment": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.rosalie",
+                  "equals": 1
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.rosalie",
+                  "equals": 1
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.acte3.train2"
+            },
+            {
+              "type": "remembered",
+              "key": "aubrune.acte2.fini"
+            }
+          ],
+          "next": "confitures"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.acte2.fini"
+            }
+          ],
+          "next": "samedi"
+        }
+      ],
+      "otherwise": "quai"
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Rails mouillés ! Georgette patine au démarrage. Elle déteste ça: elle trouve que ça fait débutante.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Brume sur la ligne: je roule au sifflet. Un coup long à chaque courbe. Les vaches du haut me répondent.",
+      "emote": null,
+      "next": null
+    },
+    "confitures": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Le samedi, je reste jusqu'à 14 h 40: on charge les confitures de la ferme et les bouquets. Georgette adore sentir la fraise.",
+      "emote": null,
+      "next": null
+    },
+    "samedi": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Le samedi, je reste jusqu'à 14 h 40. Georgette boit, je casse la croûte, et le quai me raconte sa semaine.",
+      "emote": null,
+      "next": null
+    },
+    "quai": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Un arrêt court, pas une minute de plus. Georgette reprend son souffle. Moi aussi, mais je le montre moins.",
+      "emote": null,
       "next": null
     }
   }

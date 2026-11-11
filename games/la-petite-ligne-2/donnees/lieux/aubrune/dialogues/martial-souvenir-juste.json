@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-juste",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.cloche.juste"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "On me dit que la cloche retardait de quatre minutes depuis 1962. J'arrive, elle sonne juste. J'ai toujours eu de la chance avec les horaires.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

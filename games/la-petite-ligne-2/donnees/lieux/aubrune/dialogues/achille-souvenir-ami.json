@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-ami",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "achille",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Je te garde le quignon. Tous les matins. Le bout le plus cuit, celui qui chante quand on appuie. On ne garde le quignon qu'aux amis.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

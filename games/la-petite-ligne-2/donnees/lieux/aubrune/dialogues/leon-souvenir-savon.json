@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-savon",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.leon-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.leon-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Tu sens bon ! L'autre jour, non. Moi, je me lave tous les jours. Enfin, les jours où maman regarde.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

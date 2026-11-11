@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-friture",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.sort",
+      "equals": "friture"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "L'arête de la Baronne est au mur, au-dessus du comptoir. Achille la salue en entrant. Il croit que je ne le vois pas.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

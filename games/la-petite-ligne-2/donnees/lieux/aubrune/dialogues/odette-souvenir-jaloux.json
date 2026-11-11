@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-jaloux",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.odette.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.odette.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "odette",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ta moitié connaît le bocal de derrière. Toi, non. Je ne dis pas ce qu'il y a dedans. Viens plus souvent, tu verras bien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

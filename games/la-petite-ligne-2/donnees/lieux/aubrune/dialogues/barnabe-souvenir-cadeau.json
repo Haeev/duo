@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-cadeau",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.barnabe.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.barnabe.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.barnabe-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.barnabe-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Pour moi ? Oh. Je vais le porter doucement. J'ai les mains grandes, mais j'ai l'habitude des choses fragiles.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Ta moitié m'a gâté, et toi maintenant. Je vais vous faire une chanson. Elle sera longue. Vous êtes au courant.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

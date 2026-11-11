@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-lanterne",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "item_in_bag",
+      "item": "lanterne",
+      "count": 1
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.anatole-souvenir-lanterne.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.anatole-souvenir-lanterne.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Tu portes une lanterne. Sur ce quai, à cette heure. On dirait le garde d'autrefois. Ne bouge pas. ... Voilà. Merci.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Ta moitié est venue avec la sienne. Deux lanternes à Aubrune. En trente ans de ronde, j'en espérais une.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

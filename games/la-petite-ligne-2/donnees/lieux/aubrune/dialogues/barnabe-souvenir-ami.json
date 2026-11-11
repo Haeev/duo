@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-ami",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "barnabe",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Je t'ai mis dans ma chanson de la coupe. Troisième couplet. Ça rime avec « hêtre ». J'ai un peu triché sur ton prénom.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

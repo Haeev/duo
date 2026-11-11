@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-adore",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.barnabe.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.barnabe.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Une tarte aux pommes ! Je la mange assis, sans chanter. C'est le seul moment du jour où les oiseaux reprennent la parole.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-adore",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.margot.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.margot.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Une tarte aux pommes ! J'en cache une part pour Paulin. Il dira non. Elle aura disparu avant que je me retourne.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

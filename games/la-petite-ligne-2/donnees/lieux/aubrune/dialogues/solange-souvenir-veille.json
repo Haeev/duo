@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-veille",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.solange-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.solange-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Tiens, un spectre. Non, c'est toi. À cette heure, la mercerie est un théâtre vide: ça craque, ça chuchote, j'adore.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ta moitié rôdait l'autre nuit, toi ce soir. Vous jouez en alternance ? Prévenez-moi, que je garde la petite à l'œil: elle vous suivrait.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

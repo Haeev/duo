@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-savon",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.martial-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.martial-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Ah ! Odeur de sainteté. Ou de savon. À mon niveau, je ne fais plus la différence. L'autre jour, en revanche, je la faisais.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-jaloux",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.paulin.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.paulin.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "paulin",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Ta moitié, je lui dis oui du premier coup, maintenant. Toi, c'est encore non d'abord. Ça se gagne. Reviens.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

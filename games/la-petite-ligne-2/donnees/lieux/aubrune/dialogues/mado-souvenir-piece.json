@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-piece",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.troisieme-piece",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Une pièce de plus ! Les gonds, c'est moi qui les ai battus. Écoute la porte: elle ne grince pas. Si elle grince, c'est Basile.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-pluie",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.anatole-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.anatole-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Il pleut. Le règlement prévoit un parapluie de service. Il est au dépôt de Hautefonte depuis 1961. Je contrôle donc mouillé.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Ta moitié est venue sous la pluie, l'autre nuit. Deux voyageurs sur un quai mouillé à 5 h 12. Je l'ai noté. En bien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

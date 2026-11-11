@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-refondue",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.cloche.refondue"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "La petite cloche refondue sonne clair. Marthe et Honorine se sont disputé le premier coup. Je les ai laissées faire: c'était leur prière.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

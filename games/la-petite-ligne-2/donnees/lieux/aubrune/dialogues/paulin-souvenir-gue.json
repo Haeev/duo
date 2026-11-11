@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-gue",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.decor.gue-refait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Ton gué tient. J'y passe la charrette deux fois par jour. Je regarde les dalles à chaque fois. Elles ne bougent pas. Bon.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

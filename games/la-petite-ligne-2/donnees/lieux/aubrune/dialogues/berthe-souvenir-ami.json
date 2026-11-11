@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-ami",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "berthe",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Écoute. Clac, clac... clac. Tu entends le troisième, en retard ? C'est sa façon de te saluer. Elle ne le fait pas pour grand monde.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

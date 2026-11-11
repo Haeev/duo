@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-jaloux",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.lucie.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.lucie.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "lucie",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ta moitié et moi, on se raconte tout, maintenant. Toi, je te connais surtout par ton écriture. Passe plus souvent, que je mette une tête dessus.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

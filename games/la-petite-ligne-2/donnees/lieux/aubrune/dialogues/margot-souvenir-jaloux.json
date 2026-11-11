@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-jaloux",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.margot.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.margot.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "margot",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ta moitié connaît déjà le nom de mes poules. Toi, tu en es à « la rousse » et « l'autre ». Viens plus souvent, je te les présente.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

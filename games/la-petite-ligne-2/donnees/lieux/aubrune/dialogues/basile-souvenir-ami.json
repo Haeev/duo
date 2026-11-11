@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-ami",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "basile",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Toi. Mon rabot. Prends. Essaie. ... Bien. Personne d'autre.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

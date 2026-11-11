@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-soupe",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "La soupe du concours, c'étaient mes poireaux. Personne ne l'a dit au micro. Il n'y avait pas de micro. Je le dis quand même.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

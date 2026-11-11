@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-savon",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.odette-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.odette-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ah ! Voilà qui sent le savon de chez moi. Tu te souviens, le premier soir ? « Vous sentez le wagon. » Je le pense encore, mais de loin.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

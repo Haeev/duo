@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-savon",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.berthe-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.berthe-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Tu peux approcher, aujourd'hui. L'autre fois, j'ai dû aérer le grain. Je ne t'en veux pas. La meule, si, un peu.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

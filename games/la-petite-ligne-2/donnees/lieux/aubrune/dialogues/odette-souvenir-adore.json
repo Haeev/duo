@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-adore",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.odette.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.odette.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Une tourte du quai ! C'était le plat des jours de train. Je la goûte tout de suite. Par conscience professionnelle. Deux fois.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

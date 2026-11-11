@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-jaloux",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.anatole.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.anatole.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "anatole",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Ta moitié a droit à un signe de tête, à présent. Toi, tu as encore le salut réglementaire. La nuance est mince. Elle compte.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

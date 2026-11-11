@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "id": "train-du-samedi",
+  "name": "Train du samedi",
+  "kind": "visitor",
+  "when": {
+    "type": "weekly",
+    "weekday": "saturday",
+    "seasons": []
+  },
+  "days": 1,
+  "hours": {
+    "from": 604,
+    "to": 880
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.fini"
+    }
+  ],
+  "announce": true,
+  "activates": {
+    "facts": [
+      {
+        "key": "aubrune.train.en-gare",
+        "value": true
+      }
+    ],
+    "villagers": ["rosalie"],
+    "shop": null,
+    "scene": null,
+    "tune": null
+  }
+}

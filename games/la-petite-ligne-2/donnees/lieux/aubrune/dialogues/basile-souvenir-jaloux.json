@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-jaloux",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.basile.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.basile.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "basile",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Ta moitié a son tabouret ici. Le tien sèche. Colle lente. Reviens.",
+      "emote": null,
+      "next": null
+    }
+  }
+}
