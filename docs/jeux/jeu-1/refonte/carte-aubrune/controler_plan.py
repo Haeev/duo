@@ -6,7 +6,7 @@ s'atteignent à pied depuis le quai (escaliers qui font arriver dans leur salle,
 les escaliers et les lits des joueurs).
 
 Usage: python3 -I controler_plan.py            contrôle le plan, code de sortie 1 s'il y a une erreur
-       python3 -I controler_plan.py --eprouver casse une copie du plan (de la carte et des intérieurs) de 26 façons et vérifie que chaque casse est vue
+       python3 -I controler_plan.py --eprouver casse une copie du plan (de la carte, des intérieurs et du décor des fêtes) de 36 façons et vérifie que chaque casse est vue
 """
 import copy
 import heapq
@@ -1232,16 +1232,189 @@ def controler_acces(d, carte, fiches, interieurs=None, types=None, lieu=LIEU):
     return err, info
 
 
+CIRCULATION = ('route', 'rue', 'chemin', 'sentier')
+BARRENT = ('lisse-fleurie',)        # types qui barrent une route par nature (contournés par l'accotement)
+RECUL_POSTE = 1.0                   # m entre un poste d'habitant de la fête et un objet solide de son décor
+PORTEE_LAMPES, LAMPES_MAX = 26.0, 6  # `INK_SETTINGS.lights.reach` et `MAX_LAMPS` (src/rendu/encre)
+
+
+def evenements_cites(conds):
+    out = set()
+
+    def lire(o):
+        if isinstance(o, dict):
+            if o.get('type') == 'event_is':
+                out.update(o['events'])
+            for v in o.values():
+                lire(v)
+        elif isinstance(o, list):
+            for v in o:
+                lire(v)
+    lire(conds)
+    return out
+
+
+def postes_de_fete(lieu=LIEU):
+    """Points tenus par les habitants pendant chaque événement: {événement: {point: [habitants]}} (sièges exclus)."""
+    out = {}
+    for f in sorted(os.listdir(os.path.join(lieu, 'habitants'))):
+        h = json.load(open(os.path.join(lieu, 'habitants', f), encoding='utf-8'))
+        for s in h['life']['schedule']:
+            pt = s['at'].get('point')
+            for ev in evenements_cites(s.get('when', [])):
+                if pt:
+                    out.setdefault(ev, {}).setdefault(pt, []).append(h['id'])
+    return out
+
+
+def lampe_de(o, F):
+    """(x, y) du foyer d'un objet posé dont le modèle déclare sa lumière, ou None."""
+    lum = manifeste().get(F[o['type']]['model'], {}).get('light')
+    if lum is None:
+        return None
+    a = o['rotation'] * math.pi / 2
+    gx, gz = lum['at'][0], lum['at'][2]
+    return (o['x'] + gx * math.cos(a) + gz * math.sin(a), o['y'] - gx * math.sin(a) + gz * math.cos(a))
+
+
+def controler_fetes(d, carte, lieu=LIEU):
+    """Décor des fêtes (objets à `when`): conditions qui citent des événements du lieu; rien sur la voie, sur les deux
+    rangées du bord du quai, sur un point, un nœud, une porte ou les deux cases devant elle; rien de solide sur une
+    route, une rue, un chemin ou un sentier (sauf ce qui barre par nature, contournable par ses deux bouts), ni à moins
+    de 1 m d'un poste d'habitant de la fête; chaque fête, son décor posé et celui des autres absent, laisse tous ses
+    postes atteignables depuis le quai. Compte aussi les lampes que chaque fête ajoute (info)."""
+    err, info = [], []
+    F = fiches_meubles()
+    evs = {f[:-5] for f in os.listdir(os.path.join(lieu, 'evenements')) if f.endswith('.json')}
+    W = carte['width']
+    leg = carte['terrain']['legend']
+    codes = []
+    for c, k in zip(carte['terrain']['runs'][0::2], carte['terrain']['runs'][1::2]):
+        codes += [c] * k
+    nature = lambda x, y: leg[codes[y * W + x]] if 0 <= x < W and 0 <= y < carte['height'] else 'hors-jeu'
+    quai = next(b for b in d['batiments'] if b['id'] == 'quai_b')
+    qx, qy, ql, qh = quai['rect']
+    bord_quai = lambda x, y: qx <= x < qx + ql and qy <= y < qy + 2
+    sur_quai = lambda x, y: qx <= x < qx + ql and qy <= y < qy + qh
+    interdits = {}
+    for k, p in carte['points'].items():
+        interdits[(int(p['x']), int(p['y']))] = 'le point « %s »' % k
+    for k, n in carte['graph']['nodes'].items():
+        if n['y'] < carte['height'] - 48:
+            interdits.setdefault((int(n['x']), int(n['y'])), 'le nœud « %s »' % k)
+    for k, p in carte.get('doors', {}).items():
+        fx, fy = CAP[p['facing']]
+        for i in range(3):
+            interdits.setdefault((int(p['x']) + i * fx, int(p['y']) + i * fy), 'la porte « %s » (ou les deux cases devant)' % k)
+    postes = postes_de_fete(lieu)
+    fetes = [o for o in carte['objects'] if 'when' in o]
+    for o in fetes:
+        nom = "décor de fête %s (%s)" % (o['id'], o['type'])
+        cites = evenements_cites(o['when'])
+        if not cites:
+            err.append("%s: sa condition ne cite aucun événement" % nom)
+        for e_ in sorted(cites - evs):
+            err.append("%s: l'événement « %s » n'existe pas" % (nom, e_))
+        cases = emprise_type(o, F)
+        solide = F[o['type']].get('solid', False)
+        for x, y in cases:
+            n_ = nature(x, y)
+            # Au passage à niveau, la voie croise la route: le sol y est `route`, les rails y passent quand même.
+            if n_ not in ('eau', 'batiment', 'hors-jeu') and any(
+                    not r.get('tunnel') and dist_poly((x + 0.5, y + 0.5), r['points']) < 1.6 for r in carte.get('rails', [])):
+                n_ = 'voie'
+            if n_ in ('voie', 'eau', 'batiment', 'hors-jeu'):
+                err.append("%s: posé sur %s (case %d, %d)" % (nom, n_, x, y))
+            if bord_quai(x, y):
+                err.append("%s: sur le bord du quai, où le train ouvre ses portes (case %d, %d)" % (nom, x, y))
+            if (x, y) in interdits:
+                err.append("%s: posé sur %s (case %d, %d)" % (nom, interdits[(x, y)], x, y))
+            if solide and n_ in CIRCULATION and o['type'] not in BARRENT and not sur_quai(x, y):
+                err.append("%s: solide sur une %s (case %d, %d): il barre le passage" % (nom, n_, x, y))
+        if solide and o['type'] in BARRENT:
+            xs, ys = [c[0] for c in cases], [c[1] for c in cases]
+            bouts = [(min(xs) - 1, ys[0]), (max(xs) + 1, ys[0])] if len(set(ys)) == 1 else [(xs[0], min(ys) - 1), (xs[0], max(ys) + 1)]
+            if not all(nature(*b) not in ('voie', 'eau', 'batiment', 'hors-jeu') for b in bouts):
+                err.append("%s: barre sans accotement libre à ses deux bouts" % nom)
+        if solide:
+            x0, y0 = min(c[0] for c in cases), min(c[1] for c in cases)
+            x1, y1 = max(c[0] for c in cases) + 1, max(c[1] for c in cases) + 1
+            for ev in cites:
+                for pt in postes.get(ev, {}):
+                    p = carte['points'].get(pt)
+                    if p is None:
+                        continue
+                    dd = math.hypot(max(x0 - p['x'], 0, p['x'] - x1), max(y0 - p['y'], 0, p['y'] - y1))
+                    # Ce qui barre se manœuvre: le garde se tient contre sa lisse (corps de 0,3 m, écart de 0,1 m).
+                    if dd < (0.4 if o['type'] in BARRENT else RECUL_POSTE):
+                        err.append("%s: à %.1f m du poste « %s » (%s) pendant « %s »" % (nom, dd, pt, ', '.join(postes[ev][pt]), ev))
+    # Chaque événement à décor: son décor posé, les autres absents, tous verrous levés.
+    types = lire_meubles(lieu)
+    interieurs = lire_interieurs(lieu)
+    tous = set(carte.get('locks', {}))
+    par_ev = {}
+    for o in fetes:
+        for ev in evenements_cites(o['when']):
+            par_ev.setdefault(ev, []).append(o)
+    fixes = [o for o in carte['objects'] if 'when' not in o]
+    lampes_fixes = [(o['id'], lampe_de(o, F)) for o in fixes if lampe_de(o, F)]
+    for ev in sorted(par_ev):
+        L = Lieu(dict(carte, objects=fixes + par_ev[ev]), interieurs, types)
+        vu, _ = L.atteint(tous)
+        for pt, qui in sorted(postes.get(ev, {}).items()):
+            p = carte['points'].get(pt)
+            if p is None:
+                continue
+            c = (int(p['x']), int(p['y']))
+            if not any(vu[(c[1] + dy) * W + c[0] + dx] for dx, dy in ((0, 0),) + VOISINS):
+                err.append("fête « %s »: le poste « %s » (%s) n'est plus atteignable depuis le quai" % (ev, pt, ', '.join(qui)))
+        # Lampes: le rendu en éclaire LAMPES_MAX, les plus proches du point visé, à PORTEE_LAMPES au plus.
+        # Par moment de la fête (plages `time_is` de son décor: le jour et la nuit des lumignons ne coexistent pas).
+        def minutes(o):
+            plages = [c for c in o['when'] if c.get('type') == 'time_is']
+            if not plages:
+                return set(range(0, 1440, 30))
+            a, b = plages[0]['from'], plages[0]['to']
+            return {m for m in range(0, 1440, 30) if (a <= m < b if a <= b else (m >= a or m < b))}
+        moments = sorted({frozenset(minutes(o)) for o in par_ev[ev]}, key=lambda s: (len(s), min(s)))
+        vus_ensembles = set()
+        for mo in moments:
+            ensemble = frozenset(o['id'] for o in par_ev[ev] if minutes(o) & mo)
+            if ensemble in vus_ensembles:
+                continue
+            vus_ensembles.add(ensemble)
+            pire_f, pire_t, ou = 0, 0, '-'
+            lampes = [lampe_de(o, F) for o in par_ev[ev] if lampe_de(o, F) and minutes(o) & mo]
+            for pt in postes.get(ev, {}):
+                p = carte['points'].get(pt)
+                if p is None:
+                    continue
+                nf = sum(1 for x, y in lampes if math.hypot(x - p['x'], y - p['y']) <= PORTEE_LAMPES)
+                nt = nf + sum(1 for _, (x, y) in lampes_fixes if math.hypot(x - p['x'], y - p['y']) <= PORTEE_LAMPES)
+                if (nf, nt) > (pire_f, pire_t):
+                    pire_f, pire_t, ou = nf, nt, pt
+            debut = min(m for m in mo if (m - 30) % 1440 not in mo) if len(mo) < 48 else 0
+            plage = '' if len(mo) == 48 else ' (à partir de %d h %02d)' % (debut // 60, debut % 60)
+            info.append("fête « %s »%s: %d objets de décor, %d lampes ajoutées; au pire %d de ces lampes et %d lampes en tout à %g m d'un poste (%s), le rendu en éclaire %d" % (
+                ev, plage, sum(1 for o in par_ev[ev] if minutes(o) & mo), len(lampes), pire_f, pire_t, PORTEE_LAMPES, ou, LAMPES_MAX))
+    return err, info
+
+
 def eprouver(d):
     def casse(nom, f, attendu):
         c = copy.deepcopy(d)
-        if f not in casses_interieurs:
+        if f not in casses_interieurs and f not in casses_fetes:
             f(c)
         if f in (ordre_faux, frenes_trop_courts, belvedere_non_declare):
             carte = json.load(open(os.path.join(LIEU, 'carte.json'), encoding='utf-8'))
             if f is frenes_trop_courts:
                 carte['locks']['v2b']['rects'] = [dict(x=48, y=94, w=7, h=3)]
             err, _ = controler_histoire(c, carte, lire_fiches())
+        elif f in casses_fetes:
+            # Casse du décor des fêtes sur une copie de carte.json, puis `controler_fetes`.
+            carte = json.load(open(os.path.join(LIEU, 'carte.json'), encoding='utf-8'))
+            f(carte)
+            err, _ = controler_fetes(c, carte)
         elif f in casses_interieurs:
             # Casse d'un intérieur du lieu (copie des fichiers), puis la règle d'accès.
             carte = json.load(open(os.path.join(LIEU, 'carte.json'), encoding='utf-8'))
@@ -1287,6 +1460,31 @@ def eprouver(d):
     def baie_d_un_metre(s):
         s['epicerie-rdc']['blocked'] = [dict(x=0, y=5, w=4, h=1), dict(x=5, y=5, w=2, h=1)]
     casses_interieurs = (table_epicerie_sur_la_baie, salle_fermee_maison, escalier_dans_le_mur, chaise_a_cheval, baie_d_un_metre)
+
+    def decor(carte, i):
+        return next(o for o in carte['objects'] if o['id'] == i)
+
+    def lisse_sur_la_voie(carte):
+        decor(carte, 'fete-lisse-nord')['y'] = 97.5
+
+    def marmite_sur_la_rue(carte):
+        decor(carte, 'fete-soupe-marmite-meres')['x'] = 204
+
+    def table_au_bord_du_quai(carte):
+        decor(carte, 'fete-hiver-table')['y'] = 100.5
+
+    def brasero_dans_la_foule(carte):
+        decor(carte, 'fete-quai-brasero')['x'] = 213.5
+
+    def quai_mure(carte):
+        # Huit ardoises autour du poste du bout est du quai: Mado et les siens ne l'atteignent plus.
+        for k, (dx, dy) in enumerate((a, b) for a in (-1, 0, 1) for b in (-1, 0, 1) if (a, b) != (0, 0)):
+            carte['objects'].append(dict(id='fete-mur-%d' % k, type='ardoise-a-craie', x=213.5 + dx, y=102.5 + dy, rotation=0,
+                                         when=[dict(type='event_is', events=['veillee-du-premier-train'], when='begun')]))
+
+    def fete_inconnue(carte):
+        decor(carte, 'fete-soupe-ardoise')['when'] = [dict(type='event_is', events=['fete-de-la-lune'], when='begun')]
+    casses_fetes = (lisse_sur_la_voie, marmite_sur_la_rue, table_au_bord_du_quai, brasero_dans_la_foule, quai_mure, fete_inconnue)
     bat = lambda c, i: next(b for b in c['batiments'] if b['id'] == i)
     eau = lambda c, i: next(w for w in c['eaux'] if w['id'] == i)
 
@@ -1386,7 +1584,13 @@ def eprouver(d):
               ("lampe au bord de la table, hors du plateau", lampe_au_bord, "hors du plateau"),
               ("lampe posée sur une chaise", lampe_sur_la_chaise, "sans plateau"),
               ("pendule du zinc contre le mur nord", bouquet_contre_la_fenetre, "décalerait une fenêtre"),
-              ("corbeille posée dans la lampe", pain_sur_la_lampe, "se chevauchent")]
+              ("corbeille posée dans la lampe", pain_sur_la_lampe, "se chevauchent"),
+              ("lisse fleurie posée sur la voie", lisse_sur_la_voie, "posé sur voie"),
+              ("marmite au milieu de la rue du Bourg", marmite_sur_la_rue, "il barre le passage"),
+              ("table de la tourte au bord du quai", table_au_bord_du_quai, "bord du quai"),
+              ("brasero dans le groupe de Mado", brasero_dans_la_foule, "du poste « quai-e »"),
+              ("poste du bout est muré par le décor", quai_mure, "n'est plus atteignable"),
+              ("ardoise d'une fête qui n'existe pas", fete_inconnue, "n'existe pas")]
     res = [casse(*e) for e in essais]
     print("banc d'épreuve: %d casses vues sur %d" % (sum(res), len(res)))
     return all(res)
@@ -1406,7 +1610,8 @@ if __name__ == '__main__':
         fiches = lire_fiches()
         e2, i2 = controler_histoire(plan, carte, fiches)
         e3, i3 = controler_acces(plan, carte, fiches)
-        erreurs += e2 + e3; infos += i2 + i3
+        e4, i4 = controler_fetes(plan, carte)
+        erreurs += e2 + e3 + e4; infos += i2 + i3 + i4
     else:
         erreurs.append("carte du lieu absente (%s): lancer plan-vers-lieu.ts puis assembler_lieu.py" % chemin_carte)
     for i in infos:

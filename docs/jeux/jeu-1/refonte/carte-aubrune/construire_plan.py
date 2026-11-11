@@ -1632,6 +1632,139 @@ for _v, _i, _t, _x, _y, _r, _pq in DECOR_6:
     M_[-1]['vue'] = _v
 
 
+# ================================================================ version 7: le décor des fêtes et des veillées (2026-11-11)
+# Chaque objet porte `when` (conditions du jeu, `src/simulation/lieux/presents.ts`): il n'existe que pendant sa fête.
+# `event_is` en `begun` tient du début de la fête jusqu'à l'aube suivante: le décor paraît quand la fête commence et
+# disparaît quand le bourg range. `fete` (nom court) sert aux contrôles et au tableau de plan.md. Règles tenues par
+# controler_plan.py (`controler_fetes`): rien sur la voie ni sur les deux rangées du bord du quai (le train du samedi
+# y ouvre ses portes); rien sur un point, un nœud, une porte et les deux cases devant elle; un objet solide jamais
+# sur une route, une rue, un chemin ou un sentier (seules les lisses barrent la route, c'est leur rôle: on les
+# contourne par l'accotement), et à 1 m au moins de chaque poste d'habitant de sa fête; tout poste de la fête reste
+# atteignable depuis le quai, son décor posé.
+def _quand(*evs, depuis=None, jusqu_a=None, plus=()):
+    c = [dict(type='event_is', events=list(evs), when='begun')]
+    if depuis is not None:
+        c.append(dict(type='time_is', **{'from': depuis, 'to': jusqu_a}))
+    return c + list(plus)
+
+
+BARR, LUM, SOUPE, HIVER = 'fete-des-barrieres-fleuries', 'nuit-des-lumignons', 'concours-de-la-soupe', 'veillee-du-premier-train'
+VEILLEES = ['veillee-du-quai-printemps', 'veillee-du-quai-ete', 'veillee-du-quai-automne', 'veillee-du-quai-hiver', 'premiere-veillee-du-quai']
+# Manifeste des décors livrés: qui porte une lumière (`light`), pour le tableau de plan.md.
+_MAN = json.load(open(os.path.join(_DOSSIER_MEUBLES, '..', '..', '..', 'assets', 'commun', 'decors', 'decors.json'), encoding='utf-8'))['models']
+NUIT = 1230  # 20 h 30: la nuit tombe, chacun pose son lumignon (écriture des fêtes, section 3)
+AUBE = 360   # borne de fin de plage: `begun` s'éteint de toute façon à l'aube
+
+
+def fete(i, typ, x, y, rot, quand, nom, pourquoi):
+    mob(i, typ, _MODELES[typ], x, y, rot, pourquoi)
+    M_[-1].update(when=quand, fete=nom)
+
+
+# 1. Fête des barrières fleuries (printemps, passage à niveau). Les lisses fleuries sont baissées par la scène
+#    d'ouverture (`les-lisses-en-fleurs`, fait `aubrune.barrieres.lisses` = `baissees`) et relevées par la clôture
+#    (`levees`): entre les deux, elles barrent la route du Gué (« la route du Gué est fermée, pour la plus belle
+#    raison de l'année »), une au nord et une au sud de la voie, bras est-ouest en travers de la route de 5 m. On passe
+#    à pied par l'accotement (une case d'herbe de chaque côté). Relevées, elles ne se dessinent pas: aucun jour ordinaire
+#    ne montre de lisse (le modèle levé n'existe pas), la fête ne fait pas exception.
+_LISSES = _quand(BARR, plus=[dict(type='remembered', key='aubrune.barrieres.lisses', equals='baissees')])
+fete('fete-lisse-nord', 'lisse-fleurie', 182.5, 95.5, 0, _LISSES, 'barrières',
+     "la lisse nord baissée en travers de la route, sur la rangée d'herbe au nord de la voie, jamais sur la voie")
+fete('fete-lisse-sud', 'lisse-fleurie', 182.5, 99.5, 0, _LISSES, 'barrières',
+     "la lisse sud baissée en travers de la route, juste au sud de la voie: Jeanne, Léon et Solange se tiennent à son pied (pn-s, 2 m au sud)")
+fete('fete-barrieres-banderole', 'banderole', 182.5, 104.5, 0, _quand(BARR), 'barrières',
+     "au-dessus de la route du Gué, entre le carrefour et la lisse sud, face au sud: on la lit en venant du bourg; non solide, elle ne barre rien")
+fete('fete-barrieres-tonneau', 'tonneau-en-perce', 177.5, 104.5, 0, _quand(BARR), 'barrières',
+     "le tonneau du café mis en perce par Colette, sur l'herbe au coin du passage à niveau: à 5 m du carrefour où elle se tient (gr0), hors de la route")
+
+# 2. Nuit des lumignons (été). Le jour (10 h à 20 h 30), les vingt et un lumignons coulés refroidissent sur le
+#    parvis, en rangs au pied de la façade, à l'est du portail (Marthe y coule la cire, poste marthe-parvis). La nuit
+#    (20 h 30 à l'aube), chacun a posé le sien là où il compte (écriture des fêtes, section 3), à un ou deux mètres de
+#    son poste de nuit: une lumière par âme, du parvis à tout le bourg. Le lumignon n'est pas solide.
+_LUM_JOUR = _quand(LUM, depuis=600, jusqu_a=NUIT)
+_LUM_NUIT = _quand(LUM, depuis=NUIT, jusqu_a=AUBE)
+_PARVIS = [(x, 79.5) for x in range(261, 268)] + [(x, 80.5) for x in range(261, 268)] + [(x, 84.5) for x in range(262, 269)]
+for _k, (_x, _y) in enumerate(_PARVIS, 1):
+    fete('fete-lumignon-parvis-%02d' % _k, 'lumignon', _x + 0.5, _y, 0, _LUM_JOUR, 'lumignons (jour)',
+         "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail")
+_LUMIGNONS = [
+    # qui, x, y, où et pour qui (écriture des fêtes, section 3)
+    ('firmin', 184.5, 99.5, "à la barrière, coin est de la route au bord de la voie, à côté de son poste (pour son oncle)"),
+    ('jeanne', 180.5, 99.5, "à côté, coin ouest de la route au bord de la voie, en face de Firmin (pour le train de 5 h 12)"),
+    ('odette', 195.5, 118.5, "sous la tonnelle, au coin de la pension, près de la table du souper"),
+    ('basile', 177.5, 91.5, "au pied de l'établi, sous l'auvent de l'atelier"),
+    ('achille', 230.5, 106.5, "sous la fenêtre du fournil, à l'ouest de la porte"),
+    ('solange', 234.5, 110.5, "devant la mercerie, à côté du seuil (hors des deux cases devant la porte)"),
+    ('mado', 262.5, 102.5, "au pied de l'enclume, côté nord: le lumignon ne se pose pas sur l'enclume, il se pose contre"),
+    ('barnabe', 264.5, 106.5, "devant la forge, à l'ouest de la porte, côté rue de l'Église"),
+    ('ambroise', 204.5, 103.5, "sur le quai, côté bourg, sous la pendule de la halte (pour la minute)"),
+    ('honorine-1', 283.5, 106.5, "sur son seuil, à gauche de la porte (pour sa marraine)"),
+    ('honorine-2', 286.5, 106.5, "sur son seuil, à droite de la porte (« pour le plaisir »)"),
+    ('marthe', 251.5, 79.5, "au pied du clocher, à l'ouest du portail"),
+    ('lucie', 249.5, 110.5, "au pied de la boîte aux lettres du bourg, à sa grille"),
+    ('colette', 252.5, 106.5, "sur la terrasse du café, entre la porte et le coin de la vitrine"),
+    ('armand', 220.5, 117.5, "contre le lavoir, à côté de son ouverture"),
+    ('paulin', 181.5, 129.5, "au gué, sur la route qui descend à l'eau"),
+    ('margot', 180.5, 129.5, "au gué, à côté de celui de Paulin"),
+    ('leon', 185.5, 127.5, "en haut de la grève, au bord du chemin de la berge"),
+    ('berthe', 202.5, 129.5, "au bout du ponton (le sien part sur l'eau: la lumière qui dérive n'existe pas encore)"),
+    ('martial', 282.5, 74.5, "au cimetière, au bord de l'allée, entre les tombes: un seul, pour tous"),
+]
+for _q, _x, _y, _pq in _LUMIGNONS:
+    fete('fete-lumignon-' + _q, 'lumignon', _x, _y, 0, _LUM_NUIT, 'lumignons (nuit)', _pq)
+# Rosalie repart à 22 h: son lumignon ne brûle que jusque-là, sur le quai, au pied de son poste (la locomotive est à
+# l'arrêt devant, et rien ne se pose sur les deux rangées du bord).
+fete('fete-lumignon-rosalie', 'lumignon', 212.5, 101.5, 0, _quand(LUM, depuis=NUIT, jusqu_a=1320), 'lumignons (nuit)',
+     "sur le quai, au bout est, face à la locomotive à l'arrêt, jusqu'au départ de 22 h")
+
+# 3. Concours de la soupe (automne, place). Deux marmites sur leur feu, de part et d'autre de la rue du Bourg, au nord
+#    de la place (rangées 112 et 113): à l'ouest la soupe des mères, côté épicerie où se tiennent Odette et Colette
+#    (pl-o); à l'est la panade du moulin, à l'est de la pompe, que l'on atteint toujours par l'ouest et le sud. Le
+#    banquet au sud-est de la place, à côté du banc d'Honorine qui préside (sa place et le devant du banc restent
+#    libres). L'ardoise du palmarès au coin nord-est, face au sud: on la lit depuis le carrefour (pl).
+fete('fete-soupe-marmite-meres', 'grande-marmite', 199, 113, 0, _quand(SOUPE), 'soupe',
+     "la soupe des mères (Odette et Colette), côté épicerie, à 2 m de la rue: on y goûte depuis la place")
+fete('fete-soupe-marmite-moulin', 'grande-marmite', 210, 113, 0, _quand(SOUPE), 'soupe',
+     "la panade du moulin (Berthe), en face, à l'est de la pompe: la pompe s'atteint toujours par l'ouest et le sud")
+fete('fete-soupe-table', 'table-de-banquet', 211.5, 120.5, 0, _quand(SOUPE), 'soupe',
+     "la grande table du concours, au sud-est de la place, à côté du banc où Honorine préside")
+fete('fete-soupe-banc-nord', 'banc-de-table', 211, 119.5, 0, _quand(SOUPE), 'soupe',
+     "le banc nord de la grande table, face à elle; le devant du banc d'Honorine reste libre")
+fete('fete-soupe-banc-sud', 'banc-de-table', 211, 121.5, 2, _quand(SOUPE), 'soupe',
+     "le banc sud de la grande table, face à elle")
+fete('fete-soupe-ardoise', 'ardoise-a-craie', 206.5, 111.5, 0, _quand(SOUPE), 'soupe',
+     "l'ardoise du palmarès, au coin nord-est de la place, face au sud: on la lit depuis le carrefour")
+
+# 4. Veillée du premier train (hiver, quai) et veillées du quai. Le quai fait 5 m de profondeur, et le train du samedi
+#    reste à quai jusqu'à 22 h: les deux rangées du bord restent libres (3 m avec la troisième), la rue qui longe le
+#    quai au sud aussi; le brasero et la table vont sur la dernière rangée du quai, le reste sur l'herbe au sud de la
+#    rue ou hors du quai. Une file de trois guirlandes court sur la bande d'herbe au sud du quai (poteau de
+#    chaque guirlande à l'ouest, poteau de bout à l'est), du banc ouest au passage vers la Grand-Route: commune aux
+#    veillées, à la veillée d'hiver et à la fête des barrières (le quai-o y accueille Ambroise, Martial et Rosalie).
+_GUIRL = _quand(*([BARR, HIVER] + VEILLEES))
+for _k, _x in enumerate((191.5, 195.5, 199.5), 1):
+    fete('fete-quai-guirlande-%d' % _k, 'guirlande-de-lampions', _x, 104.5, 0, _GUIRL, 'quai',
+         "guirlande de lampions sur l'herbe au sud du quai, entre le quai et la Grand-Route: elle éclaire le quai sans rien poser dessus")
+fete('fete-quai-poteau', 'poteau-de-guirlande', 201.5, 104.5, 0, _GUIRL, 'quai',
+     "le poteau du bout de la file, à l'ouest du passage vers la Grand-Route, qu'il laisse libre")
+_VEIL = _quand(*([HIVER] + VEILLEES))
+fete('fete-quai-brasero', 'brasero', 211.5, 102.5, 0, _VEIL, 'quai',
+     "le brasero de Mado au bout est du quai, sur la troisième rangée (hors du bord), à côté de la lanterne: Mado, Barnabé, Basile et Berthe se tiennent autour (quai-e, à 1,5 m); la rue qui longe le quai au sud reste libre")
+fete('fete-quai-banc-1', 'banc-de-ferme', 212, 104.5, 2, _VEIL, 'quai',
+     "un banc sur l'herbe au sud de la rue du quai, face au brasero et à la voie")
+fete('fete-quai-banc-2', 'banc-de-ferme', 209, 104.5, 2, _VEIL, 'quai',
+     "un second banc à côté, face au quai: les vieux s'assoient, les autres restent debout autour du feu")
+# Veillée du premier train seulement: la table de la tourte, la banderole, le tonneau et l'estrade.
+fete('fete-hiver-table', 'table-de-banquet', 195.5, 102.5, 0, _quand(HIVER), 'hiver',
+     "la table de la tourte sur la dernière rangée du quai, entre les deux bancs, son long côté vers la voie (« côté voie, c'est la place du voyageur »): on passe au nord (3 m) et par la rue du quai au sud")
+fete('fete-hiver-banderole', 'banderole', 204, 104.5, 0, _quand(HIVER), 'hiver',
+     "au-dessus du passage qui monte de la Grand-Route au quai, face au sud: on la lit en arrivant")
+fete('fete-hiver-tonneau', 'tonneau-en-perce', 186.5, 104.5, 0, _quand(HIVER), 'hiver',
+     "le tonneau en perce sur l'herbe au pied du bout ouest du quai, près de Jeanne, Solange, Lucie et Armand (quai-o)")
+fete('fete-hiver-estrade', 'estrade-de-fanfare', 175.5, 102, 1, _quand(HIVER), 'hiver',
+     "l'estrade sur l'herbe à l'ouest de la route du Gué, face à l'est (vers le quai): le quai, 5 m de profondeur et le train à quai, n'a pas la place de 4 x 3 m; à 1 m du bord de la voie")
+
+
 # ================================================================ calculs
 def dist(a, b):
     return math.hypot(N[a]['x'] - N[b]['x'], N[a]['y'] - N[b]['y'])
@@ -1863,7 +1996,20 @@ def tableaux(dist_t, dens):
     t['gabarits'] = gb
     t['mobilier'] = ['| Objet | Type du jeu | Modèle | Où (x, y) | Face au | Pourquoi |', '|---|---|---|---|---|---|'] + [
         '| %s | %s | `%s` | %g, %g | %s | %s |' % (m['id'], m['type'] or '(à créer)', m['modele'], m['x'], m['y'], 'sud est nord ouest'.split()[m['rotation']], m['pourquoi'])
-        for m in M_]
+        for m in M_ if not m.get('when')]
+
+    def _cond(m):
+        out = []
+        for c in m['when']:
+            if c['type'] == 'time_is':
+                out.append('de %d h %02d à %d h %02d' % (c['from'] // 60, c['from'] % 60, c['to'] // 60, c['to'] % 60))
+            elif c['type'] == 'remembered':
+                out.append('`%s` = `%s`' % (c['key'], c['equals']))
+        return ', '.join(out) or 'toute la fête'
+    _lum = lambda m: 'oui' if (_MAN.get(m['modele']) or {}).get('light') else ''
+    t['fetes'] = ['| Objet | Type du jeu | Fête | Où (x, y) | Face au | En plus de la fête | Lampe | Pourquoi |', '|---|---|---|---|---|---|---|---|'] + [
+        '| %s | %s | %s | %g, %g | %s | %s | %s | %s |' % (m['id'], m['type'], m['fete'], m['x'], m['y'], 'sud est nord ouest'.split()[m['rotation']],
+                                                       _cond(m), _lum(m), m['pourquoi']) for m in M_ if m.get('when')]
     t['vegetation'] = ['| Zone | Arbres pour 100 m² | Essences | Sous-étage | Recul des chemins | Pourquoi |', '|---|---|---|---|---|---|'] + [
         '| %s | %s | %s | %s | %s m | %s |' % (ZONES[v['zone']]['nom'], str(v['densite']).replace('.', ','), ', '.join(v['essences']), ', '.join(v['sous_etage']),
                                             str(v['recul_chemins']).replace('.', ','), v['pourquoi']) for v in VEGETATION]
