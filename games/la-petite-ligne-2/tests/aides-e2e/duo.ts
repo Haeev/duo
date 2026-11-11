@@ -222,6 +222,11 @@ export interface StartOptions {
   readonly keepServer?: boolean;
   /** Faux: le jeu est lancé sans la sonde, comme chez un vrai joueur (aucune lecture du monde). */
   readonly probe?: boolean;
+  /**
+   * Faux: n'attend pas le premier état chez l'invité (jeux incompatibles: l'invité n'en reçoit
+   * jamais, la partie s'arrête avant de démarrer). La sonde de l'hôte est attendue quand même.
+   */
+  readonly guestWorld?: boolean;
 }
 
 /** Profils fixes: ceux d'une sauvegarde de départ (les joueurs sont reconnus par leur identifiant). */
@@ -330,7 +335,7 @@ export async function startDuo(
   // La sonde se charge par un import différé: attendre qu'elle réponde des deux côtés.
   if (options.probe !== false) {
     await duo.until(host, 'sonde de l’hôte', () => true);
-    await duo.until(guest, 'sonde de l’invité', () => true);
+    if (options.guestWorld !== false) await duo.until(guest, 'sonde de l’invité', () => true);
   }
   return duo;
 }
