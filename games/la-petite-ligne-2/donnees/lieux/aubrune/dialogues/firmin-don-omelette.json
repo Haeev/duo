@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "firmin-don-omelette",
+  "villager": "firmin",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.barrieres.levee",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Article 45, ajouté ce matin: après la levée, omelette. Deux œufs, les herbes du talus. Colette dira que c'est la sienne. Elle a tort à moitié.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "poireau",
+  "name": "Poireau",
+  "model": "crop-radis",
+  "seed": "graines-poireau",
+  "seasons": [
+    "autumn",
+    "winter"
+  ],
+  "stages": [
+    4,
+    4
+  ],
+  "regrowStage": null,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "poireau",
+      "count": 1
+    },
+    {
+      "wateredShare": 0.5,
+      "item": "poireau",
+      "count": 2
+    },
+    {
+      "wateredShare": 1,
+      "item": "poireau",
+      "count": 3
+    }
+  ]
+}

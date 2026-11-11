@@ -106,6 +106,73 @@ def valeur_moyenne_poisson(absents):
     return total / poids
 
 
+def cycle_et_graine(culture, absents):
+    """Jours du modèle entre deux récoltes et prix de la graine par récolte (centimes).
+    Une culture qui repousse ne repart que de `regrowStage` et sa graine s'amortit (comptée nulle)."""
+    if culture['regrowStage'] is not None:
+        return sum(culture['stages'][culture['regrowStage']:]), 0
+    return sum(culture['stages']), prix_d_achat(culture['seed'], absents)
+
+
+def gain_d_une_case(culture, absents):
+    """Centimes nets par case et par jour, arrosée chaque jour, au meilleur rachat (None si invendable)."""
+    recolte = culture['qualities'][-1]
+    offres = prix_de_rachat(recolte['item'], absents)
+    cycle, graine = cycle_et_graine(culture, absents)
+    if not offres or graine is None:
+        return None
+    return (offres[0][0] * recolte['count'] - graine) / cycle
+
+
+def meilleure_culture(absents, saison=None, admises=None):
+    """La culture vendable qui rapporte le plus par case et par jour (saison ignorée si None)."""
+    gains = [(gain_d_une_case(c, absents), c) for c in CULTURES.values()
+             if (saison is None or saison in c['seasons']) and (admises is None or c['id'] in admises)]
+    gains = [(g, c) for g, c in gains if g is not None]
+    if not gains:
+        return None, None
+    _, culture = max(gains, key=lambda gc: gc[0])
+    return OBJETS[culture['qualities'][-1]['item']]['name'].lower(), culture
+
+
+def table_des_saisons(part=0.40):
+    """Acte 3, duo médian, saison par saison: potager en radis et tomates seuls (avant le 2026-11-11),
+    puis avec carotte, poireau et pomme de terre."""
+    avant = {'radis', 'tomate'}
+    acte3 = PERIODES[-1]
+    lignes = ['| Saison | Culture du potager, avant | Revenu avant | Culture du potager, après | Revenu après | Écart |',
+              '|---|---|---|---|---|---|']
+    for nom, saison in SAISONS:
+        cellules = [nom]
+        revenus = []
+        for admises in (avant, None):
+            periode = dict(acte3, saison=saison, cultures=admises)
+            culture, _ = meilleure_culture(periode['absents'], saison, admises)
+            revenu, _, _ = journee(periode, part)
+            revenus.append(revenu)
+            cellules += [culture or 'aucune', euros(revenu)]
+        cellules.append(('%+.1f %%' % (100 * (revenus[1] / revenus[0] - 1))).replace('.', ','))
+        lignes.append('| ' + ' | '.join(cellules) + ' |')
+    return '\n'.join(lignes)
+
+
+def table_des_cultures():
+    """Ce que rapporte une case de potager, culture par culture (toutes les cultures vendables)."""
+    lignes = ['| Culture | Saisons | Jours entre deux récoltes (modèle) | Récolte | Graine par récolte | Net par case et par jour |',
+              '|---|---|---|---|---|---|']
+    noms = {'spring': 'printemps', 'summer': 'été', 'autumn': 'automne', 'winter': 'hiver'}
+    for c in CULTURES.values():
+        gain = gain_d_une_case(c, set())
+        if gain is None:
+            continue
+        r = c['qualities'][-1]
+        lignes.append('| %s | %s | %d | %s x%d à %s | %s | %s |' % (
+            c['name'], ', '.join(noms[s] for s in c['seasons']), cycle_et_graine(c, set())[0],
+            OBJETS[r['item']]['name'].lower(), r['count'], euros(prix_de_rachat(r['item'], set())[0][0]),
+            euros(cycle_et_graine(c, set())[1]), euros(gain)))
+    return '\n'.join(lignes)
+
+
 def activites(periode):
     """Liste de (nom, objet vendu, unités par jour au plus, secondes par unité, frais par unité en centimes)."""
     h = HYPOTHESES
@@ -127,13 +194,14 @@ def activites(periode):
     par_tas = tas['stock']['count'] * min(2, 1440 / tas['stock']['refillMinutes'])
     liste.append(('bûches des tas de bois', 'buche', compter('tas-de-bois') * par_tas,
                   tas['seconds'] + h['marche_par_tas'] / tas['stock']['count'], 0))
-    # Potager: radis arrosés chaque jour (le meilleur résultat), une récolte tous les `sum(stages)` jours.
-    radis = CULTURES['radis']
-    cycle = sum(radis['stages'])
-    recolte = radis['qualities'][-1]
-    liste.append(('radis croquants du potager', recolte['item'], periode['cases'] * recolte['count'] / cycle,
-                  h['seconde_par_case_et_par_jour'] * cycle / recolte['count'],
-                  prix_d_achat(radis['seed'], periode['absents']) / recolte['count']))
+    # Potager: la culture qui rapporte le plus par case et par jour, arrosée chaque jour (le meilleur
+    # résultat), une récolte tous les `sum(stages)` jours; sans saison donnée, saisons ignorées (borne haute).
+    nom, culture = meilleure_culture(periode['absents'], periode.get('saison'), periode.get('cultures'))
+    if culture is not None:
+        cycle, graine = cycle_et_graine(culture, periode['absents'])
+        recolte = culture['qualities'][-1]
+        liste.append(('%s du potager' % nom, recolte['item'], periode['cases'] * recolte['count'] / cycle,
+                      h['seconde_par_case_et_par_jour'] * cycle / recolte['count'], graine / recolte['count']))
     if periode['peche']:
         liste.append(('pêche', '*poisson', h['poissons_par_jour_au_plus'], h['seconde_par_poisson'], 0))
     return liste
@@ -303,7 +371,9 @@ def table_des_pommes():
 def main():
     print('Journée de jeu: %.0f s réelles (%.1f min)\n' % (JOUR_S, JOUR_S / 60))
     print('## Prix\n\n' + table_des_prix() + '\n')
+    print('## Une case de potager, culture par culture\n\n' + table_des_cultures() + '\n')
     print('## Revenu d\'une journée à deux (euros, brut puis net du pain)\n\n' + table_des_revenus() + '\n')
+    print('## Acte 3, duo médian, saison par saison (potager de saison)\n\n' + table_des_saisons() + '\n')
     for periode in PERIODES:
         print('## Détail, duo médian, %s, cuisine achetée si possible\n\n%s\n' % (periode['nom'], table_du_detail(periode, 0.40)))
     print('## Jours pour payer la maison (moitié du revenu net au coffre commun)\n\n' + table_de_la_maison() + '\n')

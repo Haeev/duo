@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-don-tourte",
+  "villager": "odette",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.premier-train.lanterne",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "La tourte du quai, une part par garde. Elle tient au corps jusqu'à 5 h 12. Si tu veilles, mange-la à 5 h 11.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

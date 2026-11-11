@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "graines-poireau",
+  "name": "Graines de poireau",
+  "family": "seed",
+  "stack": 20,
+  "food": null,
+  "tool": null
+}
