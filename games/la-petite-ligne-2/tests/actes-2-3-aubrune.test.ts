@@ -1,7 +1,7 @@
 // Actes 2 et 3 d'Aubrune (« La minute d'écart », « Ceux qui partent »): les deux suites se jouent
 // de bout en bout par la simulation, les zones du plan s'ouvrent à l'acte prévu, les arrivants
 // descendent du train, et chaque page tient dans le bandeau.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { Content } from '../src/donnees/charger';
 import type { PlayerIndex } from '../src/donnees/schemas/communs';
 import { startTalk, talkView } from '../src/simulation/dialogues/conversation';
@@ -150,6 +150,10 @@ function afterActOne(): Sim {
   wait(sim, 0.5);
   return sim;
 }
+
+// Délai propre à ce fichier: un acte entier joué de bout en bout dure 10 à 15 s seul et dépasse le garde-temps de
+// 20 s dès que la machine est chargée. Le garde-temps reste entier pour le reste de la suite.
+vi.setConfig({ testTimeout: 90_000 });
 
 describe('écriture des actes 2 et 3 d’Aubrune', () => {
   it('chaque page tient dans le bandeau et chaque étape nomme un lieu ou un habitant', () => {

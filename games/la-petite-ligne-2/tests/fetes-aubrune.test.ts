@@ -1,7 +1,7 @@
 // Fêtes d'Aubrune (cahier 4.7 et 6.3, `ecriture-fetes.md`): les quatre fêtes de saison et la
 // veillée du quai, jouées par la simulation (ouverture au calendrier, présence des habitants,
 // scènes à deux rôles, répliques en tournante, décision à deux, récompense, retour l'an suivant).
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { Content } from '../src/donnees/charger';
 import type { PlayerIndex } from '../src/donnees/schemas/communs';
 import { startTalk, talkView } from '../src/simulation/dialogues/conversation';
@@ -370,6 +370,10 @@ function linesOf(id: string): string[] {
   if (dialogue === undefined) throw new Error(`dialogue ${id}`);
   return Object.values(dialogue.nodes).flatMap((n) => (n.kind === 'line' ? [n.text] : []));
 }
+
+// Délai propre à ce fichier: une fête entière jouée de bout en bout dure 10 à 15 s seul et dépasse le garde-temps de
+// 20 s dès que la machine est chargée. Le garde-temps reste entier pour le reste de la suite.
+vi.setConfig({ testTimeout: 90_000 });
 
 describe('fêtes d’Aubrune', () => {
   it('quatre fêtes au calendrier, un samedi 13 par saison, annoncées la veille, ouvertes par l’histoire', () => {
