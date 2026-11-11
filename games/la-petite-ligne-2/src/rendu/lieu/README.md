@@ -18,7 +18,7 @@ Une carte qui a un `terrain` (produite par `outils/plan-vers-lieu.ts`) est rendu
 | `terrain-rendu.ts`   | nature dessinée de chaque case, `surfaceAt(field, x, y)` pour le son des pas, décor semé par tuile, rails, volumes des bâtiments (logique pure, déterministe)                                     |
 | `reglages-tuiles.ts` | couleurs par nature, densités, hauteurs, budgets (technique 3.10)                                                                                                                                 |
 | `geometrie.ts`       | géométries fusionnées à couleurs de sommets; `FadingMesh`: un maillage fusionné dont une partie (un bâtiment) s'efface sans rien recréer                                                          |
-| `tuile.ts`           | une tuile: sol (berges et rails compris), eau, boîtes, troncs, boules instanciés, murs, vitres, toits: 8 appels au plus                                                                           |
+| `tuile.ts`           | une tuile: sol (berges et rails compris), eau, boîtes, végétation instanciée (un appel par modèle), murs, vitres, toits                                                                           |
 | `grand-lieu.ts`      | `TiledPlace`: anneau, construction étalée (4 ms par image, sauf tuile déjà vue), sol lointain simplifié, repères, occultation des murs, toits et houppiers, lueur des fenêtres la nuit, compteurs |
 
 Le moteur expose `surfaceAt(x, y)` (`null` hors grand lieu), `stats().tiles` (compteurs par tuile et au total) et `setOverview(largeur)` (vue haute de contrôle).
@@ -30,6 +30,21 @@ Page de démonstration: `pnpm exec vite --config src/rendu/lieu/demo/vite.config
 ## Rendu encré (ADR 0023)
 
 En style encré, `grand-lieu.ts` prend ses matériaux dans `../encre/` et ajoute: la carte du sol du lieu (`../encre/sol.ts`), le semis de cailloux et de touffes (`tileSemis`, réglages `semis`), les murs coupés et le plancher des pièces (`interiorWalls`, réglages `interior`), et les bâtiments livrés (`batiments.ts`: manifeste `assets/lieux/<lieu>/batiments/batiments.json`, un modèle par identifiant de `buildings`; sans modèle, les volumes provisoires). Les voies suivent `rails` de la carte quand il existe.
+
+Végétation semée (rendu encré): les arbres et buissons tirés par `tileDecor` sont des modèles livrés du manifeste des décors (`semis` de `reglages-recoltes.ts`: une essence par place, puis sa variante, son cap et sa taille tirés de la place), un maillage instancié par modèle et par tuile. L'ancien rendu garde ses troncs et ses boules. Un houppier s'efface devant le joueur sur la largeur du modèle posé.
+
+## Récoltables: états, potager, repères, objets au sol
+
+`recoltes.ts` (logique pure) lit l'état déjà transmis (rien de plus sur le réseau) et `lieu.ts` le montre:
+
+- **Forme stable**: chaque modèle est demandé avec l'identifiant de l'exemplaire (`ModelSource.instantiate(modèle, id, état)`): variante, cap et échelle en sont tirés, les mêmes chez l'hôte et chez l'invité, à chaque visite.
+- **États** (`objectState`): ressource récoltée pas encore revenue, l'état `after` de sa fiche (`stump`, `bare`; `gone`: rien n'est dessiné); ressource entamée, `chipped`; stock d'une brique `gather` vide, `bare`. `PlaceScene.setStates` ne refait que les volumes dont l'état change; le moteur relit l'empreinte (`harvestSignature`) à chaque image, sans allocation.
+- **Potager** (`fieldVolumes`): une case bêchée ou arrosée (états `tilled`, `watered` du modèle du meuble) par parcelle, et le plant de la culture à son stade, mûr ou à arroser (`cropModel`), sur la grille de la simulation, à la hauteur du potager (`foot`).
+- **Repères** (`markerVolumes`): un repère de pêche sur la berge de chaque coin de `lieu.json` (tourné vers l'eau), des touffes à insectes dans les zones de `nature.json`.
+- **Objets au sol**: le modèle du meuble qui EST l'objet (ressource qui disparaît et ne donne que lui: pierre, bûche, coquelicot), réduit (`ground.modelScale`); sinon un ballot encré commun (`ballot.ts`), jamais un cube.
+- **Effacement**: la boîte d'occultation d'un volume à modèle est celle du modèle posé (houppier compris), plus son emprise; une souche ne cache plus rien.
+
+Ajouter une culture ou un état: aucune ligne de code. Une culture: sa fiche (`model`) et ses modèles (`assets-src/decors/recoltables-aubrune/README.md`). Un état: le modèle sous `states` du manifeste, et le nom d'état dans la fiche (`after` d'une ressource) ou dans `reglages-recoltes.ts`. Test court: `pnpm exec vitest run tests/rendu/recoltes.test.ts` (ressource, meuble, culture et zone factices). Captures: `pnpm exec playwright test --config tests/rendu-encre/playwright.config.ts recoltes`.
 
 ## Pièces: un monde clos à l'écran
 

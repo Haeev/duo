@@ -23,6 +23,8 @@ import { Fadable } from '../fondu';
 import type { OccluderBox } from '../occultation';
 import { ResourceTracker } from '../ressources';
 import { FadingMesh, GeometryBuilder } from './geometrie';
+import { DECOR_MANIFEST, type DecorManifest, jitterOf, variantOf } from './decors-manifeste';
+import { HARVEST_LOOK, type HarvestLookSettings } from './reglages-recoltes';
 import type { TileSettings } from './reglages-tuiles';
 import type { Relief } from './relief';
 import { reliefGround } from './relief-sol';
@@ -33,6 +35,7 @@ import {
   type GroundField,
   hash01,
   railPieces,
+  type TileDecor,
   tileDecor,
   tileSemis,
   type TreeItem,
@@ -56,6 +59,25 @@ export interface TileShapes {
   readonly tuft?: BufferGeometry;
 }
 
+/**
+ * Modèles livrés de la végétation semée (rendu encré): géométrie fusionnée d'un modèle du
+ * manifeste (`DecorModels.geometryOf`), posée en instances. Les géométries restent à la source.
+ */
+export interface TilePlants {
+  geometryOf(model: string): BufferGeometry | null;
+}
+
+/** Une place de la végétation semée: le modèle tiré, sa pose, et l'arbre qu'elle montre. */
+interface Planting {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+  readonly yaw: number;
+  readonly scale: number;
+  /** Index dans `trees` (houppier effaçable), `null` pour un buisson. */
+  readonly tree: number | null;
+}
+
 /** Ce que toutes les tuiles d'un lieu partagent (créé et libéré par le lieu). */
 export interface TileKit {
   readonly map: MapDef;
@@ -68,6 +90,19 @@ export interface TileKit {
   readonly shapes: TileShapes;
   /** Relief du sol (rendu encré): le sol, le décor et le semis en suivent la hauteur; absent: sol plan. */
   readonly relief?: Relief | null;
+  /** Rendu encré: arbres et buissons semés en modèles livrés; absent: troncs et boules. */
+  readonly plants?: TilePlants | null;
+  /** Choix des modèles semés et manifeste où les lire (par défaut ceux du jeu). */
+  readonly look?: HarvestLookSettings;
+  readonly manifest?: DecorManifest;
+}
+
+/** L'instance qui montre un arbre (son houppier s'efface devant le joueur). */
+export interface CrownSlot {
+  readonly mesh: InstancedMesh;
+  readonly slot: number;
+  /** Teinte de la copie effacée (blanc: les couleurs du modèle). */
+  readonly color: string;
 }
 
 const matrix = new Matrix4();
@@ -98,9 +133,9 @@ export class TileView {
   readonly occluders: OccluderBox[] = [];
   /** Boîtes des houppiers (même index que `trees`). */
   readonly crownBoxes: OccluderBox[] = [];
-  /** Houppiers (index d'instance = index dans `trees`), pour les effacer devant le joueur. */
+  /** Arbres semés, et l'instance qui montre chacun (même index), pour les effacer devant le joueur. */
   trees: readonly TreeItem[] = [];
-  crowns: InstancedMesh | null = null;
+  readonly crownSlots: CrownSlot[] = [];
   triangles = 0;
   calls = 0;
 
@@ -412,44 +447,34 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     const item = decor.boxes[i];
     if (item !== undefined) putBox(mesh, i, item);
   });
-  instances(view, shapes.trunk, materials.instanced, decor.trees.length, 'troncs', (mesh, i) => {
-    const tree = decor.trees[i];
-    if (tree === undefined) return;
-    rotation.identity();
-    // Le tronc part d'un peu sous le sol: sur une pente, son pied ne laisse pas de jour.
-    const sunk = relief === null ? 0 : relief.settings.mesh.bury;
-    matrix.compose(
-      position.set(tree.x, (tree.ground ?? 0) - sunk, tree.z),
-      rotation,
-      scale.set(
-        tree.trunkRadius,
-        tree.trunkHeight + tree.crownHeight * 0.3 + sunk,
-        tree.trunkRadius,
-      ),
-    );
-    mesh.setMatrixAt(i, matrix);
-    mesh.setColorAt(i, color.set(kit.settings.decor.trunkColor));
-  });
-  // Houppiers d'abord (index = index de l'arbre), buissons ensuite.
-  view.crowns = instances(
-    view,
-    shapes.blob,
-    materials.instanced,
-    decor.trees.length + decor.bushes.length,
-    'boules',
-    (mesh, i) => {
-      const tree = decor.trees[i];
-      const item = tree !== undefined ? crownBlob(tree) : decor.bushes[i - decor.trees.length];
-      if (item !== undefined) putBlob(mesh, i, item);
-    },
-  );
-  for (const [i, tree] of decor.trees.entries()) {
-    const blob = crownBlob(tree);
-    view.crownBoxes.push({
-      id: String(i),
-      min: { x: blob.x - blob.rx, y: blob.y - blob.ry, z: blob.z - blob.rz },
-      max: { x: blob.x + blob.rx, y: blob.y + blob.ry, z: blob.z + blob.rz },
-    });
+  const planted =
+    kit.plants === undefined || kit.plants === null ? null : plantings(kit, decor, tile);
+  if (planted === null) trunksAndBlobs(kit, view, decor);
+  else {
+    // Un maillage instancié par modèle tiré et par morceau de tuile: un appel de dessin par forme,
+    // quel que soit le nombre, et un bois hors du champ n'est pas dessiné.
+    for (const { model, list } of planted.values()) {
+      const geometry = kit.plants?.geometryOf(model) ?? null;
+      if (geometry === null) continue;
+      instances(view, geometry, materials.instanced, list.length, model, (mesh, i) => {
+        const item = list[i];
+        if (item === undefined) return;
+        rotation.setFromAxisAngle(up, item.yaw);
+        matrix.compose(position.set(item.x, item.y, item.z), rotation, scale.setScalar(item.scale));
+        mesh.setMatrixAt(i, matrix);
+        mesh.setColorAt(i, color.set('#ffffff'));
+        if (item.tree === null) return;
+        view.crownSlots[item.tree] = { mesh, slot: i, color: '#ffffff' };
+        // Boîte du houppier: la largeur réelle du modèle tel qu'il est posé.
+        const size = (kit.manifest ?? DECOR_MANIFEST).models[model]?.size;
+        const half = (Math.max(size?.w ?? 2, size?.d ?? 2) * item.scale) / 2;
+        view.crownBoxes[item.tree] = {
+          id: String(item.tree),
+          min: { x: item.x - half, y: item.y, z: item.z - half },
+          max: { x: item.x + half, y: item.y + (size?.h ?? 4) * item.scale, z: item.z + half },
+        };
+      });
+    }
   }
   yield;
 
@@ -567,4 +592,105 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     }
   }
   return view;
+}
+
+/** Ancien décor semé (rendu en aplats, ou modèles absents): un tronc et une boule par arbre. */
+function trunksAndBlobs(kit: TileKit, view: TileView, decor: TileDecor): void {
+  const { materials, shapes } = kit;
+  const relief = kit.relief ?? null;
+  instances(view, shapes.trunk, materials.instanced, decor.trees.length, 'troncs', (mesh, i) => {
+    const tree = decor.trees[i];
+    if (tree === undefined) return;
+    rotation.identity();
+    // Le tronc part d'un peu sous le sol: sur une pente, son pied ne laisse pas de jour.
+    const sunk = relief === null ? 0 : relief.settings.mesh.bury;
+    matrix.compose(
+      position.set(tree.x, (tree.ground ?? 0) - sunk, tree.z),
+      rotation,
+      scale.set(
+        tree.trunkRadius,
+        tree.trunkHeight + tree.crownHeight * 0.3 + sunk,
+        tree.trunkRadius,
+      ),
+    );
+    mesh.setMatrixAt(i, matrix);
+    mesh.setColorAt(i, color.set(kit.settings.decor.trunkColor));
+  });
+  // Houppiers d'abord (index = index de l'arbre), buissons ensuite.
+  const crowns = instances(
+    view,
+    shapes.blob,
+    materials.instanced,
+    decor.trees.length + decor.bushes.length,
+    'boules',
+    (mesh, i) => {
+      const tree = decor.trees[i];
+      const item = tree !== undefined ? crownBlob(tree) : decor.bushes[i - decor.trees.length];
+      if (item !== undefined) putBlob(mesh, i, item);
+    },
+  );
+  for (const [i, tree] of decor.trees.entries()) {
+    const blob = crownBlob(tree);
+    if (crowns !== null) view.crownSlots.push({ mesh: crowns, slot: i, color: tree.color });
+    view.crownBoxes.push({
+      id: String(i),
+      min: { x: blob.x - blob.rx, y: blob.y - blob.ry, z: blob.z - blob.rz },
+      max: { x: blob.x + blob.rx, y: blob.y + blob.ry, z: blob.z + blob.rz },
+    });
+  }
+}
+
+function pick<T>(list: readonly T[], t: number): T | undefined {
+  return list[Math.min(list.length - 1, Math.floor(t * list.length))];
+}
+
+/**
+ * Végétation semée en modèles livrés: pour chaque arbre et buisson du décor, une essence tirée de
+ * sa place (`look.semis`), puis sa variante, son cap et sa taille (`variantOf`, `jitterOf`): la
+ * même forme à chaque chargement de la tuile et chez les deux joueurs. Rangée par morceau de
+ * tuile (`semis.chunk`) et par modèle.
+ * `null`: une essence manque au manifeste ou à la source (le moteur garde troncs et boules).
+ */
+function plantings(
+  kit: TileKit,
+  decor: TileDecor,
+  tile: number,
+): Map<string, { model: string; list: Planting[] }> | null {
+  const look = kit.look ?? HARVEST_LOOK;
+  const manifest = kit.manifest ?? DECOR_MANIFEST;
+  const { x0, y0 } = tileRect(kit.map, tile);
+  const side = look.semis.chunk;
+  const out = new Map<string, { model: string; list: Planting[] }>();
+  const place = (
+    choices: readonly string[],
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    tree: number | null,
+  ): boolean => {
+    const essence = pick(choices, hash01(Math.floor(x * 10), Math.floor(z * 10), 41));
+    if (essence === undefined || manifest.models[essence] === undefined) return false;
+    const key = `semis:${String(Math.round(x * 100))}:${String(Math.round(z * 100))}`;
+    const model = variantOf(essence, key, manifest);
+    if (kit.plants?.geometryOf(model) === null) return false;
+    const { yaw, scale } = jitterOf(essence, key, manifest);
+    const chunk = `${String(Math.floor((x - x0) / side))}:${String(Math.floor((z - y0) / side))}`;
+    const group = out.get(`${chunk}|${model}`) ?? { model, list: [] };
+    group.list.push({ x, y, z, yaw, scale: scale * size, tree });
+    out.set(`${chunk}|${model}`, group);
+    return true;
+  };
+  for (const [i, tree] of decor.trees.entries()) {
+    // La taille tirée par le décor (0,75 à 1,35) reste, resserrée autour de celle du modèle.
+    const size = 0.8 + ((tree.trunkHeight / 1.7 - 0.75) / 0.6) * 0.4;
+    if (!place(look.semis.trees, tree.x, tree.ground ?? 0, tree.z, size, i)) return null;
+  }
+  for (const bush of decor.bushes) {
+    // Le pied du buisson: le bas de sa boule (posée sur le sol, relief compris).
+    const size = 0.8 + bush.rx * 0.6;
+    if (!place(look.semis.bushes, bush.x, bush.y - bush.ry * 0.875, bush.z, size, null))
+      return null;
+  }
+  return out;
 }

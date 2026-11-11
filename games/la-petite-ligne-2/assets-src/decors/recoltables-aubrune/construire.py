@@ -127,6 +127,10 @@ def batir(gabarits: dict, cultures: dict[str, dict]):
             if m["id"] in vus:
                 raise SystemExit(f"identifiant en double: {m['id']}")
             vus.add(m["id"])
+            # `pose` d'une entrée: écarts de pose propres (taille lue à la caméra de jeu), à la
+            # place de ceux de la famille, pour le modèle et ses variantes (pas ses états).
+            if "pose" in entree and "etat" not in m:
+                m["jitter"] = {"yaw": bool(entree["pose"].get("cap", True)), "scale": list(entree["pose"]["echelle"])}
             m["famille"] = famille
             m["budget"] = entree.get("budget", gabarits["budgets"][m.pop("famille_budget", famille)])
             m["fichier"] = gabarits["fichiers"][famille]

@@ -22,6 +22,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
+import type { Content } from '../donnees/charger';
 import type { Body } from '../etat/joueur';
 import type { PlaceState } from '../etat/lieu';
 import type { DeepReadonly, ReadonlyWorld } from '../etat/monde';
@@ -67,7 +68,9 @@ import type { BuildingSource } from './lieu/batiments';
 import { Spaces } from './lieu/espaces';
 import { type TileStats, TiledPlace } from './lieu/grand-lieu';
 import { type ModelSource, PlaceScene } from './lieu/lieu';
+import { fieldVolumes, harvestSignature, markerVolumes, placeStates } from './lieu/recoltes';
 import { RELIEF_SETTINGS } from './lieu/reglages-relief';
+import type { TilePlants } from './lieu/tuile';
 import { TILE_SETTINGS, type SurfaceKind } from './lieu/reglages-tuiles';
 import { Daylight, nightShare } from './lumiere';
 import { DEFAULT_GRAPHICS_OPTIONS, type GraphicsOptions } from './options';
@@ -263,6 +266,10 @@ class Engine implements GameRenderer {
   private readonly fog = new Fog(0x000000, 1e4, 2e4);
   private overview: number | null = null;
   private signature = Number.NaN;
+  /** Empreinte de ce que montrent les récoltables (`recoltes.ts`), lue à chaque image. */
+  private harvested = Number.NaN;
+  /** Contenu et monde de l'image, relus par les récoltables (gardé: aucune allocation par image). */
+  private harvestLook: { content: Content; world: ReadonlyWorld } | null = null;
   private resolutionStep = 0;
   private adaptiveLight = false;
   private surface: DisplaySurface = {
@@ -586,6 +593,13 @@ class Engine implements GameRenderer {
     this.aspect = Math.max(1, cssWidth) / Math.max(1, cssHeight);
   }
 
+  /** La végétation semée des grands lieux en modèles livrés, si la source des décors les fournit. */
+  private plants(): TilePlants | null {
+    const models = this.options.models;
+    if (models?.geometryOf === undefined) return null;
+    return { geometryOf: (model) => models.geometryOf?.(model) ?? null };
+  }
+
   private loadPlace(id: string): void {
     this.highlight.release();
     this.place?.dispose();
@@ -593,6 +607,7 @@ class Engine implements GameRenderer {
     this.tiled?.dispose();
     this.tiled = null;
     this.signature = Number.NaN;
+    this.harvested = Number.NaN;
     this.lights = null;
     this.spaces = null;
     this.room = undefined;
@@ -608,7 +623,8 @@ class Engine implements GameRenderer {
     const description = describePlace(
       content,
       place,
-      this.options.extras?.(id) ?? [],
+      // Repères des coins de pêche et des zones à insectes: fixes, tirés des données du lieu.
+      [...markerVolumes(content, id), ...(this.options.extras?.(id) ?? [])],
       undefined,
       !tiled,
     );
@@ -621,6 +637,7 @@ class Engine implements GameRenderer {
         this.ink,
         place.interiors,
         buildings === undefined ? null : { place: id, source: buildings },
+        this.plants(),
       );
       this.scene.add(this.tiled.root);
     }
@@ -710,10 +727,21 @@ class Engine implements GameRenderer {
     this.table.visible = true;
 
     const signature = dynamicSignature(state);
-    if (signature !== this.signature) {
+    const placeContent = view.content.places[place.description.id];
+    const look = (this.harvestLook ??= { content: view.content, world });
+    look.world = world;
+    const harvested = placeContent === undefined ? 0 : harvestSignature(look, placeContent, state);
+    if (signature !== this.signature || harvested !== this.harvested) {
       this.signature = signature;
+      this.harvested = harvested;
       this.highlight.release();
-      place.setDynamic(describeDynamic(view.content, state));
+      // États des récoltables (souche, buisson cueilli...) et cases du potager: lus dans l'état
+      // déjà transmis, les mêmes chez l'hôte et chez l'invité.
+      if (placeContent !== undefined) place.setStates(placeStates(look, placeContent, state));
+      place.setDynamic([
+        ...describeDynamic(view.content, state),
+        ...(placeContent === undefined ? [] : fieldVolumes(view.content, placeContent, state)),
+      ]);
       if (this.ink !== null)
         this.lights = placeLights(place.volumes(), this.tiled?.lights() ?? null);
     }

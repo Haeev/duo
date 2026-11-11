@@ -850,8 +850,8 @@
    "file": "aubrune-recoltes.glb",
    "jitter": {
     "scale": [
-     0.92,
-     1.08
+     1.22,
+     1.36
     ],
     "yaw": true
    },
@@ -881,8 +881,8 @@
    "file": "aubrune-recoltes.glb",
    "jitter": {
     "scale": [
-     0.92,
-     1.08
+     1.22,
+     1.36
     ],
     "yaw": true
    },
@@ -946,48 +946,6 @@
     "feuillage": 187,
     "tige": 36
    }
-  },
-  "bush-flowering": {
-   "bottom": 0.002,
-   "budget": 1500,
-   "collision": {
-    "d": 0.967,
-    "h": 0.767,
-    "shape": "box",
-    "w": 1.134
-   },
-   "family": "buisson",
-   "file": "plants.glb",
-   "nodes": [
-    "bush-flowering_mesh"
-   ],
-   "size": {
-    "d": 0.967,
-    "h": 0.767,
-    "w": 1.134
-   },
-   "triangles": 1120
-  },
-  "bush-round": {
-   "bottom": 0.002,
-   "budget": 1500,
-   "collision": {
-    "d": 1.182,
-    "h": 0.937,
-    "shape": "box",
-    "w": 1.386
-   },
-   "family": "buisson",
-   "file": "plants.glb",
-   "nodes": [
-    "bush-round_mesh"
-   ],
-   "size": {
-    "d": 1.182,
-    "h": 0.937,
-    "w": 1.386
-   },
-   "triangles": 672
   },
   "chair-bedroom": {
    "bottom": 0.0,
@@ -1487,6 +1445,13 @@
    "budget": 200,
    "family": "repere",
    "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     1.45,
+     1.45
+    ],
+    "yaw": false
+   },
    "size": {
     "d": 0.722,
     "h": 1.192,
@@ -1499,27 +1464,6 @@
     "fleur": 64,
     "tige": 74
    }
-  },
-  "flowers-poppy": {
-   "bottom": 0.0,
-   "budget": 800,
-   "collision": {
-    "d": 0.324,
-    "h": 0.461,
-    "shape": "box",
-    "w": 0.387
-   },
-   "family": "fleurs",
-   "file": "plants.glb",
-   "nodes": [
-    "flowers-poppy_mesh"
-   ],
-   "size": {
-    "d": 0.324,
-    "h": 0.461,
-    "w": 0.387
-   },
-   "triangles": 772
   },
   "garden-bed": {
    "bottom": 0.0,
@@ -1584,27 +1528,6 @@
    "trianglesParMateriau": {
     "terre": 202
    }
-  },
-  "grass-tuft": {
-   "bottom": 0.0012,
-   "budget": 300,
-   "collision": {
-    "d": 0.262,
-    "h": 0.346,
-    "shape": "box",
-    "w": 0.228
-   },
-   "family": "touffe",
-   "file": "plants.glb",
-   "nodes": [
-    "grass-tuft_mesh"
-   ],
-   "size": {
-    "d": 0.262,
-    "h": 0.346,
-    "w": 0.228
-   },
-   "triangles": 144
   },
   "great-oak-tree": {
    "bottom": 0.0,
@@ -1978,8 +1901,8 @@
    "file": "aubrune-recoltes.glb",
    "jitter": {
     "scale": [
-     0.9,
-     1.1
+     1.3,
+     1.5
     ],
     "yaw": true
    },
@@ -2005,8 +1928,8 @@
    "file": "aubrune-recoltes.glb",
    "jitter": {
     "scale": [
-     0.9,
-     1.1
+     1.3,
+     1.5
     ],
     "yaw": true
    },
@@ -2429,28 +2352,6 @@
    },
    "triangles": 488
   },
-  "stump": {
-   "bottom": 0.0,
-   "budget": 800,
-   "collision": {
-    "d": 0.869,
-    "h": 0.4,
-    "shape": "box",
-    "w": 0.869
-   },
-   "family": "souche",
-   "file": "plants.glb",
-   "nodes": [
-    "stump_mesh"
-   ],
-   "size": {
-    "d": 0.869,
-    "h": 0.4,
-    "w": 0.869
-   },
-   "top": 0.4,
-   "triangles": 504
-  },
   "table-farm": {
    "bottom": 0.0,
    "budget": 1500,
@@ -2735,66 +2636,6 @@
    },
    "triangles": 360
   },
-  "tree-apple": {
-   "bottom": 0.0,
-   "budget": 2500,
-   "collision": {
-    "h": 3.875,
-    "radius": 0.2,
-    "shape": "cylinder"
-   },
-   "family": "arbre",
-   "file": "plants.glb",
-   "nodes": [
-    "tree-apple_mesh"
-   ],
-   "size": {
-    "d": 3.013,
-    "h": 3.875,
-    "w": 3.219
-   },
-   "triangles": 1672
-  },
-  "tree-fir": {
-   "bottom": 0.0,
-   "budget": 2500,
-   "collision": {
-    "h": 6.192,
-    "radius": 0.3,
-    "shape": "cylinder"
-   },
-   "family": "arbre",
-   "file": "plants.glb",
-   "nodes": [
-    "tree-fir_mesh"
-   ],
-   "size": {
-    "d": 2.8,
-    "h": 6.192,
-    "w": 2.73
-   },
-   "triangles": 1032
-  },
-  "tree-round": {
-   "bottom": 0.0,
-   "budget": 2500,
-   "collision": {
-    "h": 5.315,
-    "radius": 0.275,
-    "shape": "cylinder"
-   },
-   "family": "arbre",
-   "file": "plants.glb",
-   "nodes": [
-    "tree-round_mesh"
-   ],
-   "size": {
-    "d": 4.46,
-    "h": 5.315,
-    "w": 4.764
-   },
-   "triangles": 1272
-  },
   "tub": {
    "bottom": 0.0,
    "budget": 1500,
@@ -2887,8 +2728,8 @@
    "file": "aubrune-recoltes.glb",
    "jitter": {
     "scale": [
-     0.9,
-     1.1
+     1.35,
+     1.55
     ],
     "yaw": true
    },

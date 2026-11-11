@@ -17,8 +17,8 @@ import {
   type DecorManifest,
   type DecorMaterial,
   decorFiles,
-  keyDraw,
-  variantOf,
+  jitterOf,
+  shownModel,
 } from './decors-manifeste';
 
 const URLS = import.meta.glob<string>('../../../assets/commun/decors/*.glb', {
@@ -140,26 +140,40 @@ export class DecorModels implements ModelSource {
   /**
    * Une copie du modèle. S'il a des variantes ou des écarts de pose (`variants`, `jitter` du
    * manifeste), l'exemplaire tire sa forme, son cap et son échelle de `key` (l'identifiant de
-   * l'exemplaire posé: le même arbre garde sa forme d'une visite à l'autre); sans `key`, du rang
-   * de pose de ce modèle.
+   * l'exemplaire posé: le même arbre garde sa forme d'une visite à l'autre, et chez les deux
+   * joueurs); sans `key`, du rang de pose de ce modèle. `state` (`stump`, `bare`...): le modèle de
+   * cet état pour la forme tirée (`shownModel`), avec le même cap et la même échelle.
    */
-  instantiate(model: string, key?: string): Object3D | null {
+  instantiate(model: string, key?: string, state: string | null = null): Object3D | null {
     const sheet = this.manifest.models[model];
-    if (sheet?.variants === undefined && sheet?.jitter === undefined)
+    if (sheet?.variants === undefined && sheet?.jitter === undefined && state === null)
       return this.prototypes.get(model)?.clone() ?? null;
     const rank = this.drawn.get(model) ?? 0;
     if (key === undefined) this.drawn.set(model, rank + 1);
     const draw = key ?? `${model}#${String(rank)}`;
-    const copy = this.prototypes.get(variantOf(model, draw, this.manifest))?.clone() ?? null;
-    if (copy === null || sheet.jitter === undefined) return copy;
-    const [low, high] = sheet.jitter.scale;
-    if (sheet.jitter.yaw) copy.rotation.y = keyDraw(draw, 2) * Math.PI * 2;
-    copy.scale.setScalar(low + (high - low) * keyDraw(draw, 3));
+    const shown = shownModel(model, draw, state, this.manifest);
+    const copy = this.prototypes.get(shown)?.clone() ?? null;
+    if (copy === null || sheet?.jitter === undefined) return copy;
+    const { yaw, scale } = jitterOf(model, draw, this.manifest);
+    copy.rotation.y = yaw;
+    copy.scale.setScalar(scale);
     // L'appelant pose et tourne l'objet rendu: les écarts restent sur la copie, à l'intérieur.
     const holder = new Group();
     holder.name = model;
     holder.add(copy);
     return holder;
+  }
+
+  /**
+   * Géométrie fusionnée d'un modèle (un seul maillage, `mergeNamed`), pour le poser en instances
+   * (végétation semée des tuiles); `null` s'il n'est pas chargé ou pas fusionné. Elle reste à la
+   * source: l'appelant ne la libère pas.
+   */
+  geometryOf(model: string): BufferGeometry | null {
+    const prototype = this.prototypes.get(model);
+    return prototype !== undefined && (prototype as Partial<Mesh>).isMesh === true
+      ? (prototype as Mesh).geometry
+      : null;
   }
 
   /** Modèles chargés (contrôle). */
