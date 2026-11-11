@@ -33,6 +33,7 @@ L'heure d'allumage du dehors est un seul réglage (`INK_SETTINGS.lamps`): les la
 
 - Un modèle livré dans `assets/commun/decors/` passe seul au matériau encré: ses morceaux d'un seul tenant deviennent des morceaux de contour, leur couche de traits vient de leur teinte (`INK_SETTINGS.models.rules`). Une famille à vitres (`INK_SETTINGS.models.glass`: paroi et porte de voiture) fait de ses morceaux bleus des vitres qui suivent l'heure, et n'a pas de feuillage.
 - Une famille de modèles qui éclaire s'inscrit dans `INK_SETTINGS.lampFamilies` (hauteur du foyer, rayon de la flaque, ombre ou non).
+- Feux vivants (`INK_SETTINGS.fire`): un morceau en matériau `flamme` qui finit en pointe est une langue de feu (nature `KIND.fire`): elle ondule et s'étire selon sa hauteur au-dessus de son pied, à la phase de sa place et de son numéro, en trois aplats (jaune au cœur, orangé en pointe), sans ombre portée. Un morceau `flamme` qui ne finit pas en pointe reste un verre de lampe. `braise` (`KIND.ember`) rougeoie lentement. Allumé ou non: un objet qui porte une lampe brûle quand elle est allumée (ou toute la journée si sa famille le dit, `fire.families`), un objet sans lampe brûle toujours (son état sans feu est un autre modèle, `states`). La lampe d'un objet à flamme vacille au même battement (`fireBeat` de `couches.ts`); mouvement réduit: langues à 30 %, lampes fixes. Aucun programme ni passe de plus.
 
 ## Outil de mesure (dans le jeu)
 

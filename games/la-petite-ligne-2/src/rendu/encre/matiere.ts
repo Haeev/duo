@@ -35,7 +35,7 @@ import {
 import type { Ambiance } from './ambiances';
 import { EDGE_SETTINGS } from '../lieu/reglages-lisieres';
 import { RELIEF_SETTINGS } from '../lieu/reglages-relief';
-import { hex, KEEP_INK, LAYER, type Rgb, SLEEK_PART, TILE_METRES } from './couches';
+import { fireBeat, hex, KEEP_INK, KIND, LAYER, type Rgb, SLEEK_PART, TILE_METRES } from './couches';
 import { INK_SETTINGS } from './reglages';
 
 /**
@@ -78,6 +78,14 @@ export interface Lamp {
   share?: number;
   /** Verre de son modèle: le rendu y écrit son état à chaque image. */
   readonly glass?: InkInner;
+  /**
+   * Lampe d'un objet à flamme (`INK_SETTINGS.fire.families`): part de son intensité qui vacille,
+   * au rythme du feu de l'objet (même phase que ses langues, tirée de la place de l'objet).
+   */
+  readonly flicker?: number;
+  readonly flickerPhase?: number;
+  /** Son feu brûle aussi le jour (feux de fête); sinon il suit l'allumage de la lampe. */
+  readonly burnsByDay?: boolean;
 }
 
 /**
@@ -151,6 +159,8 @@ export interface InkUniforms {
   uWindowGlow: IUniform<Vector4>;
   uGlint: IUniform<Vector4>;
   uFlameGlow: IUniform<Vector4>;
+  /** Feux: x part du mouvement des langues (mouvement réduit), y part du vacillement des lampes. */
+  uFire: IUniform<Vector4>;
   /** Brume au sol: x force, y épaisseur en mètres. */
   uMist: IUniform<Vector2>;
   uMistColor: IUniform<Vector3>;
@@ -209,6 +219,7 @@ export function createInkUniforms(): InkUniforms {
     uWindowGlow: { value: new Vector4() },
     uGlint: { value: new Vector4() },
     uFlameGlow: { value: new Vector4() },
+    uFire: { value: new Vector4(1, 1, 0, 0) },
     uMist: { value: new Vector2() },
     uMistColor: { value: new Vector3() },
     uShadowMap: { value: null },
@@ -271,9 +282,14 @@ export function applyAmbiance(
       tint?.set(0, 0, 0, 0);
       return;
     }
-    slot.set(lamp.x, lamp.y, lamp.z, lamp.radius);
+    // Lampe d'un objet à flamme: elle vacille avec son feu (intensité, et un peu le rayon).
+    const wave =
+      (lamp.flicker ?? 0) *
+      uniforms.uFire.value.y *
+      fireBeat(uniforms.uTime.value, lamp.flickerPhase ?? 0);
+    slot.set(lamp.x, lamp.y, lamp.z, lamp.radius * (1 + wave * 0.4));
     const color = lamp.color ?? ambiance.lampColor;
-    const force = ambiance.lamps * power * (lamp.gain ?? 1);
+    const force = ambiance.lamps * power * (lamp.gain ?? 1) * (1 + wave);
     tint?.set(color[0] * force, color[1] * force, color[2] * force, power);
   });
   const spill = ambiance.windowAmount > 0 && ambiance.spill > 0;
@@ -320,6 +336,18 @@ vec3 sway(vec3 world, vec3 origin, float kind, float above, vec3 local) {
     world.y += flutter * 0.012 * length(uWind);
   }
   return world;
+}
+`;
+
+/**
+ * Feux vivants: le battement d'un feu (même somme que `fireBeat` côté processeur), après la
+ * déclaration de `uTime` du nuanceur qui l'inclut.
+ */
+const FIRE = /* glsl */ `
+uniform vec4 uFire;
+float fireBeat(float phase) {
+  return sin(uTime * 7.3 + phase) * 0.5 + sin(uTime * 12.7 + phase * 1.7) * 0.3
+    + sin(uTime * 3.1 + phase * 0.6) * 0.2;
 }
 `;
 
@@ -589,6 +617,9 @@ flat out vec4 vMeta;
 flat out float vSwap;
 // Sol en relief: 1 + la distance à l'eau (m, bornée à 2) du point affiché; 0: sol sans berge.
 out float vShore;
+// Feux: x place du sommet du pied à la pointe d'une langue, y battement (braise: sa phase).
+out vec2 vFire;
+uniform vec4 uInner;
 #if defined(CHARACTER) || defined(ATLAS)
   flat out vec2 vAnchor;
   uniform vec2 uScreen;
@@ -600,6 +631,7 @@ out float vShore;
   uniform sampler2D uAtlas;
 #endif
 ${SWAY}
+${FIRE}
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>
 vec3 toScreen(vec3 c) {
@@ -624,11 +656,31 @@ void main() {
   #ifdef USE_INSTANCING
     model = modelMatrix * instanceMatrix;
   #endif
+  // Langue de feu: plus elle monte, plus elle ondule et s'étire; son pied ne bouge pas (il tient
+  // aux bûches). Phase tirée de la place de l'objet (deux marmites ne dansent pas ensemble) et du
+  // numéro de la langue. Éteinte (lampe éteinte), elle se couche à son pied et n'est plus dessinée.
+  float fireOn = uInner.x > 1.5 ? uInner.w : 1.0;
+  bool tongue = aInk.z > ${String(KIND.fire - 0.5)} && aInk.z < ${String(KIND.fire + 0.5)};
+  float seat = model[3].x * 2.37 + model[3].z * 3.53;
+  vFire = vec2(0.0, seat + aInk.w * 2.399);
+  if (tongue) {
+    float tall = floor(aInk.x) * 0.01;
+    float along = fract(aInk.x);
+    float own = seat + aInk.w * 2.399;
+    float beat = fireBeat(seat) * 0.6 + fireBeat(own) * 0.4;
+    float lift = along * tall;
+    transformed.y += lift * (${INK_SETTINGS.fire.stretch.toFixed(3)} * beat * uFire.x - (1.0 - fireOn));
+    float lean = along * along * tall * ${INK_SETTINGS.fire.sway.toFixed(3)} * uFire.x;
+    transformed.x += lean * sin(uTime * 6.1 + own * 1.3 - along * 2.2);
+    transformed.z += lean * cos(uTime * 4.7 + own * 0.8 - along * 1.9);
+    vFire = vec2(along, beat);
+  }
   vec4 world = model * vec4(transformed, 1.0);
   vec3 origin = model[3].xyz;
   vec3 scale2 = vec3(dot(model[0].xyz, model[0].xyz), dot(model[1].xyz, model[1].xyz), dot(model[2].xyz, model[2].xyz));
 
-  float swap = step(7.5, aInk.z);
+  // Au-delà de 15 (feu, braise), la nature n'a pas de bascule des traits.
+  float swap = step(7.5, aInk.z) * step(aInk.z, 15.5);
   float kind = aInk.z - swap * 8.0;
   float code = aInk.y;
   float sizeBits = floor(code / 64.0);
@@ -647,7 +699,7 @@ void main() {
   float piece = uOwn.x > 0.5 ? uOwn.x : sizeBits * 64.0 + number;
   if (uOwn.y > 0.5) part = ${String(SLEEK_PART + 64)}.0;
   vShore = 0.0;
-  if (kind > 4.5) {
+  if (kind > 4.5 && kind < 6.5) {
     // Sol et eau: ni pièce ni morceau, le contour ne les cerne pas. Le quatrième nombre du sol
     // porte sa distance à l'eau.
     vShore = aInk.w;
@@ -674,8 +726,11 @@ void main() {
   #endif
   vColor = toScreen(tint);
   vMeta = vec4(aInk.x, piece, kind, part);
+  // Le premier nombre d'une langue de feu porte sa hauteur, pas une couche de traits.
+  if (tongue) vMeta.x = 0.0;
   vSwap = swap;
   gl_Position = projectionMatrix * viewMatrix * world;
+  if (tongue && fireOn < 0.02) gl_Position = vec4(0.0, 0.0, 2.0, 1.0);
 }
 `;
 
@@ -690,6 +745,7 @@ in float vFoot;
 flat in vec4 vMeta;
 flat in float vSwap;
 in float vShore;
+in vec2 vFire;
 uniform vec4 uWindowGlow;
 uniform vec4 uGlint;
 uniform vec4 uFlameGlow;
@@ -735,6 +791,7 @@ uniform vec4 uOwn;
   }
 #endif
 ${LIGHTING}
+${FIRE}
 // Teintes un peu poussées: de haut et de loin, chaque personnage se lit à sa couleur.
 vec3 pushed(vec3 c) {
   return clamp(mix(vec3(dot(c, vec3(0.3, 0.59, 0.11))), c, uCharacter.z) * uCharacter.w, 0.0, 1.0);
@@ -812,7 +869,7 @@ void main() {
     // Liseré d'eau claire au pied d'une berge: ni hachure ni trait dessus.
     float foam = 0.0;
     float flatGround = step(4.5, kind) * step(kind, 5.5);
-    float water = step(5.5, kind);
+    float water = step(5.5, kind) * step(kind, 6.5);
     if (flatGround > 0.5) {
       // Sol: teinte et matière de la case lues dans la carte du lieu, au point décalé par les
       // limites adoucies (la frontière entre deux natures ne suit pas la grille); un léger
@@ -950,6 +1007,32 @@ void main() {
       float on = uInner.x > 1.5 ? uInner.y : uFlameGlow.a;
       color = mix(color, mix(uFlameGlow.rgb, hue, vivid), on);
     }
+    if (kind > ${String(KIND.fire - 0.5)} && kind < ${String(KIND.fire + 0.5)}) {
+      // Langue de feu: trois aplats sans lumière ni encre (elle éclaire, elle ne reçoit pas
+      // d'ombre), jaune au cœur, orangé en pointe et sur les faces de biais; la limite entre deux
+      // tons monte et descend avec le battement. Lisible le jour, lumineuse la nuit.
+      float heat = vFire.x + (1.0 - max(dot(N, uViewDir), 0.0)) * 0.35 - vFire.y * 0.07;
+      color = heat < ${INK_SETTINGS.fire.bands[0].toFixed(3)}
+        ? vec3(${hex(INK_SETTINGS.fire.core)
+          .map((c) => c.toFixed(4))
+          .join(', ')})
+        : (heat < ${INK_SETTINGS.fire.bands[1].toFixed(3)}
+          ? vec3(${hex(INK_SETTINGS.fire.middle)
+            .map((c) => c.toFixed(4))
+            .join(', ')})
+          : vec3(${hex(INK_SETTINGS.fire.tip)
+            .map((c) => c.toFixed(4))
+            .join(', ')}));
+    }
+    if (kind > ${String(KIND.ember - 0.5)} && kind < ${String(KIND.ember + 0.5)}) {
+      // Braise: elle rougeoie lentement, chacune à sa phase, tant que son objet est allumé.
+      float on = uInner.x > 1.5 ? uInner.w : 1.0;
+      float wave = sin(uTime * ${((Math.PI * 2) / INK_SETTINGS.fire.emberPeriod).toFixed(4)} + vFire.y);
+      vec3 hot = mix(base, vec3(${hex(INK_SETTINGS.fire.ember)
+        .map((c) => c.toFixed(4))
+        .join(', ')}), 0.5) * (1.0 + ${INK_SETTINGS.fire.emberPulse.toFixed(3)} * wave);
+      color = mix(color, clamp(hot, 0.0, 1.0), on);
+    }
   #endif
   // Lueur de l'objet visé (liseré et brillance qui passe), ajoutée telle quelle.
   color += uGlow.rgb * uGlow.a;
@@ -1063,6 +1146,8 @@ void main() {
     world.xyz = sway(world.xyz, model[3].xyz, kind, world.y - model[3].y, position);
   #endif
   gl_Position = projectionMatrix * viewMatrix * world;
+  // Une langue de feu ne porte pas d'ombre (elle éclaire).
+  if (aInk.z > ${String(KIND.fire - 0.5)} && aInk.z < ${String(KIND.fire + 0.5)}) gl_Position = vec4(0.0, 0.0, 2.0, 1.0);
 }
 `;
 

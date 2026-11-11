@@ -120,6 +120,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Recensement des triangles par maillage (`window.encre.census()`) avant d'ajouter du semis: une marguerite en boîtes coûtait 232 triangles, les gravillons 35 000 à eux seuls.
 - Fichiers d'un autre membre nécessaires à une page: les reprendre de sa branche sans les indexer; `import.meta.glob` avec un chemin relatif hors du paquet marche en développement et rend un objet vide si le dossier manque (prévoir le repli).
 
+## Feux vivants du rendu encré (vérifié le 2026-11-11)
+
+- `aInk.z` = nature + 8 x bascule des traits: les natures 0 à 7 seulement; feu et braise sont à 16 et 17 (décodage borné à 15,5), et tout test « nature > 4,5 » du sol doit être borné à 6,5.
+- Le matériau `flamme` des décors sert aussi aux verres de lampe, abat-jours et lampions: distinguer une langue de feu par sa forme (haut en pointe), pas par le nom seul. Le premier nombre de `aInk` d'une langue porte sa hauteur (cm) et la place du sommet (décimales).
+- Phase partagée processeur et nuanceur: une formule lisse (`x * 2,37 + z * 3,53`), jamais un hachage `fract(sin())` (il diffère d'un côté à l'autre).
+- `InkKit.frame` saute des images quand l'écart dépasse `breath.slowMs` (rendu logiciel): page de capture, monter `slowMs`.
+
 ## Personnage modulaire avec Meshy (essai du 2026-11-10, `docs/production/essais-meshy/personnage-modulaire/`)
 
 - Texte seul: Meshy ignore « seul », « sans tête », « cinq têtes de haut » environ une fois sur deux (veste sur buste, jupe en robe sur mannequin, perruque livrée avec tête et socle, corps réaliste de 7,5 têtes). `pose_mode` ne vaut que pour un personnage: un vêtement seul sort manches à 45 ou 75 degrés.

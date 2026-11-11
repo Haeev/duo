@@ -62,6 +62,13 @@ export const KIND = {
   stem: 4,
   ground: 5,
   water: 6,
+  /**
+   * Langue de feu (matériau `flamme` qui finit en pointe): elle ondule, vacille et glisse du jaune
+   * à l'orangé. Au-delà de 15, une nature ne prend pas `SWAP` (le nuanceur ne la décompose pas).
+   */
+  fire: 16,
+  /** Braise (matériau `braise`): elle rougeoie lentement. */
+  ember: 17,
 } as const;
 export const SWAP = 8;
 
@@ -78,4 +85,21 @@ export function sizeClass(diagonal: number): number {
 /** Code d'une pièce ou d'un morceau: numéro de 1 à 62 tiré de `index`, classe de taille dessus. */
 export function inkCode(index: number, diagonal: number): number {
   return (((index % 62) + 62) % 62) + 1 + 64 * sizeClass(diagonal);
+}
+
+/**
+ * Battement d'un feu (de -1 à 1) au temps `t` pour la phase `phase`: la même somme de sinus que
+ * `fireBeat` du nuanceur, pour que la flaque d'une lampe respire avec les langues de son foyer.
+ */
+export function fireBeat(t: number, phase: number): number {
+  return (
+    Math.sin(t * 7.3 + phase) * 0.5 +
+    Math.sin(t * 12.7 + phase * 1.7) * 0.3 +
+    Math.sin(t * 3.1 + phase * 0.6) * 0.2
+  );
+}
+
+/** Phase d'un feu tirée de la place de son objet (m): la même que dans le nuanceur. */
+export function firePhase(x: number, z: number): number {
+  return x * 2.37 + z * 3.53;
 }

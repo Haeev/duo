@@ -396,7 +396,10 @@ class Engine implements GameRenderer {
     this.renderer.toneMapping = toneMappingOf(settings.toneMapping);
     this.renderer.toneMappingExposure = settings.exposure;
     this.renderer.shadowMap.type = PCFShadowMap;
-    this.ink = style === 'encre' ? new InkKit() : null;
+    this.ink =
+      style === 'encre'
+        ? new InkKit(undefined, { reducedMotion: options.reducedMotion ?? false })
+        : null;
     this.cameraSettings =
       this.ink === null
         ? RENDER_SETTINGS.camera

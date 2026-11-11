@@ -101,6 +101,8 @@ export interface InkFrame {
 export interface InkKitOptions {
   /** Outil de mesure (F9) branché sur ce rendu; `false` pour un second rendu (aperçu de l'éditeur). */
   readonly meter?: boolean;
+  /** Mouvement réduit (option du joueur): les feux bougent moins, les lampes ne vacillent pas. */
+  readonly reducedMotion?: boolean;
 }
 
 const NO_LIGHTS: InkLights = { lamps: [], windows: [] };
@@ -206,6 +208,8 @@ export class InkKit {
     // Débranché, il ne mesure rien (ses relevés attendent un rendu) et F9 reste au jeu.
     if (!this.metered) this.meter.dispose();
     this.uniforms = createInkUniforms();
+    if (options.reducedMotion === true)
+      this.uniforms.uFire.value.set(INK_SETTINGS.fire.reducedMotion, 0, 0, 0);
     this.layers = createInkLayers();
     this.noise = createNoise();
     this.uniforms.uLayers.value = this.layers;
@@ -407,7 +411,8 @@ export class InkKit {
     for (const lamp of lights.lamps) {
       if (lamp.glass === undefined) continue;
       const power = lampPower(amount, lamp);
-      lamp.glass.set(2, power, power, 0);
+      // Quatrième nombre: le feu de l'objet brûle-t-il (langues et braises dessinées) ?
+      lamp.glass.set(2, power, power, lamp.burnsByDay === true ? 1 : power);
     }
     const lampLit = (lamp: Lamp): boolean => lampPower(amount, lamp) > 0;
     nearest(
