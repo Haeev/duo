@@ -21,6 +21,11 @@ bois = "aubrune-recoltes"
 repere = "aubrune-recoltes"
 culture = "aubrune-potager"
 parcelle = "aubrune-potager"
+haie = "aubrune-lisieres"
+talus = "aubrune-lisieres"
+rang = "aubrune-lisieres"
+meuble = "aubrune-meubles"
+ouvrage = "aubrune-ouvrages"
 
 # Plafonds de triangles. Culture: par plant (`plants` du manifeste), le modèle est une case de 1 m.
 [budgets]
@@ -35,6 +40,12 @@ repere = 200
 culture = 150
 parcelle = 220
 potager = 800
+# Modules répétés case par case sur de longues files (233 cases de haie, 144 de berge): très légers.
+haie = 60
+talus = 60
+rang = 60
+meuble = 600
+ouvrage = 2500
 
 # ---------------------------------------------------------------- matériaux (noms stables)
 # Le rendu encré tire du NOM la couche de traits et la prise au vent (`nature`: leaf = feuillage
@@ -49,6 +60,15 @@ terre = { couche = "dirt" }
 tige = { couche = "plain", nature = "stem" }
 fruit = { couche = "plain", nature = "stem" }  # il suit la branche qui le porte
 fleur = { couche = "plain", nature = "stem" }
+# Aménagements: mêmes noms et mêmes couches que les bâtiments d'Aubrune (INK_SETTINGS.materials).
+gazon = { couche = "grass" }                   # dessus d'un talus: l'herbe du pré continue
+moellon = { couche = "slab" }                  # maçonnerie appareillée (pile, portail)
+crepi = { couche = "wall" }
+tuile = { couche = "roof" }
+bardage = { couche = "wood" }                  # planches jointives (poulailler)
+metal = { couche = "plain" }
+vitre = { couche = "plain" }                   # verre, glace, bocaux
+etoffe = { couche = "plain" }
 
 # ---------------------------------------------------------------- nuancier d'Aubrune (teintes d'écran)
 # Accordé à la scène d'essai validée (`src/rendu/demo-encre/`): herbe tendre, terre blonde, bois miel.
@@ -95,6 +115,56 @@ radis = ["#D8527A", "#CC4A6E"]
 tomate = ["#D2452F", "#C73C2C"]
 tomate_verte = ["#A9BE5C"]
 fleur_tomate = ["#E3C24A"]
+# Aménagements: teintes reprises des bâtiments d'Aubrune (batiments-aubrune/teintes.json).
+haie = ["#6E9348", "#7EA452", "#8DB25E"]
+gazon_berge = ["#8FAE5B", "#88A856", "#96B462"]
+terre_berge = ["#94795A", "#8A7053", "#9C8262"]
+pierre_claire = ["#E2D8C2", "#DAD0B8", "#E8E0CC"]
+moellon_portail = ["#C9BDA6"]
+crepi = ["#F1DDB8", "#F5E6C6"]
+tuile = ["#D98C62", "#CF8058", "#E09A70", "#AD6244"]
+bois_meuble = ["#A87A46", "#9C7040", "#B4854F"]
+bois_clair = ["#D7A86A", "#CC9C60", "#DDB277", "#E1BC85"]
+bois_sombre = ["#8A6444"]
+bois_grise = ["#A99E8E", "#9F9484", "#B3A898"]
+fer = ["#4A4D52", "#3F4247"]
+fer_clair = ["#6A6E74"]
+tole = ["#5E7A78", "#4E6866"]
+zinc = ["#8C8E91", "#9A9C9F"]
+laiton = ["#C8A150"]
+cuivre = ["#B87348"]
+email = ["#E8E0CC", "#D9CFB8"]
+fond = ["#3A2E28"]
+noir = ["#1E1815"]
+braise = ["#E2843A", "#F0B24A", "#D0622E"]
+peint_vert = ["#557C69"]
+peint_rouge = ["#B0604C"]
+peint_bleu = ["#7C9DB0"]
+peint_creme = ["#E6D6B2"]
+peint_rose = ["#D9919F"]
+creme = ["#F3EDE0"]
+gres = ["#B5845A", "#8E6A4E", "#C9A27A"]
+gres_meule = ["#C2B396", "#B3A486"]
+farine = ["#F3EDE0"]
+pain = ["#C98A43", "#D9A05A", "#B87A3A"]
+tourte = ["#D9A05A", "#C98A43"]
+osier = ["#C9A266"]
+etoffes = ["#B0604C", "#7C9DB0", "#96A98C", "#D9919F", "#E3C24A"]
+papier = ["#E8DCC0"]
+bonbons = ["#D9919F", "#E3C24A", "#96A98C"]
+verre_bouteille = ["#557C69", "#6B8F5E", "#7A5238"]
+liege = ["#C9A266"]
+cidre = ["#E3B24A"]
+cafe = ["#4A3020"]
+ardoise = ["#4F5458"]
+vitre = ["#B7CCD3"]
+glace = ["#B9CED6", "#A9C0C9"]
+eau_sombre = ["#4D7A8A"]
+cuir = ["#5A3A28"]
+paille = ["#E1C477", "#D4B566"]
+soupe = ["#C98A43"]
+feu_rouge = ["#D2452F"]
+feu_vert = ["#6FAE6A"]
 
 # ---------------------------------------------------------------- essences d'arbres
 # `fut`: hauteur du tronc jusqu'à la fourche, rayon au pied, pans. `houppier`: forme (rond, ovale,
@@ -370,3 +440,217 @@ fruit = "tomate"
 fruit_vert = "tomate_verte"
 fleur = "fleur_tomate"
 graine = 379
+
+# ================================================================ aménagements (amenagements.py)
+# Modules de lisière, de 1 m, posés case par case. Le module court d'ouest en est (x); ses deux
+# bouts ont le même profil quelle que soit la forme: n'importe quelle suite de formes se raccorde.
+# `bout`: fin de file fermée vers l'est; `angle`: la file vient de l'ouest et repart au nord. Le
+# rendu les tourne d'un quart de tour pour les autres directions.
+[[modeles]]
+id = "hedge"
+famille = "haie"
+teinte = "haie"
+graine = 401
+variantes = [{ suffixe = "b", graine = 409 }, { suffixe = "c", graine = 419 }]
+bout = "hedge-end"
+angle = "hedge-corner"
+pourquoi = "haie champêtre de 1,45 m: elle ferme le pré sans cacher le voisin; ses masses ne dépassent pas de sa case"
+
+# Talus de berge: l'eau est au sud (+z) du module droit. `angle`: l'eau au sud et à l'est;
+# `angle_rentrant`: l'eau au sud-est seulement; `bout`: la crête redescend à l'est.
+[[modeles]]
+id = "bank"
+famille = "talus"
+graine = 421
+variantes = [{ suffixe = "b", graine = 431 }]
+bout = "bank-end"
+angle = "bank-corner"
+angle_rentrant = "bank-corner-inner"
+
+# Rang de culture du labour: un mètre le long de z, posé bout à bout.
+[[modeles]]
+id = "field-row"
+famille = "rang"
+graine = 433
+variantes = [{ suffixe = "b", graine = 439 }]
+
+# ---------------------------------------------------------------- meubles (fiches de donnees/commun/meubles)
+# Origine au centre de l'emprise de la fiche; avant vers +z: le côté d'où l'on s'en sert.
+[[modeles]]
+id = "four"
+famille = "meuble"
+sorte = "four"
+graine = 443
+pourquoi = "four de maçonnerie (fournil, foyer de la forge): gueule devant, conduit derrière contre le mur"
+
+[[modeles]]
+id = "cuisiniere"
+famille = "meuble"
+sorte = "cuisiniere"
+graine = 449
+pourquoi = "cuisinière de fonte émaillée contre le mur: foyer, four, tuyau qui monte derrière"
+
+[[modeles]]
+id = "plan-de-travail"
+famille = "meuble"
+sorte = "plan-de-travail"
+graine = 457
+pourquoi = "plan de travail contre le mur, à 88 cm: on y pétrit et on y coupe, les pots dessous"
+
+[[modeles]]
+id = "rechaud"
+famille = "meuble"
+sorte = "rechaud"
+graine = 461
+pourquoi = "petit fourneau de fonte à deux feux contre le mur, la porte du foyer devant"
+
+[[modeles]]
+id = "comptoir"
+famille = "meuble"
+sorte = "comptoir"
+garniture = "buvette"
+graine = 463
+pourquoi = "comptoir de buvette: dessus de zinc, bouteilles et verres côté client"
+
+[[modeles]]
+id = "comptoir-epicerie"
+famille = "meuble"
+sorte = "comptoir"
+garniture = "epicerie"
+graine = 467
+pourquoi = "comptoir d'épicerie peint: balance de laiton et bocaux devant le client"
+
+[[modeles]]
+id = "comptoir-fournil"
+famille = "meuble"
+sorte = "comptoir"
+garniture = "fournil"
+graine = 479
+pourquoi = "comptoir du fournil: corbeille de miches et baguettes"
+
+[[modeles]]
+id = "comptoir-mercerie"
+famille = "meuble"
+sorte = "comptoir"
+garniture = "mercerie"
+graine = 487
+pourquoi = "comptoir de mercerie: coupons roulés, mètre de bois, bobines"
+
+[[modeles]]
+id = "comptoir-cafe"
+famille = "meuble"
+sorte = "comptoir"
+garniture = "cafe"
+graine = 491
+pourquoi = "petit comptoir de café, une case: zinc, cafetière, tasses"
+
+[[modeles]]
+id = "ratelier"
+famille = "meuble"
+sorte = "ratelier"
+graine = 499
+etats = ["bare"]
+pourquoi = "râtelier de haches contre le mur: les manches dans l'encoche, les fers devant"
+
+[[modeles]]
+id = "ratelier-forge"
+famille = "meuble"
+sorte = "ratelier"
+garniture = "forge"
+graine = 503
+pourquoi = "râtelier de la forge: marteaux et tenailles pendus, à portée de l'enclume"
+
+[[modeles]]
+id = "enclume"
+famille = "meuble"
+sorte = "enclume"
+graine = 509
+pourquoi = "enclume sur son billot, bigorne à l'est, seau de trempe au pied"
+
+[[modeles]]
+id = "etabli"
+famille = "meuble"
+sorte = "etabli"
+graine = 521
+pourquoi = "établi de menuisier: presse à l'avant gauche, planches dessous"
+
+[[modeles]]
+id = "meule"
+famille = "meuble"
+sorte = "meule"
+graine = 523
+pourquoi = "meule à aiguiser à manivelle, l'auge d'eau sous la pierre"
+
+[[modeles]]
+id = "poulailler"
+famille = "meuble"
+sorte = "poulailler"
+graine = 541
+pourquoi = "poulailler sur pilotis (3 x 2 cases): la rampe descend vers le parc, au sud"
+
+[[modeles]]
+id = "etal"
+famille = "meuble"
+sorte = "etal"
+graine = 547
+etats = ["bare"]
+pourquoi = "étal de la tourte: petite table nappée; la tourte prise, il reste la planche"
+
+[[modeles]]
+id = "miroir"
+famille = "meuble"
+sorte = "miroir"
+graine = 557
+pourquoi = "psyché: on se regarde de face (+z), la glace un peu penchée"
+
+[[modeles]]
+id = "marmite"
+famille = "meuble"
+sorte = "marmite"
+graine = 563
+etats = ["bare"]
+pourquoi = "marmite de soupe sur son trépied, les braises dessous"
+
+# ---------------------------------------------------------------- ouvrages: les repères du lieu
+# Origine au pied, au centre; avant vers +z (la voie, l'eau, le chemin).
+[[modeles]]
+id = "water-tower"
+famille = "ouvrage"
+sorte = "chateau-eau"
+graine = 569
+pourquoi = "château d'eau de la halte (12 m): réservoir des locomotives, la vidange côté voie"
+
+[[modeles]]
+id = "water-crane"
+famille = "ouvrage"
+sorte = "grue-eau"
+graine = 571
+pourquoi = "grue à eau au bord de la voie: le bras pivote au-dessus de la locomotive (+z)"
+
+[[modeles]]
+id = "semaphore"
+famille = "ouvrage"
+sorte = "semaphore"
+graine = 577
+pourquoi = "sémaphore (10 m) au bout de la tranchée: bras à l'horizontale, voie fermée"
+
+[[modeles]]
+id = "mill-wheel"
+famille = "ouvrage"
+sorte = "roue"
+graine = 587
+pourquoi = "roue à aubes du moulin (7 m), axe nord-sud: sa face regarde le sud, le bief coule le long de x"
+
+[[modeles]]
+id = "tunnel-portal"
+famille = "ouvrage"
+sorte = "portail"
+graine = 593
+pourquoi = "tête du tunnel (8 m): la voie entre par l'arc dans l'axe z, le coteau au-dessus"
+
+[[modeles]]
+id = "dovecote"
+famille = "ouvrage"
+sorte = "pigeonnier"
+graine = 599
+pourquoi = "pigeonnier de la ferme (10 m): rez de moellons, bandeau contre les rats, envol au sud"

@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "comptoir-fournil",
   "name": "Comptoir du fournil",
-  "model": "table-farm",
+  "model": "comptoir-fournil",
   "size": {
     "w": 2,
     "h": 1

@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "ratelier-de-la-forge",
   "name": "Râtelier de la forge",
-  "model": "shelf",
+  "model": "ratelier-forge",
   "size": {
     "w": 1,
     "h": 1

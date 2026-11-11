@@ -23,7 +23,11 @@ from scipy.spatial import ConvexHull
 
 # Noms de matériaux stables: le rendu en tire la couche de traits et la prise au vent
 # (table `materiaux` de recoltables.toml, recopiée dans le manifeste).
-MATERIAUX = ("feuillage", "ecorce", "bois", "pierre", "mousse", "terre", "tige", "fruit", "fleur")
+MATERIAUX = (
+    "feuillage", "ecorce", "bois", "pierre", "mousse", "terre", "tige", "fruit", "fleur",
+    # Aménagements (haies, berges, meubles, ouvrages): mêmes noms que les bâtiments d'Aubrune.
+    "gazon", "moellon", "crepi", "tuile", "bardage", "metal", "vitre", "etoffe",
+)
 
 
 def hexa(couleur: str) -> tuple[float, float, float]:

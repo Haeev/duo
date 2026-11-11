@@ -905,3 +905,8 @@ def culture(entree: dict, ctx: Contexte) -> list[dict]:
 
 
 FAMILLES = {"arbre": arbre, "buisson": buisson, "rocher": rocher, "fleur": fleur, "bois": bois, "repere": repere, "parcelle": parcelle, "culture": culture}
+
+# Haies, talus de berge, rangs du labour, meubles et ouvrages: `amenagements.py`.
+from amenagements import FAMILLES_AMENAGEMENTS  # noqa: E402
+
+FAMILLES.update(FAMILLES_AMENAGEMENTS)
