@@ -35,6 +35,21 @@
       "dailyStock": null
     },
     {
+      "item": "graines-carotte",
+      "price": 40,
+      "dailyStock": null
+    },
+    {
+      "item": "graines-poireau",
+      "price": 50,
+      "dailyStock": null
+    },
+    {
+      "item": "plants-de-pomme-de-terre",
+      "price": 50,
+      "dailyStock": null
+    },
+    {
       "item": "livre-de-cuisine",
       "price": 1200,
       "dailyStock": 1,

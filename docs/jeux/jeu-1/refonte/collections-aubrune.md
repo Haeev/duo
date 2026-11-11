@@ -111,7 +111,7 @@ Une recette s'inscrit au carnet à la première réussite en cuisine de ce plat 
 | Gratin de pommes de terre | cuisinière | pomme de terre x3, œuf x1 | livre de cuisine (Épicerie, 12 €) | ne se vend pas |
 | Matelote du bief | cuisinière | perche x1, goujon x2, poireau x1 | livre de cuisine (Épicerie, 12 €) | ne se vend pas |
 | Œuf au plat | réchaud | œuf x1 | en essayant ses ingrédients | 1,20 (Café de la Halte) |
-| Omelette aux herbes | cuisinière | œuf x2 | Les lettres en retard, étape « oeufs » | 2,80 (Café de la Halte) |
+| Omelette aux herbes | cuisinière | œuf x2 | Les lettres en retard, étape « oeufs », ou la Fête des barrières fleuries, étape « levee » | 2,80 (Café de la Halte) |
 | Pain perdu | réchaud | pain x1, œuf x1 | Le fantôme du moulin, étape « parrain » | ne se vend pas |
 | Perche meunière | réchaud | perche x1, farine x1 | La Baronne, étape « epilogue » | ne se vend pas |
 | Pomme cuite | réchaud | pomme x1 | connue dès le début | ne se vend pas |
@@ -124,6 +124,8 @@ Une recette s'inscrit au carnet à la première réussite en cuisine de ce plat 
 | Tartine grillée | réchaud | pain x1 | connue dès le début | ne se vend pas |
 | Tomates farcies | cuisinière | tomate x2, morceau de bœuf x1 | La guerre de la soupe, étape « vexee » | ne se vend pas |
 | Truite grillée | réchaud | truite fario x1 | La guerre de la soupe, étape « truite » | ne se vend pas |
+
+Légumes des recettes (2026-11-11): carotte, poireau et pomme de terre se cultivent désormais au potager (fiches `cultures/carotte.json`, `poireau.json`, `pomme-de-terre.json`; graines et plants chez Margot et chez Odette, voir `economie-aubrune.md`, section 2). La soupe de légumes, le pot-au-feu du dimanche, la matelote du bief, le gratin et les pommes sautées ne dépendent plus de l'étal des Delmas. En hiver, seul le poireau pousse; carotte et pomme de terre se gardent de la récolte d'avant ou s'achètent chez les Delmas.
 
 ## 6. Cartes postales (12)
 
@@ -220,7 +222,7 @@ L'omelette et le pot-au-feu existaient sans que rien ne les apprenne à Aubrune:
 | Manque | Conséquence aujourd'hui | Brique proposée |
 |---|---|---|
 | Fouille propre à un endroit (le plan donne le même type `point-de-fouille` aux 6 sols) | brique livrée le 2026-11-11: un objet de la carte peut déclarer sa fiche (`resource`), et `fouille-roche`, `fouille-ballast`, `fouille-pierre-levee` existent; reste à les donner aux trois points par le plan | `"resource": "<fiche>"` sur `fouille-roche`, `fouille-ballast`, `fouille-pierre-levee` de la carte |
-| Cueillette sauvage: le plan nomme coquelicots, châtaignes, champignons, myrtilles, noix, coquillages, mais n'en pose aucun sur la carte | les fleurs ne se cueillent pas, elles se cultivent; le coquelicot (racheté par Solange et Margot) ne s'obtient nulle part à Aubrune et n'entre pas au carnet | poser les ressources de cueillette par le plan, puis ajouter des fleurs sauvages (coquelicot, primevère, digitale) |
+| Cueillette sauvage: le plan nomme coquelicots, châtaignes, champignons, myrtilles, noix, coquillages | les coquelicots sont posés et repoussent depuis le 2026-11-11. Tranché le même jour: pas d'entrée au carnet. La famille des fleurs est pleine (12, compte du cahier) et ses règles l'excluent (une fleur pousse d'une graine et ne se revend pas; le coquelicot se cueille et se revend). Il reste un cadeau: adoré d'Honorine, de Lucie et de Solange, aimé de Margot et de Martial, mal reçu de Basile, Mado, Marthe et Paulin | une collection « fleurs sauvages » (coquelicot, primevère, digitale) le jour où le cahier ouvre une treizième famille |
 | La cuisine n'inscrit pas l'entrée de la recette | corrigé le 2026-11-11: source `recipe`, inscrite à la première réussite en cuisine ou par `give_recipe` | |
 | Fossile en plusieurs morceaux à assembler au carnet (cahier 4.7) | chaque fossile est d'une pièce | une entrée à fragments |
 | Insectes rendus par espèce | toutes les zones montrent le même repère d'insecte | un modèle par espèce (liste des assets) |

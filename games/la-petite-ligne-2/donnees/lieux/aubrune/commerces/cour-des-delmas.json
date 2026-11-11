@@ -40,6 +40,21 @@
       "dailyStock": null
     },
     {
+      "item": "graines-carotte",
+      "price": 30,
+      "dailyStock": null
+    },
+    {
+      "item": "graines-poireau",
+      "price": 40,
+      "dailyStock": null
+    },
+    {
+      "item": "plants-de-pomme-de-terre",
+      "price": 40,
+      "dailyStock": null
+    },
+    {
       "item": "graines-bleuet",
       "price": 30,
       "dailyStock": 5

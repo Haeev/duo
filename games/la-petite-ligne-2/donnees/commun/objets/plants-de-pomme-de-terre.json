@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "plants-de-pomme-de-terre",
+  "name": "Plants de pomme de terre",
+  "family": "seed",
+  "stack": 20,
+  "food": null,
+  "tool": null
+}

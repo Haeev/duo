@@ -8,13 +8,13 @@ Fiches: `games/la-petite-ligne-2/donnees/lieux/aubrune/commerces/`. Chaque comme
 
 | Commerce | Tenu par | Où | Heures | En rayon | Rachète | Plafond par jour |
 |---|---|---|---|---|---|---|
-| Épicerie Ferrand | Odette | comptoir de la boutique, face à la porte de la place | 7 h à 21 h | pomme, farine, grain, graines de radis et de tomate, livre de cuisine (avec le réchaud), bœuf (avec le repas de l'acte 3) | ce qui se mange, au prix le plus bas | 20 € |
+| Épicerie Ferrand | Odette | comptoir de la boutique, face à la porte de la place | 7 h à 21 h | pomme, farine, grain, graines de radis, de tomate, de carotte et de poireau, plants de pomme de terre, livre de cuisine (avec le réchaud), bœuf (avec le repas de l'acte 3) | ce qui se mange, au prix le plus bas | 20 € |
 | Fournil Pradel | Achille | comptoir devant le four, à droite en entrant | 7 h à 18 h | pain, tarte aux pommes | œufs (le mieux payé), pommes, mûres, bûches, tartes | 15 € |
 | Café de la Halte | Colette (acte 2) | comptoir au fond de la salle, à droite | 7 h à 22 h | soupe de légumes (plat du jour), omelette | poissons, légumes, œufs, plats cuisinés (le mieux payé) | 85 € |
 | Mercerie Mérigot | Solange | comptoir de la boutique, à l'ouest de la porte | 7 h à 19 h 30 | sac de toile (après les besaces), filet à insectes | coquelicots, vieilles pièces | 10 € |
 | Forge Cazals | Mado | râtelier de la forge | 7 h à 20 h | pierre à aiguiser, hache, bêche | pierres, bûches | 8 € |
 | Menuiserie Cornu | Basile | en lui parlant, sous son auvent | 7 h à 20 h | planche (bourse ou coffre commun), marteau | bûches (le mieux payé) | 35 € |
-| Cour des Delmas | Margot (acte 3) | en lui parlant, dans la cour de la ferme | 7 h à 20 h | carotte, poireau, pomme de terre, grain et graines moins chers qu'au bourg | mûres, coquelicots | 6 € |
+| Cour des Delmas | Margot (acte 3) | en lui parlant, dans la cour de la ferme | 7 h à 20 h | carotte, poireau, pomme de terre, grain, graines et plants (dont carotte, poireau, pomme de terre) moins chers qu'au bourg | mûres, coquelicots | 6 € |
 
 Raisons des emplacements. Les cinq comptoirs sont ceux que le plan dessinait « à créer »; ils deviennent cinq types de meubles (`comptoir-epicerie`, `comptoir-fournil`, `comptoir-cafe`, `comptoir-mercerie`, `ratelier-de-la-forge`). Faute de modèle de comptoir livré, ils montrent la table de ferme (`table-farm`), le tonneau (`barrel`, au café) et l'étagère (`shelf`, à la forge), trois modèles livrés: une ligne à changer dans chaque fiche quand les modèles `comptoir` et `ratelier` existeront. Deux ont bougé d'une case pour tenir sur la grille et laisser libre l'axe de la porte: le comptoir d'Odette (2,5; 3) et celui d'Achille, à l'est devant le four (5; 2,5). Celui de Colette garde sa case (4,5; 1,5) et n'en fait qu'une: large de deux, il fermait soit le passage derrière le comptoir, soit l'accès à la table de l'est. Le râtelier de la forge donnait une hache forgée gratuite par jour: il est devenu le comptoir de Mado. Basile et Margot vendent dehors, là où ils travaillent: pas de comptoir à inventer.
 
@@ -68,6 +68,9 @@ Prix de base en euros. « Meilleur rachat » dit où porter l'objet: c'est la le
 | Grain (la ration) | non | | 0,10 (Delmas), 0,20 (Épicerie) |
 | Graines de radis (la graine) | non | | 0,20 (Delmas, Épicerie) |
 | Graines de tomate (la graine) | non | | 0,60 (Delmas), 0,80 (Épicerie) |
+| Graines de carotte (la graine) | non | | 0,30 (Delmas), 0,40 (Épicerie) |
+| Graines de poireau (la graine) | non | | 0,40 (Delmas), 0,50 (Épicerie) |
+| Plants de pomme de terre (le plant) | non | | 0,40 (Delmas), 0,50 (Épicerie) |
 | Graines de fleurs (la graine) | non | | capucine, souci 0,30, pensée, giroflée 0,40 (Épicerie); bleuet, marguerite 0,30, nigelle 0,40, tournesol 0,50 (Delmas) |
 | Planche | non | | 1,60 (Menuiserie) |
 | Pierre à aiguiser | non | | 1,50 (Forge) |
@@ -94,7 +97,7 @@ Ce qui rapporte reste ce qui se récolte, se pêche ou se pond, borné par le li
 | Objet | Cahier | Ici | Raison |
 |---|---|---|---|
 | Pomme | Odette 0,60, Achille 0,90 | Odette la vend 0,90, Achille 0,70 | la pomme s'achète toute l'année chez Odette, sa revente doit rester sous 0,90; le pommier du verger communal n'en donne qu'en automne (2026-11-11: 3 par jour, 2,10 € au rachat, hors du revenu du script) |
-| Soupe de légumes | Colette 3,50, Odette 2,00 | 2,00 et 1,50 | carotte, poireau et pomme de terre ne se cultivent pas encore: tout s'achète; à remonter quand les cultures existeront |
+| Soupe de légumes | Colette 3,50, Odette 2,00 | 2,00 et 1,50 | les trois légumes se cultivent depuis le 2026-11-11, mais s'achètent toujours chez les Delmas (4,80 € les trois): à 3,50, deux soupes parfaites rapporteraient 7,00 € de légumes achetés 4,80 €, une boucle d'argent. Le prix reste donc à 2,00 tant que l'étal vend les légumes |
 | Planche | Basile l'achète 1,40 | il la vend 1,60 et ne la rachète pas | aucun plan ne fait de planche |
 | Ferraille, plume, coquille, girolle, insectes, fossile en double | prix prévus | absents | objets à créer, ou sans acheteur |
 
@@ -118,6 +121,29 @@ Lecture:
 - Dès l'acte 2, la pêche est le débouché du temps en plus: elle seule ne s'épuise pas. Le plafond de Colette (85 €) la borne pour les duos médian et appliqué, qui gagnent donc pareil: s'appliquer davantage ne fait pas creuser l'écart.
 - Le revenu dépasse désormais la fourchette du cahier (22 à 41 € par joueur): c'est voulu depuis la version 2, pour le rythme de la maison. Le sac ne change pas ces nombres, il épargne des allers-retours.
 - Le tas de bois rendait 8 bûches toutes les 12 heures (18 € par jour sans outil): réglé à 4 bûches par jour.
+
+### Carotte, poireau et pomme de terre au potager (2026-11-11)
+
+Le script prend désormais au potager la culture qui rapporte le plus par case et par jour (arrosée chaque jour, graine payée, une culture qui repousse ne repart que de son stade de repousse). Les trois légumes rapportent moins que le radis et la tomate: ils servent la cuisine (soupe, pot-au-feu, matelote, gratin, pommes sautées) et le potager d'hiver, pas la bourse.
+
+| Culture | Saisons | Jours entre deux récoltes (modèle) | Récolte | Graine par récolte | Net par case et par jour |
+|---|---|---|---|---|---|
+| Carotte | printemps, été, automne | 6 | carotte x3 à 1,10 | 0,30 | 0,50 |
+| Poireau | automne, hiver | 8 | poireau x3 à 1,20 | 0,40 | 0,40 |
+| Pomme de terre | printemps, été | 7 | pomme de terre x4 à 0,90 | 0,40 | 0,46 |
+| Radis | printemps, automne | 4 | radis croquant x2 à 2,00 | 0,20 | 0,95 |
+| Tomate | printemps, été | 3 | tomate x3 à 0,80 | 0,00 | 0,80 |
+
+Le tableau du revenu ci-dessus (saisons ignorées, borne haute) ne bouge pas: le radis reste la meilleure case. Saison par saison, acte 3, duo médian:
+
+| Saison | Culture du potager, avant | Revenu avant | Culture du potager, après | Revenu après | Écart |
+|---|---|---|---|---|---|
+| printemps | radis croquant | 133,63 | radis croquant | 133,63 | +0,0 % |
+| été | tomate | 134,16 | tomate | 134,16 | +0,0 % |
+| automne | radis croquant | 133,63 | radis croquant | 133,63 | +0,0 % |
+| hiver | aucune | 126,53 | poireau | 129,51 | +2,4 % |
+
+Seul l'hiver gagne (+2,98 € par jour), et reste sous les autres saisons: le potager n'est plus vide en hiver, sans que la bourse s'emballe (limite fixée: +5 %). Raisons des réglages: deux stades seulement (les modèles `crop-carotte`, `crop-poireau`, `crop-pomme-de-terre` ont les états de `crop-radis`); le poireau, lent, est le légume d'hiver; la pomme de terre donne le plus d'unités (4) au plus bas prix, comme les recettes en demandent deux ou trois; les graines coûtent 0,10 € de moins chez les Delmas qu'à l'Épicerie, comme la graine de tomate.
 
 ## 4. La maison du garde-barrière
 
@@ -181,7 +207,7 @@ Les jours suivants, le bonjour est celui du quotidien de l'habitant, suivi du ch
 | Commande du train du samedi | non comptée dans le revenu |
 | Enclume à poser près de la forge (le meuble existe) | l'amélioration d'outil à 30 € ne se joue que par le dialogue de l'histoire |
 
-À créer pour compléter l'offre (rien n'a été créé sans modèle): sac à dos de 10 cases (le modèle existe, ni fiche ni vignette), ferraille, plume, coquille de rivière, girolle, savon parfumé, vêtements et coiffures de Solange, cultures de carotte, poireau et pomme de terre, un pommier et des coquelicots à poser sur la carte d'Aubrune (la ressource existe, le plan n'en place pas). Objets vendus ici qui ont une vignette mais pas de modèle 3D: grain, pierre à aiguiser, sac de toile, marteau.
+À créer pour compléter l'offre (rien n'a été créé sans modèle): sac à dos de 10 cases (le modèle existe, ni fiche ni vignette), ferraille, plume, coquille de rivière, girolle, savon parfumé, vêtements et coiffures de Solange, un pommier et des coquelicots à poser sur la carte d'Aubrune (la ressource existe, le plan n'en place pas). Objets vendus ici qui ont une vignette mais pas de modèle 3D: grain, pierre à aiguiser, sac de toile, marteau.
 
 ## 7. Trois signalements
 

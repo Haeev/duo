@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "honorine-don-palmares",
+  "villager": "honorine",
+  "priority": 51,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.concours.palmares",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "don",
+  "nodes": {
+    "don": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Catégorie gardes: deux soupes aux herbes et 10 € par tête. Le jury, c'est moi, et le jury a un faible pour qui porte les marmites.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

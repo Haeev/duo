@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "pomme-de-terre",
+  "name": "Pomme de terre",
+  "model": "crop-radis",
+  "seed": "plants-de-pomme-de-terre",
+  "seasons": [
+    "spring",
+    "summer"
+  ],
+  "stages": [
+    3,
+    4
+  ],
+  "regrowStage": null,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "pomme-de-terre",
+      "count": 2
+    },
+    {
+      "wateredShare": 0.5,
+      "item": "pomme-de-terre",
+      "count": 3
+    },
+    {
+      "wateredShare": 1,
+      "item": "pomme-de-terre",
+      "count": 4
+    }
+  ]
+}

@@ -87,12 +87,18 @@ const NEW_DECOR = [
   'tonnelet',
   'vaisselier',
 ] as const;
-const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>(
-  NEW_DECOR.map((id): [string, string] => [
+/** Semences des cultures ajoutées le 2026-11-11, en attente de leur dessin. */
+const NEW_SEEDS = ['graines-carotte', 'graines-poireau', 'plants-de-pomme-de-terre'] as const;
+const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>([
+  ...NEW_DECOR.map((id): [string, string] => [
     id,
     'modèle 3D livré avant sa vignette: à dessiner par l’artiste 2D',
   ]),
-);
+  ...NEW_SEEDS.map((id): [string, string] => [
+    id,
+    'semence livrée avant sa vignette: à dessiner par l’artiste 2D',
+  ]),
+]);
 /**
  * Entrées du carnet des collections qui ne sont pas des objets (insectes, trésors de l'histoire):
  * le carnet les montre par leur identifiant (`itemThumb`), elles ont leur vignette aussi.
