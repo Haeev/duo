@@ -6,7 +6,12 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { spriteMarkup, itemThumb, thumbUrl } from '../src/interface/pictos';
 import { INK_PICTOS } from '../src/interface/pictos-encre';
-import { hasDrawnPortrait, portraitMarkup, PORTRAIT_MOODS } from '../src/interface/portrait';
+import {
+  hasDrawnPortrait,
+  loadPortraits,
+  portraitMarkup,
+  PORTRAIT_MOODS,
+} from '../src/interface/portrait';
 
 const PKG = path.join(import.meta.dirname, '..');
 const OUT = path.join(PKG, 'assets', 'commun', 'interface');
@@ -268,7 +273,9 @@ describe('portraits à la plume', () => {
     }
   });
 
-  it('donne des identifiants propres à chaque portrait affiché, et son expression', () => {
+  it('donne des identifiants propres à chaque portrait affiché, et son expression', async () => {
+    // Les dessins sont un lot à part, chargé au démarrage du jeu (`main.ts`).
+    await loadPortraits();
     expect(hasDrawnPortrait('firmin')).toBe(true);
     expect(hasDrawnPortrait('player-1')).toBe(true);
     expect(hasDrawnPortrait('habitant-factice')).toBe(false);

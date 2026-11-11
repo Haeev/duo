@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 
 /**
  * Empreinte de la fabrication: sources, données et manifeste du jeu. Deux fabrications différentes
@@ -29,6 +29,37 @@ function buildFingerprint(root: string, entries: readonly string[]): string {
   return hash.digest('hex').slice(0, 16);
 }
 
+/**
+ * Budget du code fabriqué par lot (octets après minification): relevé du 2026-11-11 plus environ
+ * 15 %. Le lot principal porte aussi les fiches de données (1,4 Mo); les portraits dessinés ont
+ * leur lot, chargé à part. Dépasser arrête la fabrication: on décide (découper, charger à la
+ * demande) ou on relève le budget en le disant. Les autres familles: `tests/poids-paquet.test.ts`.
+ */
+const CODE_BUDGET: Readonly<Record<string, number>> = {
+  index: 3_650_000, // relevé: 3 168 730
+  'portraits-dessins': 2_650_000, // relevé: 2 308 720
+};
+/** Tout autre lot (sonde d'essai, mémoire): petit par construction. */
+const OTHER_CHUNK_BUDGET = 256 * 1024;
+
+function codeBudget(): Plugin {
+  return {
+    name: 'lpl-budget-code',
+    apply: 'build',
+    generateBundle(_options, bundle) {
+      for (const output of Object.values(bundle)) {
+        if (output.type !== 'chunk') continue;
+        const size = Buffer.byteLength(output.code);
+        const budget = CODE_BUDGET[output.name] ?? OTHER_CHUNK_BUDGET;
+        if (size > budget)
+          this.error(
+            `Lot « ${output.name} »: ${String(size)} octets, budget ${String(budget)} (vite.config.ts).`,
+          );
+      }
+    },
+  };
+}
+
 // base './': le jeu est servi depuis un sous-dossier (duo-game:// dans Duo, /jeu/ dans le faux hôte).
 export default defineConfig({
   base: './',
@@ -41,6 +72,7 @@ export default defineConfig({
       ]),
     ),
   },
+  plugins: [codeBudget()],
   server: { port: 5173 },
   build: { target: 'es2024' },
 });

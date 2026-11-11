@@ -667,18 +667,26 @@ const PAINTERS: Record<number, Painter> = {
 function blurWrapped(field: Float32Array, radius: number): void {
   const scratch = new Float32Array(field.length);
   const span = radius * 2 + 1;
+  // Positions bouclées calculées une fois (`wrapped[k]`: position k - radius ramenée dans la
+  // texture): mêmes additions dans le même ordre, donc les mêmes octets, trois fois plus vite
+  // qu'un modulo par point (créé au démarrage du rendu).
+  const wrapped = new Int32Array(SIZE + radius * 2 + 1);
+  for (let i = -radius; i <= SIZE + radius; i += 1)
+    wrapped[i + radius] = ((i % SIZE) + SIZE) % SIZE;
   for (let pass = 0; pass < 3; pass += 1) {
     for (const horizontal of [true, false]) {
+      const along = horizontal ? 1 : SIZE;
+      const across = horizontal ? SIZE : 1;
       for (let line = 0; line < SIZE; line += 1) {
+        const base = line * across;
         let sum = 0;
-        const index = (i: number): number => {
-          const j = ((i % SIZE) + SIZE) % SIZE;
-          return horizontal ? line * SIZE + j : j * SIZE + line;
-        };
-        for (let i = -radius; i <= radius; i += 1) sum += field[index(i)] ?? 0;
+        for (let k = 0; k <= radius * 2; k += 1)
+          sum += field[base + (wrapped[k] ?? 0) * along] ?? 0;
         for (let i = 0; i < SIZE; i += 1) {
-          scratch[index(i)] = sum / span;
-          sum += (field[index(i + radius + 1)] ?? 0) - (field[index(i - radius)] ?? 0);
+          scratch[base + i * along] = sum / span;
+          sum +=
+            (field[base + (wrapped[i + radius * 2 + 1] ?? 0) * along] ?? 0) -
+            (field[base + (wrapped[i] ?? 0) * along] ?? 0);
         }
       }
       field.set(scratch);
@@ -694,8 +702,30 @@ const BEVEL: Record<number, number> = {
   [LAYER.tile]: 6,
 };
 
+/**
+ * Pixels des couches, peints une fois par page: ils ne dépendent que de graines fixes. Le jeu et
+ * l'aperçu de l'éditeur (ouvert dès le départ) en ont chacun une texture, sur ces mêmes octets,
+ * qui ne sont jamais modifiés après coup.
+ */
+let paintedLayers: Uint8Array | null = null;
+
 /** Les couches de traits, en tableau de textures (R trait, G second ton, B et A pente du relief). */
 export function createInkLayers(): THREE.DataArrayTexture {
+  paintedLayers ??= paintInkLayers();
+  const texture = new THREE.DataArrayTexture(paintedLayers, SIZE, SIZE, LAYER_COUNT);
+  texture.format = THREE.RGBAFormat;
+  texture.type = THREE.UnsignedByteType;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = true;
+  texture.anisotropy = 4;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function paintInkLayers(): Uint8Array {
   const data = new Uint8Array(SIZE * SIZE * 4 * LAYER_COUNT);
   const height = new Float32Array(SIZE * SIZE);
   for (let layer = 0; layer < LAYER_COUNT; layer += 1) {
@@ -724,17 +754,7 @@ export function createInkLayers(): THREE.DataArrayTexture {
       }
     }
   }
-  const texture = new THREE.DataArrayTexture(data, SIZE, SIZE, LAYER_COUNT);
-  texture.format = THREE.RGBAFormat;
-  texture.type = THREE.UnsignedByteType;
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = true;
-  texture.anisotropy = 4;
-  texture.needsUpdate = true;
-  return texture;
+  return data;
 }
 
 /** Bruit lisse à trois canaux indépendants, répétable: bords tremblés, taches, épaisseur du trait. */

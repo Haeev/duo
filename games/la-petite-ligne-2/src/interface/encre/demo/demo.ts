@@ -28,6 +28,10 @@ import { createInterface } from '../../index';
 import planAubrune from '../../../../donnees/lieux/aubrune/plan.json';
 import { provisionalBackdrop } from './fond';
 import { mountSheet } from './planche';
+import { loadPortraits } from '../../portrait';
+
+// Portraits dessinés: lot à part, attendu avant toute interface (comme `main.ts`).
+await loadPortraits();
 
 const SCREENS = [
   'hud',

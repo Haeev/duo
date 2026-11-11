@@ -14,6 +14,10 @@ import { lookRevealedKey } from '../../../simulation/regles/apparence';
 import { createCharacterPreview } from '../../../rendu/personnages/apercu';
 import { composeLook } from '../../../rendu/personnages/apparence';
 import { createInterface } from '../../index';
+import { loadPortraits } from '../../portrait';
+
+// Portraits dessinés: lot à part, attendu avant toute interface (comme `main.ts`).
+await loadPortraits();
 
 interface DemoApi {
   sent: unknown[];

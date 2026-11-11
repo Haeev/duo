@@ -13,6 +13,7 @@ import { drawTestMarkers } from './entrees/repere-essai';
 import { showNetAlert } from './plateforme/alerte-reseau';
 import { drawBaseScreen } from './plateforme/ecran-socle';
 import { createInterface } from './interface/index';
+import { loadPortraits } from './interface/portrait';
 import { createRenderer, gameDecorModels } from './rendu/index';
 import { createCharacterPreview } from './rendu/personnages/apercu';
 import { createGameObjectViewer } from './rendu/objets/index';
@@ -35,6 +36,8 @@ const canvas = document.getElementById('scene');
 if (!(canvas instanceof HTMLCanvasElement)) throw new Error('canvas #scene absent');
 
 const duo = await connect<GameAction>({ manifest });
+// Portraits dessinés: lot à part, chargé pendant la lecture des données et des modèles.
+const portraitsLoaded = loadPortraits();
 duo.reportLoading(0.2);
 const content = loadContent(DATA_FILES);
 const session = createSession({ duo, content });
@@ -58,7 +61,8 @@ const colors = [duo.host.colorHex, duo.guest.colorHex] as const;
 const probed = new URLSearchParams(location.search).get('sonde') === '1';
 // Rendu 3D; sans WebGL2, repli sur le plan 2D du socle et ses repères d'essai.
 // Décors chargés avant le premier lieu: sinon il garderait ses formes provisoires.
-await gameDecorModels().ready;
+// Portraits attendus aussi: l'interface ne montre jamais de substitut à la place d'un dessin.
+await Promise.all([gameDecorModels().ready, portraitsLoaded]);
 const renderer = createRenderer({ canvas, view: session.view, playerColors: colors });
 if (renderer === null) duo.log.warn('WebGL2 indisponible: plan 2D de repli');
 // Son et musique: nés des événements de l'hôte et de l'état, entendus chez les deux joueurs.

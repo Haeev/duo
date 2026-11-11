@@ -70,3 +70,10 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Un tag ou une release créés avec `GITHUB_TOKEN` ne déclenchent aucun workflow: un `gh release create --target` lancé à la main ne relance pas jeux.yml.
 - `gh release download` d'un fichier absent échoue: lister d'abord les fichiers (`--json assets --jq '.assets[].name'`) pour distinguer « absent » d'une panne, sinon le catalogue serait réécrit sans les autres jeux.
 - Garde-fou de l'isolation: un chemin qui contient `.github` dans une commande est pris pour une commande git; passer par un script écrit dans le dossier de travail temporaire.
+
+## Poids et démarrage des jeux (vérifié le 2026-11-11)
+
+- Composition d'un lot Vite: `vite build --sourcemap --outDir <tmp>`, puis répartir les octets par source avec `@jridgewell/sourcemap-codec` (présent dans `node_modules/.pnpm`); le texte des `?raw` et des JSON n'a pas de source (« sans source »). `--manifest` donne les entrées, pas la source des ressources: retrouver par nom de base.
+- Temps de démarrage dans l'environnement cloud: la machine partagée (charge 13 à 20 sur 4 cœurs) rend les mesures de bout en bout inutilisables pour des gains de moins d'une seconde; mesurer chaque morceau à part (analyse V8 par `vm.SourceTextModule` avec `--experimental-vm-modules`, fonction isolée dans une page Vite jetable) et donner l'empreinte SHA-256 de la sortie avant et après.
+- Profil CPU d'un jeu servi par `servir`: CDP `Profiler.start` sur la page hôte (le cadre du jeu est dans le même processus), positions ramenées aux sources par `@jridgewell/trace-mapping` sur une fabrication avec cartes (mêmes lignes et colonnes que la fabrication normale).
+- Un budget de code se pose dans `vite.config.ts` par un greffon `generateBundle` qui appelle `this.error`: la fabrication s'arrête avec le message.

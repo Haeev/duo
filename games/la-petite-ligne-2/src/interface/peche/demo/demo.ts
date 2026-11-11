@@ -16,6 +16,10 @@ import { SIM_DT } from '../../../simulation/noyau/constantes';
 import { fishingView } from '../../../simulation/peche/lecture';
 import { aimOf } from '../../../simulation/briques/visee';
 import { createInterface } from '../../index';
+import { loadPortraits } from '../../portrait';
+
+// Portraits dessinés: lot à part, attendu avant toute interface (comme `main.ts`).
+await loadPortraits();
 
 const content = loadContent(DATA_FILES);
 const world = createWorld(content, 11, [
