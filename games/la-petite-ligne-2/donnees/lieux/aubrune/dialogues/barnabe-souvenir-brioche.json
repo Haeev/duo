@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-brioche",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Tu sens cette odeur de beurre chaud ? Oui ? C'est moi. Je peux le dire, maintenant. C'est moi !",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

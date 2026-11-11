@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "honorine-mot",
+  "villager": "honorine",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.mot-honorine",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Oh, maman. Sacrée maman.",
+      "emote": "sad",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Quarante ans que je raconte que Marthe l'a cachée. C'était un bon mensonge: je le croyais moi-même.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "« Ensemble. » Elle ne viendra pas me chercher. Et moi, je ne monte plus aux échelles. Depuis mardi.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Il nous faut un prétexte. La Fêlée ! Une cloche fêlée, ça se refond. Vois Mado: pour une coulée, il faut des oreilles. J'en ai deux.",
+      "emote": "idea",
+      "next": null
+    }
+  }
+}

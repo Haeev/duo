@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "colette-sel",
+  "villager": "colette",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.sel-colette",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Goûte. Non, ne goûte pas. Salée à réveiller la cloche. Quelqu'un est passé sur ma terrasse cette nuit.",
+      "emote": "anger",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Odette ? Elle est bavarde, pas sournoise. Mais qui d'autre ? Je refais un fond. Cette nuit, il me faut des yeux sur la terrasse.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Une paire d'yeux par marmite: à deux, le compte y est. Et parlez-vous: la main qui sale passe forcément de l'une à l'autre.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

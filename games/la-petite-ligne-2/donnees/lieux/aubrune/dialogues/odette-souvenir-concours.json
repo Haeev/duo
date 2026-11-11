@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-concours",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Colette et moi, on cuisine le jeudi. Elle parle trop. C'est épuisant, quelqu'un qui parle autant.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "id": "basile-lettre",
+  "villager": "basile",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.basile",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "... Mon écriture.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Quatre pages. Tous mes mots. Mis là-dedans. Un soir.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Pour Odette. Pas de réponse. J'ai compris: non. Depuis: économies.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-jamais-1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "... Jamais ?",
+      "emote": "surprise",
+      "next": "n4-jamais-2"
+    },
+    "n4-jamais-2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Trente ans. De silence. Pour rien.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-pages-1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Recto verso. Avec des adjectifs.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "jamais",
+          "text": "Elle ne l'a jamais reçue.",
+          "when": [],
+          "effects": [],
+          "next": "n4-jamais-1"
+        },
+        {
+          "id": "pages",
+          "text": "Quatre pages, toi ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-pages-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Porte-la. Non. Attends. ... Si. Porte-la. Moi, je rabote. Très fort.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

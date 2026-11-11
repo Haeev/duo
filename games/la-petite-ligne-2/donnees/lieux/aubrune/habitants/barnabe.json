@@ -46,6 +46,95 @@
     "schedule": [
       {
         "from": 480,
+        "to": 1020,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fanfare.repetition",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "gr5"
+        },
+        "activity": "repeter-la-fanfare",
+        "gesture": null
+      },
+      {
+        "from": 480,
+        "to": 1140,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fanfare.concert",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "gr2"
+        },
+        "activity": "attendre-le-concert",
+        "gesture": null
+      },
+      {
+        "from": 1320,
+        "to": 180,
+        "when": [
+          {
+            "type": "any",
+            "conditions": [
+              {
+                "type": "remembered",
+                "key": "aubrune.fantome.premier-guet",
+                "equals": "ouvert"
+              },
+              {
+                "type": "remembered",
+                "key": "aubrune.fantome.second-guet",
+                "equals": "ouvert"
+              }
+            ]
+          }
+        ],
+        "at": {
+          "point": "mp"
+        },
+        "activity": "attendre-la-nuit",
+        "gesture": null
+      },
+      {
+        "from": 420,
+        "to": 1080,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fantome.tablier",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "gr3"
+        },
+        "activity": "hesiter-devant-le-fournil",
+        "gesture": null
+      },
+      {
+        "from": 300,
+        "to": 480,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fantome.apprenti"
+          }
+        ],
+        "at": {
+          "point": "gr4"
+        },
+        "activity": "petrir-au-fournil",
+        "gesture": null
+      },
+      {
+        "from": 480,
         "to": 1080,
         "at": {
           "point": "c2"

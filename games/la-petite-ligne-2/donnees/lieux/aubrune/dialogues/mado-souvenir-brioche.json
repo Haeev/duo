@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-brioche",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Mon grand rentre du fournil à huit heures, enfariné, content. Je ne dis rien. Je tape plus doucement, c'est tout.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

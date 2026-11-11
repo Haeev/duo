@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "honorine-etoiles",
+  "villager": "honorine",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.guet",
+      "equals": "ouvert"
+    },
+    {
+      "type": "time_is",
+      "from": 1290,
+      "to": 120
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Moi ? Je prends le frais. Je compte les étoiles. Il en manque une depuis 1951. File te cacher: tu vas l'effaroucher.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

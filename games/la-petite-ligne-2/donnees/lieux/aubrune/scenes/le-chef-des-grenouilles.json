@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "id": "le-chef-des-grenouilles",
+  "title": "Le chef des grenouilles",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Au lavoir, de dos, un homme en gilet dirige le bassin. Trois grenouilles à gauche, deux à droite. Il leur fait signe d'attendre. Elles attendent.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "armand",
+      "text": "Oh. C'est toi. Elles ne me regardent pas, elles. Enfin, si. Mais sans avis. Devant le quai entier, mes mains... elles tremblent.",
+      "emote": "sad",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu lui répètes la consigne de Solange, mot pour mot: quand le public fait peur, on lui tourne le dos.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "armand",
+      "text": "De dos ? Mais... un chef d'orchestre EST de dos. C'est même à ça qu'on le reconnaît. Pourquoi personne ne me l'a dit ?",
+      "emote": "surprise",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "armand",
+      "text": "Je dirigerai face au train. Le train ne juge pas. Va sur le quai, j'arrive. Je salue les grenouilles: c'est la moindre des choses.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.fanfare.chef",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

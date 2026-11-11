@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "marthe-dette",
+  "villager": "marthe",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.marthe",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Mon écriture. Mon enveloppe. Et mes quatre euros vingt, je parie. Ouvre. Compte.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Le prix d'un ruban que ma sœur m'avait avancé. Je l'ai remboursée par la poste, pour ne pas avoir à lui parler.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Trente ans qu'elle raconte que je lui dois de l'argent. Trente ans que je réponds: c'est réglé. Nous avions raison, elle et moi. C'est insupportable.",
+      "emote": "anger",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Porte-lui l'enveloppe. Qu'elle compte. Elle sait très bien compter, quand ça l'arrange.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-felee",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "La Fêlée sonne les quarts, maintenant. Un la. Un peu bas, d'après certaines. Certaines n'ont qu'à sonner elles-mêmes.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -45,6 +45,22 @@
     "home": "gr4",
     "schedule": [
       {
+        "from": 480,
+        "to": 1140,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fanfare.concert",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "gr1"
+        },
+        "activity": "attendre-le-concert",
+        "gesture": null
+      },
+      {
         "from": 420,
         "to": 1170,
         "at": {

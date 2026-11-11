@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "odette-sel",
+  "villager": "odette",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.sel-odette",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "SALÉE ! Ma soupe ! Salée comme la mer ! Quelqu'un a vidé une salière dans ma marmite cette nuit.",
+      "emote": "anger",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "C'est elle. Qui d'autre ? Elle a peur de perdre. Je refais une marmite, et cette nuit, quelqu'un veille sous ma tonnelle.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Si tu vois quelqu'un, ne dis rien: tousse. Je descendrai avec la louche.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "id": "firmin-mutation",
+  "villager": "firmin",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.firmin",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "« F. Lacombe, à la Direction. » ... Ah.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Demande de mutation. Je voulais Hautefonte: une vraie gare, douze voies, une horloge par quai. J'avais trente-quatre ans et de l'ambition.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "J'ai attendu la réponse. On ne quitte pas son poste sans réponse. Article 3.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-poster-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Non.",
+      "emote": "anger",
+      "next": "n4-poster-2"
+    },
+    "n4-poster-2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "... Non. J'ai changé d'avis vers 1994. Un mardi.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-reste-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Au début. Ensuite, par habitude. Ensuite, parce qu'il fallait bien que quelqu'un tienne le quai.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "poster",
+          "text": "On la poste maintenant ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-poster-1"
+        },
+        {
+          "id": "reste",
+          "text": "Trente ans pour une réponse ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-reste-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Rends-moi ça. Je la classe. Dossier « Sans suite ». C'est mon plus gros dossier.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

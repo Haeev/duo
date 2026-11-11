@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "honorine-interets-merci",
+  "villager": "honorine",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.interets",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "mures",
+      "count": 4
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Quatre poignées ! Et tu n'as pas mangé les plus grosses. On voit que tu n'es pas de la famille.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Tiens, un reçu: « Reçu de ma sœur quatre euros vingt et les intérêts. Trop tard, mais reçu. » Porte-le-lui. Et regarde bien sa tête.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

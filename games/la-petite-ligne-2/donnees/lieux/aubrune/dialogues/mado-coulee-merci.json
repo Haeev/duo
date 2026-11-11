@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "mado-coulee-merci",
+  "villager": "mado",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.bois",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "buche",
+      "count": 4
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Quatre bûches ! Le feu ronfle déjà. Barnabé a descendu la Fêlée ce matin, sous son bras, comme un pain.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Reviens avec ta moitié, en journée: il me faut des bras au soufflet et à la louche. Les deux sœurs sont prévenues. Séparément. J'ai menti deux fois.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

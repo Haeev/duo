@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-geant",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Le géant, c'était Barnabé. Je le savais. Enfin, je m'en doutais. Enfin, Jeanne me l'a dit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

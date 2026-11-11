@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-concours",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Odette sale, je goûte. Elle a la main lourde et le cœur léger. L'inverse de sa mère, paraît-il.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

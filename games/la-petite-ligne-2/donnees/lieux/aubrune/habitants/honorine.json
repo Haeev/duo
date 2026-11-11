@@ -40,6 +40,38 @@
     "home": "gr8",
     "schedule": [
       {
+        "from": 1290,
+        "to": 120,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.soupe.guet",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "pl"
+        },
+        "activity": "prendre-le-frais",
+        "gesture": null
+      },
+      {
+        "from": 600,
+        "to": 960,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.soupe.concours",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "gr1"
+        },
+        "activity": "juger-les-soupes",
+        "gesture": null
+      },
+      {
         "from": 420,
         "to": 1080,
         "at": {

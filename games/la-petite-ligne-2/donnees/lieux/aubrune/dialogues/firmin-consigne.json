@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "firmin-consigne",
+  "villager": "firmin",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.franc",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "La consigne ? Fermée. Article 19: « Tout colis se retire contre le franc de garde, par jour entamé. »",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Trente ans de garde: près de onze mille jours. Je ne fais pas crédit. Le règlement non plus.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Mais l'article ne dit pas combien de francs. Un seul fera l'affaire. Un vrai, d'époque. Le talus en est plein: une bêche, de la patience.",
+      "emote": "idea",
+      "next": null
+    }
+  }
+}

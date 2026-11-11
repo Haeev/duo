@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "jeanne-ficelle",
+  "villager": "jeanne",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.jeanne",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "La ficelle ? Quelle ficelle ? ... Bon. C'est Léon qui tire. Moi, je compte les coups. On a un règlement.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Les deux vieilles ne se parlent pas. Mais quand la Fêlée sonne, elles sortent en même temps. J'ai parié qu'au dixième soir, elles se diraient bonsoir.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-combien-1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Sept. Hier, Marthe a failli lever la main. Elle s'est gratté l'oreille à la place. Ça compte à moitié.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-robe-1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Quelle robe ? On n'a pas ouvert: c'est trop lourd, et Léon a peur des mites.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "combien",
+          "text": "Vous en êtes à combien ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-combien-1"
+        },
+        {
+          "id": "robe",
+          "text": "Et la robe, dans le coffre ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-robe-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Porte-leur le mot de leur mère. Aux deux. Et dis rien pour la ficelle: Léon dirait que c'était son idée. C'est même pas vrai. Enfin, un peu.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "honorine-interets",
+  "villager": "honorine",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.interets",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "L'enveloppe de Marthe ? Voyons. Un, deux, trois, quatre, et vingt. Le compte y est. Pour 1987.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Mais trente ans d'intérêts, mon lapin ! J'ai calculé de tête: ça fait un panier de mûres. Quatre poignées, bien noires.",
+      "emote": "idea",
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Elle ne viendra pas les cueillir, elle a sa fierté. Toi, tu n'en as pas encore: les ronces de la tranchée t'attendent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

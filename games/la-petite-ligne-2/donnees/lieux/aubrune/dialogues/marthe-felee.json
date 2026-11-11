@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "marthe-felee",
+  "villager": "marthe",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.felee",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "La grande cloche sonne juste: certifié par Pélissier. Mais la petite, la Fêlée, sonne toute seule. Trois coups sourds, certaines nuits.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ce n'est pas moi: je ne sonne pas hors horaire. C'est donc quelqu'un. Et « quelqu'un », dans ce bourg, c'est ma sœur.",
+      "emote": "anger",
+      "next": "n3"
+    },
+    "n3-pourquoi-1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Pour que je sorte en chemise de nuit devant tout le monde. Elle a toujours eu des joies simples.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-vent-1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Le vent ne compte pas jusqu'à trois. J'ai vérifié.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "pourquoi",
+          "text": "Pourquoi ferait-elle ça ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-pourquoi-1"
+        },
+        {
+          "id": "vent",
+          "text": "Le vent, peut-être ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-vent-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Va le lui demander. Moi, je ne lui parle pas. Depuis quarante ans. Pour une robe. Elle sait laquelle.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

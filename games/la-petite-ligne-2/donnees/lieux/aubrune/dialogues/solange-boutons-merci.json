@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "solange-boutons-merci",
+  "villager": "solange",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.boutons",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "vieille-piece",
+      "count": 2
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Deux pièces ! Astiquées, on jurerait de l'or. De loin. Dans une fanfare, tout se regarde de loin.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Dis à Armand que tout est prêt. Et qu'on dirige le menton haut: s'il regarde ses pieds, les cuivres regardent leurs pieds.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

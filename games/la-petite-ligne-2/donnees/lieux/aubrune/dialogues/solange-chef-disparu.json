@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "solange-chef-disparu",
+  "villager": "solange",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.trac",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Catastrophe ! Le chef a disparu. Sa baguette est sur le pupitre, sa classe est vide, et le train est annoncé.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Je connais ça. Ce n'est pas une fugue: c'est le trac. On ne se sauve pas loin, avec le trac. On va là où personne ne regarde.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-ou-1": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Là où il dirige quand il se croit seul. Tout le bourg le sait, sauf lui: au lavoir, il bat la mesure aux grenouilles.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-toi-1": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Je parle de théâtre. C'est pareil, avec plus de velours.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ou",
+          "text": "Où irait-il ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-ou-1"
+        },
+        {
+          "id": "toi",
+          "text": "Tu parles d'expérience ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-toi-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "File au lavoir. Et dis-lui ceci, de la part d'une vieille actrice: quand le public fait peur, on lui tourne le dos. Les chefs ont ce droit-là.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

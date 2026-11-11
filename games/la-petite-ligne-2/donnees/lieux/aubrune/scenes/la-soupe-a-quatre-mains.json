@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "id": "la-soupe-a-quatre-mains",
+  "title": "La soupe à quatre mains",
+  "together": true,
+  "roles": {
+    "a": "À la louche d'Odette",
+    "b": "À la louche de Colette"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.soupe.concours",
+        "equals": "ouvert"
+      },
+      {
+        "type": "time_is",
+        "from": 660,
+        "to": 900
+      },
+      {
+        "type": "reach",
+        "point": "pl",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "walk",
+      "who": "odette",
+      "to": "pl"
+    },
+    {
+      "do": "say",
+      "who": "odette",
+      "text": "Deux marmites, une seule odeur. Colette Lafon, tu as copié.",
+      "emote": "anger",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "colette",
+      "text": "Copié ? C'est la soupe de MA mère. Demande au cahier.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Quel cahier ? Je ne vois pas de quel cahier on parle. Servez, les gardes: ça refroidit.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu sers à la marmite d'Odette. Elle goûte celle d'en face et te souffle: « Elle a mis du laurier. C'est mieux. Ne le lui répète jamais. »",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu sers à la marmite de Colette. Elle goûte celle d'en face et te souffle: « Elle coupe plus fin que maman. C'est mieux. Motus. »",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Vous vous répétez tout, à voix haute, devant tout le bourg. C'est fait exprès.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Verse ta louche dans le grand chaudron, en même temps que ta moitié: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Verse ta louche dans le grand chaudron, en même temps que ta moitié: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Deux louches, un seul chaudron. Ça fait un bruit de réconciliation: un gros floc.",
+      "emote": null,
+      "sound": "Floc !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "odette",
+      "text": "Bon. Le laurier, je le garde. Tes petits dés, tu les gardes. Mais c'est moi qui sale.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "colette",
+      "text": "Tu sales, je goûte. Et la prochaine, on la fait dans MA cuisine. Elle est plus grande.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Premier Concours de la soupe d'Aubrune: une marmite, deux gagnantes. À l'automne, on recommence. Je reprends du bouillon.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.decor.concours-de-soupe",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "mado-caisse-merci",
+  "villager": "mado",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.caisse",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "pierre",
+      "count": 3
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Trois pierres ! Topons. Ha ! Tiens, ta caisse. Tape dessus: tu entends ? Elle sonne encore, sous le charbon.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "La peau est crevée d'un côté. Vois Solange: ce qu'elle ne recoud pas, personne ne le recoud.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

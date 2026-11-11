@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "id": "mado-caisse",
+  "villager": "mado",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.caisse",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "La grosse caisse ? C'est mon bac à charbon. Vingt ans qu'elle me sert. Elle est très bien où elle est.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Mais contre trois belles pierres, je me maçonne un vrai bac, et je te rends ton tambour. La grève en est pleine.",
+      "emote": "idea",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "colette-baronne",
+  "villager": "colette",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.appat",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "La Baronne ! Maman avait sa photo au mur. Enfin: la photo du grand-père Pradel, trempé, avec une canne cassée.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "L'appât, c'est le goujon vif. Mais pas ceux de la fosse: elle les connaît par leur prénom. Il lui faut des goujons du ponton. Des inconnus.",
+      "emote": "idea",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Deux goujons, un par ligne. Portez-les à Achille. Et si vous la sortez, passez par ici: mon mur attend la suite de la photo.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

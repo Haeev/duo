@@ -50,6 +50,48 @@
     "home": "gr5",
     "schedule": [
       {
+        "from": 420,
+        "to": 1260,
+        "when": [
+          {
+            "type": "any",
+            "conditions": [
+              {
+                "type": "remembered",
+                "key": "aubrune.fanfare.trac",
+                "equals": "ouvert"
+              },
+              {
+                "type": "remembered",
+                "key": "aubrune.fanfare.lavoir",
+                "equals": "ouvert"
+              }
+            ]
+          }
+        ],
+        "at": {
+          "point": "lv"
+        },
+        "activity": "diriger-les-grenouilles",
+        "gesture": null
+      },
+      {
+        "from": 420,
+        "to": 1260,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fanfare.concert",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "quai-e"
+        },
+        "activity": "diriger-la-fanfare",
+        "gesture": null
+      },
+      {
         "from": 480,
         "to": 1020,
         "at": {

@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "colette-soupe-merci",
+  "villager": "colette",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.soupe-colette",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "soupe-de-legumes",
+      "count": 1
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "... Attends. Coupé gros. Tourné longtemps. Trois pincées. C'est la soupe de maman. Qui t'a donné ça ?",
+      "emote": "surprise",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ne dis rien. Une seule personne ici vole un cahier et le rend quarante-six ans après. Odette a la même ? Alors j'y vais. Avec ma louche.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

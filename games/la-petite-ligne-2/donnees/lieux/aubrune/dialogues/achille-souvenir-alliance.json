@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-alliance",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "L'alliance est dans le pot à levain. Depuis, ma pâte lève mieux. C'est la levure, sûrement. Ou les excuses.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

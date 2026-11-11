@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "jeanne-geant",
+  "villager": "jeanne",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.jeanne",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Le fantôme du moulin ? Je parie que c'en est pas un. Un fantôme, ça ne laisse pas de traces de pas. Sinon c'est juste quelqu'un de sale.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Il vient vers onze heures du soir, il repart avant le jour. Et il sent le beurre chaud. Un fantôme qui sent le beurre, moi je dis: suspect.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Léon a trop peur pour y retourner. Il dira que non. Paie-le en mûres: il devient courageux quand il a la bouche pleine.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

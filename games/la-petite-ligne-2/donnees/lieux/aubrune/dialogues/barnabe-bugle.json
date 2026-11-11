@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "barnabe-bugle",
+  "villager": "barnabe",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.bugle",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Le bugle de papa ? Il est au grenier, dans un bas de laine. Je le sors à Noël. Je le regarde. Je le range.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Je chante mieux que je ne souffle. Mais pour une fanfare... Papa disait: un bugle qui se tait, c'est un entonnoir.",
+      "emote": "idea",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Prends-le. Et dis à l'instituteur que je viens avec: il faut quelqu'un au bout de l'instrument, et j'ai du coffre.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

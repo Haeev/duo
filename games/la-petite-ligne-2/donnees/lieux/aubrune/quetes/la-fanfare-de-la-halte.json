@@ -1,0 +1,381 @@
+{
+  "schema": 1,
+  "id": "la-fanfare-de-la-halte",
+  "kind": "side",
+  "title": "La fanfare de la halte",
+  "giver": "armand",
+  "requires": [
+    {
+      "type": "quest_step",
+      "quest": "ceux-qui-partent",
+      "step": "matin"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "trois-instruments",
+      "title": "Trois instruments",
+      "steps": [
+        {
+          "id": "idee",
+          "objective": "Armand a trouvé un vieux cahier dans les archives de l'école. Il a une idée, et il n'ose pas la dire fort.",
+          "target": {
+            "villager": "armand"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "armand-fanfare",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.idee",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.idee",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "bugle",
+          "objective": "Le bugle: demande-le à Barnabé, à la coupe le jour, à la forge le soir.",
+          "target": {
+            "villager": "barnabe"
+          },
+          "after": ["idee"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "barnabe-bugle",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.bugle",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.bugle",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "caisse",
+          "objective": "La grosse caisse sert de bac à charbon chez Mado: échange-la contre trois pierres de la grève.",
+          "target": {
+            "villager": "mado"
+          },
+          "after": ["idee"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "pierre",
+              "count": 3,
+              "villager": "mado"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.caisse",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.caisse",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "trombone",
+          "objective": "Le trombone dort au fond de la fosse du bief depuis 1986: allez-y à deux, de jour, canne en main.",
+          "target": {
+            "point": "i2"
+          },
+          "after": ["idee"],
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "le-trombone-du-bief"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.trombone",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.trombone",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "boutons",
+          "objective": "Solange recoud la peau de la caisse, et veut des boutons dorés: déterre deux vieilles pièces à la bêche.",
+          "target": {
+            "villager": "solange"
+          },
+          "after": ["caisse"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "vieille-piece",
+              "count": 2,
+              "villager": "solange"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.boutons",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.boutons",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "la-repetition",
+      "title": "La répétition",
+      "steps": [
+        {
+          "id": "repetition",
+          "objective": "Répétition devant l'école, à deux, pendant la classe: Armand distribue triangle et cymbales.",
+          "target": {
+            "point": "gr5"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-repetition-de-la-fanfare"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.repetition",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.repetition",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "nuit",
+          "objective": "Le concert est pour demain: va dormir, les cymbales sous l'oreiller.",
+          "target": {
+            "point": "hd"
+          },
+          "done": [
+            {
+              "type": "need_at_least",
+              "need": "sleep",
+              "value": 95
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.nuit",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.nuit",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "le-trac",
+      "title": "Le trac",
+      "steps": [
+        {
+          "id": "trac",
+          "objective": "Le train est annoncé et personne n'a vu le chef. Solange fait les cent pas devant la mercerie.",
+          "target": {
+            "villager": "solange"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "solange-chef-disparu",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.trac",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.trac",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "lavoir",
+          "objective": "Cherche Armand là où il dirige quand il se croit seul: au lavoir, entre la place et la halte.",
+          "target": {
+            "point": "lv"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "lv",
+              "who": "one",
+              "radius": 4
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.lavoir",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.lavoir",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "le-chef-des-grenouilles"
+            }
+          ]
+        },
+        {
+          "id": "concert",
+          "objective": "En journée, à deux sur le quai: le train entre en gare, et la fanfare l'attend.",
+          "target": {
+            "point": "quai"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "le-concert-du-quai"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.concert",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.concert",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "give_money",
+              "amount": 1000,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "armand",
+              "points": 50,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "solange",
+              "points": 30,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "barnabe",
+              "points": 30,
+              "to": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.fanfare.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

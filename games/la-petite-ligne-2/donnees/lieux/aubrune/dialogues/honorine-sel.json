@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "honorine-sel",
+  "villager": "honorine",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.aveu",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Te voilà. Tu n'as rien dit ? Bien. Tu as l'étoffe d'une vieille dame.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Tiens: le cahier de leurs mères. Je l'ai gardé quarante-six ans. Je l'avais « emprunté » pour qu'elles ne le déchirent pas en deux.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "La soupe du quai. Carotte, poireau, pomme de terre. Rien de plus. Le secret, c'est d'être deux: une main qui coupe, une main qui tourne.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-sel-1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Trois pincées. Pas une salière. Je sais, je sais.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-vrai-1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Je mens sur les préfets et sur mon âge. Jamais sur la soupe.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "sel",
+          "text": "Et le sel ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-sel-1"
+        },
+        {
+          "id": "vrai",
+          "text": "Tu as vraiment gardé ce cahier ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-vrai-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Faites-en deux marmites, une par cuisinière, sans dire d'où vient la recette. Les légumes: Margot, à la ferme. Dis que c'est pour moi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

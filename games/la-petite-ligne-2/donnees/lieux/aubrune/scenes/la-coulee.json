@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "id": "la-coulee",
+  "title": "La coulée",
+  "together": true,
+  "roles": {
+    "a": "Au soufflet",
+    "b": "À la louche"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.robe.coulee",
+        "equals": "ouvert"
+      },
+      {
+        "type": "time_is",
+        "from": 480,
+        "to": 1140
+      },
+      {
+        "type": "reach",
+        "point": "gr6",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "walk",
+      "who": "marthe",
+      "to": "gr6"
+    },
+    {
+      "do": "walk",
+      "who": "honorine",
+      "to": "gr6"
+    },
+    {
+      "do": "say",
+      "who": "mado",
+      "text": "Le bronze est prêt. Les gardes: au soufflet et à la louche. Mesdames: vous me dites quand la couleur est bonne. D'accord entre vous, si possible.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "marthe",
+      "text": "Trop rouge.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Pas assez. Tu as toujours vu rouge trop tôt.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu pompes le soufflet. D'ici, tu vois le bronze: quand il passe de l'orange au jaune paille, dis « maintenant » à ta moitié.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu tiens la louche au-dessus du moule. Tu ne vois pas le creuset: verse quand ta moitié dit « maintenant ». Pas quand les sœurs le disent.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Pompe le soufflet: appuie et tiens.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 2.5
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Au « maintenant » de ta moitié, verse: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le bronze coule d'un trait dans le moule. Mado frappe le bord de son marteau. Une note monte, ronde, entière.",
+      "emote": null,
+      "sound": "Dooong...",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "marthe",
+      "text": "Un la.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Un si bémol, sourde.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "marthe",
+      "text": "Un la. J'ai sonné soixante ans.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Et moi, j'ai dansé avec un préfet: ça forme l'oreille. ... Bon. Un la. Mais un la un peu bas. Comme toi.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Elles se disputent sans reprendre leur souffle, épaule contre épaule, pour la première fois depuis quarante ans. Mado vous fait signe: pas un mot.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "marthe",
+      "text": "La robe. On monte la chercher jeudi. Tu passes devant: tu es l'aînée. Si tu tombes, j'amortis.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Et on la garde pour Jeanne. Dans quinze ans. Si elle parie moins. ... Non: même si elle parie.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.cloche.refondue",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.robe.ensemble",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

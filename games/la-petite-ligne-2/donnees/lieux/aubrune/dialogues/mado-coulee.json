@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "id": "mado-coulee",
+  "villager": "mado",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.bois",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Refondre la Fêlée ? Ha ! Enfin un vrai travail. Je n'ai pas coulé de bronze depuis mon apprentissage.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Il me faut un feu de deux jours: quatre bûches de plus. Et deux oreilles pour juger la note: une sonneuse, et une qui chante juste. Tu vois qui.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

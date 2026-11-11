@@ -359,3 +359,14 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Carte d'Aubrune à cette date: plusieurs verrous se contournent (V2 seul ouvre 97 % de la zone de la voie et 76 % de la rivière); mesurer avec `zoneViews` avant d'écrire qu'une étape « ouvre » une zone. Aucune ressource, aucun coin de pêche, aucun poste de cuisine sur la carte: le test donne les objets par `giveItem`.
 - Compter avant d'écrire un nombre du cahier dans une réplique: « douze foyers » ne tombait pas juste (13 dès l'acte 2); « vingt âmes » oui (10 + 2 + 3 + 5).
 - Accords de « vous » (les deux joueurs): balise `[[duo:f|m]]`, acceptée dans les dialogues, les options et les scènes.
+
+## Suites secondaires en données (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Générateur gardé dans le scratchpad de la session (`gdsuites/lib.py`, un fichier Python par suite): le recopier d'une mission à l'autre plutôt que le réécrire; il journalise ce qu'il écrit pour pouvoir se relancer.
+- `tests/grands-lieux.test.ts` et `tests/lieux-verrous.test.ts` chargent quêtes, scènes et plannings sur la carte brute du plan, sans intérieurs: ne citer que des nœuds du plan (`gr2`, `mc`, `pv`, `i2`), jamais un point d'intérieur (`halte-p-guichet`, `clocher-vue`) ni un poste ajouté à l'assemblage (`peche-fosse`, `guet-moulin`, `siege-*`, `mado-enclume`). `pnpm test` entier le révèle, pas le test de la suite.
+- Priorités: histoire principale 60 et plus; suites secondaires 55; demande d'objets 52 et son merci 57 (dialogue à part, `when` avec `item_in_bag`), sinon une demande en attente cache l'étape d'une autre suite chez le même habitant; cadeau par joueur 58.
+- Le validateur d'accords refuse « Vous êtes deux » et un « tu es payée » même cité: tourner (« à deux, le compte y est », « c'est réglé »).
+- Gestes de scène (`hold`, `press`, `together`): dans un essai, tenir d'abord ceux qui tiennent, puis un appui bref de l'autre; boucler tant que l'identifiant de la scène est le même (une scène en file enchaîne aussitôt).
+- Un habitant qui doit parler dans une scène de nuit ou hors de son poste: ligne de planning conditionnée par le fait de l'étape, en tête de fiche, finie avant 3 h; les marches de scène (`walk`) vont en ligne droite et replacent au bout de 20 s.
+- Vérifier qui est arrivé au moment où la suite s'ouvre avant de citer un habitant dans une réplique (Berthe et Barnabé n'arrivent qu'au deuxième train de l'acte 3), et ne pas citer une autre suite secondaire: l'ordre de jeu est libre.
+- À Aubrune (à cette date): ni boutique, ni pommier, ni légumes de ferme, ni établi sur la carte; ce qui manque se donne par dialogue. Les habitants dorment debout à leur poste (aucun planning vers un intérieur).

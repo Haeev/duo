@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "achille-goujons-merci",
+  "villager": "achille",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.goujons",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "goujon",
+      "count": 2
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Deux goujons. Et pas d'ici: ça se voit à leur air perdu.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Ce soir, entre sept et neuf, à la fosse. J'y serai. Venez à deux. Si je dors, ne me réveillez pas: je porte bonheur en dormant.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

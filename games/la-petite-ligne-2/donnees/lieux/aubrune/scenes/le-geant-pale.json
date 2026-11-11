@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "id": "le-geant-pale",
+  "title": "Le géant pâle",
+  "together": true,
+  "roles": {
+    "a": "Côté porte",
+    "b": "Côté cour"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.fantome.premier-guet",
+        "equals": "ouvert"
+      },
+      {
+        "type": "time_is",
+        "from": 1380,
+        "to": 120
+      },
+      {
+        "type": "reach",
+        "point": "mc",
+        "who": "both",
+        "radius": 6
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "say",
+      "who": "berthe",
+      "text": "Vous voilà. Je veille aussi: je dors d'un œil, l'autre compte les sacs. Pas un mot. Il vient par le portillon de la berge.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "walk",
+      "who": "barnabe",
+      "to": "mc"
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu surveilles la porte du moulin. Une forme immense la pousse du bout des doigts, comme on réveille quelqu'un. Elle est blanche de la tête aux pieds.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu surveilles la cour. Derrière la forme, des pas blancs se posent un à un sur les pavés. Et elle fredonne: « Le temps des cerises ».",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Ne bouge plus: appuie et retiens ton souffle.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 2.5
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Ne bouge plus: appuie et retiens ton souffle.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 2.5
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La farine vole jusqu'à la cachette. Ça chatouille. Ça monte. Vous tenez. Vous tenez. Berthe ne tient pas.",
+      "emote": null,
+      "sound": "Atchoum !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "walk",
+      "who": "barnabe",
+      "to": "mp"
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La forme sursaute, lâche un sac et file par le portillon en trois enjambées. Pour un fantôme, il a le pas lourd et l'air très ennuyé.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "berthe",
+      "text": "C'est ma meule. Elle me fait éternuer quand elle boude. ... Il a semé de la farine partout, votre fantôme. Au jour, suivez-la.",
+      "emote": "anger",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "berthe",
+      "text": "Un géant pâle ? Un grand gaillard enfariné, oui. La nuit, tout le monde a l'air d'un drap.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.fantome.vu",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "id": "la-baronne",
+  "kind": "side",
+  "title": "La Baronne",
+  "giver": "achille",
+  "requires": [
+    {
+      "type": "quest_step",
+      "quest": "la-minute-d-ecart"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "trois-generations",
+      "title": "Trois générations",
+      "steps": [
+        {
+          "id": "legende",
+          "objective": "Achille a parlé d'une perche qu'on appelle la Baronne. Demande-lui toute l'histoire, au fournil.",
+          "target": {
+            "villager": "achille"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "achille-baronne",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.legende",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.legende",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "heure",
+          "objective": "L'heure de la Baronne: Jeanne traîne au bief et note tout. Fais-la parler.",
+          "target": {
+            "villager": "jeanne"
+          },
+          "after": ["legende"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "jeanne-baronne",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.heure",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.heure",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "appat",
+          "objective": "L'appât de la Baronne: le café a tout vu passer. Demande à Colette.",
+          "target": {
+            "villager": "colette"
+          },
+          "after": ["legende"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "colette-baronne",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.appat",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.appat",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "goujons",
+          "objective": "Deux goujons du ponton, un par ligne: pêche-les au ponton de la berge, et porte-les à Achille.",
+          "target": {
+            "villager": "achille"
+          },
+          "after": ["heure", "appat"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "goujon",
+              "count": 2,
+              "villager": "achille"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.goujons",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.goujons",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "la-touche",
+      "title": "La touche",
+      "steps": [
+        {
+          "id": "affut",
+          "objective": "Ce soir, entre 19 h et 21 h, à deux à la fosse du bief: une personne à la canne, l'autre à l'épuisette.",
+          "target": {
+            "point": "i2"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-baronne-mord"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.affut",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.affut",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "decision",
+          "objective": "La Baronne attend dans l'épuisette. Décidez à deux, puis dis à Achille: à l'eau, ou au café ?",
+          "target": {
+            "villager": "achille"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "achille-decision",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.decision",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.decision",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "epilogue",
+          "objective": "Va raconter la fin de l'histoire à Colette: son mur attend depuis 1934.",
+          "target": {
+            "villager": "colette"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "colette-epilogue"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.epilogue",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.epilogue",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "achille",
+              "points": 50,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "colette",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "jeanne",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

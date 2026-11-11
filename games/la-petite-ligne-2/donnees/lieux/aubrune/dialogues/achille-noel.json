@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "achille-noel",
+  "villager": "achille",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.achille",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Mmh ? « Achille, 8 ans, au Père Noël. » C'est mon écriture. Elle n'a pas bougé.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "« Cher Père Noël, je voudrais une canne plus grande que celle de papa, pour attraper la Baronne. Je promets de ne pas m'endormir. »",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "J'ai eu la canne. Sans la lettre. ... Mmh.",
+      "emote": "question",
+      "next": "n4"
+    },
+    "n4-pere-1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Sûrement. Il faisait semblant de pétrir. Il pétrissait très mal quand j'écrivais.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-promesse-1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Tenue jusqu'au 26 décembre. Vers quatre heures.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "pere",
+          "text": "Ton père lisait par-dessus ton épaule.",
+          "when": [],
+          "effects": [],
+          "next": "n4-pere-1"
+        },
+        {
+          "id": "promesse",
+          "text": "Et la promesse ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-promesse-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Je la range dans le pot à levain. Les bonnes choses, je les mets là. Elles gonflent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

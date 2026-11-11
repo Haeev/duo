@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-baronne",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "J'ai perdu mon pari. Je te dois le respect. Voilà, c'est fait. Ne t'y habitue pas.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

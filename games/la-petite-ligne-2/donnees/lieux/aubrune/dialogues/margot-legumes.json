@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "id": "margot-legumes",
+  "villager": "margot",
+  "priority": 55,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "aubrune.soupe.legumes",
+          "equals": "ouvert"
+        },
+        {
+          "type": "remembered",
+          "key": "aubrune.soupe.soupe-colette",
+          "equals": "ouvert"
+        },
+        {
+          "type": "remembered",
+          "key": "aubrune.soupe.soupe-odette",
+          "equals": "ouvert"
+        }
+      ]
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "carotte",
+              "count": 1
+            },
+            {
+              "type": "item_in_bag",
+              "item": "poireau",
+              "count": 1
+            },
+            {
+              "type": "item_in_bag",
+              "item": "pomme-de-terre",
+              "count": 1
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Pour Honorine ? Elle m'a commandé « de quoi réconcilier deux têtes de mule ». J'ai compris: des légumes à soupe.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "carotte",
+          "count": 1
+        },
+        {
+          "type": "give_item",
+          "item": "poireau",
+          "count": 1
+        },
+        {
+          "type": "give_item",
+          "item": "pomme-de-terre",
+          "count": 1
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Une carotte, un poireau, une pomme de terre: de quoi faire une marmite. Ta moitié passe prendre les siens ? Une marmite par paire de bras.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Paulin dit que la soupe ne réconcilie personne. Il dit ça la bouche pleine.",
+      "emote": null,
+      "next": null
+    },
+    "a1": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Tu as ton panier: carotte, poireau, pomme de terre. À la cuisinière ! Et si la soupe rate, reviens: j'ai un champ entier d'excuses.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

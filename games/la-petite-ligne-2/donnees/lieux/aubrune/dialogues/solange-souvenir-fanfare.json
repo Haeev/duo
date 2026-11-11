@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-fanfare",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "J'ai joué du trombone devant un train. Sans trac. Le secret: un chef qui en a pour tout l'orchestre.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

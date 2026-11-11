@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "marthe-mot",
+  "villager": "marthe",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.mot-marthe",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "L'écriture de maman.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "« Ensemble. » Elle l'a montée là-haut elle-même, à soixante-douze ans, par l'échelle. Pour nous donner une leçon. Et elle est partie sans la finir.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Quarante ans que j'accuse ma sœur. Elle n'avait rien fait. Pour une fois.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Je n'irai pas chercher la robe seule: ce serait tricher. Qu'Honorine vienne. Je ne le lui demanderai pas. Trouve autre chose.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

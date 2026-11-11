@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "leon-geant",
+  "villager": "leon",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.leon",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Le géant ? Je l'ai vu ! Trois mètres. Blanc comme un drap. Je lui ai presque parlé. Enfin, j'ai presque ouvert la bouche.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Il chantait. Tout bas. Une chanson de cerises. Les fantômes chantent, c'est connu. Enfin, celui-là.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Je te montre d'où on le voit, si tu veux. Mais ça se paie: quatre poignées de mûres. C'est le tarif des témoins.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

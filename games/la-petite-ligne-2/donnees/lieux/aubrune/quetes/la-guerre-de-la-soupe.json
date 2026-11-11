@@ -1,0 +1,482 @@
+{
+  "schema": 1,
+  "id": "la-guerre-de-la-soupe",
+  "kind": "side",
+  "title": "La guerre de la soupe",
+  "giver": "odette",
+  "requires": [
+    {
+      "type": "quest_step",
+      "quest": "ceux-qui-partent",
+      "step": "repas"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "deux-marmites",
+      "title": "Deux marmites",
+      "steps": [
+        {
+          "id": "vexee",
+          "objective": "Odette a appris pour le pot-au-feu cuisiné au café. Va la voir à l'épicerie. Prépare-toi.",
+          "target": {
+            "villager": "odette"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "odette-vexee",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.vexee",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.vexee",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "defi",
+          "objective": "Porte le défi d'Odette à Colette, au café: deux marmites sur la place, et le bourg vote.",
+          "target": {
+            "villager": "colette"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "colette-defi",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.defi",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.defi",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "radis",
+          "objective": "Pour la marmite d'Odette: quatre radis du potager, avec leurs fanes. Une paire de bras par marmite.",
+          "target": {
+            "villager": "odette"
+          },
+          "after": ["defi"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "radis",
+              "count": 4,
+              "villager": "odette"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.radis",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.radis",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "truite",
+          "objective": "Pour la marmite de Colette: une truite, pêchée à l'aval, là où la berge tourne.",
+          "target": {
+            "villager": "colette"
+          },
+          "after": ["defi"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "truite",
+              "count": 1,
+              "villager": "colette"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.truite",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.truite",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "le-sel",
+      "title": "Le sel",
+      "steps": [
+        {
+          "id": "nuit",
+          "objective": "Les deux marmites mijotent dehors toute la nuit: va dormir, le bourg goûtera demain.",
+          "target": {
+            "point": "hd"
+          },
+          "done": [
+            {
+              "type": "need_at_least",
+              "need": "sleep",
+              "value": 95
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.nuit",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.nuit",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "sel-odette",
+          "objective": "Au matin, Odette hurle sous sa tonnelle. Va voir ce qu'elle a trouvé dans sa marmite.",
+          "target": {
+            "villager": "odette"
+          },
+          "after": ["nuit"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "odette-sel",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.sel-odette",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.sel-odette",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "sel-colette",
+          "objective": "Au matin, Colette fait la grimace sur sa terrasse. Va goûter. Ou plutôt, ne goûte pas.",
+          "target": {
+            "villager": "colette"
+          },
+          "after": ["nuit"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "colette-sel",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.sel-colette",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.sel-colette",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "guet",
+          "objective": "Cette nuit, dès 22 h 30: une personne sous la tonnelle d'Odette, l'autre à la terrasse du café. Et parlez-vous.",
+          "target": {
+            "point": "pl-o"
+          },
+          "after": ["sel-odette", "sel-colette"],
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-main-dans-le-sel"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.guet",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.guet",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quatre-mains",
+      "title": "Quatre mains",
+      "steps": [
+        {
+          "id": "aveu",
+          "objective": "Honorine t'attend chez elle, au bout de la Grand-Route. Pas un mot aux cuisinières.",
+          "target": {
+            "villager": "honorine"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "honorine-sel",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.aveu",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.aveu",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "legumes",
+          "objective": "Les légumes du cahier poussent à la ferme: demande-les à Margot, de la part d'Honorine.",
+          "target": {
+            "villager": "margot"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "margot-legumes",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.legumes",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.legumes",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "soupe-colette",
+          "objective": "Cuisine la soupe du cahier à la cuisinière de la maison, et porte une marmite à Colette.",
+          "target": {
+            "villager": "colette"
+          },
+          "after": ["legumes"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "soupe-de-legumes",
+              "count": 1,
+              "villager": "colette"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.soupe-colette",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.soupe-colette",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "soupe-odette",
+          "objective": "Cuisine la soupe du cahier à la cuisinière de la maison, et porte une marmite à Odette.",
+          "target": {
+            "villager": "odette"
+          },
+          "after": ["legumes"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "soupe-de-legumes",
+              "count": 1,
+              "villager": "odette"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.soupe-odette",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.soupe-odette",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "concours",
+          "objective": "Entre 11 h et 15 h, à deux sur la place: les deux marmites sortent, et tout le bourg a faim.",
+          "target": {
+            "point": "pl"
+          },
+          "after": ["soupe-colette", "soupe-odette"],
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-soupe-a-quatre-mains"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.concours",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.concours",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "give_item",
+              "item": "soupe-de-legumes",
+              "count": 2,
+              "to": "duo"
+            },
+            {
+              "type": "give_money",
+              "amount": 800,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "odette",
+              "points": 40,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "colette",
+              "points": 40,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "honorine",
+              "points": 30,
+              "to": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.soupe.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

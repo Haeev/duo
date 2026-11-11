@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "barnabe-tablier",
+  "villager": "barnabe",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.tablier",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Par devant ? En plein jour ? Avec le tablier ? Devant Paulin, devant Firmin, devant tout le monde ?",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2-quatre-1": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "... À quatre. Oui. Ça, personne d'autre ne le fait, par ici.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "n2-mado-1": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Elle l'a dit ? Elle a tapé sur quelque chose en le disant ? Alors c'est vrai.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n2": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "quatre",
+          "text": "Ta brioche est tressée à quatre.",
+          "when": [],
+          "effects": [],
+          "next": "n2-quatre-1"
+        },
+        {
+          "id": "mado",
+          "text": "Mado est fière de toi.",
+          "when": [],
+          "effects": [],
+          "next": "n2-mado-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Bon. J'y vais. Par la Grand-Route. La tête haute. Marche à côté de moi, tu veux ? Pas devant. À côté.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

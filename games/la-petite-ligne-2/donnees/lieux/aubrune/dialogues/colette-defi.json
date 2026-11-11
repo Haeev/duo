@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "colette-defi",
+  "villager": "colette",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.defi",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Un concours de soupe ? Odette me déclare la guerre par messager. C'est du grand style.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "J'accepte. La soupe de légumes de ma mère contre la soupe aux herbes de la sienne. Elles se disputaient déjà la louche, ces deux-là.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-meres-1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Jusqu'en 1971. Une histoire de sel. Depuis: deux marmites, deux boutiques, deux versions.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n3-perdre-1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Je ne perds jamais. Je préviens toujours: c'est plus honnête.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "meres",
+          "text": "Vos mères cuisinaient ensemble ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-meres-1"
+        },
+        {
+          "id": "perdre",
+          "text": "Et si tu perds ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-perdre-1"
+        }
+      ]
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Une paire de bras par marmite, c'est la règle. À deux, le compte y est. Décidez à voix haute qui trahit qui.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Pour ma marmite: une truite de l'aval, pour le fond. Pour la sienne: quatre radis, elle met les fanes. Ne lui dis pas que je le sais.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

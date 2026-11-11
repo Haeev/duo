@@ -1,0 +1,211 @@
+{
+  "schema": 1,
+  "id": "la-main-dans-le-sel",
+  "title": "La main dans le sel",
+  "together": false,
+  "roles": {
+    "a": "Sous la tonnelle",
+    "b": "À la terrasse du café"
+  },
+  "trigger": {
+    "at": 1350,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.soupe.guet",
+        "equals": "ouvert"
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Cache-toi sous la tonnelle d'Odette, près de sa marmite.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "pl-o",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Cache-toi à la terrasse du café, près de la marmite de Colette.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "gr6",
+              "who": "one",
+              "radius": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La marmite de Colette fait blop. Rien ne bouge. Puis un petit pas très léger, du côté de la Grand-Route. Un pas qui sait où il va.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La marmite d'Odette fait blop. À l'étage, Odette ronfle, bien en mesure. Sur la place, rien. Tu attends des nouvelles de ta moitié.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Une ombre menue, un cabas. Elle soulève le couvercle, sort une boîte en fer, et secoue. Longtemps. Tu ne vois pas son visage.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "b",
+          "hint": "Ne bouge plus: appuie et retiens ton souffle.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 2
+          }
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "L'ombre referme le couvercle et repart vers la place, à petits pas pressés. Préviens ta moitié: elle arrive de son côté.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "walk",
+      "who": "honorine",
+      "to": "pl-o"
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Quand ta moitié te prévient: laisse l'ombre soulever le couvercle, puis démasque ta lanterne d'un coup.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Démasque la lanterne: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dans le rond de lumière: une boîte à sel, une main, et au bout de la main, Honorine Valade, quatre-vingt-neuf ans.",
+      "emote": null,
+      "sound": "Clic !",
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Ah. On ne dort donc jamais, dans ce bourg ?",
+      "emote": "surprise",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "b",
+          "hint": "Rejoins ta moitié sous la tonnelle: on tient la main dans le sel.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "pl-o",
+              "who": "one",
+              "radius": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Chut. Odette ronfle en ré: ne lui cassez pas la mesure. Oui, c'est moi. Les deux nuits. Les deux marmites.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Leurs mères faisaient LA soupe d'Aubrune, à quatre mains. Brouillées en 1971 pour une pincée de sel. Depuis: deux soupes moyennes.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Alors je sale. Tant que les deux sont ratées, personne ne gagne. Elles finiront bien par cuisiner ensemble, pour avoir la paix.",
+      "emote": "idea",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Venez me voir demain. Pas un mot aux cuisinières. À mon âge, on ne me dénonce pas: on me consulte.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.soupe.coupable",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

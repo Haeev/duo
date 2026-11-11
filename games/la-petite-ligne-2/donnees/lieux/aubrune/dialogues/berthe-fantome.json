@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "berthe-fantome",
+  "villager": "berthe",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.farine",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Ah, toi. J'ai fini de compter. Onze kilos de farine en six nuits. Ma meule dit: un rat. J'ai répondu: un rat de quatre-vingt-dix kilos, alors.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Et chaque matin, des pas blancs dans ma cour. Du portillon à ma porte, et retour. Grands comme des pelles à pain.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-fantome-1": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Un fantôme qui mange de la farine ? Ici, les fantômes ont tous une adresse. Je veux la sienne.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-cle-1": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Depuis toujours, la clé pend au clou, dehors. C'est un moulin, pas une banque.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "fantome",
+          "text": "Les enfants parlent d'un fantôme.",
+          "when": [],
+          "effects": [],
+          "next": "n3-fantome-1"
+        },
+        {
+          "id": "cle",
+          "text": "Ta porte ferme à clé ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-cle-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Le petit Delmas jure qu'il a vu « un géant pâle ». Jeanne aussi. Va les faire parler. Moi, quand je questionne, ils se sauvent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

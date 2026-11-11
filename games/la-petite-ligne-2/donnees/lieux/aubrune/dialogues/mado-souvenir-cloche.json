@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-cloche",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "J'ai coulé une cloche et réconcilié deux sœurs dans la même matinée. Le plus dur à démouler, c'étaient les sœurs.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

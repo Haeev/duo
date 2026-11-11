@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-lettre",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.odette",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Quatre pages ! Je les sais par cœur. Je ne les répéterai à personne. C'est bien la première fois.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}
