@@ -21,7 +21,7 @@
   scale: var(--order-k);
   pointer-events: auto;
   display: grid;
-  grid-template-columns: 14rem 1fr 15.5rem;
+  grid-template-columns: 13rem minmax(0, 1fr) 13.5rem;
   background: var(--paper);
   color: var(--ink);
   border: 0.1875rem solid var(--ink);
@@ -97,28 +97,69 @@
   min-width: 0;
   padding: 1rem 1.25rem 0.75rem;
 }
+/* En-tête: le titre et l'échéance à gauche, le total à recevoir à droite (ce qui compte d'abord). */
+.lpl-ui .lpl-order-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 1rem;
+}
 .lpl-ui .lpl-order-head h2 {
   margin: 0;
   font-family: var(--font-display);
   font-size: 1.75rem;
   line-height: 1.1;
 }
-.lpl-ui .lpl-order-due,
-.lpl-ui .lpl-order-pay {
+.lpl-ui .lpl-order-due {
   margin: 0.25rem 0 0;
-  color: var(--ink-muted);
-  font-size: 0.9375rem;
+  font-size: 1rem;
+  font-weight: 700;
 }
-.lpl-ui .lpl-order-pay b {
-  margin-left: 0.75rem;
+.lpl-ui .lpl-order-pay {
+  margin: 0.125rem 0 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+.lpl-ui .lpl-order-sum {
+  display: grid;
+  justify-items: end;
+  gap: 0.125rem;
+  min-width: 9.5rem;
+  padding: 0.5rem 0.875rem 0.5rem 1.25rem;
+  background: var(--paper-sunken);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.75rem;
+}
+.lpl-ui .lpl-order-sum__label {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.lpl-ui .lpl-order-sum__amount {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+.lpl-ui .lpl-order-sum small {
   color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 750;
 }
 .lpl-ui .lpl-order-cols,
 .lpl-ui .lpl-order-row {
   display: grid;
-  grid-template-columns: 2.75rem minmax(0, 1fr) 6rem 6rem 6rem 7.5rem;
+  grid-template-columns: 2.75rem minmax(0, 1fr) 5.5rem 5.25rem 4.75rem 6.25rem 8.25rem;
   align-items: center;
   column-gap: 0.625rem;
+}
+.lpl-ui .lpl-order-cols > :nth-child(5),
+.lpl-ui .lpl-order-cols > :nth-child(6),
+.lpl-ui .lpl-order-row__unit,
+.lpl-ui .lpl-order-row__due {
+  text-align: right;
 }
 .lpl-ui .lpl-order-cols {
   margin-top: 0.75rem;
@@ -147,8 +188,13 @@
   outline: none;
   box-shadow: inset 0 0 0 0.125rem var(--accent);
 }
+/* Livrée: un fond en creux et la mention « Livré » cochée; les textes restent lisibles (pas d'opacité). */
 .lpl-ui .lpl-order-row--done {
-  opacity: 0.72;
+  background: var(--paper-sunken);
+  border-style: solid;
+}
+.lpl-ui .lpl-order-row--done .lpl-order-row__name b {
+  color: var(--ink-muted);
 }
 .lpl-ui .lpl-order-row__thumb .obj {
   display: block;
@@ -158,10 +204,22 @@
 .lpl-ui .lpl-order-row__name,
 .lpl-ui .lpl-order-row__asked,
 .lpl-ui .lpl-order-row__have,
-.lpl-ui .lpl-order-row__price {
+.lpl-ui .lpl-order-row__due {
   display: grid;
   gap: 0.125rem;
   min-width: 0;
+}
+.lpl-ui .lpl-order-row__asked {
+  gap: 0.3125rem;
+}
+.lpl-ui .lpl-order-row__unit {
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.lpl-ui .lpl-order-row__due b {
+  font-variant-numeric: tabular-nums;
 }
 .lpl-ui .lpl-order-row__name b {
   font-size: 1.0625rem;
@@ -174,9 +232,11 @@
   color: var(--ink-muted);
   font-size: 0.8125rem;
 }
-.lpl-ui .lpl-order-row__asked b,
-.lpl-ui .lpl-order-row__price b {
-  font-size: 1.0625rem;
+.lpl-ui .lpl-order-row__asked b {
+  font-size: 0.9375rem;
+}
+.lpl-ui .lpl-order-row__due b {
+  font-size: 1.125rem;
 }
 /* Part livrée: une barre pleine à proportion, lisible sans la couleur (hachures). */
 .lpl-ui .lpl-order-row__bar {
@@ -209,13 +269,28 @@
   background: var(--accent);
   color: var(--on-accent);
 }
+.lpl-ui .lpl-order-row__state--go .key {
+  font-size: 0.75rem;
+}
+/* Livré: une coche dessinée devant le mot (forme en plus de la couleur). */
 .lpl-ui .lpl-order-row__state--done {
   border: 0.125rem solid var(--primary);
   color: var(--primary);
 }
+.lpl-ui .lpl-order-row__state--done::before {
+  content: '';
+  width: 0.375rem;
+  height: 0.75rem;
+  margin: -0.25rem 0.125rem 0 0;
+  border-right: 0.1875rem solid currentColor;
+  border-bottom: 0.1875rem solid currentColor;
+  rotate: 40deg;
+}
+/* Il en manque: en tirets, sans action; le nombre dit combien. */
 .lpl-ui .lpl-order-row__state--miss {
   border: 0.125rem dashed var(--line);
   color: var(--ink-muted);
+  font-size: 0.875rem;
 }
 .lpl-ui .lpl-order-empty {
   color: var(--ink-muted);
@@ -352,8 +427,61 @@
   border: 0.125rem solid #231a17;
   border-image: none;
 }
-.lpl-ui .lpl-order-prov {
-  position: absolute;
-  right: 0.75rem;
-  bottom: 0.375rem;
+
+/*
+ * Thème sombre (version tenue): les cadres encrés de la boutique. Panneau à grand cadre, qui
+ * reçoit dans sa loge (comme le commerçant), réplique et plaque à petit cadre, ligne choisie sur
+ * un fond d'accent éteint (texte 9,9 pour 1) sous le liseré d'accent.
+ */
+[data-lpl-style='encre'] .lpl-ui .lpl-order {
+  background: none;
+  border-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  border-image: var(--cadre-grand-papier-ombre) var(--bi-grand-ombre);
+  overflow: visible;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-order-receiver {
+  margin: 0.375rem 0 0.375rem 0.375rem;
+  background: var(--soft-green);
+  border-right: 0.125rem solid var(--line);
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-order-mail {
+  margin: 0.375rem 0.375rem 0.375rem 0;
+  background: var(--paper-raised);
+  border-left: 0.125rem solid var(--line);
+}
+[data-lpl-style='encre'] .lpl-ui :is(.lpl-order-say, .lpl-order-plate, .lpl-order-sum) {
+  background: none;
+  border-color: transparent;
+  border-radius: 0;
+  border-image: var(--cadre-petit-papier) var(--bi-petit);
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-order-say {
+  rotate: -1deg;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-order-say::after {
+  background: var(--paper-raised);
+  border-color: var(--line);
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-order-plate {
+  rotate: -1.5deg;
+  font-weight: 850;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-order-sum {
+  rotate: 0.6deg;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-order-row {
+  border-radius: 0.25rem;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-order-row.lpl-order-on {
+  background: var(--chosen-bg);
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 0.0625rem var(--accent);
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-order-row__state {
+  border-radius: 0.25rem;
+}
+[data-lpl-style='encre'] .lpl-ui .lpl-order-envelope {
+  border-radius: 0.25rem;
 }

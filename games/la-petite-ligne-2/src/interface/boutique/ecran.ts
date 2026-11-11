@@ -310,6 +310,7 @@ export function createShopScreen(
       ui,
       model.tiles,
       model.detail,
+      model.news,
       world.players[me].money,
       world.common.chest,
       message?.text,
@@ -354,13 +355,20 @@ export function createShopScreen(
       return b;
     };
     const talkButton = (name: string): HTMLElement => {
+      const label = fill(SHOP_TEXTS.talkLabel, { nom: name, touche: keyLabel('KeyP') });
       const b = el(
         'button',
         {
-          class: 'shop-talk',
-          'aria-label': fill(SHOP_TEXTS.talkLabel, { nom: name, touche: keyLabel('KeyP') }),
+          class: `shop-talk${m.news ? ' shop-talk--news' : ''}`,
+          'aria-label': m.news ? `${label}. ${fill(SHOP_TEXTS.talkNews, { nom: name })}` : label,
         },
-        [icon('parole'), SHOP_TEXTS.talk, keyChip('KeyP')],
+        [
+          icon('parole'),
+          SHOP_TEXTS.talk,
+          keyChip('KeyP'),
+          // Pastille: une réplique pas encore entendue attend chez ce commerçant.
+          m.news ? el('span', { class: 'shop-talk__news', 'aria-hidden': 'true' }) : null,
+        ],
       );
       b.addEventListener('click', talk);
       return b;
@@ -444,7 +452,7 @@ export function createShopScreen(
     const d = m.detail;
     if (d !== null) {
       const piece = d.tile.kind === 'piece';
-      const thumb = el('div', { class: 'shop-v3d' });
+      const thumb = el('div', { class: `shop-v3d${piece ? ' shop-v3d--tenue' : ''}` });
       thumb.innerHTML = tileImage(d.tile);
       if (!piece)
         thumb.append(

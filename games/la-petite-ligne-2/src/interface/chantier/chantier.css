@@ -85,6 +85,10 @@
 .lpl-ui .site-row--work .site-note {
   white-space: nowrap;
 }
+/* Le reste dit en mots (« Encore un peu »): un peu plus petit qu'un nombre, il tient la ligne. */
+.lpl-ui .site-row--work .site-count b {
+  font-size: 1rem;
+}
 .lpl-ui .site-thumb {
   display: grid;
   place-items: center;

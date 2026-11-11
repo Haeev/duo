@@ -19,6 +19,7 @@ import {
   SITE_GESTURES,
   siteRefusalText,
   worksiteModel,
+  workFeel,
   type SiteGesture,
   type WorksiteModel,
 } from './modele';
@@ -200,12 +201,14 @@ export function createWorksiteScreen(
         : `<span class="site-count"><b>${model.cost.due === 0 ? T.paid : formatEuros(model.cost.due)}</b></span>` +
           `<span class="site-note">${model.cost.due === 0 ? picto('check') : fill(T.chest, { montant: formatEuros(model.cost.chest) })}</span>`;
     const ratio = model.work.total === 0 ? 1 : model.work.done / model.work.total;
+    // En mots, pas en secondes: la barre montre la part faite, le mot ce qu'il reste à peu près.
+    const feel = T.workFeel[workFeel(model.work)];
     const other: PlayerIndex = me === 0 ? 1 : 0;
     const work =
       model.work.total === 0
         ? `<span class="site-count">${T.workNone}</span>`
-        : `<span class="site-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${String(Math.round(ratio * 100))}"><span style="transform:scaleX(${ratio.toFixed(3)})"></span></span>` +
-          `<span class="site-count"><b>${fill(T.workLeft, { n: model.work.left })}</b></span>` +
+        : `<span class="site-bar" role="progressbar" aria-label="${T.work}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${String(Math.round(ratio * 100))}" aria-valuetext="${feel}"><span style="transform:scaleX(${ratio.toFixed(3)})"></span></span>` +
+          `<span class="site-count"><b>${feel}</b></span>` +
           `<span class="site-note">${token(me, me, model.work.workers[me])}${token(other, me, model.work.workers[other])}</span>`;
     const status =
       message !== null && now < message.until

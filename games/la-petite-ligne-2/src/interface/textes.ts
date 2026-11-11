@@ -222,6 +222,10 @@ export const TEXTS = {
   dialogue: {
     provisional: 'Portrait provisoire',
     choices: 'Ta réponse',
+    /** Sous les choix: la touche qui valide (Espace), ou Entrée pour une décision à deux. */
+    choose: 'choisir',
+    decide: 'décider à deux',
+    choicesDecision: 'Décision à deux, Entrée pour décider',
     fails: 'Échouera : lave-toi d’abord',
     /** Option impossible pour l'instant: sa raison, écrite en clair (`{nom}`: l'autre joueur). */
     blocked: {

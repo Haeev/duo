@@ -277,7 +277,7 @@ export function createKitchen(
               )
             : '';
         html = `<div class="lpl-cook-play">${partnerFrieze}${stepFrieze(def?.steps ?? [], screen.game.grades, v.step, 'mine')}
-          <div class="lpl-cook-stage">${thumb(screen.recipe.output.item)}${picto(v.kind, 'big now')}</div>${gaugeHtml(screen.game)}</div>`;
+          <div class="lpl-cook-desk"><div class="lpl-cook-stage">${thumb(screen.recipe.output.item)}${picto(v.kind, 'big now')}</div>${gaugeHtml(screen.game)}</div></div>`;
         break;
       }
       case 'wait':

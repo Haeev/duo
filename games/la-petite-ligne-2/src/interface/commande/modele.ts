@@ -15,6 +15,7 @@ import {
   ordersOf,
 } from '../../simulation/commandes/lecture';
 import { ORDERS } from '../../simulation/commandes/reglages';
+import type { PortraitMood } from '../portrait';
 import { fill } from '../textes';
 import { ORDER_TEXTS as T } from './textes';
 
@@ -31,6 +32,11 @@ export interface OrderRow {
   /** Ce qu'une livraison donnerait maintenant: le reste demandé, borné par ce qu'on a. */
   readonly deliverable: number;
   readonly done: boolean;
+  /** Reste à livrer, et ce qu'il rapportera (centimes): `price` est le prix à l'unité. */
+  readonly left: number;
+  readonly due: number;
+  /** Déjà payé pour cette ligne (centimes). */
+  readonly received: number;
 }
 
 export type OrderEntry =
@@ -55,7 +61,29 @@ export interface OrderScreenModel {
   readonly here: boolean;
   readonly mood: ReceiverMood;
   readonly says: string;
+  /** L'expression du buste, accordée à sa réplique (`RECEIVER_EXPRESSION`). */
+  readonly expression: PortraitMood;
+  /** Toute la commande: ce qui reste à recevoir et ce qui est déjà payé (centimes). */
+  readonly toReceive: number;
+  readonly received: number;
 }
+
+/**
+ * L'expression de qui reçoit selon sa réplique (les portraits en ont cinq). Elle n'est contente
+ * que quand il y a de quoi l'être; quand la livraison attendra samedi prochain, elle s'en soucie.
+ */
+export const RECEIVER_EXPRESSION: Readonly<Record<ReceiverMood, PortraitMood>> = {
+  // « La commande de la semaine ! Pose ça sur le quai, je charge. »
+  open: 'content',
+  // « Tout y est. Je charge, je signe. »
+  thanks: 'content',
+  // « Le reste, samedi prochain. »: on livrera plus tard.
+  partial: 'soucieux',
+  // « Rien pour le fourgon ? Pas grave. »: rien de livré, elle reste posée.
+  nothing: 'neutre',
+  // Elle tend le courrier, amusée.
+  mail: 'content',
+};
 
 export function entryKey(entry: OrderEntry): string {
   return entry.kind === 'mail' ? 'mail' : `${entry.kind}:${entry.id}`;
@@ -88,6 +116,9 @@ export function orderScreenModel(
       store: have.store,
       deliverable: Math.min(left, have.bag + have.store),
       done: left <= 0,
+      left: Math.max(0, left),
+      due: line.price * Math.max(0, left),
+      received: line.price * line.delivered,
     };
   });
   const waiting = lettersIn(content, world, place, ORDERS.mailWaiting);
@@ -124,6 +155,9 @@ export function orderScreenModel(
     here,
     mood,
     says: orders.desk.says[mood],
+    expression: RECEIVER_EXPRESSION[mood],
+    toReceive: rows.reduce((sum, row) => sum + row.due, 0),
+    received: rows.reduce((sum, row) => sum + row.received, 0),
   };
 }
 

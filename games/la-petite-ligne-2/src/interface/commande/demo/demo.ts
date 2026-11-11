@@ -2,7 +2,8 @@
  * Démonstration de l'écran de livraison sur une vraie simulation d'Aubrune: après l'acte 2, le
  * premier samedi, train à quai, à côté de Rosalie. États par l'ancre: `#livraison` (une ligne
  * livrée, une autre en partie, le courrier qui attend), `#lettre` (courrier pris, la première
- * lettre ouverte), `#vide` (rien en main: Rosalie dit qu'on livrera plus tard). Thème sombre:
+ * lettre ouverte), `#reste` (courrier pris, lettre reposée: Rosalie dit que le reste attendra),
+ * `#vide` (rien en main, le courrier attend). Thème sombre:
  * `data-lpl-style="encre"` sur la racine, comme `main.ts`. Sert aux captures.
  */
 import { loadContent } from '../../../donnees/charger';
@@ -74,8 +75,14 @@ if (state !== 'vide') {
     queue.push({ player: 0, intent: { type: 'order_deliver', line: full.id } });
   if (half !== undefined)
     queue.push({ player: 0, intent: { type: 'order_deliver', line: half.id } });
-  if (state === 'lettre') queue.push({ player: 0, intent: { type: 'mail_take' } });
+  if (state === 'lettre' || state === 'reste')
+    queue.push({ player: 0, intent: { type: 'mail_take' } });
 }
+// `#reste`: courrier pris et lettre reposée; la commande attendra samedi prochain (Rosalie soucieuse).
+if (state === 'reste')
+  setTimeout(() => {
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Backspace' }));
+  }, 900);
 
 const listeners = new Set<(event: GameEvent) => void>();
 const root = document.getElementById('ui');

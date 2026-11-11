@@ -616,6 +616,26 @@
 [data-lpl-style='encre'] .lpl-ui .choice--fails {
   color: var(--ink-muted);
 }
+/* La touche qui valide les choix: petit cadre de papier, le trait de la garde en accent. */
+[data-lpl-style='encre'] .lpl-ui .choices-hint {
+  background: none;
+  border-color: transparent;
+  border-radius: 0;
+  border-image: var(--cadre-petit-papier) var(--bi-petit);
+  rotate: 0.6deg;
+  font-weight: 800;
+}
+[data-lpl-style='encre'] .lpl-ui .choices-hint::after {
+  left: 0.25rem;
+  right: 0.25rem;
+  bottom: 0.125rem;
+}
+[data-lpl-style='encre'] .lpl-ui .choices--rappel .choices-hint {
+  border-image: var(--cadre-petit-accent) var(--bi-petit);
+}
+[data-lpl-style='encre'] .lpl-ui .choices--rappel .choices-hint::after {
+  background: var(--on-accent);
+}
 
 /* ---------- Carnet ---------- */
 [data-lpl-style='encre'] .lpl-ui .carnet {

@@ -9,6 +9,7 @@ export const SHOP_TEXTS = {
   sell: 'Vendre',
   talk: 'Parler',
   talkLabel: 'Parler à {nom} ({touche})',
+  talkNews: '{nom} a quelque chose de neuf à te dire',
   buyGrid: 'Ce que vend {nom}',
   sellGrid: 'Ce que {nom} te rachète',
   refusedGrid: 'Ce que {nom} ne rachète pas',

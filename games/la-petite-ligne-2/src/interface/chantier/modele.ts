@@ -10,8 +10,30 @@ import type { Look } from '../../simulation/briques/types';
 import { currentStage, stageReady, stageRefusal } from '../../simulation/logement/chantier';
 import { HOUSING_TUNING } from '../../simulation/logement/reglages';
 import { formatEuros } from '../../simulation/sac/argent';
+import { UI_TUNING } from '../reglages';
 import { fill } from '../textes';
 import { isSiteRefusal, SITE_TEXTS as T } from './textes';
+
+/**
+ * Le travail restant dit dans l'unité du joueur: la règle compte en secondes de marteau
+ * (`stage.work`), le joueur en « encore un peu ». `todo`: rien de fait encore; les autres
+ * paliers se lisent sur les secondes qu'il faudrait au rythme du moment (`UI_TUNING.worksiteFeel`).
+ */
+export type WorkFeel = 'todo' | 'long' | 'while' | 'little' | 'almost' | 'done';
+
+export function workFeel(work: {
+  readonly total: number;
+  readonly done: number;
+  readonly left: number;
+}): WorkFeel {
+  if (work.done >= work.total) return 'done';
+  if (work.done <= 0) return 'todo';
+  const { almostS, littleS, whileS } = UI_TUNING.worksiteFeel;
+  if (work.left <= almostS) return 'almost';
+  if (work.left <= littleS) return 'little';
+  if (work.left <= whileS) return 'while';
+  return 'long';
+}
 
 export type SiteGesture = 'supply' | 'pay' | 'work';
 export const SITE_GESTURES: readonly SiteGesture[] = ['supply', 'pay', 'work'];

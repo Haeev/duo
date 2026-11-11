@@ -1,14 +1,17 @@
 /**
  * Fenêtre de dialogue (interface.md, 5.2): bandeau bas avec portrait, nom, texte accordé
  * (`talkView`) écrit lettre par lettre, trois lignes au plus par page; Espace affiche tout puis
- * continue; choix aux flèches et Entrée; option qui échouera marquée d'avance.
+ * continue; choix aux flèches et Entrée; option qui échouera marquée d'avance. Garde des choix
+ * (`garde-choix.ts`): inactifs un instant à leur apparition, Entrée seule pour une décision à deux.
  */
 import type { Content } from '../donnees/charger';
 import type { TalkView } from '../simulation/dialogues/conversation';
 import type { Intent } from '../simulation/noyau/entrees';
 import { el, icon, onPointerHover, setText, show, toggle } from './dom';
+import { choiceKeyOutcome } from './garde-choix';
 import { paginate, Typewriter } from './modeles';
 import { moodOfEmote, portraitMarkup } from './portrait';
+import { UI_TUNING } from './reglages';
 import { blockedText, TEXTS } from './textes';
 
 export interface BabbleInfo {
@@ -17,8 +20,11 @@ export interface BabbleInfo {
 }
 
 export interface DialogueWindow {
-  /** La vue du dialogue de ce joueur (`null`: fermé). */
-  sync(view: TalkView | null, now: number): void;
+  /**
+   * La vue du dialogue de ce joueur (`null`: fermé). `decision`: les choix offrent une décision à
+   * deux (`isDecisionChoice`), qui ne se valide qu'avec Entrée ou un clic.
+   */
+  sync(view: TalkView | null, now: number, decision?: boolean): void;
   frame(dtMs: number): void;
   isOpen(): boolean;
   /** Touche lue par la fenêtre (vrai: consommée). */
@@ -72,6 +78,11 @@ export function createDialogue(
   let openedAt = 0;
   /** Une intention est partie: on attend le nœud suivant sans renvoyer. */
   let pending = false;
+  /** Garde des choix (`garde-choix.ts`): instant d'apparition, armés, décision à deux, rappel. */
+  let shownAt = 0;
+  let armed = false;
+  let decision = false;
+  let remindUntil = 0;
   const writer = new Typewriter((char) => {
     onBabble({ villager, char });
   });
@@ -136,11 +147,53 @@ export function createDialogue(
       });
       choices.append(button);
     });
-    show(choices, options.length > 0 && writer.done);
+    const visible = options.length > 0 && writer.done;
+    // Les choix apparaissent: la garde commence, Espace et Entrée n'y valident encore rien.
+    if (visible && choices.hidden) {
+      shownAt = clock;
+      armed = false;
+    }
+    if (options.length > 0) choices.append(hintNode());
+    show(choices, visible);
+    markChoices();
+  }
+
+  /** La touche qui valide, sous les choix: Entrée pour une décision à deux, sinon Espace. */
+  function hintNode(): HTMLElement {
+    return el('p', { class: 'choices-hint', 'aria-hidden': 'true' }, [
+      el('span', { class: 'key', text: keyLabel(decision ? 'Enter' : 'Space') }),
+      el('span', {
+        class: 'choices-hint__text',
+        text: decision ? TEXTS.dialogue.decide : TEXTS.dialogue.choose,
+      }),
+    ]);
+  }
+
+  /** États visibles de la garde: inactifs (atténués), prêts, décision, rappel de la touche. */
+  function markChoices(): void {
+    toggle(choices, 'choices--garde', !armed);
+    toggle(choices, 'choices--pret', armed);
+    toggle(choices, 'choices--decision', decision);
+    toggle(choices, 'choices--rappel', clock < remindUntil);
+    choices.style.setProperty('--garde', `${String(UI_TUNING.choiceGuardMs)}ms`);
+    choices.setAttribute(
+      'aria-label',
+      decision ? TEXTS.dialogue.choicesDecision : TEXTS.dialogue.choices,
+    );
+  }
+
+  /** Espace ou Entrée sur les choix affichés, selon la garde (`garde-choix.ts`). */
+  function validate(code: string): void {
+    const outcome = choiceKeyOutcome(code, clock - shownAt, UI_TUNING.choiceGuardMs, decision);
+    if (outcome === 'choose') api.choose(focus);
+    else if (outcome === 'remind') {
+      remindUntil = clock + UI_TUNING.decisionHintMs;
+      markChoices();
+    }
   }
 
   const api: DialogueWindow = {
-    sync(view, now) {
+    sync(view, now, isDecision = false) {
       if (view === null) {
         if (current !== null) {
           current = null;
@@ -170,6 +223,10 @@ export function createDialogue(
         setText(name, def?.name ?? view.villager);
       }
       focus = 0;
+      // Nœud nouveau: ses choix repartent cachés, donc avec une garde neuve.
+      decision = isDecision;
+      remindUntil = 0;
+      show(choices, false);
       // Expression du portrait: l'émotion de la réplique, quand c'est l'habitant qui parle.
       bust.setAttribute(
         'data-expr',
@@ -190,6 +247,14 @@ export function createDialogue(
       if (triedId !== '' && clock >= triedUntil) {
         triedId = '';
         drawChoices();
+      }
+      if (!armed && !choices.hidden && clock - shownAt >= UI_TUNING.choiceGuardMs) {
+        armed = true;
+        markChoices();
+      }
+      if (remindUntil !== 0 && clock >= remindUntil) {
+        remindUntil = 0;
+        markChoices();
       }
       if (writer.advance(dtMs)) setText(text, writer.visible);
       const typing = !writer.done;
@@ -212,7 +277,7 @@ export function createDialogue(
         } else if (page + 1 < pages.length) {
           page += 1;
           startPage();
-        } else if (options.length > 0) api.choose(focus);
+        } else if (options.length > 0) validate(code);
         else if (!pending) {
           pending = true;
           send({ type: 'talk_next' });
@@ -223,7 +288,7 @@ export function createDialogue(
         if (code === 'ArrowUp' || code === 'KeyW')
           focus = (focus + options.length - 1) % options.length;
         else if (code === 'ArrowDown' || code === 'KeyS') focus = (focus + 1) % options.length;
-        else if (code === 'Enter') api.choose(focus);
+        else if (code === 'Enter') validate(code);
         drawChoices();
       }
       if (code === 'Backspace' && !pending) {
