@@ -37,6 +37,11 @@
     }
   ],
   "refusal": "Pas du bois.",
+  "lines": {
+    "bought": "Bien. Ça tiendra.",
+    "sold": "Bon bois. Tiens.",
+    "noMoney": "Pas les sous. Reviens."
+  },
   "talk": {
     "open": "Je regarde ton bois.",
     "leave": "Rien. Bonne journée."

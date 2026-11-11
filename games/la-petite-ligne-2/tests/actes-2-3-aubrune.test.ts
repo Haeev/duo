@@ -11,6 +11,7 @@ import type { Sim } from '../src/simulation/noyau/pas';
 import { remember } from '../src/simulation/regles/memoire';
 import { equipBag, giveItem } from '../src/simulation/sac/actions';
 import { act, contentWith, contextOf, wait } from './aides-l3';
+import { visit } from './aides-visite';
 import { newSim } from './aides';
 
 type Json = Record<string, unknown>;
@@ -40,11 +41,32 @@ function both(sim: Sim, name: string): void {
   moveTo(sim, 1, name);
 }
 
+/** Mène un joueur à l'habitant comme un joueur: par les portes, puis à portée de la touche d'action. */
 function nextTo(sim: Sim, player: PlayerIndex, villager: string): void {
-  const v = sim.world.places[AUBRUNE]?.villagers[villager];
-  if (v === undefined) throw new Error(`habitant ${villager}`);
-  sim.world.players[player].body.x = v.body.x + 0.8;
-  sim.world.players[player].body.y = v.body.y;
+  try {
+    visit(sim, player, villager);
+  } catch (error) {
+    // Défaut connu, signalé au manager le 2026-11-11: de 7 h à 12 h, deux plannings tiennent le
+    // même point de la place et, l'heure avancée d'un coup, les deux habitants sont posés l'un
+    // dans l'autre; la touche d'action ne vise que le premier. Pour celui-là seul, on se pose à côté.
+    if (!sharesSpot(sim, villager)) throw error;
+    const v = sim.world.places[AUBRUNE]?.villagers[villager];
+    if (v === undefined) throw error;
+    sim.world.players[player].body.x = v.body.x + 0.8;
+    sim.world.players[player].body.y = v.body.y;
+  }
+}
+
+/** Un autre habitant se tient-il exactement au même endroit que celui-ci ? */
+function sharesSpot(sim: Sim, villager: string): boolean {
+  const all = sim.world.places[AUBRUNE]?.villagers ?? {};
+  const me = all[villager]?.body;
+  return (
+    me !== undefined &&
+    Object.entries(all).some(
+      ([id, v]) => id !== villager && Math.hypot(v.body.x - me.x, v.body.y - me.y) < 0.3,
+    )
+  );
 }
 
 /** Parle à un habitant et suit le dialogue, en prenant l'option donnée (sinon la première visible). */

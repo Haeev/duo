@@ -52,6 +52,12 @@ Clôtures de la voie: les cases de lisière qui longent une voie reçoivent le m
 
 Ajouter une culture ou un état: aucune ligne de code. Une culture: sa fiche (`model`) et ses modèles (`assets-src/decors/recoltables-aubrune/README.md`). Un état: le modèle sous `states` du manifeste, et le nom d'état dans la fiche (`after` d'une ressource) ou dans `reglages-recoltes.ts`. Test court: `pnpm exec vitest run tests/rendu/recoltes.test.ts` (ressource, meuble, culture et zone factices). Captures: `pnpm exec playwright test --config tests/rendu-encre/playwright.config.ts recoltes`.
 
+## Meubles et portes selon la progression
+
+`presents.ts` (logique pure) lit la progression déjà transmise, à chaque image, chez l'hôte comme chez l'invité: un meuble de carte conditionné (`when`) dont la condition est fausse prend l'état `MAP_STATES.absent` (rien n'est dessiné, rien ne cache, n'éclaire ni ne se vise); l'objet visible d'une porte que son `opens` tient fermée prend `MAP_STATES.closed` (planches clouées en travers du vantail, ou sur le cadre d'une porte au sol). Le moteur les ajoute aux états des récoltables (`PlaceScene.setStates`): seuls les volumes qui changent sont refaits. Aucun code pour un meuble ou une porte de plus. Test court: `pnpm exec vitest run tests/rendu/presents.test.ts`. Captures: `pnpm exec playwright test --config tests/rendu-encre/playwright.config.ts briques`.
+
+Habitants: couché sur un lit (posture `lie`), il prend la pose du joueur qui dort (`personnages/allonge.ts`, `lyingOn`); quand il franchit une porte (saut de plus de `passage.jumpMeters`), il est caché le temps du saut et posé d'un coup de l'autre côté, jamais glissé.
+
 ## Pièces: un monde clos à l'écran
 
 Les pièces sont rangées côte à côte sur la grille du lieu, hors du dehors, mais on n'en dessine qu'une: celle du joueur local (`espaces.ts`: `Spaces.at`, `shows`, `bounds`). Dedans: son sol, ses murs, ses cloisons, ses meubles et les personnages qui s'y trouvent, sur une nappe sombre et chaude (`ROOM_SETTINGS.backdrop`); ni le dehors, ni les tuiles, ni les pièces voisines, et la vue reste dans ses bornes. Dehors: aucune pièce. Le moteur bascule par `TiledPlace.showRoom` et `PlaceScene.showWhere`.

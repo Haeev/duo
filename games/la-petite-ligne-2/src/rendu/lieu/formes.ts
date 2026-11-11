@@ -15,6 +15,7 @@ import {
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RENDER_SETTINGS } from '../reglages';
 import type { SceneVolume } from './description';
+import { MAP_STATES } from './presents';
 import { TILE_SETTINGS } from './reglages-tuiles';
 
 type StandInSettings = typeof RENDER_SETTINGS.standIn;
@@ -61,8 +62,14 @@ export const DOOR_CUT_COUNT = 'doorCutCount';
  * de l'encadrement, à cheval sur le mur. Avec `cutHeight`, la porte se fabrique en deux parts,
  * le bas d'abord (jusqu'à la coupe, coiffé d'une tranche à l'encre) puis le haut: quand son mur
  * est coupé devant la caméra, on n'en dessine que le bas (`low`: nombre de boîtes du bas).
+ * `closed` (l'histoire la tient fermée): deux planches clouées en travers du vantail, d'un
+ * montant à l'autre. On voit qu'on ne passe pas avant de lire pourquoi.
  */
-function doorParts(volume: SceneVolume, look: DoorLook): { parts: BufferGeometry[]; low: number } {
+function doorParts(
+  volume: SceneVolume,
+  look: DoorLook,
+  closed: boolean,
+): { parts: BufferGeometry[]; low: number } {
   const { w, h: depth, height } = volume;
   const d = look.door;
   const jamb = look.doorJamb;
@@ -105,6 +112,9 @@ function doorParts(volume: SceneVolume, look: DoorLook): { parts: BufferGeometry
   part(clear * 0.64, height * 0.3, 0.02, 0, height * 0.14, face + 0.01, d.panelColor);
   part(clear * 0.64, height * 0.34, 0.02, 0, height * 0.52, face + 0.01, d.panelColor);
   part(0.07, 0.07, 0.06, clear / 2 - 0.13, height * 0.47, face + 0.03, d.knobColor);
+  if (closed)
+    for (const at of d.boards.at)
+      part(w, d.boards.height, d.boards.depth, 0, height * at, face + 0.02, d.frameColor, true);
   return { parts: [...low, ...caps, ...high], low: low.length + caps.length };
 }
 
@@ -119,12 +129,40 @@ function matParts(volume: SceneVolume, look: DoorLook): BufferGeometry[] {
   ];
 }
 
-/** Porte au sol: un cadre bas autour d'un puits sombre, et trois marches qui y descendent. */
-function hatchParts(volume: SceneVolume, look: DoorLook): BufferGeometry[] {
+/**
+ * Porte au sol: un cadre bas autour d'un puits sombre, et trois marches qui y descendent.
+ * `closed` (l'histoire la tient fermée): ni puits ni marches, le cadre entier est fermé par des
+ * planches clouées de deux traverses. On voit qu'on ne passe pas avant de lire pourquoi.
+ */
+function hatchParts(volume: SceneVolume, look: DoorLook, closed: boolean): BufferGeometry[] {
   const { w: size, height } = volume;
   const t = look.hatch;
   const half = size / 2 - t.curb / 2;
   const inner = size - t.curb * 2;
+  if (closed) {
+    const parts = [
+      boxAt(size, height, t.curb, 0, 0, -half, t.curbColor),
+      boxAt(size, height, t.curb, 0, 0, half, t.curbColor),
+      boxAt(t.curb, height, inner, -half, 0, 0, t.curbColor),
+      boxAt(t.curb, height, inner, half, 0, 0, t.curbColor),
+    ];
+    const plank = inner / t.planks;
+    for (let i = 0; i < t.planks; i++)
+      parts.push(
+        boxAt(
+          plank - t.plankGap,
+          height * 0.7,
+          inner,
+          -inner / 2 + plank * (i + 0.5),
+          0,
+          0,
+          look.door.leafColor,
+        ),
+      );
+    for (const z of [-inner / 4, inner / 4])
+      parts.push(boxAt(inner, height * 0.7 + 0.025, t.curb, 0, 0, z, look.door.panelColor));
+    return parts;
+  }
   const parts = [
     boxAt(size, height, t.curb, 0, 0, -half, t.curbColor),
     boxAt(t.curb, height, inner, -half, 0, 0, t.curbColor),
@@ -149,6 +187,8 @@ export function standInGeometry(
   volume: SceneVolume,
   settings: StandInSettings = RENDER_SETTINGS.standIn,
   doors: DoorLook = TILE_SETTINGS.interior,
+  /** État montré (`setStates`): une porte que l'histoire tient fermée (`MAP_STATES.closed`). */
+  state: string | null = null,
 ): BufferGeometry {
   const body =
     volume.color !== undefined
@@ -162,7 +202,7 @@ export function standInGeometry(
   let cutCount = 0;
   switch (volume.shape) {
     case 'door': {
-      const door = doorParts(volume, doors);
+      const door = doorParts(volume, doors, state === MAP_STATES.closed);
       parts.push(...door.parts);
       for (const part of door.parts.slice(0, door.low)) cutCount += part.getIndex()?.count ?? 0;
       break;
@@ -171,7 +211,7 @@ export function standInGeometry(
       parts.push(...matParts(volume, doors));
       break;
     case 'hatch':
-      parts.push(...hatchParts(volume, doors));
+      parts.push(...hatchParts(volume, doors, state === MAP_STATES.closed));
       break;
     case 'slab': {
       parts.push(

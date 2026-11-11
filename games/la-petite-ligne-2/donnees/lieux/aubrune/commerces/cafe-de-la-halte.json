@@ -129,6 +129,11 @@
     }
   ],
   "refusal": "Ça, je ne peux pas le servir. Garde-le pour quelqu'un dont c'est le métier.",
+  "lines": {
+    "bought": "Servi ! Ici on ne rend pas les assiettes pleines, c'est la règle de la maison.",
+    "sold": "Ça, ça finit dans une assiette avant midi. Je paie franc, tu peux recompter.",
+    "noMoney": "Il te manque de quoi payer, et je ne fais pas crédit. Reviens les mains pleines: je rachète."
+  },
   "talk": {
     "open": "Je regarde ta carte.",
     "leave": "Je passais dire bonjour."

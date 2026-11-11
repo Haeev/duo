@@ -30,7 +30,7 @@ Rien ici. Verrou: une entrée `locks` dans `carte.json` (produite par `outils/pl
 2. Porte ou escalier: `"opens": [conditions]` et `"says": "phrase"` sur la porte du côté d'où l'on entre (on ressort toujours).
 3. Condition courante: une pièce de logement restaurée, `{ "type": "remembered", "key": "<lieu>.<logement>.<pièce>" }`, ou un fait d'histoire.
 4. Aucun état: tout se déduit de la progression, chez l'hôte comme chez l'invité. Événement `map_object_changed` quand un meuble paraît ou disparaît; un joueur qui se tenait là est dégagé (`unstuck`).
-5. Rendu: ne pas dessiner `absentObjects(look)` (exporté par `lieux/index.ts`).
+5. Rendu: fait, sans code par meuble (`src/rendu/lieu/presents.ts`: meuble absent non dessiné, porte fermée montrée fermée).
 6. `assembler_lieu.py` conserve ces champs d'une passe à l'autre. Test court: `tests/meubles-conditionnes.test.ts`.
 
 `traversee.ts`: `doorChain(place, fx, fy, tx, ty)`, les portes à franchir d'une pièce à l'autre (habitants, scènes, coup d'œil).

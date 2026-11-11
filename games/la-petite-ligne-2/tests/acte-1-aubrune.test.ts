@@ -11,6 +11,7 @@ import { giveItem } from '../src/simulation/sac/actions';
 import { sceneView } from '../src/simulation/scenes/lecture';
 import { act, contentWith, contextOf, wait } from './aides-l3';
 import { lieDown, propsWithBrick } from './aides-prologue';
+import { visit } from './aides-visite';
 import { newSim } from './aides';
 
 type Json = Record<string, unknown>;
@@ -70,12 +71,9 @@ function both(sim: Sim, name: string): void {
   moveTo(sim, 1, name);
 }
 
-/** Pose un joueur à côté d'un habitant (là où sa vie l'a mené). */
+/** Mène un joueur à l'habitant comme un joueur: par les portes, puis à portée de la touche d'action. */
 function nextTo(sim: Sim, player: PlayerIndex, villager: string): void {
-  const v = sim.world.places[sim.world.common.place]?.villagers[villager];
-  if (v === undefined) throw new Error(`habitant ${villager}`);
-  sim.world.players[player].body.x = v.body.x + 0.8;
-  sim.world.players[player].body.y = v.body.y;
+  visit(sim, player, villager);
 }
 
 /** Parle à un habitant et suit le dialogue, en prenant l'option donnée à chaque choix. */

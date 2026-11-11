@@ -113,6 +113,11 @@
     }
   ],
   "refusal": "Ça ? Ça ne se mange pas, ça ne se raconte pas: je n'en fais rien. Va voir qui en a l'usage.",
+  "lines": {
+    "bought": "Bon choix ! Si on te demande d'où ça vient, dis chez Odette, et dis-le fort.",
+    "sold": "Je prends. Prix de l'épicerie: honnête, pas fou. La nouvelle du jour, je te l'offre avec.",
+    "noMoney": "Ta bourse est plus légère que mes nouvelles. Apporte-moi des œufs, et on en reparle."
+  },
   "talk": {
     "open": "Je regarde ton épicerie.",
     "leave": "Je passais dire bonjour."

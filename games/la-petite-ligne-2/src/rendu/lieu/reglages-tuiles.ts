@@ -217,9 +217,23 @@ export const TILE_SETTINGS = {
       panelColor: '#74502c',
       /** Tranche de la porte quand son mur est coupé devant la caméra. */
       cutColor: '#2a1f1a',
+      /**
+       * Porte fermée par l'histoire: planches clouées en travers, à ces parts de sa hauteur
+       * (la plus basse reste sous la coupe d'un mur de devant), hautes et épaisses de tant (m).
+       */
+      boards: { at: [0.12, 0.6], height: 0.13, depth: 0.045 },
     },
     mat: { depth: 0.56, gap: 0.1, height: 0.035, color: '#b08a4a', edgeColor: '#6b4f2c' },
-    hatch: { size: 0.86, curb: 0.09, height: 0.14, curbColor: '#5a4030', wellColor: '#231b18' },
+    hatch: {
+      size: 0.86,
+      curb: 0.09,
+      height: 0.14,
+      curbColor: '#5a4030',
+      wellColor: '#231b18',
+      /** Fermée par l'histoire: nombre de planches qui la bouchent, et jour entre deux planches (m). */
+      planks: 4,
+      plankGap: 0.012,
+    },
   },
   landmark: {
     /** Repère dans un lieu sauvage (loin des chemins): un grand arbre; sinon une tour. */

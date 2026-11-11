@@ -25,6 +25,11 @@ export interface UiTuning {
   /** Message court sous la bulle (refus) et avis en haut à droite (ms). */
   readonly refusalMs: number;
   readonly noticeMs: number;
+  /**
+   * Réplique de comptoir dans l'écran de boutique: durée au moins `baseMs`, allongée de
+   * `perCharMs` par caractère (une phrase de la fiche du commerce se lit en entier), `maxMs` au plus.
+   */
+  readonly shopSay: { readonly baseMs: number; readonly perCharMs: number; readonly maxMs: number };
   /** Gain d'argent qui flotte près de la bourse (ms). */
   readonly moneyFloatMs: number;
   /** Pas du coffre commun (centimes), et pas avec Maj. */
@@ -59,6 +64,7 @@ export const UI_TUNING: UiTuning = {
   openGuardMs: 300,
   refusalMs: 1600,
   noticeMs: 4000,
+  shopSay: { baseMs: 1800, perCharMs: 55, maxMs: 7000 },
   moneyFloatMs: 1200,
   chestStepCents: 100,
   chestBigStepCents: 1000,

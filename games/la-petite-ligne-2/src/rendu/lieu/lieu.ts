@@ -28,6 +28,7 @@ import { ResourceTracker } from '../ressources';
 import { bundleGeometry } from './ballot';
 import { boxOf, footprint, type PlaceDescription, type SceneVolume } from './description';
 import { DOOR_CUT_COUNT, groundGeometry, standInGeometry } from './formes';
+import { MAP_STATES } from './presents';
 import { HARVEST_LOOK } from './reglages-recoltes';
 import { floorGeometry } from './sol';
 
@@ -86,6 +87,8 @@ class VolumeView implements Aimable {
     glowColor: Color,
     /** État montré (`null`: l'état de base). */
     readonly state: string | null,
+    /** Rien n'est dessiné (ressource prise, meuble absent): ni lampe ni cible. */
+    readonly empty = false,
   ) {
     this.fadable = new Fadable(object, glowColor);
   }
@@ -154,8 +157,9 @@ export class PlaceScene {
 
   private build(volume: SceneVolume): VolumeView {
     const state = this.states.get(volume.id) ?? null;
-    // Il ne reste rien (ressource prise, pas encore revenue): un objet vide garde sa place.
-    const gone = state === HARVEST_LOOK.gone;
+    // Il ne reste rien (ressource prise, pas encore revenue), ou le meuble n'existe pas encore
+    // (`when` de la carte): un objet vide garde sa place.
+    const gone = state === HARVEST_LOOK.gone || state === MAP_STATES.absent;
     const model =
       volume.model === null || gone
         ? null
@@ -169,7 +173,7 @@ export class PlaceScene {
       if (this.inked !== null) inkTag(this.bundle, { layer: LAYER.plain });
       object = new Mesh(this.bundle, this.materials.standIn);
     } else {
-      const geometry = this.tracker.track(standInGeometry(volume));
+      const geometry = this.tracker.track(standInGeometry(volume, undefined, undefined, state));
       if (this.inked !== null) inkTag(geometry, { layer: LAYER.plain });
       object = new Mesh(geometry, this.materials.standIn);
     }
@@ -187,7 +191,14 @@ export class PlaceScene {
     object.rotation.y = (volume.rotation * Math.PI) / 2;
     if (volume.scale !== undefined) object.scale.multiplyScalar(volume.scale);
     this.root.add(object);
-    const view = new VolumeView(volume, object, model !== null || gone, this.glowColor, state);
+    const view = new VolumeView(
+      volume,
+      object,
+      model !== null || gone,
+      this.glowColor,
+      state,
+      gone,
+    );
     if (volume.occludes && !gone)
       this.occlusion.add(model === null ? boxOf(volume) : modelBox(volume, object));
     object.visible = this.shown?.(volume) ?? true;
@@ -322,16 +333,19 @@ export class PlaceScene {
     }
   }
 
-  /** Tous les volumes affichés, fixes puis dynamiques (lampes du rendu encré). */
+  /**
+   * Tous les volumes affichés, fixes puis dynamiques (lampes du rendu encré); un meuble dont il
+   * ne reste rien, ou absent, n'éclaire pas.
+   */
   *volumes(): Generator<SceneVolume> {
-    for (const view of this.fixed.values()) yield view.volume;
-    for (const view of this.dynamic.values()) yield view.volume;
+    for (const view of this.fixed.values()) if (!view.empty) yield view.volume;
+    for (const view of this.dynamic.values()) if (!view.empty) yield view.volume;
   }
 
   /** L'objet de la scène qui porte cet identifiant, s'il peut être visé. */
   aimable(id: string): Aimable | null {
     const view = this.fixed.get(id) ?? this.dynamic.get(id);
-    return view?.volume.aimable === true ? view : null;
+    return view?.volume.aimable === true && !view.empty ? view : null;
   }
 
   /** Applique les opacités que l'occultation vient de changer. */

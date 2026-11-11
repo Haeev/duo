@@ -19,6 +19,7 @@ import { formatEuros } from '../../simulation/sac/argent';
 import { el, icon } from '../dom';
 import { itemThumb } from '../pictos';
 import { portraitMarkup } from '../portrait';
+import { UI_TUNING } from '../reglages';
 import { fill } from '../textes';
 import { shopModel, type ShopModel, type ShopTab, type ShopTile, type ShopUiState } from './modele';
 import { SHOP_TEXTS, shopRefusalText } from './textes';
@@ -122,7 +123,10 @@ export function createShopScreen(
   }
 
   function say(text: string, mood: 'yes' | 'no' | 'joy', now: number): void {
-    message = { text, until: now + 1800, mood };
+    const { baseMs, perCharMs, maxMs } = UI_TUNING.shopSay;
+    // Le temps de lire: une réplique de la fiche dure plus que le « Merci ! » commun.
+    const shown = Math.min(maxMs, Math.max(baseMs, text.length * perCharMs));
+    message = { text, until: now + shown, mood };
     drawn = '';
   }
 

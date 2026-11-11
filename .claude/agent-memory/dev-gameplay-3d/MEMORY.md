@@ -731,3 +731,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Un événement ajouté: ses `case` dans `interface/index.ts` et `interface/cuisine/index.ts` (lint seulement, `tsc` ne le voit pas). Une condition ou un effet ajouté: `donnees/valider.ts` (`checkCondition`, `checkEffect`) et la liste de `quetes/valider.ts` (`checkEffects`).
 - Meuble de carte conditionné (`when`): absent pour la simulation (`lieux/presents.ts`), mais le rendu le dessine tant qu'il ne lit pas `absentObjects`. Posture `lie` d'un habitant: le rendu ne connaît que `sit`.
 
+## Rendu des briques d'Aubrune (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Meuble conditionné et porte fermée passent par les états de volumes (`rendu/lieu/presents.ts`, `PlaceScene.setStates`), relus à chaque image par une empreinte: ne pas s'en remettre à `map_object_changed`, qui peut arriver chez l'invité avant la progression.
+- Habitant qui passe une porte: comparer sa position d'état d'une image à l'autre (`jumped`), le cacher pendant le saut et remettre `placed` à faux; chez l'invité l'interpolation donne plusieurs images intermédiaires.
+- Réplique de comptoir: sa durée suit sa longueur (`UI_TUNING.shopSay`); à 1,8 s fixe une phrase de fiche était illisible.
+- Captures à deux: vérifier sur la grille que la place où l'on pose un joueur est libre (lit, cloison): `watchObjects` le dégage au premier changement et la capture ment. Un rectangle bleu nuit près du HUD dans une capture = fond de page vu à travers le canevas (artefact du rendu logiciel, `elementsFromPoint` ne trouve que le canevas).
+- Un commerçant derrière un comptoir de 1 m est hors de portée de la touche d'action (1,2 m) depuis le côté client: on ne lui parle qu'en contournant le comptoir. `tests/aides-visite.ts` mène un joueur par les portes et par la visée.
+- Banc de captures: `tests/rendu-encre/briques.spec.ts`, sauvegarde `aubrune-briques`, sonde `remember(clé)`. Lancer la fabrique des sauvegardes avec le chemin absolu de sa configuration, sinon Vitest joue toute la suite.
+

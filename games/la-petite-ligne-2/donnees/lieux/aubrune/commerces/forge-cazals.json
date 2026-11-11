@@ -46,6 +46,11 @@
     }
   ],
   "refusal": "Ça se forge pas, ça se brûle pas. Qu'est-ce que tu veux que j'en fasse ?",
+  "lines": {
+    "bought": "Ha ! Bonne pioche. Si ça casse, c'est que t'as tapé de travers.",
+    "sold": "Pose ça là. Le feu avait faim. Tiens, tes sous !",
+    "noMoney": "Ha ! Pas assez de sous. Le fer attend pas, mais moi si: reviens."
+  },
   "talk": {
     "open": "Je regarde ton râtelier.",
     "leave": "Je te laisse taper."

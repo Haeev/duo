@@ -10,6 +10,7 @@ import type { Sim } from '../src/simulation/noyau/pas';
 import { remember } from '../src/simulation/regles/memoire';
 import { equipBag, giveItem } from '../src/simulation/sac/actions';
 import { act, contentWith, contextOf, wait } from './aides-l3';
+import { visit } from './aides-visite';
 import { newSim } from './aides';
 
 type Json = Record<string, unknown>;
@@ -87,11 +88,9 @@ function aubrune(only: string | null): Sim {
   return sim;
 }
 
+/** Mène un joueur à l'habitant comme un joueur: par les portes, puis à portée de la touche d'action. */
 function nextTo(sim: Sim, player: PlayerIndex, villager: string): void {
-  const v = sim.world.places[AUBRUNE]?.villagers[villager];
-  if (v === undefined) throw new Error(`habitant ${villager}`);
-  sim.world.players[player].body.x = v.body.x + 0.8;
-  sim.world.players[player].body.y = v.body.y;
+  visit(sim, player, villager);
 }
 
 /** Parle à un habitant et suit le dialogue, en prenant l'option donnée (sinon la première visible). */
