@@ -95,3 +95,9 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Trace d'essai: `JSON.stringify` d'un tableau où l'on a poussé `player.talk` montre l'état final partout (même objet muté); copier le champ lu.
 - Ajouter un effet aux données: schéma (`regles.ts`), `effets.ts`, `donnees/valider.ts` et `quetes/valider.ts` (deux `switch` exhaustifs).
 
+
+## La Petite Ligne 2: règles de simulation (vérifié le 2026-11-11)
+
+- Le carnet des collections (`progress.album.f`) est commun; prises par joueur aux index 5 et 6 du tuple. Une entrée de recette a la source `recipe` (inscrite par `dish_cooked` et `reward_given`), pas `item`.
+- Un système qui réagit aux événements (`sim.events`) ne voit que ceux déjà émis pendant le pas: intentions de tous les systèmes, puis `step` des systèmes placés avant lui dans `SYSTEMS`. Pour tester un système seul: `{ ...contextOf(sim), events: sim.events }` puis `system.step?.(context)`.
+- `findRoute` a deux surcharges: sans `shutDoors` il rend toujours un trajet (les tests s'en servent), avec il peut rendre `null` (seule une porte fermée y mène).

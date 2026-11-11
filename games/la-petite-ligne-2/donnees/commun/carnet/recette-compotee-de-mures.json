@@ -5,8 +5,8 @@
   "name": "Compotée de mûres",
   "place": "aubrune",
   "source": {
-    "type": "item",
-    "item": "compotee-de-mures"
+    "type": "recipe",
+    "recipe": "compotee-de-mures"
   },
   "rarity": null,
   "text": "Une compotée de mûres et de pomme, violette jusqu'aux doigts. Elle tache, elle console."

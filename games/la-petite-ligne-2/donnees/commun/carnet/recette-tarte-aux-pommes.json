@@ -5,8 +5,8 @@
   "name": "Tarte aux pommes",
   "place": "aubrune",
   "source": {
-    "type": "item",
-    "item": "tarte-aux-pommes"
+    "type": "recipe",
+    "recipe": "tarte-aux-pommes"
   },
   "rarity": null,
   "text": "Une tarte aux pommes, en rosace bien serrée. Celle d'Achille est plus belle, ne le lui dis pas."

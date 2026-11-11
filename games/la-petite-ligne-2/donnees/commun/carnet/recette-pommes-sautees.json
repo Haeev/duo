@@ -5,8 +5,8 @@
   "name": "Pommes sautées",
   "place": "aubrune",
   "source": {
-    "type": "item",
-    "item": "pommes-sautees"
+    "type": "recipe",
+    "recipe": "pommes-sautees"
   },
   "rarity": null,
   "text": "Des pommes sautées, dorées sur toutes les faces. Le livre dit « à feu vif », Odette dit « patience »."

@@ -12,7 +12,7 @@ import type { GameEvent } from '../src/simulation/noyau/evenements';
 import type { Sim } from '../src/simulation/noyau/pas';
 import { drawLoot } from '../src/simulation/outils/butin';
 import { resourceReady } from '../src/simulation/outils/ressources';
-import { contextOf } from './aides-l3';
+import { contentWith, contextOf } from './aides-l3';
 import { dataFiles, gameContent, newSim } from './aides';
 import { NORTH, put, run, send, SOUTH } from './aides-noyau';
 
@@ -146,6 +146,71 @@ describe('ressources du monde', () => {
     // La trouvaille sort de la table du sol qui scintille (pièces, fossiles et trésors du lieu).
     const table = content.resources['point-de-fouille']?.loot.map((l) => l.item) ?? [];
     expect(table).toContain(found?.type === 'harvested' && found.item);
+  });
+
+  it('fouille propre à un endroit: le point déclare sa fiche, la trouvaille sort de sa table', () => {
+    const own = contentWith((files) => {
+      const objects = files['lieux/essai-gare/carte.json']?.objects as Record<string, unknown>[];
+      objects.push({
+        id: 'fouille-de-la-roche',
+        type: 'point-de-fouille',
+        x: 17.5,
+        y: 37.5,
+        rotation: 0,
+        resource: 'fouille-roche',
+      });
+    });
+    const sim = newSim(own);
+    hold(sim, 'beche');
+    put(sim, 0, 17.5, 36.4, SOUTH);
+    run(sim, 0.1);
+    expect(aimOf(sim, 0)).toMatchObject({ id: 'fouille-de-la-roche', verb: 'Creuser' });
+    const found = [...stroke(sim), ...stroke(sim)].find((e) => e.type === 'harvested');
+    expect(found).toMatchObject({ resource: 'fouille-roche' });
+    const table = own.resources['fouille-roche']?.loot.map((l) => l.item) ?? [];
+    expect(table).toContain(found?.type === 'harvested' && found.item);
+    // Les autres points gardent la table commune.
+    put(sim, 0, 33.5, 35.4, SOUTH);
+    run(sim, 0.1);
+    const common = [...stroke(sim), ...stroke(sim)].find((e) => e.type === 'harvested');
+    expect(common).toMatchObject({ resource: 'point-de-fouille' });
+    // Fiche d'un autre geste refusée au chargement (le rendu suit la fiche du meuble).
+    expect(() =>
+      contentWith((files) => {
+        const objects = files['lieux/essai-gare/carte.json']?.objects as Record<string, unknown>[];
+        objects.push({
+          id: 'x',
+          type: 'point-de-fouille',
+          x: 17.5,
+          y: 37.5,
+          rotation: 0,
+          resource: 'coquelicots',
+        });
+      }),
+    ).toThrow(/geste et le reste/);
+  });
+
+  it('coquelicots posés par le plan d’Aubrune: ils se cueillent à la main et repoussent le lendemain', () => {
+    const aubrune = contentWith((files) => {
+      const settings = files['commun/reglages.json'] as { start: Record<string, unknown> };
+      settings.start = { ...settings.start, place: 'aubrune', minute: 600 };
+    });
+    const sim = newSim(aubrune);
+    run(sim, 0.2);
+    const story = sim.world.common.story;
+    if (story !== undefined) story.scene = null;
+    put(sim, 0, 305.5, 125.4, NORTH);
+    run(sim, 0.1);
+    expect(aimOf(sim, 0)).toMatchObject({
+      id: 'coquelicots-verger',
+      verb: 'Cueillir',
+      refusal: null,
+    });
+    stroke(sim);
+    expect(count(sim, 'coquelicot')).toBeGreaterThan(0);
+    expect(aimOf(sim, 0)?.refusal).toBe('not-yet-back');
+    nextDay(sim);
+    expect(aimOf(sim, 0)?.refusal).toBeNull();
   });
 
   it('table de butin: chance des besoins sur les rares (`rareLuck`) et exemplaire en plus (`extraCatch`)', () => {

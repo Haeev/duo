@@ -58,6 +58,37 @@ function seatOffset(def: PropDef, seats: number, seat: number): number {
   return ((seat + 0.5) / seats - 0.5) * def.size.w;
 }
 
+/**
+ * Place libre la plus proche de ce joueur, -1 si tout est pris. Deux joueurs qui s'assoient l'un
+ * après l'autre prennent chacun la place de leur côté, côte à côte, plutôt que la première de la
+ * liste (qui les mettait en diagonale autour d'une table).
+ */
+export function nearestFreeSeat(
+  sim: SimContext,
+  player: PlayerIndex,
+  prop: PropInstance,
+  def: PropDef,
+  seats: readonly (PlayerIndex | null)[],
+): number {
+  const body = sim.world.players[player].body;
+  const f = front(prop.rotation, facade);
+  let best = -1;
+  let bestDistance = Infinity;
+  for (let seat = 0; seat < seats.length; seat++) {
+    if (seats[seat] !== null) continue;
+    const along = seatOffset(def, seats.length, seat);
+    const dx = prop.x + f.y * along - body.x;
+    const dy = prop.y - f.x * along - body.y;
+    const distance = dx * dx + dy * dy;
+    // Égalité: la première place, pour un choix identique sur les deux machines.
+    if (distance < bestDistance - 1e-9) {
+      best = seat;
+      bestDistance = distance;
+    }
+  }
+  return best;
+}
+
 /** Installe le joueur à cette place: sur le meuble, tourné vers sa façade. */
 export function settle(
   sim: SimContext,

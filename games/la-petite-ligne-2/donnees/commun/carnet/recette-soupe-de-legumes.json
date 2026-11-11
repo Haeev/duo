@@ -5,8 +5,8 @@
   "name": "Soupe de légumes",
   "place": "aubrune",
   "source": {
-    "type": "item",
-    "item": "soupe-de-legumes"
+    "type": "recipe",
+    "recipe": "soupe-de-legumes"
   },
   "rarity": null,
   "text": "Une soupe de légumes du jour, épaisse et fumante. La cuillère tient presque debout."

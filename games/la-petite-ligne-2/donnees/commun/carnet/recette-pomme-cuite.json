@@ -5,8 +5,8 @@
   "name": "Pomme cuite",
   "place": "aubrune",
   "source": {
-    "type": "item",
-    "item": "pomme-cuite"
+    "type": "recipe",
+    "recipe": "pomme-cuite"
   },
   "rarity": null,
   "text": "Une pomme cuite au réchaud, ridée et sucrée. Le dessert des soirs où il n'y a rien."

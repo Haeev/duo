@@ -170,9 +170,9 @@ describe('collections d’Aubrune', () => {
         .map((e) => String(e.recipe)),
     );
     for (const entry of entries('recettes')) {
-      if (entry.source.type !== 'item') throw new Error(`${entry.id}: source attendue « item »`);
-      const item = entry.source.item;
-      const recipe = Object.values(content.recipes).find((r) => r.output.item === item);
+      if (entry.source.type !== 'recipe')
+        throw new Error(`${entry.id}: source attendue « recipe »`);
+      const recipe = content.recipes[entry.source.recipe];
       expect(recipe, entry.id).toBeDefined();
       if (recipe === undefined) continue;
       const book = recipe.learn?.book;

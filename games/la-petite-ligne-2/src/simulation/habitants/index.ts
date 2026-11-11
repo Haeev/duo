@@ -22,7 +22,7 @@ import { remember } from '../regles/memoire';
 import { bodyCollides } from '../noyau/grille';
 import { placeBlockers } from '../noyau/obstacles';
 import { findRoute, type Route } from './chemins';
-import { closedLockSet } from '../lieux/chemins';
+import { closedDoorSet, closedLockSet } from '../lieux/chemins';
 import { currentEntry, goalOf, type Goal } from './planning';
 import { attend, giveGift, showEmote } from './presence';
 import { VILLAGERS } from './reglages';
@@ -241,7 +241,15 @@ function head(
     rt.goal.x,
     rt.goal.y,
     closedLockSet(sim),
+    closedDoorSet(sim, content, id),
   );
+  if (rt.route === null) {
+    // Seule une porte fermée y mène: il reste où il est, sans but (pas de retour au poste).
+    rt.goal = null;
+    body.speed = 0;
+    state.pose = 'stand';
+    return;
+  }
   state.pose = 'walk';
 }
 
@@ -466,6 +474,7 @@ function backToPost(
   sim: SimContext,
   content: PlaceContent,
   place: PlaceState,
+  id: string,
   state: VillagerLifeState,
   rt: Runtime,
   body: { readonly x: number; readonly y: number },
@@ -481,7 +490,12 @@ function backToPost(
     goal.x,
     goal.y,
     closedLockSet(sim),
+    closedDoorSet(sim, content, id),
   );
+  if (rt.route === null) {
+    rt.goal = null;
+    return;
+  }
   rt.next = 0;
   rt.waited = 0;
   state.activity = null;
@@ -549,7 +563,7 @@ function liveOne(
           snap && state.presence === 'here',
         );
       } else if (strayed(sim, villager, state, rt))
-        backToPost(sim, content, place, state, rt, villager.body);
+        backToPost(sim, content, place, def.id, state, rt, villager.body);
     }
   }
   if (state.presence === 'away') return;

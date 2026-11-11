@@ -5,8 +5,8 @@
   "name": "Omelette aux herbes",
   "place": "aubrune",
   "source": {
-    "type": "item",
-    "item": "omelette"
+    "type": "recipe",
+    "recipe": "omelette-aux-herbes"
   },
   "rarity": null,
   "text": "Une omelette aux herbes, baveuse comme il faut. Colette la plie en trois, jamais en deux."

@@ -333,7 +333,8 @@ function legRoute(
  * Trajet de (fx, fy) à (tx, ty) dans le lieu: graphe d'abord, grille à défaut; ligne droite en
  * dernier recours. `closed`: verrous d'histoire fermés (`lieux/`), ni arête ni case n'y passent.
  * D'une pièce à l'autre, un trajet par pièce, relié par les portes (`doorChain`); sans porte qui
- * les relie, l'habitant est posé à l'arrivée (un seul point `jump`).
+ * les relie, l'habitant est posé à l'arrivée (un seul point `jump`). `shutDoors`: portes fermées
+ * pour lui (`closedDoorSet`); si seules elles relient les deux pièces, `null`: il ne passe pas.
  */
 export function findRoute(
   content: Content,
@@ -343,10 +344,35 @@ export function findRoute(
   fy: number,
   tx: number,
   ty: number,
+  closed?: ReadonlySet<string>,
+): Route;
+export function findRoute(
+  content: Content,
+  place: PlaceContent,
+  state: ReadPlace,
+  fx: number,
+  fy: number,
+  tx: number,
+  ty: number,
+  closed: ReadonlySet<string>,
+  shutDoors: ReadonlySet<string>,
+): Route | null;
+export function findRoute(
+  content: Content,
+  place: PlaceContent,
+  state: ReadPlace,
+  fx: number,
+  fy: number,
+  tx: number,
+  ty: number,
   closed: ReadonlySet<string> = NONE,
-): Route {
-  const chain = doorChain(place, fx, fy, tx, ty);
-  if (chain === null) return { points: [{ x: tx, y: ty, jump: true }], doors: [] };
+  shutDoors: ReadonlySet<string> = NONE,
+): Route | null {
+  const chain = doorChain(place, fx, fy, tx, ty, shutDoors);
+  if (chain === null) {
+    if (shutDoors.size > 0 && doorChain(place, fx, fy, tx, ty) !== null) return null;
+    return { points: [{ x: tx, y: ty, jump: true }], doors: [] };
+  }
   if (chain.length === 0)
     return legRoute(content, place, state, areaAt(place, fx, fy) === '', fx, fy, tx, ty, closed);
   const points: RoutePoint[] = [];

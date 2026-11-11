@@ -14,7 +14,8 @@ Carnet: une entrée trouvée est un tuple `[premier, jour, minute, météo, sais
 
 ## Brancher
 
-- Pêche, fouilles, cueillette, recettes, tenues: donner l'objet (`item_gained`) suffit si l'entrée a la source `item`; sinon appeler `recordFind` (source `manual`), avec la mesure pour un record.
+- Pêche, fouilles, cueillette, tenues: donner l'objet (`item_gained`) suffit si l'entrée a la source `item`; sinon appeler `recordFind` (source `manual`), avec la mesure pour un record.
+- Recettes: source `recipe`; l'entrée s'inscrit à la première réussite en cuisine de chaque joueur (`dish_cooked`) ou par l'effet `give_recipe` (`reward_given`), jamais par un plat acheté.
 - Interface: `collection_found` (`first`: présentation complète, sinon rapide), `collection_record`, `collection_completed` (trophée); `collectionBook(world, content, lieu?)` pour l'onglet.
 - Rendu: `place.insects.list` (point de pose; vol autour selon `wander`), `insect_fled` (direction, vitesse), `net_swung`, `photo_taken`.
 

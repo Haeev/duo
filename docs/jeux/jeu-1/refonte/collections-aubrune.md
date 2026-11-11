@@ -102,7 +102,7 @@ Au potager: une graine, une culture (rien ne meurt), une ou deux fleurs selon l'
 
 ## 5. Recettes (18)
 
-Une recette s'inscrit au carnet la première fois qu'un joueur a le plat en main (cuisiné, acheté ou reçu). Prix: meilleur rachat du plat.
+Une recette s'inscrit au carnet à la première réussite en cuisine de ce plat par ce joueur (chacun des deux pour un repas à deux), ou quand l'histoire la donne (`give_recipe`); un plat acheté ou reçu ne l'inscrit pas (source `recipe` de l'entrée). Ce qui est déjà au carnet y reste. Prix: meilleur rachat du plat.
 
 | Recette | Poste | Ingrédients | Comment l'apprendre | Prix du plat (€) |
 |---|---|---|---|---|
@@ -219,9 +219,9 @@ L'omelette et le pot-au-feu existaient sans que rien ne les apprenne à Aubrune:
 
 | Manque | Conséquence aujourd'hui | Brique proposée |
 |---|---|---|
-| Fouille propre à un endroit (le plan donne le même type `point-de-fouille` aux 6 sols) | la roche aux fossiles et le ballast tirent dans la même table; l'endroit ne se reflète que par la saison et la météo | une ressource par sol (`fouille-roche`, `fouille-ballast`), choisie par le plan |
+| Fouille propre à un endroit (le plan donne le même type `point-de-fouille` aux 6 sols) | brique livrée le 2026-11-11: un objet de la carte peut déclarer sa fiche (`resource`), et `fouille-roche`, `fouille-ballast`, `fouille-pierre-levee` existent; reste à les donner aux trois points par le plan | `"resource": "<fiche>"` sur `fouille-roche`, `fouille-ballast`, `fouille-pierre-levee` de la carte |
 | Cueillette sauvage: le plan nomme coquelicots, châtaignes, champignons, myrtilles, noix, coquillages, mais n'en pose aucun sur la carte | les fleurs ne se cueillent pas, elles se cultivent; le coquelicot (racheté par Solange et Margot) ne s'obtient nulle part à Aubrune et n'entre pas au carnet | poser les ressources de cueillette par le plan, puis ajouter des fleurs sauvages (coquelicot, primevère, digitale) |
-| La cuisine n'inscrit pas l'entrée de la recette | la recette entre au carnet quand on a le plat en main, même acheté (omelette, soupe du café); une tarte « parfaite » donne la tarte dorée, qui n'inscrit pas la tarte aux pommes | inscrire `recette-<id>` à la première réussite (`recordFind`) |
+| La cuisine n'inscrit pas l'entrée de la recette | corrigé le 2026-11-11: source `recipe`, inscrite à la première réussite en cuisine ou par `give_recipe` | |
 | Fossile en plusieurs morceaux à assembler au carnet (cahier 4.7) | chaque fossile est d'une pièce | une entrée à fragments |
 | Insectes rendus par espèce | toutes les zones montrent le même repère d'insecte | un modèle par espèce (liste des assets) |
 | Coquillages de rivière (cahier 4.7, grèves de la berge et de l'Île) | pas de collection de coquillages; les grèves n'ont que des cailloux | ressource de ramassage par le plan |

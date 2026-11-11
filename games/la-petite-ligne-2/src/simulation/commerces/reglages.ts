@@ -11,7 +11,8 @@ export interface ShopTuning {
   readonly reach: number;
   /**
    * Distance (m) entre le commerçant et l'emprise de son comptoir tenu (`held`) pour qu'il soit
-   * tenu pour derrière son comptoir: la touche d'action s'adresse alors à lui.
+   * tenu pour derrière son comptoir: la touche d'action s'adresse alors à lui. Commerçant sans
+   * planning seulement: avec un planning, on lit son arrivée au poste (`commerces/brique.ts`).
    */
   readonly keeperReach: number;
   /** Exemplaires au plus par achat ou par vente. */

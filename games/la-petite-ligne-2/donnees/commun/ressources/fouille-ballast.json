@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "id": "fouille-ballast",
+  "name": "Ballast qui scintille",
+  "kind": "dig",
+  "verb": "Creuser",
+  "clip": "dig",
+  "seconds": 1,
+  "tool": "spade",
+  "minTier": 0,
+  "work": 6,
+  "dirty": true,
+  "effort": 0.2,
+  "after": "gone",
+  "respawnDays": 2,
+  "toGround": false,
+  "rolls": 1,
+  "loot": [
+    {
+      "item": "vieille-piece",
+      "min": 1,
+      "max": 1,
+      "weight": 6,
+      "rare": false,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "clou-de-voie-date",
+      "min": 1,
+      "max": 1,
+      "weight": 1,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "bouton-de-livree",
+      "min": 1,
+      "max": 1,
+      "weight": 1,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "jeton-de-cantine",
+      "min": 1,
+      "max": 1,
+      "weight": 0.8,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    }
+  ]
+}

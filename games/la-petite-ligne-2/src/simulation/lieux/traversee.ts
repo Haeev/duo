@@ -33,6 +33,7 @@ interface DoorSide {
 }
 
 const OUTSIDE = '';
+const NONE: ReadonlySet<string> = new Set();
 const sides = new WeakMap<PlaceContent, readonly DoorSide[]>();
 
 /** Pièce d'un point: identifiant d'intérieur, `''` dehors. */
@@ -64,6 +65,7 @@ function sidesOf(place: PlaceContent): readonly DoorSide[] {
 /**
  * Les portes à franchir de (fx, fy) à (tx, ty), dans l'ordre: aucune dans la même pièce, `null`
  * si rien ne relie les deux. Le moins de portes possible; à égalité, l'ordre des identifiants.
+ * `shut`: portes qu'on ne prend pas (fermées pour cet habitant, `lieux/chemins.ts`).
  */
 export function doorChain(
   place: PlaceContent,
@@ -71,6 +73,7 @@ export function doorChain(
   fy: number,
   tx: number,
   ty: number,
+  shut: ReadonlySet<string> = NONE,
 ): readonly DoorHop[] | null {
   const from = areaAt(place, fx, fy);
   const goal = areaAt(place, tx, ty);
@@ -83,7 +86,7 @@ export function doorChain(
   for (const area of queue) {
     if (area === goal) break;
     for (const side of all) {
-      if (side.area !== area) continue;
+      if (side.area !== area || shut.has(side.id)) continue;
       const other = byId.get(side.to);
       if (other === undefined || other.area === from || via.has(other.area)) continue;
       via.set(other.area, {

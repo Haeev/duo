@@ -46,11 +46,14 @@ export type Rarity = v.InferOutput<typeof RaritySchema>;
 
 /**
  * Comment une entrée s'inscrit. `item`: à la première fois qu'un joueur reçoit l'objet (pêche,
- * fouille, cadeau, achat: tout `item_gained`). `insect` et `photo`: par le filet et l'appareil.
+ * fouille, cadeau, achat: tout `item_gained`). `recipe`: à la première réussite en cuisine de
+ * cette recette par ce joueur (chacun de ceux d'un repas à deux), ou par l'effet `give_recipe`;
+ * un plat acheté ou reçu ne l'inscrit pas. `insect` et `photo`: par le filet et l'appareil.
  * `tune`: un air entendu (événement) ou appris. `manual`: un système appelle `recordFind`.
  */
 export const EntrySourceSchema = v.variant('type', [
   v.strictObject({ type: v.literal('item'), item: IdSchema }),
+  v.strictObject({ type: v.literal('recipe'), recipe: IdSchema }),
   v.strictObject({ type: v.literal('insect') }),
   v.strictObject({ type: v.literal('photo') }),
   v.strictObject({ type: v.literal('tune') }),
