@@ -261,6 +261,8 @@ export function tileDecor(
   keepOut: KeepOut | null = null,
   /** Faux quand les clôtures sont posées en modèles livrés (`fenceRuns`): pas de piquets en boîtes. */
   fences = true,
+  /** Cases dessinées par des modules de file livrés (`files.ts`): plus de boîte sur elles. */
+  runs: { covers(x: number, y: number): boolean } | null = null,
 ): TileDecor {
   const d = settings.decor;
   const clear = settings.semis.clear;
@@ -314,6 +316,8 @@ export function tileDecor(
             color: d.bushColor,
           });
         }
+      } else if (runs?.covers(x, y) === true) {
+        continue;
       } else if (name === 'labour' && x % 2 === 0) {
         // Rangs de culture, nord-sud.
         boxes.push({
