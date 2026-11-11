@@ -15,7 +15,7 @@ Un son du monde naît d'un événement de l'hôte ou de l'état, jamais d'une en
 | `regles.ts`, `babil.ts`, `pas.ts`, `ambiance.ts`, `espace.ts`, `reglages.ts`, `pool.ts` | logique pure, testée dans Node                                                                                                                         |
 | `moteur.ts`, `index.ts`, `fichiers.ts`                                                  | Web Audio: graphe, lecture, boucles; `createGameAudio`                                                                                                 |
 
-Fichiers sonores: `assets/commun/son/{effets,babil,ambiances}/`. Sources et script de génération: `assets-src/son/` (`generer.py`, deuxième lot dans `sons_aubrune.py` rendu et mesuré par `mesurer_lot.py`, `controler.py`, mesures dans `mesures.csv`).
+Fichiers sonores: `assets/commun/son/{effets,babil,ambiances}/`. Sources et script de génération: `assets-src/son/` (`generer.py`, deuxième lot dans `sons_aubrune.py` rendu et mesuré par `mesurer_lot.py`, troisième lot (draisine, applaudissements, épuisette) dans `sons_lot3.py` (`mesurer_lot.py --lot 3`, `planche_lot.py --lot 3`), `controler.py`, mesures dans `mesures.csv`).
 
 La **musique** (airs par heure, météo et lieu, silences, jingles) a son propre dossier et sa propre table: `musique/README.md`.
 

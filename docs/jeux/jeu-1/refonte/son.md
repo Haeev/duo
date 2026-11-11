@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | lot L9 (moteur, babil, sons de base, ambiances jour et nuit), lot musique d'Aubrune (10 morceaux, 7 jingles, régie par table) et deuxième lot d'effets (2026-11-11: pêche, cuisine, déco, cloches, passage à niveau, 5 h 12, porte, boutique, pièces, décision à deux, photo, pas sur bois, eau, gravier, tapis), six points d'accroche branchés (2026-11-11 au matin) et les 8 airs de la collection avec la musique des fêtes (2026-11-11); reste: le bouton « Écouter » du carnet (section Airs), un air propre à chaque fête si le client le souhaite, les bruitages des scènes de fête |
+| Statut | lot L9 (moteur, babil, sons de base, ambiances jour et nuit), lot musique d'Aubrune (10 morceaux, 7 jingles, régie par table) et deuxième lot d'effets (2026-11-11: pêche, cuisine, déco, cloches, passage à niveau, 5 h 12, porte, boutique, pièces, décision à deux, photo, pas sur bois, eau, gravier, tapis), six points d'accroche branchés (2026-11-11 au matin) et les 8 airs de la collection avec la musique des fêtes (2026-11-11), troisième lot (draisine, applaudissements, épuisette) et timbres de la musique jouée (2026-11-11 après-midi); reste: quatre briques du moteur pour la draisine (section Troisième lot), le bouton « Écouter » du carnet (section Airs), un air propre à chaque fête si le client le souhaite, les bruitages des scènes de fête |
 | Rédaction | sound-designer, 2026-11-10 |
 | Fichiers | sons: `games/la-petite-ligne-2/assets/commun/son/`; sources: `games/la-petite-ligne-2/assets-src/son/`; tables et moteur: `games/la-petite-ligne-2/src/audio/` (README) |
 
@@ -84,6 +84,41 @@ Sources: `assets-src/son/sons_aubrune.py` (une fabrique par son, table `SONS` av
 | Tourner un meuble | `deco_changed` avec `action: "rotate"` | `meuble-tourner` |
 | Cloche des heures | `clock_struck` de l'hôte (`simulation/monde/cloche.ts`, réglages `reglages-cloche.ts`) | `cloche-marthe-coup` |
 | Passage à niveau | `calendar_started` des quatre passages de train | `passage-a-niveau` |
+
+### Troisième lot (2026-11-11 après-midi): draisine, applaudissements, épuisette
+
+Sources: `assets-src/son/sons_lot3.py` (table `SONS`, et `BOUCLES` pour les sons tenus), rendu et mesure par `duo-python assets-src/son/mesurer_lot.py --lot 3`, planche par `planche_lot.py --lot 3` (`assets-src/son/ecoute/lot-3-aubrune.m4a`). Draisine: bois et fonte, rien de métallique aigu; joints de rail tous les 6 m, essieux à 1,4 m.
+
+| Événement | Son | Niveau (dB) | Priorité | Variations | Qui l'entend |
+|---|---|---|---|---|---|
+| `vehicle_stroke` (`push`, `same`, `alone`) | `draisine-balancier`: le bras de bois grince sur son palier, la bielle cogne doucement en bout de course | -13 | 3 | 3 variantes, hauteur 5 %, niveau 1,5 dB | les deux, l'autre placé |
+| `vehicle_stroke` `jam` | `draisine-bloque`: choc sourd et rond, court gémissement du bois, sans claquement | -11 | 2 | hauteur 4 % | les deux, placé |
+| `vehicle_started` (jusqu'à `vehicle_stopped`, ou `vehicle_in` d'office pour un train) | `draisine-roulement-moyenne`: roulement tenu, joints qui claquent par paires toutes les secondes (6 m/s) | -18 | 2 | aucune (boucle de 3 s) | les deux |
+| aucun pour l'instant (vitesse lente, rapide) | `draisine-roulement-lente`: roulement tenu au pas, joints toutes les 2,5 s (2,4 m/s, boucle de 5 s), `draisine-roulement-rapide`: roulement tenu plus clair, joints toutes les 0,75 s (8 m/s, boucle de 3 s) | -20, -16 | 2 | aucune | les deux |
+| aucun pour l'instant (frein serré) | `draisine-frein`: le levier tombe, le patin de bois frotte la roue, frottement qui ralentit | -12 | 2 | hauteur 4 % | les deux |
+| aucun pour l'instant (arrivée en bout de voie) | `draisine-butee`: tampon de bois contre la butée, petit rebond | -10 | 2 | hauteur 3 % | les deux |
+| aucun pour l'instant (un essieu passe un joint) | `draisine-joint`: tic du fer, cognement du plancher | -14 | 3 | 2 variantes, hauteur 5 % | les deux |
+| `vehicle_warning` | `draisine-avertissement`: sifflet de la rame, de loin (sol et ré), un long, un court | -9 | 1 | aucune | les deux |
+| `music_finished`, au moins un auditeur, mot 3 | `applaudissements-enthousiastes`: onze personnes, vite, deux « bravo » et un « ah ! » sans paroles | -6 | 2 | hauteur 3 % | les deux |
+| `music_finished`, au moins un auditeur, mot 2 | `applaudissements-chaleureux`: huit personnes, un « ah ! » ravi | -8 | 2 | hauteur 3 % | les deux |
+| `music_finished`, au moins un auditeur, mot 0 ou 1 | `applaudissements-polis`: cinq personnes, quelques mains | -10 | 2 | hauteur 3 % | les deux |
+| `fish_caught` avec `together` (l'épuisette de l'autre) | `epuisette-plonge`: l'épuisette plonge, remonte en ruisselant, le poisson frétille dans le filet | -8 | 2 | hauteur 4 % | les deux, placé |
+| `fish_net_missed` | `epuisette-rate`: « flouch » mat de l'épuisette vide, deux gouttes | -12 | 3 | hauteur 6 % | les deux, placé |
+
+Sans auditeur, pas d'applaudissements (on répète seul). L'annonce d'un train jouait auparavant `passage-a-niveau`, son tenu que rien ne faisait taire: elle a maintenant son sifflet, qui s'arrête de lui-même.
+
+**Briques manquantes** (moteur `src/audio/moteur.ts` et `regles.ts`, hors des données):
+
+1. Plusieurs sons pour un événement: `soundForEvent` s'arrête à la première règle. `vehicle_stopped` avec `end` doit à la fois faire taire le roulement et jouer `draisine-butee`. Proposition: un champ `"also": true` sur une règle, qui laisse la recherche continuer après elle.
+2. Boucle réglée par une valeur de l'état: le roulement suit la vitesse (`speed` du véhicule dans la tranche du lieu, de 0 à `speed.max`). Proposition: une table `held` dans `reglages.json` (`{ "sound": "draisine-roulement", "source": "vehicle.speed", "steps": [[0.3, "lente"], [3.5, "moyenne"], [6.5, "rapide"]] }`) lue par `frame()`, avec fondu croisé de 0,3 s entre deux allures et `playbackRate` de 0,9 à 1,1 dans chaque allure; les trois fichiers se raccordent (même grain, même niveau de fichier).
+3. Frein: aucun événement quand `state.brake` change (`vehicules/index.ts`); il faudrait `vehicle_brake` (`on`: vrai ou faux), ou la brique 2 sur `vehicle.brake`.
+4. Joints de rail: un compteur de distance comme `StepTracker` (`pas.ts`) sur la position du véhicule, `joint` tous les 6 m pour chaque essieu (1,4 m d'écart). En attendant, les claquements sont dans les boucles de roulement.
+
+**Mesures** (`mesures.csv`, `mesurer_lot.py --lot 3`): crêtes de -1,4 à -8,9 dBFS; sons longs de -15,9 à -22,4 LUFS momentanés (les roulements limités par la crête de leurs joints); part de l'énergie sous 300 Hz: 0 à 46 % (`draisine-bloque` 46 %, roulements 41 à 45 %, sous le plafond de 60 %). Raccord des roulements: lus dans Chromium à 44,1 et 48 kHz par `AudioBufferSourceNode` en boucle, la suite après le raccord est identique au fichier (écart nul), et le saut au raccord reste dans la plage des sauts ordinaires (centile 69 à 98); l'écart entre les deux bords de la boucle est le seul bruit de codage (0,8 à 1,8 % de la crête). Poids: 17 fichiers, 295 Ko; les sons du jeu passent à 1,45 Mo et 97 fichiers (plafond 1,8 Mo et 120).
+
+### Musique jouée: timbres (2026-11-11 après-midi)
+
+`src/audio/musique/donnees/timbres.json`: cornet à douze harmoniques décroissantes (cuivre rond, passe-bas 4,2 kHz, attaque 32 ms qui retombe à 80 %, vibrato de 11 cents à 5,4 Hz après 280 ms), clarinette à harmoniques impaires dominantes (attaque 48 ms, tenue 88 %, vibrato discret de 4 cents). Rendu hors ligne par le vrai moteur (`ecoute-musique-jouee.cjs`, `assets-src/son/ecoute/musique-jouee.m4a`) sur « Marche de la halte »: chaque instrument seul à 4,4 et 4,6 dB au-dessus de l'accompagnement (soliste qui passe devant sans écraser), mélange à -16,0 LUFS, crête -5,0 dBFS (duo du canon: -2,2 dBFS). Note fausse (`MUSIC.sound`, simulation): elle part 41 cents bas et s'affaisse à 98 cents en 60 ms environ (mesuré). Le format n'a ni souffle d'attaque, ni éclat qui suit l'intensité, ni glissé d'entrée: ce sont trois champs à ajouter au schéma et à `scene.ts` si le client veut des cuivres plus vivants.
 
 ## Babil
 

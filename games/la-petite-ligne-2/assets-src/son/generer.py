@@ -23,6 +23,7 @@ import numpy as np  # noqa: E402
 
 import dsp  # noqa: E402
 import sons_aubrune  # noqa: E402
+import sons_lot3  # noqa: E402
 from dsp import SR, env_ar, env_exp, fondu, modes, n_ech, poser, toile  # noqa: E402
 
 warnings.filterwarnings("ignore", message="Chunk")  # bloc LIST de FluidSynth, sans importance
@@ -419,6 +420,10 @@ def main() -> None:
             ecrire("effets", nom, fabrique())
     # Deuxième lot d'Aubrune (pêche, cuisine, déco, cloches, portes, boutique...): sons_aubrune.py
     for nom, fab in sons_aubrune.fichiers():
+        if voulu(nom):
+            ecrire("effets", nom, fab(rng(nom)))
+    # Troisième lot (draisine, applaudissements, épuisette): sons_lot3.py
+    for nom, fab in sons_lot3.fichiers():
         if voulu(nom):
             ecrire("effets", nom, fab(rng(nom)))
     if voulu("trajet"):

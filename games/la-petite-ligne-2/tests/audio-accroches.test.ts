@@ -137,3 +137,99 @@ describe('passage à niveau', () => {
     expect(soundForEvent(tables.events, started, 0)).toBeNull();
   });
 });
+
+describe('draisine', () => {
+  const stroke = (kind: 'push' | 'jam' | 'same' | 'alone'): GameEvent => ({
+    type: 'vehicle_stroke',
+    vehicle: 'draisine',
+    player: 1,
+    kind,
+    quality: 1,
+  });
+
+  it('un coup de balancier grince, deux coups ensemble font un choc sourd', () => {
+    expect(soundForEvent(tables.events, stroke('push'), 0)).toMatchObject({
+      sound: 'draisine-balancier',
+      own: false,
+      placed: true,
+    });
+    expect(soundForEvent(tables.events, stroke('alone'), 1)?.sound).toBe('draisine-balancier');
+    expect(soundForEvent(tables.events, stroke('jam'), 0)?.sound).toBe('draisine-bloque');
+    expect(tables.sounds['draisine-balancier']?.files.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('roule tant qu il avance, se tait à l arrêt ou quand un train le range', () => {
+    const roll = 'draisine-roulement-moyenne';
+    const started: GameEvent = { type: 'vehicle_started', vehicle: 'draisine' };
+    const stopped: GameEvent = {
+      type: 'vehicle_stopped',
+      vehicle: 'draisine',
+      stop: null,
+      end: true,
+    };
+    const putAway: GameEvent = { type: 'vehicle_in', vehicle: 'draisine', reason: 'train' };
+    expect(soundForEvent(tables.events, started, 0)).toMatchObject({ sound: roll, stop: false });
+    expect(soundForEvent(tables.events, stopped, 0)).toMatchObject({ sound: roll, stop: true });
+    expect(soundForEvent(tables.events, putAway, 1)).toMatchObject({ sound: roll, stop: true });
+    for (const pace of ['lente', 'moyenne', 'rapide']) {
+      const loop = tables.sounds[`draisine-roulement-${pace}`]?.loop;
+      expect(loop?.to, pace).toBeGreaterThan(loop?.from ?? Number.POSITIVE_INFINITY);
+    }
+  });
+
+  it('l annonce d un train n est pas une sonnerie tenue', () => {
+    const warning: GameEvent = { type: 'vehicle_warning', vehicle: 'draisine' };
+    const hit = soundForEvent(tables.events, warning, 0);
+    expect(hit?.sound).toBe('draisine-avertissement');
+    expect(tables.sounds[hit?.sound ?? '']?.loop).toBeUndefined();
+  });
+});
+
+describe('fin d un air joué', () => {
+  const finished = (rating: 0 | 1 | 2 | 3, listeners: number): GameEvent => ({
+    type: 'music_finished',
+    target: 'estrade',
+    air: 'air-marche-de-la-halte',
+    rating,
+    duo: false,
+    together: false,
+    first: false,
+    listeners,
+    results: [null, null],
+  });
+
+  it('les habitants applaudissent selon le mot, personne n applaudit sans auditeur', () => {
+    expect(soundForEvent(tables.events, finished(3, 4), 0)?.sound).toBe(
+      'applaudissements-enthousiastes',
+    );
+    expect(soundForEvent(tables.events, finished(2, 2), 1)?.sound).toBe(
+      'applaudissements-chaleureux',
+    );
+    expect(soundForEvent(tables.events, finished(1, 1), 0)?.sound).toBe('applaudissements-polis');
+    expect(soundForEvent(tables.events, finished(0, 3), 0)?.sound).toBe('applaudissements-polis');
+    expect(soundForEvent(tables.events, finished(3, 0), 0)).toBeNull();
+  });
+});
+
+describe('pêche à deux', () => {
+  it('l épuisette a son plongeon réussi et son plongeon raté', () => {
+    const caught: GameEvent = {
+      type: 'fish_caught',
+      player: 0,
+      catch: 'gardon',
+      sizeMm: 120,
+      quality: 1,
+      count: 1,
+      isNew: false,
+      record: false,
+      together: true,
+      big: false,
+    };
+    expect(soundForEvent(tables.events, caught, 1)?.sound).toBe('epuisette-plonge');
+    expect(soundForEvent(tables.events, { ...caught, together: false }, 1)?.sound).toBe(
+      'peche-prise',
+    );
+    const missed: GameEvent = { type: 'fish_net_missed', player: 1, reason: 'side' };
+    expect(soundForEvent(tables.events, missed, 0)?.sound).toBe('epuisette-rate');
+  });
+});
