@@ -561,3 +561,9 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 ## Publication du 11 novembre
 
 - Version 0.21.0 publiée à 7 h 56 après 744 tests rapides, tous les paquets du dépôt verts et 25 parcours à deux joueurs en mode strict.
+
+## 11 novembre, matin: budget de missions
+
+- Le client, après la publication de la 0.21.0: « Feux verts : tu as un budget de 20 agents ».
+- Lecture du manager (à lui de la corriger): 20 missions de membres au total pour finir Aubrune, deux en parallèle au plus, modèle économe quand la tâche est cadrée, compte tenu à jour dans le tableau de bord.
+- Missions 1 et 2 lancées: collections d'Aubrune en données; modèles des trains et des objets d'intérieur.
