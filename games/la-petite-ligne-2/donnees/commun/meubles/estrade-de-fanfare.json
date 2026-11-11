@@ -10,5 +10,9 @@
   "solid": true,
   "placeable": false,
   "series": null,
-  "bricks": []
+  "bricks": [
+    {
+      "brick": "perform"
+    }
+  ]
 }

@@ -14,6 +14,7 @@
     "test:longues": "vitest run --config vitest.longues.config.ts",
     "nouveau": "node outils/nouveau.ts",
     "pourquoi": "node outils/controle-pourquoi.ts",
+    "partition": "node outils/partition-air.ts",
     "verifier-carnet": "node outils/verifier-carnet.ts",
     "vignette": "node assets-src/vignette/generer.mjs",
     "test:e2e": "vite build && playwright test"

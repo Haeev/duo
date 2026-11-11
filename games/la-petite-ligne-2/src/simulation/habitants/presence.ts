@@ -67,10 +67,12 @@ export function attend(
   still: boolean,
   partner: { x: number; y: number; id: string } | null,
   lastReact: Map<string, number>,
+  listening: PlayerIndex | null = null,
 ): void {
   const body = villager.body;
   const talking = villager.talkingWith;
-  const near = talking ?? closestPlayer(sim, body.x, body.y, VILLAGERS.noticeRadius);
+  // Celui à qui il parle, sinon celui qu'il écoute jouer, sinon le joueur le plus proche.
+  const near = talking ?? listening ?? closestPlayer(sim, body.x, body.y, VILLAGERS.noticeRadius);
   const gaze: VillagerLifeState['gaze'] = near ?? partner?.id ?? null;
   if (state.gaze !== gaze) {
     state.gaze = gaze;

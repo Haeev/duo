@@ -1,0 +1,6 @@
+0:00.0 air-marche-de-la-halte, robot parfait: chaque note à son instant, toutes justes (cornet: 45 justes, 0 presque, 0 couacs, 0 manquées)
+0:20.6 air-marche-de-la-halte, robot maladroit: notes en avance ou en retard, couacs (notes qui s'affaissent), trous (cornet: 16 justes, 15 presque, 8 couacs, 6 manquées)
+0:41.2 air-canon-de-la-repetition, duo de robots parfaits: cornet (première entrée, à gauche), clarinette (seconde entrée, deux mesures après, à droite) (cornet: 24 justes, 0 presque, 0 couacs, 0 manquées; clarinette: 20 justes, 0 presque, 0 couacs, 0 manquées)
+
+Rendu hors ligne par le moteur du jeu (accompagnement: tige « fond », tige « air » en guide très bas; notes des joueurs: timbres synthétisés).
+Durée 61.8 s, sonie -16.4 LUFS, crête -3.5 dBFS, sans retouche de niveau.

@@ -75,6 +75,11 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     folder: 'commun/ressources',
     inPlace: false,
   },
+  'air-jouable': {
+    files: [{ from: 'air-jouable.jsonc', to: '<id>.json' }],
+    folder: 'commun/airs',
+    inPlace: false,
+  },
   'entree-de-collection': {
     files: [{ from: 'entree-de-collection.jsonc', to: '<id>.json' }],
     folder: 'commun/carnet',

@@ -12,6 +12,7 @@ La musique ne joue pas en continu et ne se choisit pas dans le code: une **table
 | `rythme.ts` | `Pacer`: plage de jeu, silence voulu, retour |
 | `regie.ts`, `index.ts` | Web Audio: tiges synchrones, fondu enchaîné, passe-bas, recul sous les jingles; `createGameMusic` |
 | `reglages.ts` | le volume de la musique, séparé de ceux de `../reglages.ts` (clé de stockage propre) |
+| `scene.ts`, `timbres.ts`, `donnees/timbres.json` | la musique jouée à l'instrument (`simulation/musique/`): accompagnement (tige `fond`, tige `air` en guide), décompte, notes des joueurs synthétisées par le timbre de leur instrument; `createGameStage` |
 
 Fichiers sonores: `assets/commun/son/musique/` (OGG Opus). Partitions, rendu et contrôles: `assets-src/son/musique/` (`aubrune.py`, `generer.py`, `controler.py`, `verifier_ecriture.py`, `midi/`).
 
@@ -29,6 +30,10 @@ Chaque morceau = deux tiges mono qui bouclent ensemble (`fond`: basse, accompagn
 ## Écouter un air depuis le carnet
 
 `listen(trackId)` joue un morceau de la table une fois en entier, pour ce joueur seulement: l'ambiance s'efface (`timing.listenFadeSeconds`), l'air passe sans couches ni passe-bas, puis l'ambiance revient. `stopListening()` l'arrête (bouton « Arrêter », fermeture du carnet); `listening()` dit l'air en cours, `listenable(id)` s'il existe. Un air de la collection porte l'identifiant de sa fiche: rien d'autre à brancher.
+
+## Musique jouée à l'instrument
+
+Pendant un air joué par les joueurs, la régie se tait (`hush`) et le son de l'air (`scene.ts`) sort par son entrée (`input`): le volume de la musique du joueur vaut pour les deux. L'accompagnement est la tige `fond` du morceau qui porte l'identifiant de l'air, lue une fois depuis le début de l'extrait; la tige `air` reste très bas pour guider (`MUSIC.sound.guideDb`). Les notes des joueurs sont synthétisées (table d'ondes par harmoniques, enveloppe, vibrato, passe-bas): un timbre est une entrée de `donnees/timbres.json`, nommée par le champ `instrument.timbre` d'un objet. Horloge et duo: `src/simulation/musique/README.md`. Écoute de contrôle rendue par ce moteur: `assets-src/son/musique/ecoute-musique-jouee.cjs` (`assets-src/son/ecoute/musique-jouee.m4a`).
 
 ## Recette: ajouter un morceau
 

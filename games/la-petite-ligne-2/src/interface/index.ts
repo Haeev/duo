@@ -34,6 +34,8 @@ import { createDecisionBanner } from './rappel-decision';
 import { createAgendaHud } from './annonce';
 import { fitScale, promptModel } from './modeles';
 import { createFishingOverlay } from './peche/index';
+import { createStage, type StageSoundPort } from './musique/index';
+import type { AssistLevel } from '../simulation/musique/reglages';
 import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
@@ -93,6 +95,15 @@ export interface InterfaceOptions {
    * de la boutique sont remplacées par l'image rendue du modèle. Absente: vignettes provisoires.
    */
   readonly objectViewer?: ObjectViewer;
+  /**
+   * Musique jouée: le son de l'air (`createGameStage` de `audio/musique`), l'heure de session
+   * commune aux deux machines, et l'aide réglable du joueur. Absent: l'air se joue en silence.
+   */
+  readonly stage?: {
+    readonly sound: StageSoundPort;
+    readonly sessionNow: () => number;
+    readonly assist?: () => AssistLevel;
+  };
 }
 
 export interface GameInterface {
@@ -294,6 +305,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
 
   function onEvent(event: GameEvent): void {
     kitchen.onEvent(event);
+    stage.onEvent(event);
     coop.onEvent(event);
     chapterEnd.onEvent(event, now);
     const me = local();
@@ -474,6 +486,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'tool_mended':
       case 'tool_sharpened':
       case 'map_object_changed':
+      case 'music_opened':
+      case 'music_started':
+      case 'music_note':
+      case 'music_finished':
+      case 'music_closed':
         break;
     }
   }
@@ -486,6 +503,18 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         );
       else if (cue.type === 'dish') options.onCue?.('poser');
     },
+  });
+  const stage = createStage({
+    layer,
+    content: view.content,
+    world: view.world,
+    local,
+    send,
+    keyLabel,
+    keyTarget,
+    reduced,
+    openGuardMs: UI_TUNING.openGuardMs,
+    ...(options.stage ?? {}),
   });
   const coop = createCoopScreen(layer, view, send, keyLabel, keyTarget, UI_TUNING.openGuardMs);
   // Fin de chapitre (écran plein) et consignes des scènes à deux (gestes, jauges).
@@ -505,6 +534,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       workshop.isOpen() ||
       notebook.isOpen() ||
       kitchen.isOpen() ||
+      stage.isOpen() ||
       coop.isOpen() ||
       chapterEnd.isOpen(),
     ...(options.projectToScreen === undefined ? {} : { projectToScreen: options.projectToScreen }),
@@ -526,6 +556,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       workshop.isOpen() ||
       notebook.isOpen() ||
       kitchen.isOpen() ||
+      stage.isOpen() ||
       coop.isOpen() ||
       chapterEnd.isOpen(),
   });
@@ -555,7 +586,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       if (!raw.repeat && chapterEnd.key(raw.code, now)) raw.preventDefault();
       return;
     }
-    if (kitchen.isOpen() || coop.isOpen()) return;
+    if (kitchen.isOpen() || coop.isOpen() || stage.isOpen()) return;
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
     let used = false;
     if (editor.isOpen()) used = editor.key(raw);
@@ -620,6 +651,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       shop.frame(world, me, now);
       workshop.frame(world, me, now);
       kitchen.frame(dtMs);
+      stage.frame(dtMs);
       deco.frame();
       coop.frame(dtMs);
       chapterEnd.frame(world, me, now);
@@ -667,6 +699,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         shop.isOpen() ||
         workshop.isOpen() ||
         kitchen.isOpen() ||
+        stage.isOpen() ||
         deco.isOpen() ||
         fishing.capturing() ||
         coop.isOpen() ||
@@ -688,6 +721,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       workshop.dispose();
       editor.dispose();
       kitchen.dispose();
+      stage.dispose();
       deco.dispose();
       coop.dispose();
       chapterEnd.dispose();

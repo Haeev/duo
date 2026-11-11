@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "clarinette",
+  "name": "Clarinette",
+  "family": "supply",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "story": true,
+  "instrument": {
+    "timbre": "clarinette",
+    "tier": 1
+  }
+}

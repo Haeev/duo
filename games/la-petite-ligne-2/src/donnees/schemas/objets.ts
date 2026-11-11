@@ -74,5 +74,12 @@ export const ItemSchema = v.strictObject({
    * étapes, il ne se vend pas et ne se jette pas (il peut se donner à l'autre ou se ranger).
    */
   story: v.exactOptional(v.literal(true)),
+  /**
+   * Instrument de musique (pile de 1, `tool: null`): en main à un endroit où jouer (brique
+   * `perform`), il ouvre le cahier de fanfare. `timbre`: son nom dans la table des timbres
+   * (`src/audio/musique/donnees/timbres.json`); `tier`: 0 de base (les trois premiers airs du
+   * cahier), 1 amélioré (six), 2 fin (tous), cahier 4.5.
+   */
+  instrument: v.exactOptional(v.strictObject({ timbre: IdSchema, tier: v.picklist([0, 1, 2]) })),
 });
 export type ItemDef = v.InferOutput<typeof ItemSchema>;

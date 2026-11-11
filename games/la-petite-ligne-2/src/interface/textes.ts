@@ -41,6 +41,8 @@ export const TEXTS = {
   },
   /** Raison d'un refus (clé de la simulation): 4 mots au plus. */
   refusals: {
+    'air-not-ready': 'Air sans partition',
+    'air-unknown': 'Air pas encore appris',
     'already-cooking': 'Déjà en cuisine',
     'already-sharp': 'Déjà bien affûté',
     'already-watered': 'Déjà arrosé',
@@ -84,6 +86,9 @@ export const TEXTS = {
     'missing-ingredients': 'Il manque des ingrédients',
     'missing-item': 'Il te manque l’objet',
     'missing-materials': 'Il manque des matériaux',
+    'instrument-too-simple': 'Instrument trop simple',
+    'music-playing': 'Air en cours',
+    'need-instrument': 'Il faut un instrument',
     'need-rod': 'Il faut une canne',
     'needs-axe': 'Il faut une hache',
     'needs-camera': 'Il faut un appareil',

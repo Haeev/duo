@@ -53,6 +53,20 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 | Intérieur            | `pnpm nouveau interieur salle-du-cafe aubrune`                                                                           | taille, `at` dans l'annexe sous le dehors (`outdoor` de la carte), murs, points, meubles, portes; la porte du dehors s'écrit dans `doors` de `carte.json` et les deux portes se nomment l'une l'autre.                                                                                                                                                                         |
 | Bâtiment             | `pnpm nouveau batiment maison-neuve aubrune`, puis `bash assets-src/decors/batiments-aubrune/construire.sh maison-neuve` | emprise du plan, niveaux, finition, couleurs, toit, porte (façade et place du plan), ouvertures par façade, options (cheminée, enseigne, auvent, lucarne). Le script en tire `assets/lieux/<lieu>/batiments/<id>.glb` et son entrée au manifeste. Recette: `assets-src/decors/batiments-aubrune/README.md`.                                                                    |
 
+## Air jouable, instrument, endroit où jouer (musique, cahier 4.7)
+
+Gabarit commenté: `_gabarits/air-jouable.jsonc`. Moteur: `src/simulation/musique/README.md`. Aucune ligne de moteur.
+
+1. L'air existe déjà en musique: sa fiche du carnet (`commun/carnet/<id>.json`, source `tune`), son morceau dans `src/audio/musique/donnees/musique.json` et son MIDI dans `assets-src/son/musique/midi/` portent le même identifiant.
+2. `pnpm nouveau air-jouable <id>` crée `commun/airs/<id>.json`.
+3. `pnpm partition --pistes <id>` liste les pistes du MIDI (noms, nombre de notes, mesures).
+4. Remplis le haut du fichier: `order` (rang au cahier), `difficulty`, l'extrait (`fromBar`, `bars`, 25 à 45 s), `minGapMs`, la voix `solo` et, si l'air s'y prête, les deux voix `duo` (appel et réponse, ou chant et contrechant).
+5. `pnpm partition <id>` écrit le bloc `score` (les notes: instant, touche, hauteur, durée). Ne le retouche jamais à la main: change le haut du fichier et relance.
+6. `pnpm test`: le validateur nomme toute faute, et le test refuse une partition qui ne sort pas du script.
+7. **Instrument**: un objet (`pnpm nouveau objet <id>`) avec `"stack": 1`, `"tool": null` et `"instrument": { "timbre": "cornet", "tier": 0 }` (`tier` 0 de base: les trois premiers rangs du cahier; 1: six; 2: tous). Un timbre nouveau est une entrée de `src/audio/musique/donnees/timbres.json`.
+8. **Endroit où jouer**: ajoute `{ "brick": "perform" }` aux briques d'un meuble (en tête s'il sert aussi à autre chose). L'estrade de la fanfare, le pupitre de musique et le banc l'ont déjà.
+9. Pour donner un instrument: l'effet `{ "type": "give_item", "item": "cornet", "count": 1, "to": "duo" }` d'un dialogue ou d'une étape, ou une ligne de vente d'un commerce.
+
 ## Objets au sol, ensembles, sacs et notes de placement
 
 Cinq ajouts de données, sans ligne de moteur (gabarits commentés: `_gabarits/lieu/carte.jsonc`, `_gabarits/objet.jsonc`).

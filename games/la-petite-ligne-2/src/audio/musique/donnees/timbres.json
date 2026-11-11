@@ -1,0 +1,26 @@
+{
+  "fallback": "cornet",
+  "countIn": { "hz": 1320, "accentHz": 1760, "ms": 45, "volumeDb": -14 },
+  "timbres": {
+    "cornet": {
+      "harmonics": [1, 0.62, 0.45, 0.3, 0.2, 0.12, 0.08, 0.05],
+      "attackMs": 26,
+      "decayMs": 140,
+      "sustain": 0.78,
+      "releaseMs": 110,
+      "vibrato": { "hz": 5.2, "cents": 9, "delayMs": 240 },
+      "lowpassHz": 3400,
+      "volumeDb": -10
+    },
+    "clarinette": {
+      "harmonics": [1, 0.05, 0.55, 0.04, 0.28, 0.03, 0.12, 0.02, 0.06],
+      "attackMs": 42,
+      "decayMs": 180,
+      "sustain": 0.85,
+      "releaseMs": 130,
+      "vibrato": { "hz": 4.6, "cents": 5, "delayMs": 320 },
+      "lowpassHz": 2800,
+      "volumeDb": -9
+    }
+  }
+}

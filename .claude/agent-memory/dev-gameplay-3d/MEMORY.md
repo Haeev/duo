@@ -774,3 +774,17 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `InkKit` ne se construit pas dans Node (couches dessinées sur un canevas 2D): `vi.mock` de `encre/textures` (`createInkLayers`, `createNoise` en textures d'un point) et un faux `WebGLRenderer` suffisent pour tester création et libération.
 - La démonstration de l'éditeur en `#miroir` ne s'ouvre pas (apparence non révélée): rouvrir par `window.editeur.mirror()` après une première validation sur la page normale. Thème sombre: poser `dataset.lplStyle = 'encre'` après le chargement (dans `addInitScript`, `documentElement` est nul).
 - Capture d'une page de jeu en rendu logiciel: `page.screenshot` dépasse 120 s; lire `canvas.toDataURL()` juste après un `renderer.frame` dans la page (et recommencer si l'image est vide: le souffle du rendu encré saute des images).
+
+## Musique jouée, mini-jeu de rythme à deux (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- L'album des collections (`progress.album`) ne part pas chez l'invité (`reseau/progression.ts` n'envoie que `memory`, `bonds`, `quests`, `collections`, `prices`, `opened`): `isFound` y est toujours faux. Ce qu'un écran de l'invité doit savoir de l'album voyage dans l'événement qui l'ouvre (`music_opened.airs`).
+- Rythme en réseau: ne rien jouer « à l'arrivée d'un message ». Premier temps donné sur `net.sessionTimeMs()` (commune aux deux machines), converti en instant du contexte audio entendu (`ctx.getOutputTimestamp()`: `contextTime` et `performanceTime`; repli `currentTime - outputLatency`), frappes datées par `KeyboardEvent.timeStamp` sur la même conversion. La voix de l'autre se programme d'avance depuis la partition et se corrige aux verdicts.
+- Logique d'un mini-jeu dans un « poste » pur (`simulation/musique/poste.ts`: événements, frappes, modèle à dessiner, commandes de son abstraites): le même objet tourne dans Node avec `createHost`, `createGuest` et `createVirtualLink` (50 ms), dans la page de démonstration et dans le jeu.
+- `use_brick` refuse `too-far` au-delà de `reach.action` (1,2 m) du bord de l'emprise: dans un test, poser le meuble à 1 m des deux joueurs.
+- Une brique placée en tête d'un meuble peut s'effacer selon l'objet en main par `inert` (banc: « jouer ici » avec un instrument, sinon « s'asseoir »); `chooseBrick` passe alors à la suivante.
+- Un objet de famille `tool` exige le bloc `tool` (validateur): un objet à champ propre (`instrument`) prend une autre famille; `story: true` l'empêche d'être vendu ou jeté.
+- Les noms de classes nus (`.page`) dans un écran sont repris par les règles communes (`.lpl-ui .page` du carnet et son cadre encré): préfixer toutes les classes de l'écran.
+- Fichier MIDI en TypeScript sans dépendance (`outils/partition-air.ts`): les notes portent un retard d'interprétation (jamais d'avance), l'arrondi au douzième de noire retrouve la mesure écrite.
+- Enregistrement d'écoute fidèle au jeu: `OfflineAudioContext` dans Chromium avec le vrai moteur (`sessionNow` et `perfNow` à 0), attendre 50 ms après `start` (les tiges se branchent dans une microtâche), WAV en base64 par `page.evaluate`, puis ffmpeg. `spawnSync(...).stderr` pour lire les mesures de ffmpeg (`execFileSync` ne rend que la sortie standard).
+- Outil Bash isolé: un `cat > fichier <<EOF` suivi d'une autre commande est refusé en bloc; Write pour le script, puis une commande simple.
+

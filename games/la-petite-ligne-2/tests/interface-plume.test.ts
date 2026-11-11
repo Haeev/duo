@@ -60,7 +60,12 @@ const AHEAD = new Set(['lettre']);
  * dessinée. Un nouvel objet des données sans dessin fait échouer le test « chaque objet a sa
  * vignette »: dessiner la vignette (recette dans `assets-src/interface-encre/README.md`) ou l'inscrire ici.
  */
-const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>();
+const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>([
+  // Musique jouée (2026-11-11): objets et meuble livrés avec le mini-jeu, vignettes demandées à l'artiste 2D.
+  ['clarinette', 'instrument de la musique jouée: vignette à dessiner'],
+  ['cornet', 'instrument de la musique jouée: vignette à dessiner'],
+  ['pupitre', 'pupitre de musique: vignette à dessiner'],
+]);
 /**
  * Entrées du carnet des collections qui ne sont pas des objets (insectes, trésors de l'histoire):
  * le carnet les montre par leur identifiant (`itemThumb`), elles ont leur vignette aussi.
