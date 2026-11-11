@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "id": "armand-accordage",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "instrument_out_of_tune"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Oh. Pardon, je... je l'entends d'ici. Ton instrument. Il ne t'en veut pas, mais il penche un peu.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Donne. Au pupitre, je n'ai peur de rien. À l'accordage non plus. Une petite minute.",
+      "emote": null,
+      "next": "accorder"
+    },
+    "accorder": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "tune_instrument"
+        }
+      ],
+      "next": "juste",
+      "otherwise": "juste"
+    },
+    "juste": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Voilà. Il chante juste. Enfin, il chantera juste si tu chantes juste avec lui. C'est gratuit, évidemment. La musique, ça ne se facture pas.",
+      "emote": "joy",
+      "next": "plan"
+    },
+    "plan": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "not",
+              "condition": {
+                "type": "remembered",
+                "key": "aubrune.armand.diapason"
+              }
+            }
+          ],
+          "next": "plan-1"
+        }
+      ],
+      "otherwise": null
+    },
+    "plan-1": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Tiens, le plan de mon diapason. Une planche, un peu d'établi, et vous accorderez vous-mêmes.",
+      "emote": null,
+      "next": "geste"
+    },
+    "geste": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Tu tiens la note jusqu'à ce que ça ne batte plus. Comme un cœur qui se calme.",
+      "emote": null,
+      "next": "plan-2"
+    },
+    "plan-2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_plan",
+          "plan": "diapason"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.armand.diapason",
+          "value": true,
+          "by": "duo"
+        }
+      ],
+      "next": "plan-3",
+      "otherwise": "plan-3"
+    },
+    "plan-3": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Vous n'aurez plus besoin de moi. Enfin... passez quand même. Les grenouilles, elles, ne m'écoutent jamais.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

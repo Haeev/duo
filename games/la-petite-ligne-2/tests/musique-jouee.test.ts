@@ -37,6 +37,7 @@ import {
 import { bestRating, leadMs, notesOf, songbook } from '../src/simulation/musique/lecture';
 import { botPresses, createPerformance, type Press } from '../src/simulation/musique/local';
 import { createPartnerVoice } from '../src/simulation/musique/partenaire';
+import { tuneSpan } from '../src/simulation/musique/accord';
 import { ASSIST } from '../src/simulation/aide';
 import { modifiersOf } from '../src/simulation/besoins/jauges';
 import {
@@ -782,7 +783,12 @@ describe('musique jouée: sauvegarde et reprise', () => {
     Object.assign(again, { world: restored.world });
     expect(recitalOf(again.world, 0)).toBeNull();
     expect(bestRating(again.world, 'air-factice')).toBe(3);
-    expect(again.world.players[0].toolbar[0]).toEqual({ item: 'cornet', count: 1 });
+    // L'air joué a usé un air d'accord du cornet (cahier 4.5), sauvegardé avec lui.
+    expect(again.world.players[0].toolbar[0]).toEqual({
+      item: 'cornet',
+      count: 1,
+      wear: tuneSpan(content.items.cornet?.instrument ?? missing()) - 1,
+    });
     // Le même jour après la reprise: le chapeau a déjà tourné; l'air se rejoue en entier.
     const replay = playSolo(again, 'perfect', 2).finished;
     expect(replay).toMatchObject({ rating: 3, first: false });

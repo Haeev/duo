@@ -81,6 +81,36 @@ export interface MusicSettings {
    * musique du lieu se tait quand le niveau dépasse `hushAbove` (de 0 à 1).
    */
   readonly listen: { readonly nearM: number; readonly farM: number; readonly hushAbove: number };
+  /**
+   * Accord des instruments (cahier 4.5: « ne s'use pas, se désaccorde après 20 airs, accordé par
+   * Armand, gratuit, ou soi-même avec un diapason »). Le reste est une proposition du studio.
+   */
+  readonly tuning: {
+    /** Tenue d'accord d'un instrument qui ne déclare pas la sienne (`instrument.holds`): airs joués. */
+    readonly holdAirs: number;
+    /** Une fois désaccordé, airs encore joués avant de sonner tout à fait faux (le pire). */
+    readonly slideAirs: number;
+    /** Décalage de hauteur de toutes les notes (cents): au premier air désaccordé, puis au pire. */
+    readonly cents: { readonly first: number; readonly worst: number };
+    /** Part de la glissade (de 0 à 1) en dessous de laquelle on dit « un peu faux », puis « faux ». */
+    readonly slightBelow: number;
+    /** Chapeau et amitié des auditeurs multipliés selon l'accord: juste, un peu faux, faux. */
+    readonly reward: { readonly just: number; readonly slight: number; readonly off: number };
+    /** Le geste au diapason: tenir la note jusqu'à ce que le battement cesse. */
+    readonly gesture: {
+      /** Vitesse à laquelle la note tenue remonte vers le diapason: base, plus tant par cent d'écart (cents/s). */
+      readonly baseCentsPerSecond: number;
+      readonly centsPerSecondPerCent: number;
+      /** Écart (cents) sous lequel le battement ne s'entend plus: lâcher là, c'est juste. Multiplié par l'aide. */
+      readonly toleranceCents: number;
+      /** Le diapason tenu par l'autre joueur: on s'entend mieux à deux, tolérance multipliée. */
+      readonly pairFactor: number;
+      /** Distance (m) à laquelle l'autre doit tenir son diapason. */
+      readonly pairReach: number;
+      /** L'écart ne s'éloigne jamais au-delà (cents): on ne peut pas se perdre. */
+      readonly maxCents: number;
+    };
+  };
   /** Ce que la machine du joueur fait sonner (dB, cents, ms). */
   readonly sound: {
     /** Niveau de la tige `air` de l'enregistrement sous les joueurs: -60 la retire. */
@@ -123,6 +153,24 @@ export const MUSIC: MusicSettings = {
   hat: { centsPerListener: [0, 20, 35, 50], maxCents: 400 },
   bond: { points: [1, 2, 3, 4] },
   listen: { nearM: 4, farM: 18, hushAbove: 0.5 },
+  // Cahier 4.5: 20 airs. Le reste se règle ici: huit airs pour aller du « un peu faux » au pire,
+  // 20 puis 60 cents trop bas (un quart, puis plus d'un demi-ton: comique, jamais injouable), et
+  // un chapeau qui baisse sans jamais tomber à rien.
+  tuning: {
+    holdAirs: 20,
+    slideAirs: 8,
+    cents: { first: -20, worst: -60 },
+    slightBelow: 0.5,
+    reward: { just: 1, slight: 0.8, off: 0.6 },
+    gesture: {
+      baseCentsPerSecond: 5,
+      centsPerSecondPerCent: 0.5,
+      toleranceCents: 3,
+      pairFactor: 1.5,
+      pairReach: 3,
+      maxCents: 70,
+    },
+  },
   memory: {
     bestPrefix: 'musique.joue.',
     hat: 'musique.chapeau',

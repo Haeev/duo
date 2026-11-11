@@ -58,6 +58,11 @@ export type Condition =
   | { type: 'fact_at_least'; key: string; of?: FactOwner; value: number }
   | { type: 'need_at_least'; need: NeedId; value: number }
   | { type: 'item_in_bag'; item: string; count: number }
+  /**
+   * Celui qui agit porte un instrument désaccordé (un peu faux ou faux, `simulation/musique/accord.ts`);
+   * sans joueur qui agit, l'un ou l'autre.
+   */
+  | { type: 'instrument_out_of_tune' }
   /** La bourse du joueur qui agit contient au moins `amount` centimes. */
   | { type: 'money_at_least'; amount: number }
   | { type: 'place_is'; place: string }
@@ -138,6 +143,7 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
       item: IdSchema,
       count: v.pipe(CountSchema, v.minValue(1)),
     }),
+    v.strictObject({ type: v.literal('instrument_out_of_tune') }),
     v.strictObject({
       type: v.literal('money_at_least'),
       amount: v.pipe(CentsSchema, v.minValue(1)),
@@ -288,6 +294,11 @@ export const EffectSchema = v.variant('type', [
    * sans effet.
    */
   v.strictObject({ type: v.literal('reveal_look'), to: v.exactOptional(EffectTargetSchema) }),
+  /**
+   * Accorde tous les instruments que porte celui qui agit (ou chacun avec `to: 'duo'`): l'accordage
+   * d'Armand, gratuit (cahier 4.5). Déjà justes: sans effet.
+   */
+  v.strictObject({ type: v.literal('tune_instrument'), to: v.exactOptional(EffectTargetSchema) }),
   /**
    * Une bête offerte par l'histoire arrive dans un abri de basse-cour (`simulation/elevage/`):
    * `shelter` est l'identifiant du meuble abri sur la carte (brique `shelter` de cette espèce),

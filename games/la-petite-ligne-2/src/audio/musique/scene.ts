@@ -45,7 +45,12 @@ export interface StageAudio extends StageSound {
 interface Voice {
   readonly oscillator: OscillatorNode;
   readonly stopAt: number;
+  /** Désaccord de l'instrument (cents): un couac s'y ajoute. */
+  readonly cents: number;
 }
+
+/** Niveau du diapason et de la note tenue pendant l'accordage (dB). */
+const TUNING_DB = { fork: -14, note: -12 } as const;
 
 const ROLES = ['fond', 'air'] as const;
 const FADE_IN = 0.02;
@@ -184,6 +189,28 @@ export function createStageAudio(options: StageAudioOptions): StageAudio {
     hush(false);
   }
 
+  // --- Accordage --------------------------------------------------------------------------------
+  let tuning: {
+    readonly bus: GainNode;
+    readonly fork: OscillatorNode;
+    readonly note: OscillatorNode;
+    readonly noteGain: GainNode;
+    holding: boolean;
+  } | null = null;
+
+  function stopTuning(): void {
+    const current = tuning;
+    if (current === null) return;
+    tuning = null;
+    const t = ctx.currentTime;
+    current.bus.gain.setTargetAtTime(0, t, 0.05);
+    current.fork.stop(t + 0.3);
+    current.note.stop(t + 0.3);
+    current.fork.onended = (): void => {
+      current.bus.disconnect();
+    };
+  }
+
   /** Débranche plus tard; sans minuteur (rendu hors ligne), le nœud reste branché, muet. */
   function setTimeoutSafe(run: () => void, ms: number): void {
     if (typeof setTimeout === 'function' && 'resume' in ctx) setTimeout(run, ms);
@@ -292,18 +319,20 @@ export function createStageAudio(options: StageAudioOptions): StageAudio {
         lfo.start(at);
         lfo.stop(stopAt);
       }
+      // Instrument désaccordé: toutes ses notes un peu basses (cahier 4.5).
+      if (spec.cents !== 0) oscillator.detune.setValueAtTime(spec.cents, at);
       if (spec.sour) {
         // Un couac: la note part un peu basse et s'affaisse encore.
-        oscillator.detune.setValueAtTime(MUSIC.sound.falseCents * 0.6, at);
+        oscillator.detune.setValueAtTime(spec.cents + MUSIC.sound.falseCents * 0.6, at);
         oscillator.detune.setTargetAtTime(
-          MUSIC.sound.falseCents * 1.4,
+          spec.cents + MUSIC.sound.falseCents * 1.4,
           at + 0.03,
           MUSIC.sound.falseGlideMs / 3000,
         );
       }
       oscillator.start(at);
       oscillator.stop(stopAt);
-      voices.set(id, { oscillator, stopAt });
+      voices.set(id, { oscillator, stopAt, cents: spec.cents });
       oscillator.onended = (): void => {
         voices.delete(id);
         panner.disconnect();
@@ -324,7 +353,7 @@ export function createStageAudio(options: StageAudioOptions): StageAudio {
       const voice = voices.get(id);
       if (voice === undefined || ctx.currentTime >= voice.stopAt) return;
       voice.oscillator.detune.setTargetAtTime(
-        MUSIC.sound.falseCents,
+        voice.cents + MUSIC.sound.falseCents,
         ctx.currentTime,
         MUSIC.sound.falseGlideMs / 3000,
       );
@@ -332,8 +361,55 @@ export function createStageAudio(options: StageAudioOptions): StageAudio {
     stop() {
       stopPlaying(MUSIC.tailMs / 1000 / 2);
     },
+    tuning(spec) {
+      if (disposed) return;
+      if (spec === null) {
+        stopTuning();
+        return;
+      }
+      const t = ctx.currentTime;
+      if (tuning === null) {
+        // Le diapason: un la pur, frappé une fois, qui tient tant que le geste dure.
+        const bus = ctx.createGain();
+        bus.connect(master);
+        const fork = ctx.createOscillator();
+        fork.frequency.value = 440 * 2 ** ((spec.midi - 69) / 12);
+        const forkGain = ctx.createGain();
+        forkGain.gain.setValueAtTime(0, t);
+        forkGain.gain.linearRampToValueAtTime(dbToGain(TUNING_DB.fork), t + 0.01);
+        fork.connect(forkGain);
+        forkGain.connect(bus);
+        fork.start(t);
+        // La note de l'instrument, au même la, décalée de son désaccord: le battement naît seul.
+        const timbre = timbreOf(spec.timbre);
+        const note = ctx.createOscillator();
+        note.setPeriodicWave(waveOf(spec.timbre, timbre));
+        note.frequency.value = fork.frequency.value;
+        const noteGain = ctx.createGain();
+        noteGain.gain.value = 0;
+        const tone = ctx.createBiquadFilter();
+        tone.type = 'lowpass';
+        tone.frequency.value = timbre.lowpassHz;
+        note.connect(noteGain);
+        noteGain.connect(tone);
+        tone.connect(bus);
+        note.start(t);
+        tuning = { bus, fork, note, noteGain, holding: false };
+      }
+      tuning.note.detune.setTargetAtTime(spec.cents, t, 0.02);
+      if (spec.holding !== tuning.holding) {
+        tuning.holding = spec.holding;
+        tuning.noteGain.gain.cancelScheduledValues(t);
+        tuning.noteGain.gain.setTargetAtTime(
+          spec.holding ? dbToGain(TUNING_DB.note) : 0,
+          t,
+          spec.holding ? 0.02 : 0.08,
+        );
+      }
+    },
     dispose() {
       stopPlaying(0.02);
+      stopTuning();
       disposed = true;
       for (const voice of voices.values()) {
         try {

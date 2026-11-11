@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "diapason",
+  "name": "Diapason",
+  "makes": {
+    "kind": "item",
+    "item": "diapason",
+    "count": 1
+  },
+  "station": "workbench",
+  "materials": [
+    {
+      "item": "planche",
+      "count": 1
+    }
+  ],
+  "work": 18,
+  "source": "villager",
+  "series": null
+}

@@ -99,6 +99,7 @@ export function checkCondition(
         problems.push(`${at}: days_since impossible, atLeast au-delà de atMost`);
       return;
     case 'need_at_least':
+    case 'instrument_out_of_tune':
     case 'money_at_least':
     case 'time_is':
     case 'weather_is':
@@ -162,6 +163,7 @@ export function checkEffect(content: Content, e: Effect, at: string, problems: s
     case 'take_money':
     case 'change_need':
     case 'reveal_look':
+    case 'tune_instrument':
       return;
     case 'adopt_animal':
       checkAdoption(content, e, at, problems);

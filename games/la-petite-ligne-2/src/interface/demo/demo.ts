@@ -188,7 +188,8 @@ if (state === 'carnet-sac' || state === 'rangement') {
       { item: 'pomme', count: 4 },
       { item: 'buche', count: 5 },
       { item: 'planche', count: 3 },
-      null,
+      // Un instrument désaccordé: son mot (« faux ») sur la case et dans la fiche (cahier 4.5).
+      { item: 'clarinette', count: 1, wear: 0 },
       null,
       null,
       null,

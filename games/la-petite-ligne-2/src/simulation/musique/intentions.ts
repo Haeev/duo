@@ -27,6 +27,14 @@ export const MUSIC_INTENTS = [
     lane: v.pipe(IntSchema, v.minValue(0), v.maxValue(LANES - 1)),
     offsetMs: v.nullable(v.pipe(IntSchema, v.minValue(-2000), v.maxValue(2000))),
   }),
+  /**
+   * Accordé au diapason (cahier ouvert, entre deux airs): l'écart (cents) entre la note tenue et
+   * le diapason à l'instant où le joueur l'a lâchée. L'hôte refait la vérification.
+   */
+  v.strictObject({
+    type: v.literal('music_tune'),
+    cents: v.pipe(IntSchema, v.minValue(-100), v.maxValue(100)),
+  }),
   /** Ranger l'instrument: avant l'air ou en plein milieu, sans rien perdre. */
   v.strictObject({ type: v.literal('music_leave') }),
 ] as const;

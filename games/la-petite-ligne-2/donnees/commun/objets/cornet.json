@@ -10,6 +10,7 @@
   "story": true,
   "instrument": {
     "timbre": "cornet",
-    "tier": 0
+    "tier": 0,
+    "holds": 20
   }
 }

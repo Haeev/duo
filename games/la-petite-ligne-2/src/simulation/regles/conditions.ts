@@ -10,6 +10,7 @@ import type { ReadonlyWorld } from '../../etat/monde';
 import { bondKey, type Fact } from '../../etat/progression';
 import { calendarOf, eventDayKey, inHours, occursOn } from '../monde/calendrier';
 import { choiceOf, decisionState, decisionTaken, previousDecision } from '../quetes/decisions';
+import { worstTune } from '../musique/accord';
 import { otherPlayer, playerFactKey } from './memoire';
 
 export interface RuleContext {
@@ -85,6 +86,8 @@ export function evaluate(ctx: RuleContext, condition: Condition): boolean {
       return forActor(ctx, (p) => world.players[p].needs[condition.need] >= condition.value);
     case 'item_in_bag':
       return forActor(ctx, (p) => countHeld(world.players[p], condition.item) >= condition.count);
+    case 'instrument_out_of_tune':
+      return forActor(ctx, (p) => worstTune(ctx.content, world, p) !== 'just');
     case 'money_at_least':
       return forActor(ctx, (p) => world.players[p].money >= condition.amount);
     case 'place_is':

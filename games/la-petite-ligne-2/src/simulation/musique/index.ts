@@ -24,6 +24,15 @@ import type { Intent } from '../noyau/entrees';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { playerFactKey, recall, remember } from '../regles/memoire';
 import { earn } from '../sac/argent';
+import {
+  forkFor,
+  toleranceFor,
+  tuneReward,
+  tuneStack,
+  tuneState,
+  wearTune,
+  type TuneState,
+} from './accord';
 import type { MusicResult, VoiceId } from './evenements';
 import { accuracyOf, judge, ratingOf, tallyOf, windowScaleOf, windowsOf } from './jugement';
 import {
@@ -43,6 +52,8 @@ interface Member {
   assist: number;
   voice: VoiceId;
   readonly verdicts: (Verdict | null)[];
+  /** Accord de son instrument au lancement de l'air: il règle ce que l'air rapporte. */
+  tune: TuneState;
 }
 
 interface Recital {
@@ -140,7 +151,7 @@ export function sitIn(
     };
     stage.recitals.push(recital);
   }
-  recital.members[player] = { assist: 1, voice: 'solo', verdicts: [] };
+  recital.members[player] = { assist: 1, voice: 'solo', verdicts: [], tune: 'just' };
   sim.emit({
     type: 'music_opened',
     player,
@@ -209,6 +220,8 @@ function go(
     member.voice = voice;
     member.assist = assistFactor(sim.world, p);
     member.verdicts.length = 0;
+    const held = heldInstrument(sim.content, sim.world, p);
+    member.tune = held === null ? 'just' : tuneState(held.instrument, held.stack);
   }
   const startTick = sim.world.tick + Math.round(leadMs(score) / 1000 / SIM_DT);
   recital.playing = {
@@ -298,12 +311,15 @@ function finish(sim: SimContext, recital: Recital): void {
   const results: [MusicResult | null, MusicResult | null] = [null, null];
   for (const p of [0, 1] as const) {
     const mine = tallies[p];
-    if (mine === null || mine === undefined) continue;
+    const member = recital.members[p];
+    if (mine === null || mine === undefined || member === null) continue;
+    // Un instrument désaccordé rapporte un peu moins, jamais rien (cahier 4.5).
+    const gain = factor * tuneReward(member.tune);
     let cents = 0;
     const hatKey = playerFactKey(MUSIC.memory.hat, p);
     const perListener = MUSIC.hat.centsPerListener[mine.rating];
     if (listeners.length > 0 && perListener > 0 && recall(sim.world, hatKey)?.day !== day) {
-      const wanted = Math.min(MUSIC.hat.maxCents, listeners.length * perListener) * factor;
+      const wanted = Math.min(MUSIC.hat.maxCents, listeners.length * perListener) * gain;
       cents = earn(sim, p, Math.round(wanted / 5) * 5);
       remember(sim, hatKey, cents, p);
     }
@@ -312,10 +328,15 @@ function finish(sim: SimContext, recital: Recital): void {
       const key = villagerFactKey(id, MUSIC.memory.listened, p);
       if (recall(sim.world, key)?.day === day) continue;
       remember(sim, key, mine.rating, p);
-      if (addBond(sim, p, id, Math.round(MUSIC.bond.points[mine.rating] * factor)) > 0)
-        friends += 1;
+      const points = Math.max(1, Math.round(MUSIC.bond.points[mine.rating] * gain));
+      if (addBond(sim, p, id, points) > 0) friends += 1;
     }
     results[p] = { rating: mine.rating, ...mine.tally, cents, friends };
+    // L'air est allé au bout: l'instrument perd un air d'accord.
+    const state = sim.world.players[p];
+    const stack = state.selected === null ? null : (state.toolbar[state.selected] ?? null);
+    const instrument = stack === null ? undefined : sim.content.items[stack.item]?.instrument;
+    if (stack !== null && instrument !== undefined) wearTune(sim, instrument, stack);
   }
   const emote = MUSIC.audience.emotes[rating];
   if (emote !== null && place !== undefined)
@@ -340,8 +361,34 @@ function finish(sim: SimContext, recital: Recital): void {
   stage.recitals = stage.recitals.filter((r) => r !== recital);
 }
 
+/**
+ * Accordé au diapason, cahier ouvert, entre deux airs: la machine du joueur annonce l'écart où il
+ * a lâché la note; l'hôte vérifie l'instrument, le diapason et la tolérance (aide du joueur).
+ */
+function tune(
+  sim: SimContext,
+  player: PlayerIndex,
+  intent: Extract<Intent, { type: 'music_tune' }>,
+): void {
+  const recital = recitalWith(sim.world, player);
+  // Pas pendant un air (ni hors du cahier).
+  if (recital?.playing !== null) return;
+  const held = heldInstrument(sim.content, sim.world, player);
+  if (held === null || tuneState(held.instrument, held.stack) === 'just') return;
+  const fork = forkFor(sim.content, sim.world, player);
+  if (fork === null) {
+    refuse(sim, player, 'need-tuner', recital.target);
+    return;
+  }
+  if (Math.abs(intent.cents) > toleranceFor(sim.world, player, fork.pair)) return;
+  const state = sim.world.players[player];
+  const stack = state.selected === null ? null : (state.toolbar[state.selected] ?? null);
+  if (stack !== null) tuneStack(sim, stack);
+}
+
 function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
   if (intent.type === 'music_go') go(sim, player, intent);
+  else if (intent.type === 'music_tune') tune(sim, player, intent);
   else if (intent.type === 'music_note') note(sim, player, intent);
   else if (intent.type === 'music_leave') leave(sim, player);
 }

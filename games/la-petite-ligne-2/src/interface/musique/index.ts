@@ -154,6 +154,18 @@ export function createStage(options: StageOptions): StageScreen {
       instrument === null || instrument === undefined
         ? ''
         : escapeHtml(content.items[instrument]?.name ?? '');
+    const tune =
+      who === ''
+        ? ''
+        : ` <span class="lpl-mus-tune" data-tune="${view.tune}">${escapeHtml(T.tune[view.tune])}</span>`;
+    const where =
+      view.tune === 'just'
+        ? ''
+        : `<p class="lpl-mus-tunewhere" data-tune="${view.tune}">${escapeHtml(T.tuneWhere[view.tune])}</p>`;
+    const tuneKey =
+      view.tune !== 'just' && view.tuner
+        ? `<span>${keys(['KeyQ'])} ${escapeHtml(T.tuneKey)}</span>`
+        : '';
     const duo = view.partner
       ? `<p class="lpl-mus-duo on">${escapeHtml(fillText(T.duoWith, { nom: nameOf(mate()) }))}</p>`
       : `<p class="lpl-mus-duo">${escapeHtml(fillText(T.duoHint, { nom: nameOf(mate()) }))}</p>`;
@@ -177,7 +189,36 @@ export function createStage(options: StageOptions): StageScreen {
       .join('');
     const list =
       view.lines.length === 0 ? `<p class="lpl-mus-empty">${escapeHtml(T.empty)}</p>` : rows;
-    return `<section class="lpl-mus-panel lpl-mus-book"><header><h2>${escapeHtml(T.title)}</h2><p class="lpl-mus-who">${who}</p></header>${duo}<ol>${list}</ol><footer><span>${keys(['KeyW', 'KeyS'])} ${T.choose}</span><span>${keys(['Space'])} ${T.play}</span><span>${keys(['Backspace'])} ${T.leave}</span></footer></section>`;
+    return `<section class="lpl-mus-panel lpl-mus-book"><header><h2>${escapeHtml(T.title)}</h2><p class="lpl-mus-who">${who}${tune}</p></header>${where}${duo}<ol>${list}</ol><footer><span>${keys(['KeyW', 'KeyS'])} ${T.choose}</span><span>${keys(['Space'])} ${T.play}</span>${tuneKey}<span>${keys(['Backspace'])} ${T.leave}</span></footer></section>`;
+  }
+
+  // --- Accordage au diapason --------------------------------------------------------------------
+  /**
+   * Le repère visuel du battement, pour qui n'entend pas: deux anneaux, celui du diapason fixe,
+   * celui de l'instrument qui palpite au rythme du battement. Plus le battement est lent, plus la
+   * palpitation est faible; quand il se tait, les deux anneaux se confondent et ne bougent plus.
+   */
+  let beat = { phase: 0, el: null as HTMLElement | null, word: null as HTMLElement | null };
+
+  function tuneHtml(view: Extract<DeskView, { kind: 'tune' }>): string {
+    const word = view.result === 'tuned' ? T.tuneTuned : view.result === 'again' ? T.tuneAgain : '';
+    const pair = view.pair
+      ? `<p class="lpl-mus-duo on">${escapeHtml(fillText(T.tunePair, { nom: nameOf(mate()) }))}</p>`
+      : '';
+    return `<section class="lpl-mus-panel lpl-mus-tuning" data-holding="${view.holding ? 'oui' : 'non'}" data-result="${view.result ?? ''}"><header><h2>${escapeHtml(T.tuneTitle)}</h2></header><p class="lpl-mus-help">${escapeHtml(fillText(T.tuneHelp, { touche: keyLabel('Space') }))}</p>${pair}<div class="lpl-mus-fork" aria-hidden="true"><span class="ring fork"></span><span class="ring beat"></span></div><p class="lpl-mus-calm" aria-live="polite"></p><p class="lpl-mus-tuneword" aria-live="polite">${escapeHtml(word)}</p><footer><span>${keys(['Space'])} ${escapeHtml(T.tuneHold)}</span><span>${keys(['Backspace'])} ${escapeHtml(T.tuneBack)}</span></footer></section>`;
+  }
+
+  function updateBeat(view: Extract<DeskView, { kind: 'tune' }>, dtMs: number): void {
+    // Profondeur: nulle quand le battement se tait, pleine dès 2 battements par seconde.
+    const depth = Math.min(1, view.beatHz / 2);
+    beat.phase = (beat.phase + (view.beatHz * dtMs) / 1000) % 1;
+    const reduced = options.reduced?.() === true;
+    // Mouvement réduit: pas de palpitation, l'écart se lit à la taille de l'anneau.
+    const swing = reduced ? 1 : Math.abs(Math.sin(Math.PI * beat.phase));
+    const scale = 1 + 0.45 * depth * swing;
+    beat.el?.style.setProperty('transform', `scale(${scale.toFixed(3)})`);
+    const calm = view.result === 'tuned' ? '' : depth < 0.4 ? T.tuneCalm : T.tuneBeat;
+    if (beat.word !== null && beat.word.textContent !== calm) beat.word.textContent = calm;
   }
 
   // --- Partition -------------------------------------------------------------------------------
@@ -355,10 +396,17 @@ export function createStage(options: StageOptions): StageScreen {
     else if (view.listeners > 0) lines.push(`<p class="muted">${escapeHtml(T.hatDone)}</p>`);
     if (view.mine.friends > 0)
       lines.push(`<p>${escapeHtml(plural(T.friends, view.mine.friends))}</p>`);
+    if (view.tune !== 'just') {
+      // Un mot des auditeurs, toujours le même pour un air donné (rien de tiré au hasard ici).
+      const said = T.tuneListeners[view.tune];
+      const line =
+        view.listeners === 0 ? T.tuneAlone : (said[view.air.length % said.length] ?? said[0]);
+      lines.push(`<p class="tuneword">${escapeHtml(line)} ${escapeHtml(T.tuneAfter)}</p>`);
+    }
     return `<section class="lpl-mus-panel lpl-mus-result r${String(view.rating)}"><header><h2>${escapeHtml(T.ratings[view.rating])}</h2><p class="lpl-mus-who">${escapeHtml(name)}</p></header><p class="line">${escapeHtml(T.ratingLines[view.rating])}</p><ul class="tallies">${tally(view.other === null ? T.you : nameOf(options.local()), view.mine)}${view.other === null ? '' : tally(nameOf(mate()), view.other)}</ul><div class="gains">${lines.join('')}</div><footer><span>${keys(['Space'])} ${T.close}</span></footer></section>`;
   }
 
-  function render(): void {
+  function render(dtMs: number): void {
     const view = desk.view();
     if (view.kind !== shown) {
       shown = view.kind;
@@ -367,6 +415,7 @@ export function createStage(options: StageOptions): StageScreen {
       openedFor = 0;
       held.fill(false);
       root.dataset.kind = view.kind;
+      beat = { phase: 0, el: null, word: null };
     }
     root.hidden = view.kind === 'closed';
     root.dataset.motion = options.reduced?.() === true ? 'reduced' : 'full';
@@ -379,10 +428,14 @@ export function createStage(options: StageOptions): StageScreen {
     else if (view.kind === 'wait')
       html = `<section class="lpl-mus-panel lpl-mus-wait"><header><h2>${escapeHtml(T.title)}</h2></header><p>${escapeHtml(fillText(T.wait, { nom: nameOf(mate()) }))}</p><p class="muted">${escapeHtml(T.waitHint)}</p><footer><span>${keys(['Backspace'])} ${T.leave}</span></footer></section>`;
     else if (view.kind === 'result') html = resultHtml(view);
+    else if (view.kind === 'tune') html = tuneHtml(view);
     if (html !== lastHtml) {
       root.innerHTML = html;
       lastHtml = html;
+      beat.el = root.querySelector<HTMLElement>('.ring.beat');
+      beat.word = root.querySelector<HTMLElement>('.lpl-mus-calm');
     }
+    if (view.kind === 'tune') updateBeat(view, dtMs);
   }
 
   function onKey(raw: Event, down: boolean): void {
@@ -403,6 +456,12 @@ export function createStage(options: StageOptions): StageScreen {
       if (down && !raw.repeat && (code === 'Backspace' || code === 'Escape')) desk.leave();
       return;
     }
+    if (view.kind === 'tune') {
+      if (code === 'Space' || code === 'Enter') {
+        if (!raw.repeat) desk.hold(down);
+      } else if (down && !raw.repeat && (code === 'Backspace' || code === 'Escape')) desk.leave();
+      return;
+    }
     if (!down || raw.repeat) return;
     if (code === 'Backspace' || code === 'Escape') {
       desk.leave();
@@ -413,6 +472,7 @@ export function createStage(options: StageOptions): StageScreen {
       if (code === 'KeyW' || code === 'ArrowUp') desk.move(-1);
       else if (code === 'KeyS' || code === 'ArrowDown') desk.move(1);
       else if (code === 'Space' || code === 'Enter') desk.confirm();
+      else if (code === 'KeyQ') desk.tune();
     } else if (view.kind === 'result' && (code === 'Space' || code === 'Enter')) desk.confirm();
   }
   const onDown = (e: Event): void => {
@@ -431,7 +491,7 @@ export function createStage(options: StageOptions): StageScreen {
     frame(dtMs) {
       openedFor += dtMs;
       desk.frame(dtMs);
-      render();
+      render(dtMs);
     },
     isOpen: () => desk.isOpen(),
     dispose() {

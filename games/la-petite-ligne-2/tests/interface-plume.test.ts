@@ -65,6 +65,10 @@ const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>([
     'baronne',
     'prise unique qui reste à l’épuisette (`toBag: false`): elle ne passe jamais par le sac ni la boutique',
   ],
+  [
+    'diapason',
+    'objet neuf de l’accordage (2026-11-11): vignette à dessiner par l’art (`vignettes/diapason.svg`), vignette générique provisoire en attendant',
+  ],
 ]);
 /**
  * Entrées du carnet des collections qui ne sont pas des objets (insectes, trésors de l'histoire):
