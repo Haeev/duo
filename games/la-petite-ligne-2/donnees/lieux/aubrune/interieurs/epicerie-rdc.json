@@ -42,8 +42,8 @@
       "rotation": 1
     },
     {
-      "id": "epicerie-etal",
-      "type": "etal-de-tourte",
+      "id": "epicerie-rdc-caisse-4",
+      "type": "caisse-de-legumes",
       "x": 5.5,
       "y": 0.5,
       "rotation": 0

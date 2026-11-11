@@ -69,6 +69,16 @@
       }
     },
     {
+      "item": "tourte-du-quai",
+      "price": 1200,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte2.train"
+      }
+    },
+    {
       "item": "graines-capucine",
       "price": 30,
       "dailyStock": 5

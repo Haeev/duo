@@ -7,6 +7,7 @@ Auteur: game-designer, 2026-11-11. Suite de `ecriture-suites-secondaires.md`. So
 - 21 habitants écrits (les 20 du cahier et Martial Roques, qui arrive après la Veillée): 504 dialogues, 1 237 répliques dans `donnees/lieux/aubrune/dialogues/`.
 - Chacun a au moins 12 souvenirs (277 en tout, dont 217 nouveaux), 4 au moins sur ce qu'a fait l'autre joueur, un secret confié par amitié, des goûts, et des répliques selon l'heure, le lieu de son planning, la pluie et la brume.
 - Sept secrets nouveaux, en deux paliers (1 cœur, puis 2 cœurs): Anatole, Barnabé, Berthe, Léon, Margot, Paulin, Rosalie. Martial a le sien.
+- Depuis le 2026-11-11, les 21 habitants ont deux paliers: les douze qui n'en avaient qu'un ont leur seconde confidence, à 4 cœurs (section 10).
 - Deux trains réguliers font revenir les habitants de passage: celui du samedi (Rosalie) et l'autorail de 5 h 12 (le Contrôleur). Sans eux, leurs répliques ne s'entendraient jamais.
 
 ## 1. Comment c'est fait
@@ -14,7 +15,7 @@ Auteur: game-designer, 2026-11-11. Suite de `ecriture-suites-secondaires.md`. So
 | Sorte              | Fichier                                  | Priorité                | Condition                                                  |
 | ------------------ | ---------------------------------------- | ----------------------- | ---------------------------------------------------------- |
 | Souvenir           | `<habitant>-souvenir-<sujet>`            | 30, une fois par joueur | un fait que le moteur ou l'histoire écrit                  |
-| Secret             | `<habitant>-secret-<n>`                  | 40, une fois par joueur | 100 points d'amitié, puis 200 et le premier palier entendu |
+| Secret             | `<habitant>-secret-<n>`                  | 40, une fois par joueur | 100 points d'amitié, puis 200 et le premier palier entendu (les douze de la section 10: 400 points) |
 | Première rencontre | `<habitant>-arrivee`                     | 50, une fois par joueur | son arrivée                                                |
 | Quotidien          | `<habitant>-quotidien` (`anatole-arret`) | 0                       | bonjour en tournante, puis le moment                       |
 
@@ -41,7 +42,7 @@ Les autres tiennent aux étapes et aux issues des suites (gué, registre, concou
 
 ## 2. Les habitants
 
-Trois lignes par habitant: la voix, le secret, ce qui change avec l'amitié (à 3 cœurs, et ce qu'il dit de ta moitié).
+Trois lignes par habitant: la voix, le secret, ce qui change avec l'amitié (à 3 cœurs, et ce qu'il dit de ta moitié). La seconde confidence des douze premiers (Firmin à Armand) est en section 10.
 
 | Habitant      | Voix                                            | Secret                                                                                                                          | Avec l'amitié                                             |
 | ------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
@@ -73,27 +74,29 @@ Aucun secret nouveau ne touche à l'histoire principale ni aux six suites. Deux 
 
 | Habitant      | Souvenirs          | dont ta moitié | Paliers de secret           | Bonjours | Moments (pluie et brume compris) | Répliques |
 | ------------- | ------------------ | -------------- | --------------------------- | -------- | -------------------------------- | --------- |
-| Achille       | 13                 | 4              | 1                           | 6        | 6                                | 80        |
-| Ambroise      | 12                 | 4              | 1                           | 6        | 6                                | 47        |
+| Achille       | 13                 | 4              | 2                           | 6        | 6                                | 80        |
+| Ambroise      | 12                 | 4              | 2                           | 6        | 6                                | 47        |
 | Le Contrôleur | 14                 | 4              | 2                           | 4        | 4                                | 30        |
-| Armand        | 12                 | 4              | 1                           | 6        | 6                                | 38        |
+| Armand        | 12                 | 4              | 2                           | 6        | 6                                | 38        |
 | Barnabé       | 13                 | 4              | 2                           | 4        | 6                                | 40        |
-| Basile        | 13                 | 4              | 1                           | 6        | 6                                | 80        |
+| Basile        | 13                 | 4              | 2                           | 6        | 6                                | 80        |
 | Berthe        | 12                 | 4              | 2                           | 4        | 6                                | 42        |
-| Colette       | 14 (13 par partie) | 4              | 1                           | 6        | 6                                | 79        |
-| Firmin        | 14                 | 4              | 1 (et l'aveu de l'histoire) | 6        | 6                                | 120       |
+| Colette       | 14 (13 par partie) | 4              | 2                           | 6        | 6                                | 79        |
+| Firmin        | 14                 | 4              | 2 (et l'aveu de l'histoire) | 6        | 6                                | 120       |
 | Honorine      | 15                 | 4              | 2                           | 6        | 6                                | 80        |
-| Jeanne        | 13                 | 4              | 1                           | 6        | 7                                | 66        |
+| Jeanne        | 13                 | 4              | 2                           | 6        | 7                                | 66        |
 | Léon          | 13                 | 4              | 2                           | 4        | 6                                | 42        |
-| Lucie         | 12                 | 4              | 1                           | 6        | 6                                | 57        |
-| Mado          | 14                 | 4              | 1                           | 6        | 6                                | 70        |
+| Lucie         | 12                 | 4              | 2                           | 6        | 6                                | 57        |
+| Mado          | 14                 | 4              | 2                           | 6        | 6                                | 70        |
 | Margot        | 13                 | 4              | 2                           | 4        | 6                                | 43        |
-| Marthe        | 14                 | 4              | 1                           | 6        | 6                                | 69        |
+| Marthe        | 14                 | 4              | 2                           | 6        | 6                                | 69        |
 | Martial       | 13                 | 4              | 2                           | 6        | 12                               | 46        |
-| Odette        | 14                 | 4              | 1                           | 6        | 6                                | 85        |
+| Odette        | 14                 | 4              | 2                           | 6        | 6                                | 85        |
 | Paulin        | 12                 | 4              | 2                           | 4        | 6                                | 34        |
 | Rosalie       | 14                 | 4              | 2                           | 3        | 5                                | 36        |
-| Solange       | 13                 | 4              | 1                           | 6        | 6                                | 53        |
+| Solange       | 13                 | 4              | 2                           | 6        | 6                                | 53        |
+
+Colonne « Paliers de secret » mise à jour le 2026-11-11 (section 10: 51 répliques de plus chez les douze); les autres colonnes datent de la première passe.
 
 Goûts du Contrôleur: il adore son billet poinçonné, aime la lanterne, la soupe aux herbes, l'œuf au plat et la tartine (du chaud, pour qui travaille la nuit), et déteste le sandwich (il en vend depuis trente ans) et le goujon.
 
@@ -144,7 +147,7 @@ Mise à jour du 2026-11-11: les points 1 à 6 ont leurs briques (`src/simulation
 2. **Le Contrôleur s'appelle Anatole**, et il le dit à un cœur. Recommandation: garder, c'est la première fois que quelqu'un lui demande.
 3. **Paulin se perd dans ses champs** et Margot noue ses rubans. Recommandation: garder; c'est le pendant tendre de son « non ».
 4. **Martial arrive dès la Veillée**, pendant que la fanfare peut encore se jouer; il n'y entre qu'une fois le concert donné. Recommandation: garder, il n'attend pas le départ pour Hautefonte.
-5. **Les secrets nouveaux ont deux paliers** (1 et 2 cœurs) là où les treize premiers n'en ont qu'un. Recommandation: garder, et passer les anciens à deux paliers à l'occasion.
+5. **Les secrets nouveaux ont deux paliers** (1 et 2 cœurs) là où les treize premiers n'en ont qu'un. Recommandation: garder, et passer les anciens à deux paliers à l'occasion. Fait le 2026-11-11 (section 10).
 
 ## 8. Contrôles
 
@@ -182,3 +185,42 @@ Le don passe sous les étapes d'histoire (52 et plus) et devant les souvenirs: i
 Aucune carte postale n'est donnée par une quête ou un habitant: elles se photographient toutes. Rien à écrire.
 
 Contrôle: `tests/habitants-aubrune.test.ts`, trois essais de plus: les quatre sortes chez les 21, conditions faites de faits que le moteur écrit; l'absence vraie au jour près, sa variante quand ta moitié est passée, puis jouée dans une vraie conversation chez Lucie et plus le même jour; une réplique et une seule par don, dans la voix de qui donne.
+
+## 10. La seconde confidence des douze (2026-11-11)
+
+Audit du 11 novembre, ligne B.19: douze habitants n'avaient qu'un palier. Chacun a désormais sa seconde confidence, plus intime que la première: 12 dialogues, 51 répliques, en données seulement.
+
+| Sorte | Fichier | Priorité, fois | Condition |
+|---|---|---|---|
+| Seconde confidence | `<habitant>-secret-<sujet>` | 40, une fois par joueur | 400 points d'amitié (4 cœurs, cahier 4.9); le premier palier entendu jusqu'au bout par ce joueur (`dialogues.aubrune.<premier palier>`, `of: actor`, valeur `true`); un fait d'histoire quand le texte le suppose |
+
+Chaque joueur a sa relation: l'un peut l'entendre des jours avant l'autre, et la raconter. La fin écrit `aubrune.secret-2.<habitant>` (le fait par joueur est celui du moteur, `dialogues.aubrune.<dialogue>.j<n>`).
+
+| Habitant | Fichier | Ce qu'on apprend | Ce qu'on reçoit | Attend aussi | Ce qu'on regarde autrement |
+|---|---|---|---|---|---|
+| Firmin | `firmin-secret-vitrine` | pendant trente ans de brouille, il a traversé le bourg chaque matin à 6 h 52 pour régler sa montre sur la comtoise d'Ambroise, sans un bonjour: « on était à la même seconde » | rien | la fin de l'acte 2 | ses horaires à la seconde: c'était l'heure d'Ambroise |
+| Ambroise | `ambroise-secret-comtoise` | une comtoise ne se met pas en vitrine; la sienne y était pour un seul passant, qu'il regardait de derrière le rideau: « je lui devais une minute, j'ai rendu trente ans d'heure exacte » | rien | la fin de l'acte 2 | sa rancune: trente ans de service rendu en cachette |
+| Odette | `odette-secret-fil` | de ses trois nouvelles du matin, la troisième est inventée, et c'est toujours un mot gentil prêté à quelqu'un: « trente ans que je recouds ce bourg avec du fil que j'invente » | la recette de la tourte du quai (`give_recipe`) | rien | son bonjour « j'ai trois nouvelles, et deux sont vraies » |
+| Basile | `basile-secret-nichoirs` | en 1987, quand les maisons se sont vidées, il a posé la nuit un nichoir par maison fermée, avec ses chutes: « ça chantait, devant les volets clos » | rien | rien | les mésanges du bourg, et son silence |
+| Achille | `achille-secret-torchon` | il ne dort pas sur le comptoir de Colette: il ferme les yeux et attend qu'elle lui pose le torchon sur les épaules | rien | le train de l'acte 2 (Colette est là) | chaque fois qu'il « laisse reposer ses yeux » |
+| Colette | `colette-secret-torchon` | elle qui dit tout en face ne sait pas quoi dire à Achille réveillé: « alors je fais durer le torchon » | rien | rien | sa franchise, et le torchon de son bonjour |
+| Solange | `solange-secret-souffleuse` | elle joue encore, un acte par soir, pour Jeanne, qui fait semblant de dormir et lui souffle le texte; Solange a un trou chaque soir, exprès | rien | rien | les deux à la fois: la mercière et la petite |
+| Mado | `mado-secret-signal` | le bras du signal était son premier travail d'apprentie, forgé de travers en 1987; trois mois après, la ligne fermait, et elle s'est crue responsable | rien | la fin de l'acte 2 | son « trente ans que je rêve d'en redresser un », et l'enclume où elle monte |
+| Marthe | `marthe-secret-lettre` | en 1969, l'aiguilleur du poste lui a écrit « Chère Marte », sans h; elle n'a pas répondu: « on n'épouse pas une faute d'orthographe ». Elle a ajouté le h au crayon l'an dernier | rien | rien | son exactitude: elle lui a coûté quelque chose |
+| Jeanne | `jeanne-secret-brioche` | la brioche d'Achille, un jour sur deux, c'est elle: elle la porte à la barrière, « ceux qui partent passent par la voie ». Le lendemain, plus une miette: elle parie sur un renard | rien | rien | ses après-midi au passage à niveau |
+| Lucie | `lucie-secret-courrier` | vingt ans de sacoche sans recevoir une vraie lettre: elle s'en écrit une par mois et fait l'étonnée au tri | rien | rien | sa hâte, et son rire |
+| Armand | `armand-secret-redactions` | il a retrouvé les rédactions « Plus tard, je serai... » (Firmin: « à l'heure »; Achille: « boulanger, mais réveillé ») et leur a mis dix sur dix; la sienne disait « quelqu'un qu'on écoute » | rien | rien | l'instituteur, et les deux anciens élèves |
+
+**Celles qui se répondent.** Achille et Colette: le même torchon, vu des deux côtés, sans que l'un sache pour l'autre. Firmin et Ambroise: la même vitrine à 6 h 52, l'un se croyant discret, l'autre derrière le rideau. Dans un duo, chaque joueur peut tenir une moitié: il faut se la raconter. Trois autres renvoient à une confidence déjà écrite ou à un voisin: Jeanne répond au premier palier d'Achille (qui prend la brioche), Solange parle de Jeanne, Armand de Firmin et d'Achille enfants.
+
+**Ce qu'elles ne font pas.** Aucune ne cite une suite secondaire ni n'en donne la clé (la lettre de Basile, la robe, le sel, le géant pâle restent à découvrir), aucune ne touche à 5 h 12. Rien n'est résolu à la place des joueurs: Achille et Colette ne se parlent toujours pas, et ce n'est pas aux gardes de le faire. La brioche de la barrière garde son explication raisonnable, dite par Jeanne (un renard).
+
+**Un seul cadeau**, celui qui est juste: Odette donne la recette de la tourte du quai, « la recette de maman », le repas à deux postes qui manquait (audit B.11; `economie-aubrune.md`, section 2, « La tourte du quai »). Les autres confidences ne donnent rien: le plan du nichoir (`commun/plans/nichoir.json`, source `quest`, donné par personne) irait à Basile, mais l'objet ne se pose pas et ne plaît à personne; à brancher le jour où le nichoir sert à quelque chose.
+
+**Seuils.** Les douze secondes confidences suivent le cahier (4 cœurs). Les premières restent à 1 cœur, et les secondes des neuf autres habitants à 2 cœurs: l'écart cahier contre données (audit D.6) reste à trancher pour ces 30 fichiers, une valeur par fichier.
+
+**Ajouts au monde, à faire valider par le client** (le manager transmet): le sentiment tu d'Achille et de Colette (recommandation: garder, c'est la paire que deux joueurs se raconteront); l'aiguilleur de Marthe; le bras de signal de Mado; les nichoirs de Basile; Jeanne qui porte la brioche à la barrière.
+
+**Manques.** Le carnet n'affiche pas les confidences (le cahier les veut « à sa page du carnet »): aucun écran ne lit ces faits.
+
+**Contrôles.** `tests/habitants-aubrune.test.ts` (pages de 150 caractères, priorité, palier d'amitié) passe sans retouche. Essai court joué le 2026-11-11, non versionné: pour chacun des douze, pas de seconde confidence sans la première, ni à 399 points, ni pour l'autre joueur; à 400 points, elle se dit en entier dans une vraie conversation, une seule fois; chez Odette, la recette est apprise.

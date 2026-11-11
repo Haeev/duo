@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-tourte-en-rayon",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.train"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Le train est revenu, la tourte du quai aussi: c'était le plat des jours de train. Une par semaine, en rayon, douze euros. Pas une de plus.",
+      "emote": "joy",
+      "next": "souvenir-2"
+    },
+    "souvenir-2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Elle se mange à table, à deux, jamais sur le pouce. Après, on a les mains sûres: pas un outil ne s'émousse tant que le ventre est plein.",
+      "emote": null,
+      "next": null
+    }
+  }
+}
