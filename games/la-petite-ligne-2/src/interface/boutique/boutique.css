@@ -9,13 +9,20 @@
   z-index: 45;
   pointer-events: none;
 }
+/*
+ * Le panneau garde sa mise en page de 73,75 x 38 rem et rapetisse d'un même facteur `--shop-k`
+ * quand la fenêtre est plus petite (960 x 540: 0,79), sans jamais grandir; `tan(atan2(a, b))`
+ * donne le rapport a / b de deux longueurs. Centré, à 6,75 rem du haut si la hauteur le permet.
+ */
 .lpl-ui .shop {
+  --shop-k: min(1, tan(atan2(100vw - 1.5rem, 73.75rem)), tan(atan2(100vh - 1rem, 38rem)));
   position: absolute;
-  left: 50%;
-  top: 6.75rem;
-  width: min(73.75rem, calc(100% - 1.5rem));
-  height: min(38rem, calc(100% - 7.5rem));
-  transform: translateX(-50%);
+  left: calc(50% - 36.875rem * var(--shop-k));
+  top: max(0.5rem, min(6.75rem, calc(100% - 38.5rem * var(--shop-k))));
+  width: 73.75rem;
+  height: 38rem;
+  transform-origin: 0 0;
+  scale: var(--shop-k);
   pointer-events: auto;
   display: grid;
   grid-template-columns: 15.5rem 1fr 20.5rem;
@@ -31,7 +38,7 @@
 }
 @keyframes shop-in {
   from {
-    transform: translateX(-50%) translateY(2rem) scale(0.96);
+    transform: translateY(2rem) scale(0.96);
     opacity: 0;
   }
 }

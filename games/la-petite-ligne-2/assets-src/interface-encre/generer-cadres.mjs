@@ -17,21 +17,53 @@
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-/** Couleurs: les mêmes que les variables de `encre.css` (une image ne lit pas les variables). */
-const INK = '#9c8a6c';
-const SHADOW = '#0b0908';
-const FILLS = {
-  papier: '#2a2421',
-  page: '#221d1b',
-  creux: '#171413',
-  accent: '#ffc83d',
-  encre: '#f0e4c8',
-  nuit: '#1b2238',
-  tilleul: '#26302a',
-  ciel: '#1e2a33',
-};
-/** Liseré par fond: clair sur le sombre, plus chaud sur l'accent, éteint sur les tirets. */
-const LINES = { accent: '#ffe7a3', creux: '#6e604f' };
+/**
+ * Couleurs: les mêmes que les variables de `encre.css` (une image ne lit pas les variables).
+ * Deux palettes, chacune sous son sélecteur: le thème sombre de l'interface, et le papier des
+ * objets de papier posés dessus (pages et signets du carnet, photo de l'éditeur), où les mêmes noms de cadres
+ * sont redéfinis: un composant posé sur une page prend le cadre de papier sans rien changer.
+ * `line`: liseré par fond (défaut `ink`); `halo`: second trait du focus.
+ */
+const PALETTES = [
+  {
+    name: 'sombre',
+    selector: "[data-lpl-style='encre'] .lpl-ui",
+    ink: '#9c8a6c',
+    shadow: '#0b0908',
+    halo: '#ffc83d',
+    fills: {
+      papier: '#2a2421',
+      page: '#221d1b',
+      creux: '#171413',
+      accent: '#ffc83d',
+      encre: '#f0e4c8',
+      nuit: '#1b2238',
+      tilleul: '#26302a',
+      ciel: '#1e2a33',
+    },
+    // Clair sur le sombre, plus chaud sur l'accent, éteint sur les tirets.
+    line: { accent: '#ffe7a3', creux: '#6e604f' },
+  },
+  {
+    name: 'papier',
+    selector: "[data-lpl-style='encre'] .lpl-ui :is(.carnet .page, .carnet .signet, .lpl-ed__stage)",
+    ink: '#3a2c24',
+    shadow: '#3a2c24',
+    halo: '#231a17',
+    fills: {
+      papier: '#f7edd6',
+      page: '#efe2c4',
+      creux: '#e2d0aa',
+      accent: '#ffc83d',
+      encre: '#231a17',
+      nuit: '#2c3b57',
+      tilleul: '#c9d3a8',
+      ciel: '#cfe0df',
+    },
+    // Encre sur l'accent, plus douce sur les tirets.
+    line: { accent: '#231a17', creux: '#8a7458' },
+  },
+];
 
 /**
  * Tailles (px): `ink` épaisseur du trait, `out` débord du cadre hors de la boîte, `shadow`
@@ -141,7 +173,8 @@ function edge(rnd, s, horizontal, anchorFar, near, far, depth, dashed) {
   return `<svg ${place} overflow='visible'>${lines.join('')}</svg>`;
 }
 
-function frameSvg(name, sizeName, fillName, shadow, dashed, halo = false) {
+function frameSvg(palette, name, sizeName, fillName, shadow, dashed, halo = false) {
+  const { ink: INK, shadow: SHADOW, fills: FILLS, line: LINES } = palette;
   const s = SIZES[sizeName];
   const rnd = random(seedOf(name));
   // Le milieu du trait passe à `lead` du bord de l'image, et l'encre mord d'un pixel sur la boîte.
@@ -191,7 +224,7 @@ function frameSvg(name, sizeName, fillName, shadow, dashed, halo = false) {
     const pen = { ink: 1.6, skew: 0.8, over: 0, bends: s.bends };
     const [near, far] = [2.6, trail - lead + 2.6];
     parts.push(
-      `<g stroke='${FILLS.accent}' stroke-linecap='square'>`,
+      `<g stroke='${palette.halo}' stroke-linecap='square'>`,
       edge(rnd, pen, true, false, near, far, near, false),
       edge(rnd, pen, false, true, near, far, far, false),
       edge(rnd, pen, true, true, near, far, far, false),
@@ -204,10 +237,12 @@ function frameSvg(name, sizeName, fillName, shadow, dashed, halo = false) {
 
 const encode = (svg) => svg.replace(/#/g, '%23').replace(/</g, '%3C').replace(/>/g, '%3E');
 
-const lines = FRAMES.map(([name, size, fill, shadow, dashed, halo]) => {
-  const svg = encode(frameSvg(name, size, fill, shadow, dashed, halo));
-  return `  --cadre-${name}: url("data:image/svg+xml,${svg}");`;
-});
+const framesOf = (palette) =>
+  FRAMES.map(([name, size, fill, shadow, dashed, halo]) => {
+    const svg = encode(frameSvg(palette, name, size, fill, shadow, dashed, halo));
+    return `  --cadre-${name}: url("data:image/svg+xml,${svg}");`;
+  });
+const [dark, ...others] = PALETTES;
 const outsets = Object.entries(SIZES).flatMap(([name, s]) => [
   `  --bi-${name}: 0 fill / 0 / ${s.out}px stretch;`,
   `  --bi-${name}-ombre: 0 fill / 0 / ${s.out}px ${s.out + s.shadow}px ${s.out + s.shadow}px ${s.out}px stretch;`,
@@ -220,10 +255,18 @@ const css = `/*
  * la main (changer le script, relancer, repasser Prettier).
  * Usage: border-image: var(--cadre-<taille>-<fond>[-ombre]) var(--bi-<taille>[-ombre]);
  */
-[data-lpl-style='encre'] .lpl-ui {
+${dark.selector} {
 ${outsets.join('\n')}
-${lines.join('\n')}
+${framesOf(dark).join('\n')}
 }
-`;
+${others
+  .map(
+    (palette) => `/* Palette « ${palette.name} »: mêmes cadres, autres couleurs. */
+${palette.selector} {
+${framesOf(palette).join('\n')}
+}
+`,
+  )
+  .join('')}`;
 
 writeFileSync(fileURLToPath(new URL('../../src/interface/encre/cadres.css', import.meta.url)), css);

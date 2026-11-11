@@ -19,6 +19,9 @@ export const EDITOR_TEXTS = {
   sections: {
     gender: 'Femme ou homme',
     shape: 'Silhouette',
+    /** Légendes des deux groupes de silhouettes, sous le titre « Silhouette ». */
+    'shape:f': 'de femme',
+    'shape:m': 'd’homme',
     height: 'Taille',
     skin: 'Peau',
     colors: 'Couleur',
@@ -26,6 +29,12 @@ export const EDITOR_TEXTS = {
   genders: { f: 'Femme', m: 'Homme' },
   /** Note sous le choix du genre (cahier 1.5): il ne ferme rien. */
   genderNote: 'Règle les accords des textes. Toutes les pièces restent à toi.',
+  /**
+   * À la première photo, rien n'est coché: le prénom ne dit pas le genre, et une case cochée
+   * d'office se trompe une fois sur deux (« Loïc » en « Femme »).
+   */
+  genderAsk: 'Choisis l’un des deux : les textes s’accorderont. Toutes les pièces restent à toi.',
+  genderMissing: 'Choisis d’abord femme ou homme, juste ici.',
   builds: { slim: 'Mince', medium: 'Moyenne', round: 'Ronde' } as Readonly<Record<string, string>>,
   /** Nom lu d'une pièce: l'emplacement et son rang dans le catalogue. */
   slots: {

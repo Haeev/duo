@@ -92,6 +92,10 @@ const settings = memorySettings(
     sound.setSettings({ master: next.volume / 100 });
   },
 );
+// Thème sombre de l'interface (validé par le client le 10 novembre): `?interface=ancien` rend
+// l'habillage clair d'avant, pour comparer.
+if (new URLSearchParams(location.search).get('interface') !== 'ancien')
+  document.documentElement.dataset.lplStyle = 'encre';
 // L'interface HTML se pose sur le canevas; le repli sans WebGL2 n'en a pas besoin (plan d'essai).
 const ui =
   renderer === null
