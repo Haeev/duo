@@ -116,24 +116,21 @@ export const PlayerSchema = v.strictObject({
 });
 export type PlayerState = v.InferOutput<typeof PlayerSchema>;
 
-/** Les champs lents d'un joueur, dans l'ordre du schéma (copie de surface). */
+/**
+ * Les champs lents d'un joueur (copie de surface): tout, sauf ce qui part sur le canal rapide. Un
+ * champ ajouté au joueur est donc transmis sans rien écrire ici (une liste écrite à la main
+ * laisserait un champ facultatif de côté sans erreur de type).
+ */
 export function slowOf(player: PlayerState): PlayerSlow {
-  const { member, name, look, gender, money, toolbar, bag, selected, tiers, staminaMods } = player;
-  const { gesture, talk, aim, assist } = player;
-  return {
-    member,
-    name,
-    look,
-    gender,
-    money,
-    toolbar,
-    bag,
-    selected,
-    tiers,
-    staminaMods,
-    gesture,
-    talk,
-    aim,
-    ...(assist === undefined ? {} : { assist }),
-  };
+  return withoutFields(player, ['body', 'needs', 'stamina']);
+}
+
+/** Copie de surface sans les champs nommés (ceux du canal rapide). */
+export function withoutFields<T extends object, K extends keyof T>(
+  value: T,
+  fields: readonly K[],
+): Omit<T, K> {
+  const copy: Omit<T, K> & Partial<Pick<T, K>> = { ...value };
+  for (const field of fields) Reflect.deleteProperty(copy, field);
+  return copy;
 }

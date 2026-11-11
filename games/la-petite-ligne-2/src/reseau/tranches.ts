@@ -23,7 +23,7 @@ export function sliceMessage(world: WorldState, slice: Slice): SliceMessage<Slic
   const tick = world.tick;
   switch (slice) {
     case 'common':
-      return { tick, common: world.common };
+      return { tick, seed: world.seed, common: world.common };
     case 'players':
       return { tick, players: [slowOf(world.players[0]), slowOf(world.players[1])] };
     case 'progress':

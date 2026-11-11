@@ -44,6 +44,8 @@ export interface NetSettings {
   readonly progress: {
     /** Taille visée d'un morceau de progression (octets de JSON), sous le budget du canal. */
     readonly partBytes: number;
+    /** Filet de sécurité: la progression repart complète au plus tard tous les N pas (comme le lieu). */
+    readonly fullEveryTicks: number;
   };
   readonly place: {
     /** Taille visée d'un morceau de l'état du lieu (octets de JSON), sous le budget du canal. */
@@ -74,7 +76,7 @@ export const NET_SETTINGS: NetSettings = {
     snapDistance: 2,
     gestureTimeoutTicks: 45,
   },
-  progress: { partBytes: 12_288 },
+  progress: { partBytes: 12_288, fullEveryTicks: 900 },
   place: { partBytes: 12_288, fullEveryTicks: 900 },
   warnShare: 0.75,
 };

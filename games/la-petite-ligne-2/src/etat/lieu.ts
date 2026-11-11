@@ -13,7 +13,7 @@ import {
 } from '../donnees/schemas/communs';
 import { BrickStatesSchema } from './briques';
 import { VillagerLifeStateSchema } from './habitants';
-import { BodySchema, StackSchema } from './joueur';
+import { BodySchema, StackSchema, withoutFields } from './joueur';
 import { HousingStateSchema } from './logement';
 import { FishingPlaceStateSchema } from './peche';
 import { RailVehiclesSchema } from './vehicules';
@@ -103,12 +103,9 @@ export type PlaceState = v.InferOutput<typeof PlaceStateSchema>;
 
 export function slowOfPlace(place: PlaceState): PlaceSlow {
   const villagers: PlaceSlow['villagers'] = {};
-  // Tout sauf la position, qui part par le canal rapide.
+  // Tout sauf la position, qui part par le canal rapide: un champ ajouté à l'habitant suit.
   for (const [id, villager] of Object.entries(place.villagers))
-    villagers[id] =
-      villager.life === undefined
-        ? { met: villager.met, talkingWith: villager.talkingWith }
-        : { met: villager.met, talkingWith: villager.talkingWith, life: villager.life };
+    villagers[id] = withoutFields(villager, ['body']);
   // Tout le reste part tel quel: un champ ajouté au lieu par un système est transmis sans code
   // de plus (`reseau/par-cles.ts`, mission M3).
   return { ...place, villagers };

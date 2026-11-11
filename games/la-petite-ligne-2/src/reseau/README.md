@@ -10,7 +10,7 @@ ADR 0007, 0019 et 0020. L'hôte fait autorité; l'invité affiche les autres der
 | `par-cles.ts`       | état envoyé par différences et par morceaux, une clé par entité, sans rien connaître du contenu (M3)                                 |
 | `etat-lieu.ts`      | l'état lent du lieu par `par-cles.ts`, sur le canal fiable 5 (morceaux de 16 Kio au plus)                                            |
 | `file-commandes.ts` | file des commandes de l'invité chez l'hôte: coussin, rattrapage, commande devinée (2 au plus)                                        |
-| `progression.ts`    | progression par différences et par morceaux, sur le canal fiable 8 (proposé à L0)                                                    |
+| `progression.ts`    | la progression par `par-cles.ts`, sur le canal fiable 8: tous ses champs, sans liste écrite à la main                                |
 | `invite.ts`         | état reçu (`world()`), état à afficher (`render(now, alpha)`), geste prédit, bascule, reprise                                        |
 | `interpolation.ts`  | coussin de gigue (95e centile du retard observé, 2 à 10 pas) et interpolation                                                        |
 | `prediction.ts`     | contrat `Predictor` que fournit la simulation, prédiction du déplacement et réconciliation                                           |
@@ -25,6 +25,30 @@ Compatibilité (ADR 0006, MA2 de la revue du 2026-11-11): le schéma de la carte
 - `Predictor` (`prediction.ts`): `canWalk`, `walk`, `gesture`, fonctions pures qui ne lisent que l'état connu de l'invité. L'hôte appelle les mêmes dans son pas. Passé à `createGuest(content, net, member, { predictor })`.
 - `session.ts`: `host.resume()` et `guest.resume()` sur l'événement `resume` de la plateforme; le rendu de l'invité lit `guest.render(now, alpha)` (même horloge que l'option `now`), pas `world()`.
 - Voyage: `onPlaceSwitch` des deux côtés au pas du changement de `common.place`; la machine charge le lieu puis envoie l'intention `place_loaded`.
+
+## Ce que l'invité voit: tout ce que l'hôte possède (2026-11-11)
+
+Règle: l'état connu de l'invité (`guest.world()`) est égal à celui de l'hôte, champ pour champ. Les seuls écarts voulus sont écrits dans `tests/reseau-etat-partage.test.ts` (`LOCAL` et `sharedView`), chacun avec sa raison: le générateur aléatoire (`rng`), les lieux autres que le lieu courant (ADR 0018), la position des habitants arrondie au centième.
+
+| Morceau de l'état                                             | Par où                       | Quand                                                                       |
+| ------------------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------- |
+| `tick`, `minutes`, corps, jauges, endurance, habitants        | canal rapide 2               | à chaque pas                                                                |
+| `common` (coffre commun, histoire, voyage, météo) et `seed`   | canal 1, tranche entière     | au pas du changement, rappel toutes les 5 s                                 |
+| `players` (sac, bourse, tenue, geste, cran d'aide...)         | canal 4, tranche entière     | au pas du changement, rappel toutes les 5 s                                 |
+| `progress` (mémoire, amitiés, quêtes, album, prix...)         | canal 8, différences par clé | 15 pas au plus après le changement; complète: départ, reprise, filet        |
+| lieu courant (meubles, logement, pêche, véhicules, commerces) | canal 5, différences par clé | 6 pas au plus après le changement; complète: départ, reprise, voyage, filet |
+
+Aucune de ces étapes ne nomme les champs: un champ ajouté à un schéma de `src/etat/` est transmis sans rien coder ici (`slowOf` et `slowOfPlace` retirent seulement ce qui part sur le canal rapide; `progression.ts` lit la forme de `ProgressSchema`). Le test `reseau-etat-partage` le garantit de deux façons: l'égalité après un scénario qui touche chaque sous-système, et la couverture (tout champ déclaré dans `WorldSchema` doit recevoir une valeur dans `fillEverything`, sinon le test échoue et nomme le champ).
+
+Trois trous fermés ce jour-là, à ne pas rouvrir:
+
+- `progress.album` (carnet des collections, airs appris) ne partait jamais: `progression.ts` tenait une liste de champs écrite à la main, où il manquait.
+- Le record d'une prise disparaissait à chaque validation (réception chez l'invité, mais aussi relecture de la sauvegarde chez l'hôte): `FindSchema` était une union de deux `v.tuple`, et `v.tuple` coupe un tableau trop long au lieu de le refuser. Pour deux formes de longueurs différentes: `v.strictTuple`.
+- La graine de la partie n'était pas transmise (l'invité avait 0): le besoin du jour des boutiques, tiré de la graine, n'était pas le même sur les deux machines.
+
+Ce qui reste hors de l'état, donc hors de cette garantie: les activités en cours tenues dans la mémoire de l'hôte (récital, ouvrage à l'établi, sonnerie de la cloche), que l'invité suit par les événements. Un invité qui revient au milieu de l'une d'elles ne la retrouve pas.
+
+Progression, détail: `album` est un objet à champs fixes (`f`, `h`); il s'aplatit en chemins (`album.f`, `album.h`) pour qu'une prise de plus parte seule (192 octets) et non avec tout l'album (7,2 Ko au pire des 98 entrées). La progression ne repart complète qu'au filet (`NET_SETTINGS.progress.fullEveryTicks`, 30 s), comme le lieu: avant, elle repartait entière toutes les 5 s.
 
 ## État lent du lieu: par différences et par morceaux (mission M3)
 
@@ -60,4 +84,4 @@ Une minute chargée au pire (`tests/etat-lieu.test.ts`, 80 ms, 20 ms de gigue, 2
 
 Un message hors budget n'est jamais envoyé ni fatal: il est journalisé (avertissement au-delà de 75 % du budget).
 
-Tests: `tests/reseau-gigue.test.ts` (banc de gigue, geste prédit), `tests/reseau-envois.test.ts` (tailles au pire, progression, bascule, reprise), `tests/etat-lieu.test.ts` (état du lieu par morceaux, système factice, débit). Aides: `tests/aides-reseau.ts` (lien virtuel, prédicteur et pas factices).
+Tests: `tests/reseau-gigue.test.ts` (banc de gigue, geste prédit), `tests/reseau-envois.test.ts` (tailles au pire, progression, bascule, reprise), `tests/etat-lieu.test.ts` (état du lieu par morceaux, système factice, débit), `tests/reseau-etat-partage.test.ts` (égalité de l'état entre hôte et invité, couverture des champs, reconnexion, coût). Aides: `tests/aides-reseau.ts` (lien virtuel, prédicteur et pas factices).

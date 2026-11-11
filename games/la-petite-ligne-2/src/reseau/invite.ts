@@ -261,8 +261,9 @@ export function createGuest(
     return {
       schema: DATA_SCHEMA,
       tick: fast.tick,
-      // L'invité ne simule pas: ni graine ni générateur.
-      seed: 0,
+      // La graine de la partie sert aux lectures communes (besoin du jour des boutiques); le
+      // générateur, lui, ne sert qu'à l'hôte, seul à simuler.
+      seed: common.seed,
       rng: [0, 0, 0, 0],
       minutes: fast.minutes,
       common: common.common,

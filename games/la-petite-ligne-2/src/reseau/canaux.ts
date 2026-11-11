@@ -109,7 +109,12 @@ export type EventsMessage = v.InferOutput<typeof EventsSchema>;
 
 /** Les tranches lentes, validées champ par champ chez l'invité. */
 export const SLICE_SCHEMAS = {
-  common: v.strictObject({ tick: TickSchema, common: CommonSchema }),
+  /**
+   * `seed`: la graine de la partie. Elle ne change jamais, mais des lectures communes aux deux
+   * machines en tirent leurs résultats (le besoin du jour des boutiques, `commerces/prix.ts`):
+   * sans elle, l'invité voyait un autre besoin du jour, donc d'autres prix, que ceux de l'hôte.
+   */
+  common: v.strictObject({ tick: TickSchema, seed: IntSchema, common: CommonSchema }),
   players: v.strictObject({
     tick: TickSchema,
     players: v.tuple([PlayerSlowSchema, PlayerSlowSchema]),
