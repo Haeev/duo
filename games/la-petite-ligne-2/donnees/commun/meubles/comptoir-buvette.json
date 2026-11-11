@@ -10,6 +10,7 @@
   "solid": true,
   "placeable": false,
   "series": "gare",
+  "top": 0.98,
   "bricks": [
     {
       "brick": "shop",

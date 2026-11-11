@@ -10,6 +10,7 @@
   "solid": true,
   "placeable": true,
   "series": "repos",
+  "top": 0.655,
   "bricks": [
     {
       "brick": "store",

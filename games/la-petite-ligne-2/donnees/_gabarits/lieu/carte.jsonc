@@ -30,6 +30,11 @@
   //   { "id": "table", "type": "table-a-manger", ..., "group": "repas" },
   //   { "id": "chaise-1", "type": "chaise", ..., "group": "repas" },
   //   { "id": "chaise-2", "type": "chaise", ..., "group": "repas" }
+  //   "on": objet posé sur un meuble. Soit l'"id" d'un autre objet de la carte dont la fiche a "top"
+  //   (le centre doit tomber sur son emprise), soit une hauteur en m (sur une cheminée: 1.1).
+  //   Il se dessine à cette hauteur, ne bloque pas, ne se vise pas, suit la présence (when) du
+  //   porteur, et sa lampe éclaire d'en haut. Décor seulement: fiche sans brique ni "solid". Exemple:
+  //   { "id": "lampe-table", "type": "lampe-de-table", "x": 4.5, "y": 3.5, "rotation": 0, "on": "table" }
   "objects": [
     {
       "id": "banc-du-quai",

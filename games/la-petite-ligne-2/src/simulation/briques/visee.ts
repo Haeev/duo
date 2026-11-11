@@ -10,6 +10,7 @@
  */
 import type { Brick, BrickId } from '../../donnees/schemas/briques';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
+import { isPosed } from '../../donnees/poses';
 import type { PropDef } from '../../donnees/schemas/meuble';
 import { isObjectPresent } from '../lieux/presents';
 import { isWallCell, type Blockers } from '../noyau/grille';
@@ -175,7 +176,7 @@ export function aimOf(
     });
   };
   for (const object of placeContent.map.objects)
-    if (isObjectPresent(look, object)) considerProp(object);
+    if (!isPosed(object) && isObjectPresent(look, object)) considerProp(object);
   for (const placed of place.placed) considerProp(placed);
 
   if (boarded) return best;

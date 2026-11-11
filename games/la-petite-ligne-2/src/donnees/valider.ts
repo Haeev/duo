@@ -6,6 +6,7 @@
 import { terrainProblem } from './carte';
 import type { Content, PlaceContent } from './charger';
 import type { ShopDef } from './schemas/commerce';
+import { objectsById, poseHeight } from './poses';
 import { shopProblems } from '../simulation/commerces/validation';
 import { NEED_IDS } from './schemas/communs';
 import type { DialogueDef } from './schemas/dialogue';
@@ -312,6 +313,37 @@ function checkOwnResource(
     );
 }
 
+/**
+ * Objets posés sur un meuble (`on`): porteur de la même carte, doté d'un plateau (`top`), sous le
+ * centre de l'objet, sans boucle ni chaîne trop longue; l'objet posé est du décor (ni brique, ni solide).
+ */
+function checkPoses(content: Content, place: PlaceContent, problems: string[]): void {
+  const byId = objectsById(place.map.objects);
+  for (const o of place.map.objects) {
+    if (o.on === undefined) continue;
+    const where = `lieu ${place.def.id}, objet ${o.id}`;
+    const prop = content.props[o.type];
+    if (prop !== undefined && (prop.bricks.length > 0 || prop.solid))
+      problems.push(`${where}: un objet posé sur un meuble est du décor (ni brique, ni solide)`);
+    if (typeof o.on === 'number') continue;
+    const carrier = byId.get(o.on);
+    if (carrier === undefined) {
+      problems.push(`${where}: porteur inconnu « ${o.on} » (champ \`on\`)`);
+      continue;
+    }
+    const top = content.props[carrier.type]?.top;
+    if (top === undefined)
+      problems.push(
+        `${where}: « ${o.on} » n'a pas de plateau (\`top\` absent de la fiche « ${carrier.type} »)`,
+      );
+    else if (poseHeight(content.props, byId, o) === null)
+      problems.push(`${where}: chaîne de porteurs trop longue ou en boucle`);
+    const f = footprint(content, carrier);
+    if (f !== null && (o.x < f.x || o.x > f.x + f.w || o.y < f.y || o.y > f.y + f.h))
+      problems.push(`${where}: son centre n'est pas sur l'emprise de « ${o.on} » (il flotterait)`);
+  }
+}
+
 /** Ensembles de meubles (`group`): deux meubles au moins, un siège au moins, assez proches pour un repas. */
 function checkGroups(content: Content, place: PlaceContent, problems: string[]): void {
   const groups = new Map<string, MapObject[]>();
@@ -405,6 +437,7 @@ function checkPlace(content: Content, place: PlaceContent, problems: string[]): 
     if (o.resource !== undefined) checkOwnResource(content, o.resource, prop, where, problems);
   }
   checkGroups(content, place, problems);
+  checkPoses(content, place, problems);
   checkGroundItems(content, place, blockedAt, inside, problems);
   for (const villager of place.villagers) {
     // La clé d'amitié par joueur (`bondKey`) préfixe l'identifiant: il doit y tenir.

@@ -4,7 +4,7 @@
  * identifiant; les joueurs posent ceux qui sont `placeable` (mode déco, jalon 2).
  */
 import * as v from 'valibot';
-import { FileVersionSchema, IdSchema, IntSchema, LabelSchema } from './communs';
+import { FileVersionSchema, FiniteSchema, IdSchema, IntSchema, LabelSchema } from './communs';
 import { BrickSchema } from './briques';
 import { DecoSchema } from './logement';
 
@@ -24,6 +24,11 @@ export const PropSchema = v.strictObject({
   placeable: v.boolean(),
   /** Série de meubles assortis (réponse 57), `null`: aucune. */
   series: v.nullable(IdSchema),
+  /**
+   * Hauteur de son plateau (m, depuis le sol): ce qu'on y pose (champ `on` d'un objet de carte)
+   * se dessine à cette hauteur. Absent: rien ne se pose dessus.
+   */
+  top: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0.05), v.maxValue(3))),
   /** Ce qu'il sait faire, dans l'ordre de priorité de la touche d'action; une brique de chaque sorte au plus. */
   bricks: v.pipe(v.array(BrickSchema), v.maxLength(4)),
   /** Mode déco: couche, surface, dedans ou dehors, confort (`logement.ts`); absent: au sol, dedans, confort 1. */

@@ -5,6 +5,7 @@
  * donnée fausse arrête le chargement avec le chemin du fichier et du champ: jamais de valeur de
  * secours silencieuse.
  */
+import { withInheritedPresence } from './poses';
 import * as v from 'valibot';
 import { NeedsFileSchema, type NeedsFile } from './schemas/besoins';
 import { ShopSchema, type ShopDef } from './schemas/commerce';
@@ -207,7 +208,9 @@ export function loadContent(files: Files): Content {
       );
     places[def.id] = {
       def,
-      map: withSillObjects(withInteriors(map, interiors), props, DOORS.prop, DOORS.width),
+      map: withInheritedPresence(
+        withSillObjects(withInteriors(map, interiors), props, DOORS.prop, DOORS.width),
+      ),
       interiors,
       villagers,
       dialogues,
