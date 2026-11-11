@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "margot-potager",
+  "villager": "margot",
+  "priority": 26,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.gue",
+      "equals": "fait"
+    }
+  ],
+  "once": "duo",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ton potager, six carrés ? Paulin a dit « un jardin de poupée ». Chez lui, ça veut dire qu'il veut aider.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "logement.potager.agrandi",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "logement.poulailler.agrandi",
+          "value": true,
+          "by": "duo"
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Il est passé avec la charrue ce matin: douze carrés. Et il a rallongé le perchoir du poulailler, deux places de plus.",
+      "emote": "joy",
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ne le remercie pas trop fort. Il dirait non.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

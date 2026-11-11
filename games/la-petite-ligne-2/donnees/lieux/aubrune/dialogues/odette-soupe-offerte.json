@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "id": "odette-soupe-offerte",
+  "villager": "odette",
+  "priority": 95,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hunger",
+        "value": 1
+      }
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "money_at_least",
+        "amount": 100
+      }
+    },
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "not",
+          "condition": {
+            "type": "remembered",
+            "key": "entendu.aubrune.odette-soupe-offerte",
+            "of": "actor"
+          }
+        },
+        {
+          "type": "days_since",
+          "key": "entendu.aubrune.odette-soupe-offerte",
+          "of": "actor",
+          "atLeast": 1
+        }
+      ]
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ça me fait mal de te voir comme ça. Assieds-toi, ne dis rien: une soupe, ça ne se discute pas.",
+      "emote": "sad",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "change_need",
+          "need": "hunger",
+          "amount": 35,
+          "cap": 100
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Voilà. Demain, tu me rapportes des œufs, et on n'en parle plus. Enfin, moi, j'en parlerai.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

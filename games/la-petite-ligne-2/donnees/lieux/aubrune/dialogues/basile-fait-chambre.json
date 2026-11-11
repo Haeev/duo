@@ -24,6 +24,25 @@
       "speaker": "basile",
       "text": "Dors dessus. Tu verras.",
       "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "fabrication.plan.etagere-campagne",
+          "value": true,
+          "by": "duo"
+        }
+      ],
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Une chambre veut une étagère. Le plan. À l'établi.",
+      "emote": null,
       "next": null
     }
   }

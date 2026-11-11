@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "mado-plan-arrosoir",
+  "villager": "mado",
+  "priority": 26,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.hache-forgee",
+      "equals": "fait"
+    }
+  ],
+  "once": "duo",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ta hache coupe ? Ha ! Alors parlons de ton arrosoir: une passoire avec une anse.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "fabrication.plan.arrosoir-cuivre",
+          "value": true,
+          "by": "duo"
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Je t'en fais un en cuivre: neuf carrés d'un coup. Trente euros, à l'enclume, quand tu veux.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Et tu le rapportes quand il fuit. Je rapièce, je ne jette rien. Sauf les gens lents.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

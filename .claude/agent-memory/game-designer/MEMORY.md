@@ -436,3 +436,9 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Dans un essai, Lucie et Martial disent d'abord leur arrivée (`once` 50): parler deux fois avant d'attendre une autre réplique.
 - Collection des fleurs pleine (12, épinglée par `collections-aubrune.test.ts`), et une fleur doit pousser d'une graine et ne pas se revendre: une fleur sauvage (coquelicot) n'y entre pas.
 - Cultures: `stages` en points de pousse (sec 1, arrosé 2); un modèle de culture a `len(stages) + 1` états (`crop-radis`: 3). `economie_aubrune.py` choisit la meilleure culture vendable et donne un tableau par saison (avant/après): l'utiliser pour tout nouveau légume.
+
+## La Petite Ligne refonte: pièges de données (vérifiés le 2026-11-11)
+
+- Réplique « une fois par jour et par joueur »: lire le fait daté du moteur `entendu.<lieu>.<dialogue>.j<n>` (`days_since` avec `of: actor`, dialogue `once: null`, priorité 10 ou plus); un `remember` avec `of: actor` n'est pas reconnu par `writable()` de `tests/habitants-aubrune.test.ts`.
+- Un plan `source: villager` ou `quest` n'est connu que par le fait `fabrication.plan.<id>` (effet `remember`); sans lui, l'amélioration ou le meuble est inatteignable. Vérifier qu'un fichier écrit chaque fait lu par un palier (`logement.potager.*`, `logement.poulailler.*`).
+- Un audit se fait sur les données et le code, pas sur les documents d'écriture: plusieurs règles « décrites » (blocage à 0 par `onlyReliefFor`, poules d'Odette) ne sont branchées nulle part.
