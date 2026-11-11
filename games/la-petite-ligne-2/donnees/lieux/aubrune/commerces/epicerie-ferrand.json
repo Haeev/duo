@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "id": "epicerie-ferrand",
+  "name": "Épicerie Ferrand",
+  "keeper": "odette",
+  "icon": "piece",
+  "hours": {
+    "from": 420,
+    "to": 1260
+  },
+  "sells": [
+    {
+      "item": "pomme",
+      "price": 90,
+      "dailyStock": 10
+    },
+    {
+      "item": "farine",
+      "price": 80,
+      "dailyStock": 6
+    },
+    {
+      "item": "grain",
+      "price": 20,
+      "dailyStock": null
+    },
+    {
+      "item": "graines-radis",
+      "price": 20,
+      "dailyStock": null
+    },
+    {
+      "item": "graines-tomate",
+      "price": 80,
+      "dailyStock": null
+    },
+    {
+      "item": "livre-de-cuisine",
+      "price": 1200,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.maison.rechaud"
+      }
+    },
+    {
+      "item": "boeuf",
+      "price": 350,
+      "dailyStock": 2,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte3.repas"
+      }
+    }
+  ],
+  "buys": [
+    {
+      "item": "oeuf",
+      "price": 60
+    },
+    {
+      "item": "oeuf-roux",
+      "price": 100
+    },
+    {
+      "item": "radis",
+      "price": 50
+    },
+    {
+      "item": "radis-croquant",
+      "price": 80
+    },
+    {
+      "item": "tomate",
+      "price": 60
+    },
+    {
+      "item": "carotte",
+      "price": 80
+    },
+    {
+      "item": "poireau",
+      "price": 90
+    },
+    {
+      "item": "pomme-de-terre",
+      "price": 60
+    },
+    {
+      "item": "mures",
+      "price": 30
+    },
+    {
+      "item": "coquelicot",
+      "price": 40
+    },
+    {
+      "item": "truite",
+      "price": 200
+    },
+    {
+      "item": "soupe-de-legumes",
+      "price": 150
+    }
+  ],
+  "dailyBuyCap": 2000,
+  "dailyNeeds": ["oeuf", "radis", "tomate", "mures"],
+  "friendship": [
+    {
+      "hearts": 3,
+      "factor": 1.1
+    }
+  ],
+  "refusal": "Ça ? Ça ne se mange pas, ça ne se raconte pas: je n'en fais rien. Va voir qui en a l'usage.",
+  "talk": {
+    "open": "Je regarde ton épicerie.",
+    "leave": "Je passais dire bonjour."
+  }
+}

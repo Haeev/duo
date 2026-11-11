@@ -72,7 +72,8 @@
           "point": "cf0"
         },
         "activity": "raboter",
-        "gesture": "raboter"
+        "gesture": "raboter",
+        "shop": "menuiserie-cornu"
       },
       {
         "from": 1200,

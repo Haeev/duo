@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "comptoir-epicerie",
+  "name": "Comptoir de l'épicerie",
+  "model": "table-farm",
+  "size": {
+    "w": 2,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "shop",
+      "shop": "epicerie-ferrand"
+    }
+  ]
+}

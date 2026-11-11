@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "id": "fournil-pradel",
+  "name": "Fournil Pradel",
+  "keeper": "achille",
+  "icon": "bol",
+  "hours": {
+    "from": 420,
+    "to": 1080
+  },
+  "sells": [
+    {
+      "item": "pain",
+      "price": 120,
+      "dailyStock": 8
+    },
+    {
+      "item": "tarte-aux-pommes",
+      "price": 450,
+      "dailyStock": 2
+    }
+  ],
+  "buys": [
+    {
+      "item": "oeuf",
+      "price": 100
+    },
+    {
+      "item": "oeuf-roux",
+      "price": 150
+    },
+    {
+      "item": "pomme",
+      "price": 70
+    },
+    {
+      "item": "mures",
+      "price": 50
+    },
+    {
+      "item": "buche",
+      "price": 50
+    },
+    {
+      "item": "tarte-aux-pommes",
+      "price": 170
+    },
+    {
+      "item": "tarte-doree",
+      "price": 200
+    }
+  ],
+  "dailyBuyCap": 1500,
+  "dailyNeeds": ["oeuf", "mures", "buche"],
+  "friendship": [
+    {
+      "hearts": 3,
+      "factor": 1.1
+    }
+  ],
+  "refusal": "Ça ne lève pas, ça ne cuit pas. Je ne saurais pas quoi lui dire.",
+  "talk": {
+    "open": "Je regarde ton étal.",
+    "leave": "Je te laisse à ta pâte."
+  }
+}

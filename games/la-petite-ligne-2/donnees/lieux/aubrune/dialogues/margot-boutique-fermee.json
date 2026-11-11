@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "margot-boutique-fermee",
+  "villager": "margot",
+  "priority": 1,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1200,
+      "to": 420
+    }
+  ],
+  "once": null,
+  "start": "ferme",
+  "nodes": {
+    "ferme": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "La cour est couchée, les poules aussi. Reviens à sept heures: la rosée fait de plus belles carottes.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

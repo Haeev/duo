@@ -32,6 +32,13 @@
       "rotation": 0
     },
     {
+      "id": "cafe-comptoir",
+      "type": "comptoir-cafe",
+      "x": 4.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
       "id": "cafe-table-1",
       "type": "table-a-manger",
       "x": 0.5,

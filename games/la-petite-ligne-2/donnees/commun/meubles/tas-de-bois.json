@@ -21,8 +21,8 @@
         "count": 1
       },
       "stock": {
-        "count": 8,
-        "refillMinutes": 720
+        "count": 4,
+        "refillMinutes": 1440
       },
       "tool": null
     }

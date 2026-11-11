@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "achille-boutique-fermee",
+  "villager": "achille",
+  "priority": 1,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1260,
+      "to": 420
+    }
+  ],
+  "once": null,
+  "start": "ferme",
+  "nodes": {
+    "ferme": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Chut. La pâte dort, et moi avec. Reviens à sept heures, on sera levés, elle et moi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -35,6 +35,13 @@
   },
   "objects": [
     {
+      "id": "epicerie-comptoir",
+      "type": "comptoir-epicerie",
+      "x": 2.5,
+      "y": 3,
+      "rotation": 1
+    },
+    {
       "id": "epicerie-etal",
       "type": "etal-de-tourte",
       "x": 5.5,

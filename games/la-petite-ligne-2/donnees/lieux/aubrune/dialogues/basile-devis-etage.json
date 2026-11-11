@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "basile-devis-etage",
+  "villager": "basile",
+  "priority": 25,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.troisieme-piece"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "remembered",
+        "key": "aubrune.maison-du-garde.etage"
+      }
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "L'étage. Charpente. Escalier.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Huit cents euros. Dix planches. Six bûches.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Long. Mais beau.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "comptoir-cafe",
+  "name": "Comptoir du café",
+  "model": "barrel",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "shop",
+      "shop": "cafe-de-la-halte"
+    }
+  ]
+}

@@ -67,7 +67,8 @@
           "point": "gr4"
         },
         "activity": "coudre",
-        "gesture": null
+        "gesture": null,
+        "shop": "mercerie-merigot"
       },
       {
         "from": 1170,

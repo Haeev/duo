@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-boutique-fermee",
+  "villager": "odette",
+  "priority": 1,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1260,
+      "to": 420
+    }
+  ],
+  "once": null,
+  "start": "ferme",
+  "nodes": {
+    "ferme": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "L'épicerie dort, et moi presque. Reviens à sept heures: les nouvelles seront plus fraîches, les œufs aussi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

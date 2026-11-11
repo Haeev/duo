@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "basile-fait-piece",
+  "villager": "basile",
+  "priority": 26,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.troisieme-piece"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Troisième pièce. Faite.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Reste le dessus.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

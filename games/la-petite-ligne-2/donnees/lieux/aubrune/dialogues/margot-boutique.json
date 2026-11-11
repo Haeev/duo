@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "id": "margot-boutique",
+  "villager": "margot",
+  "priority": 25,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 420,
+      "to": 1200
+    },
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "item_in_bag",
+          "item": "mures",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "coquelicot",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Bienvenue dans la cour ! Ne fais pas attention à Paulin, il compte ses rangs de poireaux.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "On vend les légumes du jour, le grain et les graines. Moins cher qu'au bourg, mais ne le répète pas à Odette.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Et je te prends tes mûres et tes coquelicots: confitures et bouquets partent par le train du samedi.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "voir",
+          "text": "Je regarde ton étal.",
+          "when": [],
+          "effects": [
+            {
+              "type": "open_shop",
+              "shop": "cour-des-delmas"
+            }
+          ],
+          "next": null
+        },
+        {
+          "id": "offre",
+          "text": "Une carotte. (1,60 €)",
+          "when": [],
+          "effects": [],
+          "next": "payer"
+        },
+        {
+          "id": "partir",
+          "text": "Plus tard.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "payer": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "take_money",
+          "amount": 160
+        },
+        {
+          "type": "give_item",
+          "item": "carotte",
+          "count": 1
+        }
+      ],
+      "next": "merci",
+      "otherwise": "refus"
+    },
+    "merci": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Tirée de ce matin. Si Paulin demande, tu l'as payée le double.",
+      "emote": "joy",
+      "next": null
+    },
+    "refus": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ah. Poches trop pleines ou bourse trop vide ? Dans les deux cas, je te la garde.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

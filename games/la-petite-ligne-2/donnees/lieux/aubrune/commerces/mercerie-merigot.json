@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "id": "mercerie-merigot",
+  "name": "Mercerie Mérigot",
+  "keeper": "solange",
+  "icon": "sac",
+  "hours": {
+    "from": 420,
+    "to": 1170
+  },
+  "sells": [
+    {
+      "item": "sac-de-toile",
+      "price": 3500,
+      "dailyStock": null,
+      "unlock": {
+        "type": "remembered",
+        "key": "aubrune.acte1.besaces",
+        "equals": "fait"
+      }
+    },
+    {
+      "item": "filet",
+      "price": 600,
+      "dailyStock": 2,
+      "restockDays": 7
+    }
+  ],
+  "buys": [
+    {
+      "item": "coquelicot",
+      "price": 60
+    },
+    {
+      "item": "vieille-piece",
+      "price": 120
+    }
+  ],
+  "dailyBuyCap": 1000,
+  "dailyNeeds": ["coquelicot"],
+  "friendship": [
+    {
+      "hearts": 3,
+      "factor": 1.1
+    }
+  ],
+  "refusal": "Ça ? Ça sent la vase, ou la sciure. Pas de ça dans mon répertoire.",
+  "talk": {
+    "open": "Je regarde tes rayons.",
+    "leave": "Je ne fais que passer."
+  }
+}

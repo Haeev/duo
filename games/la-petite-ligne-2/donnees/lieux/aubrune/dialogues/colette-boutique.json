@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "id": "colette-boutique",
+  "villager": "colette",
+  "priority": 25,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 420,
+      "to": 1320
+    },
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "item_in_bag",
+          "item": "goujon",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "ablette",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "perche",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "truite",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "tanche",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "brochet",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Bienvenue au café de la Halte ! Assieds-toi où tu veux, sauf sur ma chaise.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "J'achète tout ce qui finit dans une assiette: poisson, légumes, œufs. Et je paie franc, demande à Achille.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Plat du jour: la soupe de légumes, trois euros. Elle cale jusqu'au soir.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "voir",
+          "text": "Je regarde ta carte.",
+          "when": [],
+          "effects": [
+            {
+              "type": "open_shop",
+              "shop": "cafe-de-la-halte"
+            }
+          ],
+          "next": null
+        },
+        {
+          "id": "offre",
+          "text": "Une soupe du jour, servie ici. (3 €)",
+          "when": [],
+          "effects": [],
+          "next": "payer"
+        },
+        {
+          "id": "partir",
+          "text": "Plus tard.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "payer": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "take_money",
+          "amount": 300
+        },
+        {
+          "type": "change_need",
+          "need": "hunger",
+          "amount": 50,
+          "cap": 100
+        }
+      ],
+      "next": "merci",
+      "otherwise": "refus"
+    },
+    "merci": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Et voilà. Mange tant que ça fume, les compliments viendront après.",
+      "emote": "joy",
+      "next": null
+    },
+    "refus": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Trois euros, et tu ne les as pas. Je ne fais pas crédit, mais je rachète ta pêche: reviens les mains pleines.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

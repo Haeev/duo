@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "id": "solange-boutique",
+  "villager": "solange",
+  "priority": 25,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 420,
+      "to": 1170
+    },
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "item_in_bag",
+          "item": "coquelicot",
+          "count": 1
+        },
+        {
+          "type": "item_in_bag",
+          "item": "vieille-piece",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Entrée en scène ! Bienvenue à la mercerie, le seul endroit du bourg où l'on soigne le costume.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "J'achète les coquelicots pour mes teintures, et les vieilles pièces: ça fait des boutons superbes.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Je vends le sac de toile, six poches, et le filet à papillons. Le goût, je l'offre, mais il se mérite.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "voir",
+          "text": "Je regarde tes rayons.",
+          "when": [],
+          "effects": [
+            {
+              "type": "open_shop",
+              "shop": "mercerie-merigot"
+            }
+          ],
+          "next": null
+        },
+        {
+          "id": "offre",
+          "text": "Un coup de peigne. (1 €)",
+          "when": [],
+          "effects": [],
+          "next": "payer"
+        },
+        {
+          "id": "partir",
+          "text": "Plus tard.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "payer": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "take_money",
+          "amount": 100
+        },
+        {
+          "type": "change_need",
+          "need": "hygiene",
+          "amount": 15,
+          "cap": 100
+        }
+      ],
+      "next": "merci",
+      "otherwise": "refus"
+    },
+    "merci": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Et voilà: une tête de premier rôle. Ne va pas la gâcher sous une casquette.",
+      "emote": "joy",
+      "next": null
+    },
+    "refus": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Un euro, et tes poches sonnent creux. Au théâtre, on appelle ça un four. Reviens après la recette.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

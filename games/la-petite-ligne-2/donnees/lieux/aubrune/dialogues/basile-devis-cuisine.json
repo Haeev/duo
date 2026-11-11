@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "id": "basile-devis-cuisine",
+  "villager": "basile",
+  "priority": 25,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison.cuisine"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.salle"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "remembered",
+        "key": "aubrune.maison-du-garde.cuisine"
+      }
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Cuisine. Vraie cuisinière. Plan de travail.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Cent cinquante euros. Coffre commun. Plus quatre planches, quatre pierres.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Apporte tout à la maison. Je monte.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

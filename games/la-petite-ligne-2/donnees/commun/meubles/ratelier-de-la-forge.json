@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "ratelier-de-la-forge",
+  "name": "Râtelier de la forge",
+  "model": "shelf",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "shop",
+      "shop": "forge-cazals"
+    }
+  ]
+}
