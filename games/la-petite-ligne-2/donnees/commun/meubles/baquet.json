@@ -8,7 +8,7 @@
     "h": 1
   },
   "solid": true,
-  "placeable": false,
+  "placeable": true,
   "series": null,
   "bricks": [
     {
@@ -20,5 +20,11 @@
       "amount": 100,
       "cap": 100
     }
-  ]
+  ],
+  "deco": {
+    "layer": "floor",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 1
+  }
 }

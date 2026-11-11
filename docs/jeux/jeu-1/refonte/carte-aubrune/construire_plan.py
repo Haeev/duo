@@ -1182,11 +1182,11 @@ HABITE = {
         ('portrait', 'cadre-ovale', 9.5, 3.5, 3, "au mur est, au-dessus de la tête du lit"),
         ('panier', 'panier-a-linge', 9.5, 2.5, 0, "au pied du lit, contre le mur est, hors du passage de la porte"),
         ('seau', 'seau', 9.5, 5.5, 0, "l'eau tirée à la pompe du jardin, posée à côté de la cuisinière"),
-        # Le baquet de la toilette (hygiène à 100, cahier 4.4) avant la salle d'eau: dans la seule pièce couverte au
-        # début, entre le pied du lit et le refend, en long; on s'y lave au chaud à trois pas des feux (l'eau chauffée
-        # à la bouilloire) et du seau de la pompe, hors de la vue de la porte d'entrée. Il laisse 1 m libre le long du
-        # refend, de la porte à l'escalier de l'étage et aux feux.
-        ('baquet', 'baquet', 7.5, 4, 3, "le baquet de la toilette, entre le pied du lit et le refend: au chaud près des feux et du seau de la pompe, hors de la vue de la porte"),
+        # Le baquet de la toilette (hygiène à 100, cahier 4.4) n'est plus un objet de la carte: c'est un meuble des
+        # joueurs, déjà posé à l'arrivée en (21,5; 214) du lieu, soit (7,5; 4) ici, rotation 3 (`furnished` de
+        # `logements/maison-du-garde.json`). Même place: entre le pied du lit et le refend, en long, au chaud à trois pas
+        # des feux et du seau de la pompe, hors de la vue de la porte; 1 m libre le long du refend. Fixe, il prenait la
+        # dernière place libre de la salle: les joueurs le rangent pour faire de la place, ou le déplacent plus tard.
         ('tapis-de-sol', 'tapis-long', 7.5, 2.5, 0, "le passage de la porte vers la cuisine et le lit, là où l'on marche le plus"),
         ('balai', 'balai', 3.5, 1.5, 0, "le balai du déblayage, laissé dans la chambre en ruine"),
         ('seau-gravats', 'seau', 2.5, 0.5, 0, "le seau des gravats de la chambre en ruine"),

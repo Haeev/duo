@@ -742,13 +742,13 @@ Pièces: salle des pas perdus (5 x 5); guichet (1 x 5); bureau de Firmin (3 x 3)
 . A S . A # T T H P
 . . . B . # C . . P
 . . . . . . T T * P
-E A . . . . . B L C
-. . . . A E . B L L
+E A . . . . . . L C
+. . . . A E . . L L
 . . . . . A . * * S
 . . A . . # R A P C
 ```
 
-Pièces: salle commune et cuisine (5 x 7); chambre (5 x 4); troisième pièce (5 x 3). Meubles: maison-cuisiniere (cuisiniere), maison-plan (plan-de-travail), maison-table (table-a-manger), maison-chaise-1 (chaise), maison-chaise-2 (chaise), lit-de-la-maison (lit-double), maison-armoire (armoire), maison-rechaud (rechaud), maison-rdc-patere (patere), maison-rdc-horloge (horloge-murale), maison-rdc-portrait (cadre-ovale), maison-rdc-panier (panier-a-linge), maison-rdc-seau (seau), maison-rdc-baquet (baquet), maison-rdc-tapis-de-sol (tapis-long), maison-rdc-balai (balai), maison-rdc-seau-gravats (seau), maison-rdc-lampe (lampe-a-petrole, sur maison-table), maison-rdc-pain (corbeille-de-pain, sur maison-table), maison-rdc-journal (journal, sur maison-table), maison-rdc-pots (pots-de-gres, sur maison-plan), maison-chantier-salle (ardoise-de-chantier), maison-chantier-cuisine (ardoise-de-chantier), maison-chantier-chambre (ardoise-de-chantier), maison-chantier-troisieme-piece (ardoise-de-chantier), maison-chantier-etage (ardoise-de-chantier), maison-chantier-cave (ardoise-de-chantier). Points: maison-lit-g (lit), maison-lit-d (lit), maison-cuisine (poste).
+Pièces: salle commune et cuisine (5 x 7); chambre (5 x 4); troisième pièce (5 x 3). Meubles: maison-cuisiniere (cuisiniere), maison-plan (plan-de-travail), maison-table (table-a-manger), maison-chaise-1 (chaise), maison-chaise-2 (chaise), lit-de-la-maison (lit-double), maison-armoire (armoire), maison-rechaud (rechaud), maison-rdc-patere (patere), maison-rdc-horloge (horloge-murale), maison-rdc-portrait (cadre-ovale), maison-rdc-panier (panier-a-linge), maison-rdc-seau (seau), maison-rdc-tapis-de-sol (tapis-long), maison-rdc-balai (balai), maison-rdc-seau-gravats (seau), maison-rdc-lampe (lampe-a-petrole, sur maison-table), maison-rdc-pain (corbeille-de-pain, sur maison-table), maison-rdc-journal (journal, sur maison-table), maison-rdc-pots (pots-de-gres, sur maison-plan), maison-chantier-salle (ardoise-de-chantier), maison-chantier-cuisine (ardoise-de-chantier), maison-chantier-chambre (ardoise-de-chantier), maison-chantier-troisieme-piece (ardoise-de-chantier), maison-chantier-etage (ardoise-de-chantier), maison-chantier-cave (ardoise-de-chantier). Points: maison-lit-g (lit), maison-lit-d (lit), maison-cuisine (poste).
 
 **la maison du garde, étage** (`interieurs/maison-etage.json`, 10 x 7 m, 70 m², niveau 1): sous le toit, ouvert à l'acte 2 (chambre d'amis, atelier).
 

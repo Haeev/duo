@@ -11,6 +11,7 @@ import type { Intent } from '../simulation/noyau/entrees';
 import { el, icon, onPointerHover } from './dom';
 import { equipModel, equippedText } from './equiper';
 import { stowedText, stowModel } from './ranger-maison';
+import { stowedWasher } from '../simulation/logement/etat';
 import {
   chestModel,
   gridMove,
@@ -442,12 +443,20 @@ export function createNotebook(
         { class: 'needs needs--inline' },
         NEEDS.map((need) => {
           const low = me.needs[need] < UI_TUNING.lowNeed;
+          const label = `${TEXTS.needs[need]} : ${TEXTS.needs.state[me.tiers[need]]}`;
+          // Le meuble pour se laver est rangé: l'aide de l'hygiène dit de le poser.
+          const washer = need === 'hygiene' ? stowedWasher(content, world) : null;
+          const hint =
+            washer === null
+              ? label
+              : `${label}. ${fill(TEXTS.needs.washStowed, { meuble: washer.toLocaleLowerCase('fr') })}`;
           const node = el(
             'div',
             {
               class: `need${low ? ' need--low' : ''}${me.tiers[need] === 'bonus' ? ' need--bonus' : ''}`,
               role: 'img',
-              'aria-label': `${TEXTS.needs[need]} : ${TEXTS.needs.state[me.tiers[need]]}`,
+              'aria-label': hint,
+              title: hint,
             },
             [icon(NEED_ICONS[need])],
           );

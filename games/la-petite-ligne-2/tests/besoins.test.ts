@@ -171,12 +171,13 @@ describe('besoins', () => {
   it('fait sa toilette au baquet de la maison du garde: hygiène à 100 en 4 s (cahier 4.4)', () => {
     const sim = newSim(content);
     const aubrune = content.places.aubrune;
-    const tub = aubrune?.map.objects.find((o) => o.id === 'maison-rdc-baquet');
-    if (aubrune === undefined || tub === undefined) throw new Error('baquet absent de la maison');
-    // Le baquet est un meuble de la carte, sans mémoire de brique: une partie déjà commencée
-    // le trouve chez elle sans rattrapage.
+    if (aubrune === undefined) throw new Error('Aubrune absente');
+    // Le baquet est un meuble des joueurs, déjà posé à la création de la maison (`furnished`).
     sim.world.common.place = 'aubrune';
     sim.world.places.aubrune = createPlaceState(content, aubrune);
+    wait(sim, 1 / 30);
+    const tub = sim.world.places.aubrune.placed.find((p) => p.type === 'baquet');
+    if (tub === undefined) throw new Error('baquet absent de la maison');
     // Façade à l'ouest (rotation 3): on se tient entre le refend et le baquet, tourné vers lui.
     put(sim, 0, tub.x - 1, tub.y, 0);
     sim.world.players[0].needs.hygiene = 12;
@@ -184,7 +185,7 @@ describe('besoins', () => {
       type: 'gesture_started',
       player: 0,
       clip: 'wash',
-      target: 'maison-rdc-baquet',
+      target: tub.id,
     });
     wait(sim, 4.5);
     expect(sim.world.players[0].needs.hygiene).toBeCloseTo(100, 0);

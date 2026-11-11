@@ -338,6 +338,7 @@ function fillEverything(sim: Sim): void {
         cuisine: { state: 'works', stage: 1, delivered: { planche: 2 }, paid: 100, work: 1.5 },
       },
       stock: { banc: 2, lit: 1 },
+      granted: { banc: 2, baquet: 1 },
       held: [null, { prop: null, type: 'banc', x: 1, y: 2, rotation: 1 }],
       decorating: [false, true],
       working: [null, 'cuisine'],

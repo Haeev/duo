@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "baquet",
+  "name": "Baquet",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "prop": "baquet"
+}

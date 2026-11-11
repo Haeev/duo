@@ -57,4 +57,9 @@
   "garden": { "x": 8, "y": 12, "w": 10, "h": 11 },
   // Meubles déjà possédés à l'arrivée (inventaire de la maison): type de meuble -> nombre.
   "stock": { "chaise": 1 },
+  // Facultatif: meubles des joueurs déjà posés à l'arrivée (centre en coordonnées du lieu,
+  // rotation 0 à 3), dans une pièce qui les permet (`unlocks`). Ils se déplacent et se rangent
+  // comme les autres. Un meuble de départ ajouté ici ou dans "stock" après coup arrive une fois
+  // dans l'inventaire des parties déjà commencées.
+  "furnished": [{ "prop": "chaise", "x": 12.5, "y": 16.5, "rotation": 0 }],
 }
