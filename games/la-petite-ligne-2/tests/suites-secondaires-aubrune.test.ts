@@ -11,6 +11,9 @@ import { remember } from '../src/simulation/regles/memoire';
 import { equipBag, giveItem } from '../src/simulation/sac/actions';
 import { act, contentWith, contextOf, wait } from './aides-l3';
 import { visit } from './aides-visite';
+import { playPair, rodInHand } from './aides-peche-a-deux';
+import { countItem } from '../src/simulation/sac/inventaire';
+import { shadowsNow, spotById } from '../src/simulation/peche/lecture';
 import { newSim } from './aides';
 
 type Json = Record<string, unknown>;
@@ -370,7 +373,31 @@ describe('écriture des suites secondaires d’Aubrune', () => {
     both(sim, 'peche-fosse');
     wait(sim, 1);
     playScene(sim, 'la-baronne-mord');
+    expect(fact(sim, 'aubrune.baronne.sortie')).toBeUndefined();
+
+    // La touche, au vrai mini-jeu: 0 à la canne amorcée d'un goujon, 1 à l'épuisette.
+    const bank = sim.content.places[AUBRUNE]?.map.points['peche-fosse'];
+    if (bank === undefined) throw new Error('peche-fosse');
+    const north = -Math.PI / 2;
+    rodInHand(sim, 0, { x: bank.x + 1, y: bank.y, facing: north });
+    sim.world.players[1].body = { x: bank.x + 2.5, y: bank.y, facing: north, speed: 0 };
+    expect(countItem(sim.world.players[0], 'goujon')).toBe(2);
+    const cast = act(sim, 0, { type: 'fish_cast', x: bank.x + 2, y: bank.y - 4, bait: 'goujon' });
+    expect(cast.find((e) => e.type === 'refused')).toBeUndefined();
+    expect(sim.world.places[AUBRUNE]?.fishing?.lines[0]?.catch).toBe('baronne');
+    const events = playPair(sim, 0, { wrongNets: 1 });
+    expect(events.filter((e) => e.type === 'fish_net_missed')).toHaveLength(1);
+    expect(events.find((e) => e.type === 'fish_caught')).toMatchObject({
+      catch: 'baronne',
+      together: true,
+    });
+    // Le goujon a servi d'appât; la Baronne reste à l'épuisette (la décision dira où elle va).
+    expect(countItem(sim.world.players[0], 'goujon')).toBe(1);
+    expect(held(sim, 0, 'baronne')).toBe(false);
     expect(fact(sim, 'aubrune.baronne.sortie')).toBe(true);
+    wait(sim, 0.5);
+    expect(passed(sim, Q)).toContain('affut');
+    playScene(sim, 'la-baronne-alliance');
 
     // La décision à deux: en parler d'abord ne tranche rien; une seule voix attend l'autre; deux
     // avis invitent à se mettre d'accord; le même choix des deux la prend.
@@ -387,6 +414,21 @@ describe('écriture des suites secondaires d’Aubrune', () => {
       expect(talk(sim, p, 'achille')[0]).toBe('achille-canne-fine#n1');
       expect(held(sim, p, 'canne-fine')).toBe(true);
     }
+  });
+
+  it('« La Baronne »: sortie par l’ancienne scène (sauvegarde d’avant), elle ne revient pas', () => {
+    const sim = aubrune('la-baronne');
+    sim.world.minutes = 1170;
+    wait(sim, 0.2);
+    const spot = spotById(sim.content, sim.world, 'fosse');
+    if (spot === null) throw new Error('fosse');
+    const baronne = (): boolean =>
+      shadowsNow(sim.content, sim.world, spot).some((s) => s.catch === 'baronne');
+    remember(contextOf(sim), 'aubrune.baronne.affut', 'ouvert', 'duo');
+    expect(baronne()).toBe(true);
+    // L'ancienne scène écrivait ce fait: c'est celui de la prise unique.
+    remember(contextOf(sim), 'aubrune.baronne.sortie', true, 'duo');
+    expect(baronne()).toBe(false);
   });
 
   it('« La Baronne »: relâchée, Colette raconte l’autre fin', () => {

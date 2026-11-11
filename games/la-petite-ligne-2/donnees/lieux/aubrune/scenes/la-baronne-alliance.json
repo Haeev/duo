@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "id": "la-baronne-alliance",
+  "title": "L'alliance",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Elle sort dans une gerbe: une perche énorme, rayée de noir, l'œil furieux d'une dame qu'on dérange à l'heure du souper.",
+      "emote": null,
+      "sound": "Splash !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "achille",
+      "text": "Mmh ? ... C'est elle. C'est ELLE. Grand-père, papa: c'est elle !",
+      "emote": "surprise",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dans l'épuisette, quelque chose brille à sa lèvre. Pas un hameçon: un anneau. Vous le dégagez doucement. Elle vous laisse faire.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Un anneau d'or terni. À l'intérieur, gravé fin: « Anselme et Léonie, 1931 ».",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "achille",
+      "text": "L'alliance de grand-mère. Elle l'a jetée au bief un jour de colère: grand-père avait passé leur dimanche à la pêche.",
+      "emote": "sad",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "achille",
+      "text": "Il a pêché ici trente ans. Il disait: « Je ne cours pas après un poisson. Je cours après des excuses. » On croyait qu'il plaisantait.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La Baronne attend dans l'épuisette, à moitié dans l'eau. Elle vous regarde. Achille aussi. Il va falloir décider.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

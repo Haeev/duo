@@ -60,6 +60,7 @@
     { "on": "fish_cast", "sound": "peche-lancer", "audience": "both", "placed": true },
     { "on": "fish_hooked", "sound": "peche-touche", "audience": "both", "placed": true },
     { "on": "fish_caught", "sound": "peche-prise", "audience": "both", "placed": true },
+    { "on": "fish_net_missed", "sound": "peche-bouchon", "audience": "both", "placed": true },
     {
       "on": "fish_lost",
       "where": { "reason": "escaped" },

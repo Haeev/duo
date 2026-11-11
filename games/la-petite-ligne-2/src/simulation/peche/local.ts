@@ -22,10 +22,14 @@ import {
 import { heldRod, shadowsNow, spotInFront } from './lecture';
 import { fishOf } from './ombres';
 import { FISHING } from './reglages';
+import { baitItems, uniqueOf } from './uniques';
+import { countHeld } from '../regles/conditions';
 
 export type LocalPhase =
   /** Le repère va et vient devant le pêcheur. */
   | { readonly kind: 'aim'; readonly x: number; readonly y: number; readonly reach: number }
+  /** Pêche à deux, à la canne: on sent ses élans; Espace tenu: la canne tenue (`a-deux.ts`). */
+  | { readonly kind: 'pair' }
   /** Bouchon lâché, en attendant que l'hôte donne la ligne. */
   | { readonly kind: 'cast'; readonly x: number; readonly y: number }
   /** L'ombre vient, le bouchon frémit; `dip`: 0 calme, 0 à 1 feinte, 1 plongeon. */
@@ -48,6 +52,9 @@ export interface LocalFishing {
   press(): void;
   /** Ranger la ligne (Retour arrière). */
   cancel(): void;
+  /** Appât de la prochaine ligne (objet du sac), `null`: sans appât. */
+  setBait(item: string | null): void;
+  bait(): string | null;
   /** Avance de `dt` secondes avec l'état connu de cette machine; rend les intentions à envoyer. */
   update(dt: number, world: ReadonlyWorld): Intent[];
 }
@@ -63,6 +70,36 @@ export function canStartFishing(
   if (spot === null) return false;
   if ((world.places[world.common.place]?.fishing?.lines[player] ?? null) !== null) return false;
   return shadowsNow(content, world, spot).length > 0;
+}
+
+/** Appâts possibles pour ce joueur: sans appât, puis chaque objet-appât qu'il a sur lui. */
+export function baitChoices(
+  content: Content,
+  world: ReadonlyWorld,
+  player: PlayerIndex,
+): (string | null)[] {
+  const out: (string | null)[] = [null];
+  for (const item of [...baitItems(content)].sort())
+    if (countHeld(world.players[player], item) > 0) out.push(item);
+  return out;
+}
+
+/**
+ * Appât proposé en sortant la canne: celui d'une prise unique dont l'ombre est dans le coin
+ * devant soi, si on l'a sur soi; sinon aucun.
+ */
+export function defaultBait(
+  content: Content,
+  world: ReadonlyWorld,
+  player: PlayerIndex,
+): string | null {
+  const spot = spotInFront(content, world, player);
+  if (spot === null) return null;
+  for (const shadow of shadowsNow(content, world, spot)) {
+    const bait = uniqueOf(content, shadow.catch)?.unique.bait ?? null;
+    if (bait !== null && countHeld(world.players[player], bait) > 0) return bait;
+  }
+  return null;
 }
 
 /** Commence la visée; le pêcheur se tient où il est, tourné vers l'eau. */
@@ -81,6 +118,9 @@ export function createLocalFishing(content: Content, player: PlayerIndex): Local
   let log = createLog();
   let strike = 0;
   let accumulator = 0;
+  let bait: string | null = null;
+  /** Pêche à deux: dernier état de la canne envoyé à l'hôte. */
+  let sentDown = false;
 
   function lineOf(world: ReadonlyWorld): DeepReadonly<FishingLine> | null {
     return world.places[world.common.place]?.fishing?.lines[player] ?? null;
@@ -97,6 +137,10 @@ export function createLocalFishing(content: Content, player: PlayerIndex): Local
     cancel() {
       cancelled = true;
     },
+    setBait(item) {
+      bait = item;
+    },
+    bait: () => bait,
     update(dt, world) {
       const out: Intent[] = [];
       const press = pressed;
@@ -123,7 +167,7 @@ export function createLocalFishing(content: Content, player: PlayerIndex): Local
         const y = body.y + Math.sin(heading) * distance;
         phase = { kind: 'aim', x, y, reach };
         if (press) {
-          out.push({ type: 'fish_cast', x, y });
+          out.push({ type: 'fish_cast', x, y, ...(bait === null ? {} : { bait }) });
           phase = { kind: 'cast', x, y };
           sinceCast = 0;
         }
@@ -143,9 +187,29 @@ export function createLocalFishing(content: Content, player: PlayerIndex): Local
         }
         return out;
       }
-      if (phase.kind === 'bite' && line !== null) {
-        if (lineOf(world) === null) {
+      if (phase.kind === 'pair') {
+        const now = lineOf(world);
+        if (now?.pair === undefined) {
           phase = { kind: 'closed' };
+          return out;
+        }
+        if (held.reel !== sentDown) {
+          sentDown = held.reel;
+          out.push({ type: 'fish_hold', down: sentDown });
+        }
+        return out;
+      }
+      if (phase.kind === 'bite' && line !== null) {
+        const now = lineOf(world);
+        if (now === null) {
+          phase = { kind: 'closed' };
+          return out;
+        }
+        // À deux, l'hôte ferre lui-même au plongeon: on attend sa touche, sans délai à tenir.
+        const together = uniqueOf(content, line.catch)?.unique.crew === 'pair';
+        if (now.pair !== undefined) {
+          phase = { kind: 'pair' };
+          sentDown = false;
           return out;
         }
         const t = sinceCast - line.approach;
@@ -162,6 +226,7 @@ export function createLocalFishing(content: Content, player: PlayerIndex): Local
         }
         phase = { kind: 'bite', x: line.x, y: line.y, dip, plunge };
         const def = fishOf(content, line.catch);
+        if (together) return out;
         if (press && def !== null) {
           strike = sinceCast;
           if (judgeStrike(dips, line.approach, strike, line.help) === 'hooked') {

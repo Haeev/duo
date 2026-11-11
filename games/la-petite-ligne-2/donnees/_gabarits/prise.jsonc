@@ -35,4 +35,24 @@
     // Taille de son ombre dans l'eau: small, medium, large, huge.
     "shadow": "medium",
   },
+  // Facultatif: appâts qui l'attirent (objets du sac dont on amorce la ligne, touche S pendant la
+  // visée), et de combien (1 à 5). Facteur 3: il vient de trois fois plus loin et passe devant les
+  // autres ombres. L'appât est mangé à la touche. [] ou champ absent: aucun appât ne l'attire.
+  "baits": [{ "item": "pomme", "factor": 3 }],
+  // Facultatif: prise UNIQUE (une seule fois dans la partie). Décommenter et remplir; elle ne va
+  // alors dans aucune table de coin de pêche (son ombre vient de cette fiche seule).
+  // "unique": {
+  //   // Coin de pêche (champ "fishing" d'un de ses lieux) où elle vit.
+  //   "spot": "etang",
+  //   // Condition de son apparition (fait d'histoire...), en plus de "hours", "weathers", "seasons".
+  //   "when": [{ "type": "remembered", "key": "essai-gare.carpe.affut", "equals": "ouvert" }],
+  //   // Appât exigé (objet du sac), ou null.
+  //   "bait": "pomme",
+  //   // "solo": le mini-jeu ordinaire; "pair": l'un à la canne, l'autre à l'épuisette (à deux).
+  //   "crew": "pair",
+  //   // Fait écrit (vrai) à sa sortie: elle ne revient plus. Les quêtes le lisent ("remembered").
+  //   "fact": "essai-gare.carpe.sortie",
+  //   // true: elle va au sac du pêcheur; false: elle reste à l'épuisette (l'histoire décide).
+  //   "toBag": false,
+  // },
 }

@@ -13,6 +13,7 @@ import { SIM_DT } from '../noyau/constantes';
 import { toolCondition } from '../sac/outils';
 import { fishOf, gameSeconds, shadowPosition, spotShadows, type Shadow } from './ombres';
 import { FISHING } from './reglages';
+import { uniqueShadows } from './uniques';
 
 /** La canne en main (case de la barre), ou `null`. */
 export function heldRod(
@@ -72,17 +73,19 @@ export function spotById(content: Content, world: ReadonlyWorld, id: string): Fi
   return placeSpots(content, world).find((s) => s.id === id) ?? null;
 }
 
-/** Ombres d'un coin en ce moment (sans celles déjà parties). */
+/** Ombres d'un coin en ce moment (sans celles déjà parties), prises uniques comprises. */
 export function shadowsNow(content: Content, world: ReadonlyWorld, spot: FishingSpot): Shadow[] {
   const fishing = world.places[world.common.place]?.fishing;
   if (fishing === undefined) return [];
-  return spotShadows(content, spot, {
+  const shadows = spotShadows(content, spot, {
     seed: fishing.seed,
     taken: fishing.taken,
     day: world.common.day,
     minutes: world.minutes,
     weather: world.common.weather,
   });
+  for (const shadow of uniqueShadows(content, world, spot, fishing.seed)) shadows.push(shadow);
+  return shadows;
 }
 
 // --- Rendu ---------------------------------------------------------------------------------
@@ -194,7 +197,8 @@ export function fishCollectionView(content: Content, world: ReadonlyWorld): Fish
   const out: FishEntryView[] = [];
   for (const id of Object.keys(content.catches).sort()) {
     const def = fishOf(content, id);
-    if (def === null) continue;
+    // Une prise unique n'est pas une espèce du carnet.
+    if (def === null || def.unique !== undefined) continue;
     const record = (p: PlayerIndex): number => {
       const value = world.progress.memory[recordKey(p, id)]?.v;
       return typeof value === 'number' ? value : 0;

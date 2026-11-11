@@ -33,6 +33,15 @@ export const FISHING_EVENTS = [
     together: v.boolean(),
     big: v.boolean(),
   }),
+  /**
+   * Pêche à deux: l'épuisette a plongé à côté. `reason`: elle était au fond, dans un autre
+   * couloir, ou la canne n'était pas tenue. Elle replonge; rien n'est perdu.
+   */
+  v.strictObject({
+    type: v.literal('fish_net_missed'),
+    player: PlayerIndexSchema,
+    reason: v.picklist(['deep', 'side', 'slack']),
+  }),
   /** Pas de prise, rien de perdu. `reason`: raté au ferrage, décroché, ligne rangée, résultat refusé. */
   v.strictObject({
     type: v.literal('fish_lost'),

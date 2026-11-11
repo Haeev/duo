@@ -4,9 +4,36 @@
  * (`simulation/peche/ombres.ts`); seules partent les ombres déjà prises et les lignes à l'eau.
  */
 import * as v from 'valibot';
-import { FiniteSchema, IdSchema, IntSchema, TickSchema } from '../donnees/schemas/communs';
+import {
+  FiniteSchema,
+  IdSchema,
+  IntSchema,
+  PlayerIndexSchema,
+  TickSchema,
+} from '../donnees/schemas/communs';
 
-const ShadowIdSchema = v.pipe(v.string(), v.regex(/^\d{1,9}-\d$/));
+/** `<vague>-<rang>`; `<vague>-u<rang>` pour l'ombre d'une prise unique. */
+const ShadowIdSchema = v.pipe(v.string(), v.regex(/^\d{1,9}-u?\d$/));
+
+/**
+ * Pêche à deux (prise unique `crew: "pair"`), tenue par l'hôte: l'un à la canne (le joueur de la
+ * ligne), l'autre à l'épuisette. Les élans et remontées du poisson sont une fonction pure de la
+ * graine et des pas (`simulation/peche/a-deux.ts`): seuls partent les gestes des joueurs.
+ */
+export const PairFightSchema = v.strictObject({
+  netter: PlayerIndexSchema,
+  /** Pas de la touche (début du combat). */
+  since: TickSchema,
+  /** Secondes tenues pendant ses élans (moins celles tenues à contretemps). */
+  held: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(120)),
+  /** La canne est tenue (touche enfoncée chez le pêcheur). */
+  down: v.boolean(),
+  /** Pas où elle s'est fatiguée (elle remonte par moments), `null`: elle se bat encore. */
+  tired: v.nullable(TickSchema),
+  /** Plongeons d'épuisette ratés. */
+  misses: v.pipe(IntSchema, v.minValue(0), v.maxValue(99)),
+});
+export type PairFight = v.InferOutput<typeof PairFightSchema>;
 
 /** Une ligne à l'eau: le bouchon, l'ombre qui vient, la graine de la touche et du combat. */
 export const FishingLineSchema = v.strictObject({
@@ -28,6 +55,10 @@ export const FishingLineSchema = v.strictObject({
   help: v.pipe(FiniteSchema, v.minValue(0.2), v.maxValue(4)),
   /** Le poisson est ferré: le combat se joue (le partenaire voit la canne pliée). */
   hooked: v.boolean(),
+  /** Appât de la ligne (objet du sac, retiré à la touche). */
+  bait: v.exactOptional(IdSchema),
+  /** Pêche à deux en cours (après la touche d'une prise qui la demande). */
+  pair: v.exactOptional(PairFightSchema),
 });
 export type FishingLine = v.InferOutput<typeof FishingLineSchema>;
 

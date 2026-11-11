@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "baronne",
+  "kind": "fish",
+  "item": "baronne",
+  "places": ["aubrune"],
+  "hours": {
+    "from": 1140,
+    "to": 1260
+  },
+  "weathers": [],
+  "seasons": [],
+  "rarity": "rare",
+  "difficulty": 4,
+  "fish": {
+    "force": 0.9,
+    "nervousness": 0.5,
+    "rhythm": {
+      "pull": 2,
+      "rest": 1.2
+    },
+    "stamina": 20,
+    "feints": 2,
+    "sizeCm": {
+      "min": 46,
+      "max": 52
+    },
+    "shadow": "huge"
+  },
+  "unique": {
+    "spot": "fosse",
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.baronne.affut",
+        "equals": "ouvert"
+      }
+    ],
+    "bait": "goujon",
+    "crew": "pair",
+    "fact": "aubrune.baronne.sortie",
+    "toBag": false
+  }
+}

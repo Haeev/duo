@@ -774,3 +774,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `InkKit` ne se construit pas dans Node (couches dessinées sur un canevas 2D): `vi.mock` de `encre/textures` (`createInkLayers`, `createNoise` en textures d'un point) et un faux `WebGLRenderer` suffisent pour tester création et libération.
 - La démonstration de l'éditeur en `#miroir` ne s'ouvre pas (apparence non révélée): rouvrir par `window.editeur.mirror()` après une première validation sur la page normale. Thème sombre: poser `dataset.lplStyle = 'encre'` après le chargement (dans `addInitScript`, `documentElement` est nul).
 - Capture d'une page de jeu en rendu logiciel: `page.screenshot` dépasse 120 s; lire `canvas.toDataURL()` juste après un `renderer.frame` dans la page (et recommencer si l'image est vide: le souffle du rendu encré saute des images).
+
+## Pêche à deux et prises uniques (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- `random.int(min, max)` du SDK exclut `max`: un côté -1, 0 ou 1 se tire par `int(-1, 2)`.
+- Le départ de `reglages.json` est `train-de-nuit`: une page de démonstration sur la gare d'essai doit réécrire `start.place` avant `loadContent` (`createWorld` part du lieu de départ). La démo `peche/demo/index.html` d'avant ne le fait pas.
+- Deux interfaces côte à côte dans une page: la couche `.lpl-ui` est en `position: fixed`; un parent en `transform: translateZ(0)` en devient le cadre. Chaque moitié a son `keyTarget` (`new EventTarget()`), le robot y envoie ses `KeyboardEvent`.
+- Le rendu 3D de la refonte ne lit pas `fishingView` (aucune ombre de poisson dessinée): ce que voit l'épuisette passe par l'interface (`interface/peche`).
+- Une étape franchie par un fait (`remembered`) se voit après un pas de plus: `wait` avant de lire `passed`.
+- Lint seul (pas `tsc`): `interface/cuisine/index.ts` liste aussi tous les événements; un événement ajouté par un autre lot y manque souvent (`clock_struck`).

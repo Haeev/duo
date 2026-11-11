@@ -66,8 +66,8 @@ type FactValues = ReadonlySet<FactValue> | null;
 
 /**
  * Faits que le jeu peut écrire: effets `remember` et `bump` des données (avec `of: "actor"`, la clé
- * de chacun des deux joueurs), et faits du moteur qui se déduisent des données: faits écrits par
- * les événements du calendrier, pièces et confort des logements, décisions à deux déclarées par
+ * de chacun des deux joueurs), et faits du moteur qui se déduisent des données: sortie d'une
+ * prise unique, faits écrits par les événements du calendrier, pièces et confort des logements, décisions à deux déclarées par
  * les étapes (et le souvenir de la précédente si elle se rouvre), achats et ventes des commerces.
  */
 function collectFacts(content: Content): Map<string, FactValues> {
@@ -89,6 +89,9 @@ function collectFacts(content: Content): Map<string, FactValues> {
     if (node.of === 'actor') for (const p of [0, 1] as const) add(playerFactKey(key, p), values);
     else add(key, values);
   });
+  // Faits écrits par la pêche à la sortie d'une prise unique (`unique.fact`).
+  for (const def of Object.values(content.catches))
+    if (def.unique !== undefined) add(def.unique.fact, new Set([true]));
   // Faits écrits par le calendrier au début de chaque événement (`activates.facts`).
   for (const list of Object.values(content.time.events))
     for (const event of list)

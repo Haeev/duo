@@ -3,10 +3,7 @@
   "id": "la-baronne-mord",
   "title": "La touche",
   "together": true,
-  "roles": {
-    "a": "À la canne",
-    "b": "À l'épuisette"
-  },
+  "roles": null,
   "trigger": {
     "at": null,
     "when": [
@@ -33,7 +30,7 @@
     {
       "do": "say",
       "who": "achille",
-      "text": "Vous voilà. La ligne est à l'eau. Je surveille le bouchon. De l'intérieur. Mmh...",
+      "text": "Vous voilà. La fosse est à vous. Moi, je surveille l'eau. De l'intérieur. Mmh...",
       "emote": null,
       "sound": null,
       "to": "both",
@@ -60,93 +57,7 @@
     {
       "do": "say",
       "who": "narrator",
-      "text": "Le bouchon plonge. La canne plie jusqu'à l'eau. Tu sens où elle tire, mais tu ne vois rien: dis à ta moitié « à gauche » ou « sous la roue ».",
-      "emote": null,
-      "sound": null,
-      "to": "a",
-      "seconds": null
-    },
-    {
-      "do": "say",
-      "who": "narrator",
-      "text": "Tu vois une ombre longue comme une pelle à four, mais tu ne sens rien: dis à ta moitié quand l'ombre se fatigue. Alors seulement, l'épuisette.",
-      "emote": null,
-      "sound": null,
-      "to": "b",
-      "seconds": null
-    },
-    {
-      "do": "await",
-      "parts": [
-        {
-          "role": "a",
-          "hint": "Tiens la canne sans tirer: appuie et ne lâche pas.",
-          "done": [],
-          "gesture": {
-            "type": "hold",
-            "seconds": 3
-          }
-        },
-        {
-          "role": "b",
-          "hint": "Quand la canne tient bon, plonge l'épuisette: appuie.",
-          "done": [],
-          "gesture": {
-            "type": "press"
-          }
-        }
-      ],
-      "together": 0.5
-    },
-    {
-      "do": "say",
-      "who": "narrator",
-      "text": "Elle sort dans une gerbe: une perche énorme, rayée de noir, l'œil furieux d'une dame qu'on dérange à l'heure du souper.",
-      "emote": null,
-      "sound": "Splash !",
-      "to": "both",
-      "seconds": null
-    },
-    {
-      "do": "say",
-      "who": "achille",
-      "text": "Mmh ? ... C'est elle. C'est ELLE. Grand-père, papa: c'est elle !",
-      "emote": "surprise",
-      "sound": null,
-      "to": "both",
-      "seconds": null
-    },
-    {
-      "do": "say",
-      "who": "narrator",
-      "text": "Dans l'épuisette, quelque chose brille à sa lèvre. Pas un hameçon: un anneau. Tu le dégages doucement. Elle te laisse faire.",
-      "emote": null,
-      "sound": null,
-      "to": "b",
-      "seconds": null
-    },
-    {
-      "do": "say",
-      "who": "narrator",
-      "text": "Ta moitié te tend un anneau d'or terni. À l'intérieur, gravé fin: « Anselme et Léonie, 1931 ».",
-      "emote": null,
-      "sound": null,
-      "to": "a",
-      "seconds": null
-    },
-    {
-      "do": "say",
-      "who": "achille",
-      "text": "L'alliance de grand-mère. Elle l'a jetée au bief un jour de colère: grand-père avait passé leur dimanche à la pêche.",
-      "emote": "sad",
-      "sound": null,
-      "to": "both",
-      "seconds": null
-    },
-    {
-      "do": "say",
-      "who": "achille",
-      "text": "Il a pêché ici trente ans. Il disait: « Je ne cours pas après un poisson. Je cours après des excuses. » On croyait qu'il plaisantait.",
+      "text": "Une canne amorcée d'un goujon, une épuisette. Choisissez qui tient quoi. À la canne, on sent où elle tire, mais on ne voit rien.",
       "emote": null,
       "sound": null,
       "to": "both",
@@ -155,22 +66,11 @@
     {
       "do": "say",
       "who": "narrator",
-      "text": "La Baronne attend dans l'épuisette, à moitié dans l'eau. Elle vous regarde. Achille aussi. Il va falloir décider.",
+      "text": "À l'épuisette, on voit l'ombre, mais on ne sent rien. Dites-vous tout: « à gauche », « elle remonte », « tiens bon », « maintenant ».",
       "emote": null,
       "sound": null,
       "to": "both",
       "seconds": null
-    },
-    {
-      "do": "effects",
-      "effects": [
-        {
-          "type": "remember",
-          "key": "aubrune.baronne.sortie",
-          "value": true,
-          "by": "duo"
-        }
-      ]
     }
   ]
 }
