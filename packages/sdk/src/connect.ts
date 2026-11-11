@@ -26,6 +26,7 @@ import type {
   Notebook,
   Player,
   SaveSnapshot,
+  SessionSummary,
   UiSettings,
   Unsubscribe,
 } from './api';
@@ -36,6 +37,7 @@ import { createLoop } from './loop';
 import { createNet } from './net';
 import { createNotebook, type NotebookInternal } from './notebook';
 import { createRandom, deriveSeed } from './random';
+import { boundProgress, boundStats } from './results';
 import { SDK_VERSION } from './version';
 
 const DEFAULT_TIMEOUT_MS = 15_000;
@@ -254,6 +256,29 @@ function createContext<TAction extends string>(
   const pendingSaves = new Map<number, (status: SaveStatus) => void>();
   let lastProgress: number | undefined = init.save?.progress;
   let sessionEnded = false;
+  let summaryProvider: (() => SessionSummary | null) | null = null;
+
+  /** `sessionEnd` borné aux limites du pont; sans progression du jeu, celle de la dernière sauvegarde. */
+  const sessionEndMessage = (summary: SessionSummary | null, finished: boolean): GameMessage => {
+    const progress = boundProgress(summary?.progress) ?? lastProgress;
+    return {
+      type: 'sessionEnd',
+      stats: boundStats(summary?.stats),
+      finished,
+      ...(progress === undefined ? {} : { progress }),
+    };
+  };
+
+  /** Résumé du fournisseur du jeu; s'il échoue, c'est journalisé et la séance se termine quand même. */
+  const providedSummary = (): SessionSummary | null => {
+    if (summaryProvider === null) return null;
+    try {
+      return summaryProvider();
+    } catch (error) {
+      log.error('résumé de séance: le fournisseur a échoué', String(error));
+      return null;
+    }
+  };
 
   const writeSave = (moment: SaveMoment, snapshot: SaveSnapshot): Promise<SaveStatus> => {
     if (init.role !== 'host') return Promise.resolve('refused');
@@ -375,12 +400,7 @@ function createContext<TAction extends string>(
         void exitSave.then(() => {
           if (init.role === 'host' && manifest.play === 'session' && !sessionEnded) {
             sessionEnded = true;
-            send({
-              type: 'sessionEnd',
-              stats: [],
-              finished: false,
-              ...(lastProgress === undefined ? {} : { progress: lastProgress }),
-            });
+            send(sessionEndMessage(providedSummary(), false));
           }
           emit('stop', { reason: message.reason });
         });
@@ -521,29 +541,31 @@ function createContext<TAction extends string>(
         log.warn('results.endMatch: réservé aux jeux match');
         return;
       }
+      const progress = boundProgress(result.progress);
       send({
         type: 'matchEnd',
         outcome: result.outcome,
         scores: { ...result.scores },
-        stats: [...(result.stats ?? [])].slice(0, 3),
-        ...(result.progress === undefined ? {} : { progress: result.progress }),
+        stats: boundStats(result.stats),
+        ...(progress === undefined ? {} : { progress }),
         ...(result.replayLabel === undefined ? {} : { replayLabel: result.replayLabel }),
       });
     },
-    endSession(summary = {}) {
+    endSession(summary) {
       if (manifest.play !== 'session') {
         log.warn('results.endSession: réservé aux jeux session');
         return;
       }
       if (sessionEnded) return;
       sessionEnded = true;
-      const progress = summary.progress ?? lastProgress;
-      send({
-        type: 'sessionEnd',
-        stats: [...(summary.stats ?? [])].slice(0, 3),
-        finished: true,
-        ...(progress === undefined ? {} : { progress }),
-      });
+      send(sessionEndMessage(summary ?? providedSummary(), true));
+    },
+    provideSummary(provider) {
+      if (manifest.play !== 'session') {
+        log.warn('results.provideSummary: réservé aux jeux session');
+        return;
+      }
+      summaryProvider = provider;
     },
   };
   const hostContext: HostContext<TAction> = Object.assign(base, {

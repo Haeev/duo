@@ -211,4 +211,12 @@ describe('catalogue', () => {
     expect(result).toMatchObject({ ok: true, skipped: 2 });
     expect(result.ok && result.entries.map((item) => item.version)).toEqual(['0.10.0']);
   });
+
+  it('accepte une entrée sans empreinte (catalogue ancien)', () => {
+    const ancienne: Partial<typeof entry> = { ...entry };
+    delete ancienne.sha256;
+    const result = parseCatalogue({ schema: 1, jeux: [ancienne] });
+    expect(result).toMatchObject({ ok: true, skipped: 0 });
+    expect(result.ok && result.entries[0]?.sha256).toBeUndefined();
+  });
 });

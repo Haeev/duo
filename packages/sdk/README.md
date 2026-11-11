@@ -117,6 +117,7 @@ hashState(monde); // empreinte stable, pour les tests et les contrôles de désy
 - `saves.write(moment, instantané)`: écriture immédiate à un moment déclaré (`level-end`, `manual`); renvoie `ok`, `too-large`, `moment-not-declared`, `write-error` ou `refused`.
 - `results.endMatch({ outcome, scores, stats, replayLabel })` pour un jeu `match`.
 - `results.endSession({ progress, stats })` pour un jeu `session` qui finit de lui-même (fin de la démo). Si c'est la plateforme qui arrête la séance, le SDK répond seul.
+- `results.provideSummary(() => ({ progress, stats }))` (SDK 1.2), jeu `session`: le résumé de la séance, lu quand la plateforme l'arrête (« Retour au salon ») et par `endSession()` sans argument. Duo le range dans l'historique et le montre à l'écran de fin et dans le salon (« Dernières séances »). Trois statistiques au plus, libellé de 32 caractères, valeur de 16, progression de 0 à 1: le SDK coupe ce qui dépasse. Pas de changement du pont: un jeu qui s'en sert tourne aussi dans une application plus ancienne, qui ne range simplement pas le résumé.
 
 ## Audio
 

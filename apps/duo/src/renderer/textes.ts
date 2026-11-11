@@ -62,6 +62,12 @@ export function playedDuration(ms: number): string {
   return `${secs} s`;
 }
 
+/** « 42 min », « 1 h 05 », « moins d'une minute »: durée d'une séance passée. */
+export function playedMinutes(ms: number): string {
+  const total = Math.round(Math.max(0, ms) / 60_000);
+  return total === 0 ? typo("moins d'une minute") : minutes(total);
+}
+
 /** « 0:42 », compteur de la coupure (E12). */
 export function clock(ms: number): string {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
@@ -254,6 +260,24 @@ export const t = {
       versionTitre: (version: string, title: string): string =>
         title === '' ? version : `${version} · ${title}`,
       fermer: 'Fermer',
+    },
+    // Texte à valider par ux-ui-designer: la fiche du jeu (E07) n'a pas encore son bloc d'historique.
+    historique: {
+      titre: (session: boolean): string => (session ? 'Dernières séances' : 'Dernières parties'),
+      vide: (session: boolean): string =>
+        session
+          ? fr`Pas encore de séance sur cet ordinateur : la première s'inscrira ici.`
+          : fr`Pas encore de partie sur cet ordinateur : la première s'inscrira ici.`,
+      avancement: (value: string): string => fr`Avancement : ${value}`,
+      resultat: {
+        session: '',
+        interrupted: 'Interrompue',
+        won: 'Gagnée',
+        lost: 'Perdue',
+        draw: 'Égalité',
+        success: 'Réussie',
+        failure: 'Pas cette fois',
+      },
     },
     decompte: (seconds: number): string => `La partie commence dans ${seconds}`,
     connexionPerdue: (name: string): string =>

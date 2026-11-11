@@ -6,6 +6,14 @@ Les changements de l'application Duo, version par version, écrits pour les deux
 
 ## [Non publié]
 
+### Ajouté
+
+- Dans le salon d'un jeu, un bloc « Dernières séances » montre les trois dernières séances jouées sur cet ordinateur: date, durée, avancement, et les nombres que le jeu donne (pour La Petite Ligne: jours vécus, étapes de quête franchies, entrées de collection ajoutées). Les mêmes nombres apparaissent à l'écran de fin quand on revient au salon depuis la pause.
+
+### Modifié
+
+- Si le fichier d'une mise à jour de jeu arrive abîmé, Duo ne l'installe pas et le dit clairement; ta version actuelle du jeu reste jouable.
+
 ## [0.3.1] - 2026-11-04
 
 Duo montre quand il télécharge la mise à jour d'un jeu et attend qu'elle soit installée avant de le lancer.

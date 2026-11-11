@@ -1,6 +1,9 @@
 // Catalogue des jeux publiés (ADR 0010, point 2), schéma 1. Il n'est pas
 // signé: la signature de chaque paquet suffit, et l'empreinte de l'archive
-// écarte un téléchargement abîmé avant toute extraction. Une entrée invalide est
+// écarte un téléchargement abîmé avant toute extraction. L'empreinte reste
+// facultative à la lecture: un catalogue ancien qui ne la porterait pas est
+// accepté (la signature du paquet est alors le seul contrôle); le flux de
+// publication l'écrit toujours. Une entrée invalide est
 // ignorée sans écarter les autres; un catalogue illisible ou d'un schéma
 // inconnu est écarté en entier.
 import * as v from 'valibot';
@@ -36,7 +39,8 @@ export const CatalogueEntrySchema = v.object({
     v.maxValue(MAX_PACKAGE_BYTES + MAX_METADATA_BYTES),
   ),
   url: v.pipe(v.string(), v.url(), v.regex(/^https?:\/\//)),
-  sha256: Sha256Schema,
+  /** Empreinte SHA-256 de l'archive `.duogame`; absente d'un catalogue ancien. */
+  sha256: v.optional(Sha256Schema),
 });
 export type CatalogueEntry = v.InferOutput<typeof CatalogueEntrySchema>;
 

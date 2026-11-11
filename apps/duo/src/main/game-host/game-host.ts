@@ -83,6 +83,8 @@ export class GameHost {
   private blocker: number | null = null;
   private failed = false;
   private stopWaiter: (() => void) | null = null;
+  /** Arrêt en cours qui attend le `sessionEnd` du jeu, pas seulement sa sauvegarde de sortie. */
+  private awaitingEnd = false;
   private pendingSaves = 0;
   /** Carnet de séance ouvert dans le jeu: Échap lui revient (annuler la note). */
   private notebookTyping = false;
@@ -214,12 +216,17 @@ export class GameHost {
     this.view?.webContents.focus();
   }
 
-  /** Arrête le jeu; avec `save`, lui laisse 2 s pour écrire avant de détruire la vue. */
-  async stop(reason: StopReason, save: boolean): Promise<void> {
+  /**
+   * Arrête le jeu; avec `save`, lui laisse 2 s pour écrire avant de détruire la vue. Avec
+   * `awaitEnd` (hôte d'un jeu `session`), attend aussi son `sessionEnd`, qui porte le résumé
+   * de la séance, dans le même délai.
+   */
+  async stop(reason: StopReason, save: boolean, awaitEnd = false): Promise<void> {
     if (this.view === null) return;
     if (!this.failed) {
       this.send({ type: 'stop', reason, save });
-      if (save) {
+      if (save || awaitEnd) {
+        this.awaitingEnd = awaitEnd;
         await new Promise<void>((resolve) => {
           const timer = setTimeout(done, STOP_SAVE_GRACE_MS);
           function done(): void {
@@ -229,6 +236,7 @@ export class GameHost {
           this.stopWaiter = done;
         });
         this.stopWaiter = null;
+        this.awaitingEnd = false;
       }
     }
     this.destroy();
@@ -338,8 +346,11 @@ export class GameHost {
           })
           .finally(() => {
             this.pendingSaves -= 1;
-            // Sauvegarde de sortie écrite: le jeu n'a plus rien à dire avant sa destruction.
-            if (message.moment === 'exit' && this.pendingSaves === 0) this.stopWaiter?.();
+            // Sauvegarde de sortie écrite: le jeu n'a plus rien à dire avant sa destruction,
+            // sauf le résumé de la séance (`sessionEnd`), qui part juste après.
+            if (message.moment === 'exit' && this.pendingSaves === 0 && !this.awaitingEnd) {
+              this.stopWaiter?.();
+            }
           });
         return;
       case 'matchEnd':

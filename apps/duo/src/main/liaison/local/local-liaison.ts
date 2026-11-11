@@ -240,6 +240,10 @@ export class LocalLiaison implements Liaison {
     this.route({ type: 'stop', seat: 'host', reason, summary }, { type: 'stop', reason });
   }
 
+  reportSummary(matchId: string, summary: EndSummary): void {
+    if (this.own.lastEnd?.matchId === matchId) this.applyOwn({ type: 'summary', matchId, summary });
+  }
+
   sendGame(message: GameRelayMessage): void {
     this.link?.send({
       t: 'game',

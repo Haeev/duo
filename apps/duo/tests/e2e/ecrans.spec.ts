@@ -132,6 +132,34 @@ test('salon: quoi de neuf, pastille et toutes les notes', async () => {
   await page.close();
 });
 
+test('salon: dernières séances, libellés longs de La Petite Ligne', async () => {
+  const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
+  await page.goto(`${origin}/?scenario=salon-hote`);
+  const history = page.getByTestId('salon-historique');
+  await expect(history.getByTestId('historique-entree')).toHaveCount(2);
+  await expect(history).toContainText('Entrées de collection ajoutées');
+  await expect(history).toContainText('Interrompue');
+  await page.evaluate(() => document.fonts.ready);
+  await history.scrollIntoViewIfNeeded();
+  // Aucun libellé ne déborde de sa colonne.
+  const overflow = await history.evaluate((block) =>
+    [...block.querySelectorAll('dt, dd')].some((cell) => cell.scrollWidth > cell.clientWidth),
+  );
+  expect(overflow).toBe(false);
+  await page.screenshot({
+    path: path.join(
+      APP_DIR,
+      '..',
+      '..',
+      'docs',
+      'plateforme',
+      'captures',
+      'salon-historique-libelles-longs.png',
+    ),
+  });
+  await page.close();
+});
+
 test('réglages: la case Plein écran et sa touche', async () => {
   const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
   await page.goto(`${origin}/?scenario=accueil`);

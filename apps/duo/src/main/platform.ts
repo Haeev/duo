@@ -9,6 +9,7 @@ import type {
   EndView,
   GameSummary,
   GameToastKind,
+  HistoryItemView,
   InvitationView,
   MatchView,
   NoticeView,
@@ -21,6 +22,7 @@ import type {
   Toast,
   ToastKind,
 } from '../shared/state';
+import type { HistoryEntry, LocalHistory } from './data/local-history';
 import type { LocalSaves } from './data/local-saves';
 import { publicSettings, type MachineStore, type SettingsFile } from './data/store';
 import type { GameEntry } from './games/catalog';
@@ -48,6 +50,7 @@ import type { Journal } from './journal';
 import type { LiaisonEvent, Liaison, PeerInfo, SessionsView } from './liaison/liaison';
 import {
   EMPTY_SESSION,
+  type EndSummary,
   type HostSession,
   type MatchEnd,
   type SalonGame,
@@ -59,11 +62,14 @@ import type { AppWindow, PlatformLayer } from './window';
 const TOAST_MS = 6000;
 const HINT_MS = 4000;
 const PLATFORM_MAX_SAVE_BYTES = 33_554_432;
+/** Parties ou séances montrées dans le salon (« Dernières séances »). */
+const HISTORY_SHOWN = 3;
 
 export interface PlatformDeps {
   readonly journal: Journal;
   readonly store: MachineStore;
   readonly saves: LocalSaves;
+  readonly history: LocalHistory;
   readonly liaison: Liaison;
   readonly machineId: string;
   readonly appVersion: string;
@@ -142,6 +148,13 @@ export class Platform {
   private salonNews: { gameId: string; version: string; isNew: boolean } | null = null;
   /** Notes de version par `id@version`; `null`: pas de notes; `loading`: lecture en cours. */
   private readonly releaseNotes = new Map<string, readonly ReleaseNote[] | null | 'loading'>();
+  /** Dernières entrées de l'historique par jeu; absent: à lire. */
+  private readonly historyCache = new Map<string, readonly HistoryItemView[]>();
+  private readonly historyLoading = new Set<string>();
+  /** Entrées écrites pendant cette exécution, par partie: le résumé du jeu peut les compléter. */
+  private readonly recorded = new Map<string, { entry: HistoryEntry; summarized: boolean }>();
+  /** Partie dont l'écran de fin est affiché, pour y reporter un résumé arrivé après coup. */
+  private endMatchId: string | null = null;
 
   constructor(private readonly deps: PlatformDeps) {
     this.profile = deps.profile;
@@ -193,13 +206,29 @@ export class Platform {
               : 'win-guest'
             : outcome.kind,
         stats: message.stats,
+        progress: message.progress,
       });
     },
     sessionEnd: (message) => {
-      this.deps.journal.write('info', 'platform', 'session-end', { finished: message.finished });
+      this.deps.journal.write('info', 'platform', 'session-end', {
+        finished: message.finished,
+        stats: message.stats.length,
+      });
+      const summary: EndSummary = {
+        outcome: null,
+        stats: message.stats,
+        progress: message.progress,
+      };
       // Le jeu termine la séance de lui-même (fin de la démo): fin pour les deux machines.
       if (message.finished && this.running?.role === 'host') {
-        this.deps.liaison.stopMatch('end', { outcome: null, stats: message.stats });
+        this.deps.liaison.stopMatch('end', summary);
+        return;
+      }
+      // Réponse à l'arrêt (« Retour au salon », coupure): le résumé complète la fin déjà
+      // décidée, ici et chez l'autre (historique, écran de fin).
+      const target = this.running ?? this.stopping;
+      if (!message.finished && target?.role === 'host') {
+        this.deps.liaison.reportSummary(target.matchId, summary);
       }
     },
   };
@@ -605,6 +634,7 @@ export class Platform {
       role: self,
       game: this.summary(game),
       news: this.newsFor(game),
+      history: this.historyFor(game.manifest.id),
       saveChoice: salon.game.saveChoice,
       save: salon.game.save,
       selfReady: salon.ready[self],
@@ -730,6 +760,7 @@ export class Platform {
         this.announceSalonChanges(this.sessions, event.sessions);
         this.sessions = event.sessions;
         this.reconcileMatch();
+        this.absorbSummaries();
         break;
       case 'game':
         if (this.running !== null) {
@@ -991,6 +1022,108 @@ export class Platform {
     };
   }
 
+  private showEnd(running: RunningMatch, end: MatchEnd): void {
+    this.end = this.endView(running, end);
+    this.endMatchId = end.matchId;
+  }
+
+  // Historique (prototype, ADR 0009 point 8) -----------------------------------
+
+  /** Dernières entrées d'un jeu pour le salon; lues une fois, puis tenues à jour. */
+  private historyFor(gameId: string): readonly HistoryItemView[] {
+    const known = this.historyCache.get(gameId);
+    if (known === undefined) this.loadHistory(gameId);
+    return known ?? [];
+  }
+
+  private loadHistory(gameId: string): void {
+    if (this.historyLoading.has(gameId)) return;
+    this.historyLoading.add(gameId);
+    void this.deps.history
+      .recent(gameId, HISTORY_SHOWN)
+      .then(
+        (entries) => {
+          this.historyCache.set(
+            gameId,
+            entries.map((entry) => historyItem(entry)),
+          );
+        },
+        (error: unknown) => {
+          this.historyCache.set(gameId, []);
+          this.deps.journal.write('warn', 'platform', 'history-read-failed', {
+            game: gameId,
+            error: String(error),
+          });
+        },
+      )
+      .finally(() => {
+        this.historyLoading.delete(gameId);
+        this.publish();
+      });
+  }
+
+  /**
+   * Inscrit la partie qui vient de finir, sur chaque machine (pas de réplication avant le lot
+   * L9). Un échec du chargement n'est pas une partie: rien n'est inscrit (ADR 0009, point 8).
+   */
+  private recordHistory(running: RunningMatch, end: MatchEnd): void {
+    if (end.reason === 'load-failed') return;
+    const manifest = running.game.manifest;
+    const entry: HistoryEntry = {
+      schema: 1,
+      matchId: end.matchId,
+      gameId: manifest.id,
+      gameVersion: manifest.version,
+      play: manifest.play,
+      role: running.role,
+      endedAt: new Date().toISOString(),
+      durationMs: Math.max(0, end.durationMs),
+      reason: end.reason,
+      outcome: end.summary?.outcome ?? null,
+      progress: end.summary?.progress ?? null,
+      stats: [...(end.summary?.stats ?? [])],
+    };
+    this.recorded.set(end.matchId, { entry, summarized: end.summary !== null });
+    // Quelques parties suffisent: un résumé arrive dans les secondes qui suivent la fin.
+    for (const key of [...this.recorded.keys()].slice(0, -8)) this.recorded.delete(key);
+    this.writeHistory(entry);
+  }
+
+  /** Résumé du jeu arrivé après la fin (séance arrêtée par la plateforme): il complète l'entrée. */
+  private absorbSummaries(): void {
+    for (const lastEnd of [this.sessions.own.lastEnd, this.sessions.peer?.lastEnd ?? null]) {
+      const summary = lastEnd?.summary ?? null;
+      if (lastEnd === null || summary === null) continue;
+      const known = this.recorded.get(lastEnd.matchId);
+      if (known === undefined || known.summarized) continue;
+      const entry: HistoryEntry = {
+        ...known.entry,
+        outcome: summary.outcome,
+        progress: summary.progress ?? known.entry.progress,
+        stats: [...summary.stats],
+      };
+      this.recorded.set(lastEnd.matchId, { entry, summarized: true });
+      this.writeHistory(entry);
+      if (this.endMatchId === lastEnd.matchId && this.end !== null) {
+        this.end = { ...this.end, stats: summary.stats };
+      }
+    }
+  }
+
+  private writeHistory(entry: HistoryEntry): void {
+    void this.deps.history.record(entry).then(
+      () => {
+        this.loadHistory(entry.gameId);
+      },
+      (error: unknown) => {
+        this.deps.journal.write('error', 'platform', 'history-write-failed', {
+          game: entry.gameId,
+          error: String(error),
+        });
+      },
+    );
+  }
+
   /** Écran de fin vu de cette machine: « Tu as gagné ! » ou « Sacha a gagné » (UX 4.3). */
   private endView(running: RunningMatch, end: MatchEnd): EndView {
     const outcome = end.summary?.outcome ?? null;
@@ -1034,15 +1167,16 @@ export class Platform {
 
     if (end !== null && !this.handledEnds.has(end.matchId)) {
       this.handledEnds.add(end.matchId);
+      this.recordHistory(running, end);
       const byPeer = end.by !== null && end.by !== selfSeat;
       switch (end.reason) {
         case 'stopped':
           if (byPeer) this.toast('stopped-match');
           // Une séance se termine normalement par « Retour au salon »; une partie arrêtée n'a pas d'écran de fin (UX 4.1).
-          if (isSession) this.end = this.endView(running, end);
+          if (isSession) this.showEnd(running, end);
           break;
         case 'end':
-          this.end = this.endView(running, end);
+          this.showEnd(running, end);
           break;
         case 'crash':
           this.notice = {
@@ -1074,7 +1208,9 @@ export class Platform {
     const reason =
       end?.reason === 'crash' ? 'peer-crash' : end?.reason === 'end' ? 'end' : 'stopped';
     this.stopping = running;
-    void host.stop(reason, saveOnStop).then(() => {
+    // Séance arrêtée par la plateforme: le jeu de l'hôte répond par son résumé (`sessionEnd`).
+    const awaitEnd = running.role === 'host' && isSession && end !== null && end.reason !== 'end';
+    void host.stop(reason, saveOnStop, awaitEnd).then(() => {
       if (this.stopping === running) this.stopping = null;
       if (this.end !== null && running.savedDuringStop) this.end = { ...this.end, saved: true };
       void this.refreshSaveSummaries().then(() => {
@@ -1209,4 +1345,36 @@ export class Platform {
     if (layer.kind !== 'full' && this.lastLayer === 'full') this.gameHost?.focus();
     this.lastLayer = layer.kind;
   }
+}
+
+/** Une entrée de l'historique vue de cette machine (issue relative à sa place). */
+export function historyItem(entry: HistoryEntry): HistoryItemView {
+  let result: HistoryItemView['result'];
+  if (entry.reason === 'crash' || entry.reason === 'guest-gone') result = 'interrupted';
+  else if (entry.reason === 'stopped')
+    result = entry.play === 'session' ? 'session' : 'interrupted';
+  else {
+    switch (entry.outcome) {
+      case 'win-host':
+      case 'win-guest':
+        result = (entry.outcome === 'win-host') === (entry.role === 'host') ? 'won' : 'lost';
+        break;
+      case 'draw':
+      case 'success':
+      case 'failure':
+        result = entry.outcome;
+        break;
+      case null:
+        result = 'session';
+        break;
+    }
+  }
+  return {
+    matchId: entry.matchId,
+    endedAt: Date.parse(entry.endedAt),
+    durationMs: entry.durationMs,
+    result,
+    progress: entry.progress,
+    stats: entry.stats,
+  };
 }

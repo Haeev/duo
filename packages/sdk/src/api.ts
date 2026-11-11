@@ -270,6 +270,11 @@ export interface MatchResult {
   readonly replayLabel?: string;
 }
 
+/**
+ * Résumé d'une séance: avancement (0 à 1) et trois statistiques au plus, libellé de
+ * 32 caractères et valeur de 16 (« Jours vécus », « 3 »). Le SDK coupe ce qui dépasse.
+ * La plateforme le range dans l'historique et le montre à l'écran de fin et dans le salon.
+ */
 export interface SessionSummary {
   readonly progress?: number;
   readonly stats?: readonly ResultStat[];
@@ -283,6 +288,13 @@ export interface HostResults {
    * plateforme qui arrête la séance, le SDK répond seul avec la progression de la dernière sauvegarde.
    */
   endSession(summary?: SessionSummary): void;
+  /**
+   * Jeux `session` (SDK 1.2): fournit le résumé de la séance, lu quand la plateforme l'arrête
+   * (« Retour au salon », coupure) et par `endSession()` appelé sans argument. `null`: rien à
+   * dire, seule la progression de la dernière sauvegarde part. Sans changement du pont: dans
+   * une application plus ancienne, le résumé part aussi, simplement sans être rangé.
+   */
+  provideSummary(provider: () => SessionSummary | null): void;
 }
 
 // Audio.

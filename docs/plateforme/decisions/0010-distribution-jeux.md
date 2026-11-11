@@ -104,3 +104,10 @@ Les fichiers de release d'un dépôt privé exigent une authentification, et emb
 - Débit de la copie LAN d'un paquet de 50 Mo en Wi-Fi chez le client, et sa reprise après coupure (CA-PF-126).
 - Requêtes partielles du protocole `duo-game://` pour la lecture en flux des musiques (lot L4).
 - Comportement des redirections de GitHub Releases derrière le mandataire de l'environnement cloud et en CI (lot L11).
+
+## Précision: empreinte du catalogue (Duo 0.4.0, 2026-11-11)
+
+- Le flux `.github/workflows/jeux.yml` écrit le `sha256` de chaque archive (`outils/publication-jeu.mjs`, contrôlé par `sha256sum -c` avant la release); le catalogue public le porte pour chaque jeu (relevé le 2026-11-11).
+- L'application contrôle cette empreinte pendant le téléchargement, avant toute installation, depuis le lot L11. Depuis 0.4.0, un écart se dit en clair dans le bandeau du jeu (« Le fichier de la mise à jour ... est arrivé abîmé : Duo ne l'a pas installé. Ta version ... reste jouable »), cause `integrity`; l'archive est supprimée, la version installée n'est pas touchée et « Jouer quand même » la lance.
+- À la lecture, `sha256` devient facultatif: une entrée d'un catalogue ancien sans empreinte est acceptée (journal `catalogue-entry-without-sha256`), la signature du paquet restant contrôlée à l'installation. Avant 0.4.0, une telle entrée était écartée.
+

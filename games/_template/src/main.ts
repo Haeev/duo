@@ -37,6 +37,12 @@ if (duo.role === 'host') {
   const lu = v.safeParse(InstantaneSchema, reprise);
   if (lu.success) monde = lu.output;
   duo.saves.provide(() => ({ label: `Pas ${monde.tick}`, dataSchema: 1, data: monde }));
+  // Résumé de la séance pour l'historique de Duo: avancement (0 à 1) et trois nombres au plus,
+  // libellé de 32 caractères et valeur de 16. Lu quand la plateforme arrête la séance.
+  const depart = monde.tick;
+  duo.results.provideSummary(() => ({
+    stats: [{ label: 'Pas joués', value: String(monde.tick - depart) }],
+  }));
   commandes.onMessage((frame) => {
     commandesInvite = frame;
   });
