@@ -20,7 +20,7 @@ export { isLockOpen, closedLocks, lockOfObject } from './verrous';
 export { isZoneOpen, zoneViews, zoneAt, reachMask, type ZoneView } from './zones';
 export { interiorAt, playerInterior, doorRefusal, passDoor, sillsOf } from './portes';
 export { passageSays } from './passage';
-export { edgePassable, closedLockSet } from './chemins';
+export { edgePassable, closedDoorSet, closedLockSet } from './chemins';
 export { absentObjects, isObjectAbsent, isObjectPresent } from './presents';
 export { areaAt, doorChain, type DoorHop } from './traversee';
 

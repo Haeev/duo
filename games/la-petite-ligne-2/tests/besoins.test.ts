@@ -176,7 +176,7 @@ describe('besoins', () => {
         name: 'Tourte',
         family: 'food',
         stack: 1,
-        food: { hunger: 60 },
+        food: { hunger: 60, stamina: { capacity: { extra: 0.5, seconds: 60 } } },
         tool: null,
         meal: { perk: 'better_prices' },
       };
@@ -196,8 +196,12 @@ describe('besoins', () => {
     });
     const seats = sim.world.places['essai-gare']?.objects.banc?.sit;
     if (seats !== undefined) seats.splice(0, 2, 0, 1);
+    expect(sim.world.players[1].staminaMods.capacity).toBeNull();
     act(sim, 0, serve);
     expect(sim.world.players[0].toolbar[0]).toBeNull();
     expect(modifiersOf(custom, sim.world, 1).sellPrice).toBe(RULES.needs.betterPrices);
+    // Le renfort d'endurance du plat, pour les deux convives.
+    for (const p of [0, 1] as const)
+      expect(sim.world.players[p].staminaMods.capacity?.extra).toBe(0.5);
   });
 });

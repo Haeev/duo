@@ -133,6 +133,7 @@ export function validateTimeAndBook(content: Content): string[] {
   );
   const categories = new Set(book.categories.map((c) => c.id));
   const byItem = new Map<string, string>();
+  const byRecipe = new Map<string, string>();
   for (const entry of Object.values(book.entries)) {
     const at = `commun/carnet/${entry.id}.json`;
     if (!categories.has(entry.category))
@@ -145,6 +146,13 @@ export function validateTimeAndBook(content: Content): string[] {
       if (other !== undefined)
         problems.push(`${at}: l'objet « ${entry.source.item} » inscrit déjà « ${other} »`);
       byItem.set(entry.source.item, entry.id);
+    } else if (entry.source.type === 'recipe') {
+      if (!(entry.source.recipe in content.recipes))
+        problems.push(`${at}: recette inconnue « ${entry.source.recipe} »`);
+      const other = byRecipe.get(entry.source.recipe);
+      if (other !== undefined)
+        problems.push(`${at}: la recette « ${entry.source.recipe} » inscrit déjà « ${other} »`);
+      byRecipe.set(entry.source.recipe, entry.id);
     }
   }
   const entryOf = (at: string, id: string, source: string): void => {

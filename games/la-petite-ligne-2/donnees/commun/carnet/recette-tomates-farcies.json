@@ -5,8 +5,8 @@
   "name": "Tomates farcies",
   "place": "aubrune",
   "source": {
-    "type": "item",
-    "item": "tomates-farcies"
+    "type": "recipe",
+    "recipe": "tomates-farcies"
   },
   "rarity": null,
   "text": "Les tomates farcies d'Odette, qui éclatent au four. Elle ne donne jamais la dose de persil."

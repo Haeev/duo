@@ -6,6 +6,7 @@
  */
 import type { Brick } from '../../donnees/schemas/briques';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
+import type { MapDef } from '../../donnees/schemas/lieu';
 import type { ResourceDef } from '../../donnees/schemas/recolte';
 import type { HarvestState } from '../../donnees/schemas/recolte-briques';
 import type { DeepReadonly } from '../../etat/monde';
@@ -22,8 +23,25 @@ type HarvestBrick = Extract<Brick, { brick: 'harvest' }>;
 /** Au plus 80 objets au sol (`etat/lieu.ts`). */
 const GROUND_MAX = 80;
 
+const ownResources = new WeakMap<MapDef, ReadonlyMap<string, string>>();
+
+/** Ressources propres aux points de la carte (champ `resource` d'un objet), par identifiant. */
+function ownResourcesOf(map: MapDef): ReadonlyMap<string, string> {
+  let found = ownResources.get(map);
+  if (found === undefined) {
+    const built = new Map<string, string>();
+    for (const o of map.objects) if (o.resource !== undefined) built.set(o.id, o.resource);
+    found = built;
+    ownResources.set(map, found);
+  }
+  return found;
+}
+
+/** La fiche de ce point: la sienne s'il en déclare une, sinon celle de la brique du meuble. */
 export function resourceOf(look: Look, target: BrickView<HarvestBrick>): ResourceDef | null {
-  return look.content.resources[target.params.resource] ?? null;
+  const map = look.content.places[look.world.common.place]?.map;
+  const own = map === undefined ? undefined : ownResourcesOf(map).get(target.id);
+  return look.content.resources[own ?? target.params.resource] ?? null;
 }
 
 /** La ressource est-elle là (pas encore récoltée, ou repoussée) ? Pour le rendu: souche, arbre nu. */

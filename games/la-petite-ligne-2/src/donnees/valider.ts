@@ -287,6 +287,31 @@ function checkShop(content: Content, place: PlaceContent, shop: ShopDef, problem
     if (line.unlock !== undefined) checkCondition(content, line.unlock, `${at}, unlock`, problems);
 }
 
+/** Ressource propre à un point (`resource` d'un objet de la carte): même geste, même reste. */
+function checkOwnResource(
+  content: Content,
+  id: string,
+  prop: PropDef,
+  where: string,
+  problems: string[],
+): void {
+  const own = content.resources[id];
+  if (own === undefined) {
+    problems.push(`${where}: ressource inconnue « ${id} »`);
+    return;
+  }
+  const brick = prop.bricks.find((b) => b.brick === 'harvest');
+  if (brick === undefined) {
+    problems.push(`${where}: \`resource\` sans brique \`harvest\` sur le meuble`);
+    return;
+  }
+  const base = content.resources[brick.resource];
+  if (base !== undefined && (base.kind !== own.kind || base.after !== own.after))
+    problems.push(
+      `${where}: « ${id} » doit avoir le geste et le reste de « ${base.id} » (${base.kind}, ${base.after})`,
+    );
+}
+
 /** Ensembles de meubles (`group`): deux meubles au moins, un siège au moins, assez proches pour un repas. */
 function checkGroups(content: Content, place: PlaceContent, problems: string[]): void {
   const groups = new Map<string, MapObject[]>();
@@ -377,6 +402,7 @@ function checkPlace(content: Content, place: PlaceContent, problems: string[]): 
       if (brick.brick === 'shop' && !(brick.shop in place.shops))
         problems.push(`${where}: commerce inconnu « ${brick.shop} » dans ce lieu`);
     }
+    if (o.resource !== undefined) checkOwnResource(content, o.resource, prop, where, problems);
   }
   checkGroups(content, place, problems);
   checkGroundItems(content, place, blockedAt, inside, problems);

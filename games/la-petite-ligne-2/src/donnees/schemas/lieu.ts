@@ -106,6 +106,14 @@ export const MapObjectSchema = v.strictObject({
    * se vise pas et ne se dessine pas (`simulation/lieux/presents.ts`). Sans ce champ: toujours là.
    */
   when: v.exactOptional(v.pipe(v.array(ConditionSchema), v.minLength(1), v.maxLength(8))),
+  /**
+   * Point de récolte propre à cet endroit: sa fiche `commun/ressources/<id>.json` (sa table de
+   * butin) remplace celle de la brique `harvest` du meuble. La roche aux fossiles et le ballast
+   * sont le même « sol qui scintille », mais n'y dorment pas les mêmes trésors. Même geste et même
+   * reste que la fiche du meuble (`kind`, `after`: contrôlés), pour un rendu identique. Absent: la
+   * fiche du meuble.
+   */
+  resource: v.exactOptional(IdSchema),
   /** Note de placement: pourquoi cet élément est ici, dans ce sens (règle « cohérence du monde »). Ignorée du moteur. */
   pourquoi: v.exactOptional(TextSchema),
 });

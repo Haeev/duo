@@ -9,7 +9,7 @@ import { wakeUp } from '../besoins/soins';
 import { canSkipNight, skipToMorning } from '../noyau/horloge';
 import { findProp } from '../noyau/obstacles';
 import type { SimContext } from '../noyau/systemes';
-import { freeSeat, postureOf, settle } from './postures';
+import { freeSeat, nearestFreeSeat, postureOf, settle } from './postures';
 import type { BrickBehaviour } from './types';
 
 type SleepBrick = Extract<Brick, { brick: 'sleep' }>;
@@ -22,8 +22,9 @@ export const sleepBehaviour: BrickBehaviour<SleepBrick> = {
   use(sim, player, target) {
     const def = sim.content.props[target.type];
     const places = target.states.sleep;
-    const place = freeSeat(places);
-    if (def === undefined || places === undefined || place < 0) return;
+    if (def === undefined || places === undefined) return;
+    const place = nearestFreeSeat(sim, player, target, def, places);
+    if (place < 0) return;
     settle(sim, player, target, def, places, place);
     const state = sim.world.places[sim.world.common.place];
     const other: PlayerIndex = player === 0 ? 1 : 0;

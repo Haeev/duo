@@ -3,7 +3,7 @@
  * (`noyau/deplacement.ts`); le sommeil remonte doucement tant qu'on est assis (`index.ts`).
  */
 import type { Brick } from '../../donnees/schemas/briques';
-import { freeSeat, settle } from './postures';
+import { freeSeat, nearestFreeSeat, settle } from './postures';
 import type { BrickBehaviour } from './types';
 
 type SitBrick = Extract<Brick, { brick: 'sit' }>;
@@ -16,8 +16,9 @@ export const sitBehaviour: BrickBehaviour<SitBrick> = {
   use(sim, player, target) {
     const def = sim.content.props[target.type];
     const seats = target.states.sit;
-    const seat = freeSeat(seats);
-    if (def === undefined || seats === undefined || seat < 0) return;
+    if (def === undefined || seats === undefined) return;
+    const seat = nearestFreeSeat(sim, player, target, def, seats);
+    if (seat < 0) return;
     settle(sim, player, target, def, seats, seat);
   },
 };

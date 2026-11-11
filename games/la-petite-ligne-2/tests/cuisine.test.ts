@@ -4,12 +4,15 @@ import { describe, expect, it } from 'vitest';
 import type { Content } from '../src/donnees/charger';
 import type { PlayerIndex } from '../src/donnees/schemas/communs';
 import { BRICK_BEHAVIOURS } from '../src/simulation/briques/registre';
+import { collectionSystem } from '../src/simulation/collections/index';
 import { cookingOf } from '../src/simulation/cuisine/index';
 import { botAct, createMinigame, windowScaleOf } from '../src/simulation/cuisine/minijeu';
 import { bestQuality, partOf, recipeSeconds } from '../src/simulation/cuisine/recettes';
 import { SIM_DT } from '../src/simulation/noyau/constantes';
 import type { GameEvent } from '../src/simulation/noyau/evenements';
 import type { Sim } from '../src/simulation/noyau/pas';
+import { giveRecipe } from '../src/simulation/regles/recompenses';
+import { giveItem } from '../src/simulation/sac/actions';
 import { addItem, countItem } from '../src/simulation/sac/inventaire';
 import { act, contentWith, contextOf, wait } from './aides-l3';
 import { newSim } from './aides';
@@ -113,6 +116,31 @@ describe('cuisine', () => {
       'wrong-station',
       'recipe-unknown',
     ]);
+  });
+
+  it('la recette entre au carnet à la première réussite de chacun ou par `give_recipe`, pas à l’achat', () => {
+    const sim = kitchenSim();
+    const album = (): Record<string, readonly number[]> => sim.world.progress.album?.f ?? {};
+    const context = { ...contextOf(sim), events: sim.events };
+    // Plat acheté (ou reçu): l'objet arrive, la recette n'est pas inscrite.
+    giveItem(context, 0, 'pomme-cuite', 1);
+    collectionSystem.step?.(context);
+    expect(album()['recette-pomme-cuite']).toBeUndefined();
+    // Première réussite de chacun: inscrite, une prise par joueur, pas une de plus ensuite.
+    give(sim, 0, 'pomme', 2);
+    give(sim, 1, 'pomme', 1);
+    act(sim, 0, { type: 'cook_start', target: 'rechaud-1', recipe: 'pomme-cuite' });
+    expect(album()['recette-pomme-cuite']?.slice(5, 7)).toEqual([1, 0]);
+    act(sim, 0, { type: 'cook_start', target: 'rechaud-1', recipe: 'pomme-cuite' });
+    expect(album()['recette-pomme-cuite']?.slice(5, 7)).toEqual([1, 0]);
+    Object.assign(sim.world.players[1].body, { x: 18.5, y: 20.2 });
+    act(sim, 1, { type: 'cook_start', target: 'rechaud-1', recipe: 'pomme-cuite' });
+    expect(album()['recette-pomme-cuite']?.slice(5, 7)).toEqual([1, 1]);
+    // Recette donnée par l'histoire: inscrite au nom de qui la reçoit.
+    sim.events.length = 0;
+    giveRecipe(context, 1, 'pain-perdu');
+    collectionSystem.step?.(context);
+    expect(album()['recette-pain-perdu']?.[0]).toBe(1);
   });
 
   it('apprend par essai et par un livre lu', () => {

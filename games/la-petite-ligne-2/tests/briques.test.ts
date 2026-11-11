@@ -59,6 +59,19 @@ describe('brique sit', () => {
     expect(v.safeParse(WorldSchema, sim.world).success).toBe(true);
   });
 
+  it('donne à chacun la place libre la plus proche, même quand celui de l’est s’assoit d’abord', () => {
+    const sim = newSim(furnished);
+    put(sim, 0, 19.6, 26.6, NORTH);
+    put(sim, 1, 20.4, 26.6, NORTH);
+    run(sim, 0.1);
+    send(sim, 1, { type: 'act' });
+    expect(placeOf(sim).objects['banc-sud']?.sit).toEqual([null, 1]);
+    send(sim, 0, { type: 'act' });
+    expect(placeOf(sim).objects['banc-sud']?.sit).toEqual([0, 1]);
+    expect(sim.world.players[0].body.x).toBe(19.5);
+    expect(sim.world.players[1].body.x).toBe(20.5);
+  });
+
   it('montre le refus avant l’appui quand toutes les places sont prises', () => {
     const sim = newSim(furnished);
     placeOf(sim).objects['banc-sud'] = { sit: [1, 1] };

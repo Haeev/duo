@@ -100,7 +100,11 @@ function stepPlayer(sim: SimContext, player: PlayerIndex): void {
   if (changed) sim.touch('players');
 }
 
-/** Repas spécial servi à table: les deux joueurs assis au meuble visé, la pile de la case se consomme. */
+/**
+ * Repas spécial servi à table: les deux joueurs assis au meuble visé, la pile de la case se
+ * consomme. Le renfort d'endurance du plat (`food.stamina`) vaut pour les deux, comme s'ils
+ * l'avaient mangé chacun.
+ */
 function serveMeal(sim: SimContext, player: PlayerIndex, from: SlotRef, target: string): void {
   const state = sim.world.players[player];
   const stack = stackAt(state, from);
@@ -114,6 +118,8 @@ function serveMeal(sim: SimContext, player: PlayerIndex, from: SlotRef, target: 
     sim.emit({ type: 'refused', player, reason: refusal, target });
     return;
   }
+  const stamina = sim.content.items[stack.item]?.food?.stamina;
+  if (stamina !== undefined) for (const p of [0, 1] as const) applyFoodStamina(sim, p, stamina);
   takeOne(state, from);
   sim.touch('players');
 }

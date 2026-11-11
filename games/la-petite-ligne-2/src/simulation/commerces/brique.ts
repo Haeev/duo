@@ -24,8 +24,11 @@ const BUY_VERB = 'Acheter';
 
 /**
  * Le commerçant à qui parle la touche d'action sur ce comptoir, `null`: la boutique s'ouvre. Il
- * faut un comptoir tenu, son commerçant debout à moins de `SHOP_TUNING.keeperReach` de l'emprise,
- * et un dialogue en attente pour ce joueur.
+ * faut un comptoir tenu, son commerçant à son poste derrière, et un dialogue en attente pour ce
+ * joueur. Commerçant à planning: « à son poste » se lit sur son état de vie transmis (arrivé sur
+ * une ligne qui tient ce commerce), jamais sur sa position, interpolée chez l'invité: la bulle et
+ * la touche disent la même chose sur les deux machines pendant qu'il rejoint le comptoir. Sans
+ * planning, il ne bouge pas: à moins de `SHOP_TUNING.keeperReach` de l'emprise.
  */
 export function counterKeeper(
   look: Look,
@@ -38,11 +41,23 @@ export function counterKeeper(
   if (shop === null || def === undefined) return null;
   const keeper = look.world.places[look.world.common.place]?.villagers[shop.keeper];
   if (keeper === undefined || keeper.life?.presence === 'away') return null;
-  const size = footprintOf(def, target.rotation);
-  const { x, y } = keeper.body;
-  const dx = Math.max(Math.abs(x - target.x) - size.w / 2, 0);
-  const dy = Math.max(Math.abs(y - target.y) - size.h / 2, 0);
-  if (Math.hypot(dx, dy) > SHOP_TUNING.keeperReach) return null;
+  const schedule = look.content.places[look.world.common.place]?.villagers.find(
+    (v) => v.id === shop.keeper,
+  )?.life?.schedule;
+  if (schedule !== undefined && keeper.life !== undefined) {
+    const life = keeper.life;
+    const atPost =
+      life.presence === 'here' &&
+      life.activity !== null &&
+      schedule[life.entry]?.shop === target.params.shop;
+    if (!atPost) return null;
+  } else {
+    const size = footprintOf(def, target.rotation);
+    const { x, y } = keeper.body;
+    const dx = Math.max(Math.abs(x - target.x) - size.w / 2, 0);
+    const dy = Math.max(Math.abs(y - target.y) - size.h / 2, 0);
+    if (Math.hypot(dx, dy) > SHOP_TUNING.keeperReach) return null;
+  }
   if (talkBehaviour.refuse(look, player, shop.keeper) !== null) return null;
   return pendingDialogue(look, player, shop.keeper) === null ? null : shop.keeper;
 }

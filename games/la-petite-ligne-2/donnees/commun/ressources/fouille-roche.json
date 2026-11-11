@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "id": "fouille-roche",
+  "name": "Roche aux fossiles",
+  "kind": "dig",
+  "verb": "Creuser",
+  "clip": "dig",
+  "seconds": 1,
+  "tool": "spade",
+  "minTier": 0,
+  "work": 6,
+  "dirty": true,
+  "effort": 0.2,
+  "after": "gone",
+  "respawnDays": 2,
+  "toGround": false,
+  "rolls": 1,
+  "loot": [
+    {
+      "item": "vieille-piece",
+      "min": 1,
+      "max": 1,
+      "weight": 3,
+      "rare": false,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "fossile-coquille",
+      "min": 1,
+      "max": 1,
+      "weight": 2,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "fossile-coquille",
+      "min": 1,
+      "max": 1,
+      "weight": 3,
+      "rare": true,
+      "hours": null,
+      "weathers": ["rain", "mist"],
+      "seasons": []
+    },
+    {
+      "item": "ammonite",
+      "min": 1,
+      "max": 1,
+      "weight": 1,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "belemnite",
+      "min": 1,
+      "max": 1,
+      "weight": 0.6,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "oursin-fossile",
+      "min": 1,
+      "max": 1,
+      "weight": 1,
+      "rare": true,
+      "hours": null,
+      "weathers": ["rain", "mist"],
+      "seasons": []
+    },
+    {
+      "item": "dent-de-requin",
+      "min": 1,
+      "max": 1,
+      "weight": 0.8,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": ["autumn", "winter"]
+    }
+  ]
+}

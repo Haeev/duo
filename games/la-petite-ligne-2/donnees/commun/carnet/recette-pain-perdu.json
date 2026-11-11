@@ -5,8 +5,8 @@
   "name": "Pain perdu",
   "place": "aubrune",
   "source": {
-    "type": "item",
-    "item": "pain-perdu"
+    "type": "recipe",
+    "recipe": "pain-perdu"
   },
   "rarity": null,
   "text": "Le pain perdu d'Achille: le pain de la veille, trempé, doré. Rien ne se perd au fournil."

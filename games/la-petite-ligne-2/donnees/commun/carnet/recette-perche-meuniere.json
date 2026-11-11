@@ -5,8 +5,8 @@
   "name": "Perche meunière",
   "place": "aubrune",
   "source": {
-    "type": "item",
-    "item": "perche-meuniere"
+    "type": "recipe",
+    "recipe": "perche-meuniere"
   },
   "rarity": null,
   "text": "Une perche meunière, farinée puis dorée. La recette du café depuis 1934, l'année de la Baronne."

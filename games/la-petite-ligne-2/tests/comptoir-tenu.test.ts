@@ -161,12 +161,21 @@ describe('comptoir tenu', () => {
     });
   });
 
-  it('commerçant parti de son comptoir: la boutique s’ouvre, sans détour', () => {
+  it('commerçant pas à son poste: la boutique s’ouvre, sans détour; à son poste, sa position ne compte pas', () => {
     const sim = sim10h(content);
     remember(contextOf(sim), NEWS, true, 'duo');
-    const keeper = sim.world.places[AUBRUNE]?.villagers[KEEPER]?.body;
-    if (keeper === undefined) throw new Error('Odette absente');
-    keeper.x += 4;
+    const keeper = sim.world.places[AUBRUNE]?.villagers[KEEPER];
+    const life = keeper?.life;
+    if (keeper === undefined || life === undefined) throw new Error('Odette absente');
+    expect(life.activity).not.toBeNull();
+    const activity = life.activity;
+    // En chemin vers son comptoir (activité nulle), même tout près: pas encore derrière.
+    life.activity = null;
     expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Acheter' });
+    // Arrivée: chez l'invité, la position interpolée peut traîner au-delà de `keeperReach`;
+    // l'état de vie transmis suffit, la bulle dit la même chose que l'hôte.
+    life.activity = activity;
+    keeper.body.x -= 1.6;
+    expect(aimOf(sim, 0)).toMatchObject({ id: COUNTER, verb: 'Parler' });
   });
 });

@@ -7,6 +7,7 @@ import { aimOf } from '../src/simulation/briques/visee';
 import { findRoute } from '../src/simulation/habitants/chemins';
 import { isShopOpen } from '../src/simulation/habitants/lecture';
 import {
+  closedDoorSet,
   closedLockSet,
   edgePassable,
   isLockOpen,
@@ -217,5 +218,30 @@ describe('habitants et verrous', () => {
     const route = findRoute(sim.content, place, state, 4.5, 27.5, 4.5, 21.5, closed);
     for (const p of route.points)
       expect(p.x >= 2 && p.x < 8 && p.y >= 24 && p.y < 26, `${p.x},${p.y}`).toBe(false);
+  });
+
+  it('une porte à `opens` fausse ne se franchit pas: détour par une porte ouverte, sinon rien', () => {
+    const sim = trial();
+    const place = sim.content.places['essai-gare'];
+    const state = sim.world.places['essai-gare'];
+    if (place === undefined || state === undefined) throw new Error('lieu absent');
+    const shut = closedDoorSet(sim, place, 'habitant-d-essai');
+    expect([...shut]).toEqual(['porte-cave']);
+    // Vers la salle, la buvette mise à part: sans filtre, la porte de cave (ordre des noms);
+    // fermée, le détour par la porte du dehors.
+    const locks = closedLockSet(sim);
+    const buvette = new Set(['porte-buvette']);
+    const free = findRoute(sim.content, place, state, 34.5, 27, 6, 47, locks, buvette);
+    expect(free?.doors.map((d) => d.id)).toEqual(['porte-cave']);
+    const both = new Set([...shut, ...buvette]);
+    const route = findRoute(sim.content, place, state, 34.5, 27, 6, 47, locks, both);
+    expect(route?.doors.map((d) => d.id)).toEqual(['porte-dehors']);
+    const all = new Set(['porte-cave', 'porte-dehors', 'porte-buvette']);
+    expect(findRoute(sim.content, place, state, 34.5, 27, 6, 47, closedLockSet(sim), all)).toBe(
+      null,
+    );
+    // La clé trouvée, la porte s'ouvre aussi pour les habitants.
+    sim.world.progress.memory['essai-gare.cave.clef'] = { v: true, by: 0, day: 1 };
+    expect(closedDoorSet(sim, place, 'habitant-d-essai').size).toBe(0);
   });
 });
