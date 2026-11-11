@@ -47,7 +47,7 @@ Visionneuse des modèles du jeu: liste par famille avec recherche, vue 3D (tourn
 
 Un fichier GLB du jeu regroupe plusieurs modèles: l'index a une entrée par modèle (`fichier` et `noeud`), pas par fichier. Trois modes d'inventaire, choisis par lot dans `modeles-sources.json`:
 
-- `racines`: un modèle par noeud racine de chaque GLB du dossier (décors, objets);
+- `racines`: un modèle par noeud racine de chaque GLB du dossier (bâtiments d'Aubrune, décors, objets). Avec `manifeste` (`decors.json`, `index.json` des objets, `batiments.json`), seuls les noeuds déclarés par le jeu sont publiés, la famille vient du manifeste (`familleParFamille`, ou `familleParCle` pour forcer un noeud, ex. les commerces), le nom du champ `nom` s'il existe;
 - `pieces`: un modèle par maillage, montré sur le mannequin du lot (figurine du jeu: corps, têtes, coiffures, tenues);
 - `essai-encre`: personnages assemblés (corps, coiffure sur l'os `Head`, col sur l'os `Spine`, atlas peint et atlas des traits du visage), lus dans `atlas/index.json` de l'essai de style.
 
@@ -66,10 +66,11 @@ Limites connues, voulues:
 
 Recette, ajouter un modèle:
 
-1. Déposer le GLB (ou le réexporter) dans un dossier déjà inventorié: `games/la-petite-ligne-2/assets/commun/decors/`, `objets/` ou `personnages/`.
-2. Facultatif: son nom français dans `outils/noms-modeles.json` (sinon le nom de la fiche du jeu qui cite ce modèle, sinon l'identifiant mis en forme).
-3. `node outils/tableau-de-bord/outils/inventaire-modeles.mjs` (réécrit tout `modeles/`, affiche le poids et les modèles écartés).
-4. Publier `modeles/` avec la page.
+1. Déclarer le modèle dans le manifeste du jeu (`decors.json`, `index.json` des objets ou `batiments.json`) et déposer le GLB dans `games/la-petite-ligne-2/assets/commun/decors/`, `commun/objets/`, `commun/personnages/` ou `lieux/aubrune/batiments/`.
+2. Si sa famille du jeu est nouvelle: la ranger dans `familleParFamille` du lot `decors` de `modeles-sources.json` (sinon elle tombe dans « Repères et ouvrages »).
+3. Facultatif: son nom français dans `outils/noms-modeles.json`. Sans entrée, le nom vient du manifeste, puis de la base + suffixes d'état (`_suffixes`: `-b`, `-bare`, `-winter`...), puis de l'identifiant mis en forme.
+4. `node outils/tableau-de-bord/outils/inventaire-modeles.mjs` (réécrit tout `modeles/`, affiche le poids et les modèles écartés), puis `node outils/tableau-de-bord/outils/essai-inventaire.mjs`.
+5. Publier `modeles/` avec la page.
 
 Ajouter un dossier entier: un bloc de plus dans `lots` de `modeles-sources.json` (`id`, `titre`, `mode`, `famille`, `dossier`). Budget tenu par le script (`budget` du même fichier): 40 Mo au total, 4 Mo par fichier, 150 fichiers; ce qui dépasse est listé dans `ecartes` de l'index au lieu d'être publié.
 

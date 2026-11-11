@@ -2,20 +2,48 @@
  "format": "tdb-modeles/1",
  "familles": [
   {
+   "id": "batiments",
+   "titre": "Bâtiments"
+  },
+  {
+   "id": "commerces",
+   "titre": "Commerces"
+  },
+  {
+   "id": "arbres",
+   "titre": "Arbres et plantes"
+  },
+  {
+   "id": "terrain",
+   "titre": "Terrain et rochers"
+  },
+  {
+   "id": "potager",
+   "titre": "Potager et cultures"
+  },
+  {
+   "id": "meubles",
+   "titre": "Meubles et objets d'intérieur"
+  },
+  {
+   "id": "trains",
+   "titre": "Trains"
+  },
+  {
+   "id": "reperes",
+   "titre": "Repères et ouvrages"
+  },
+  {
+   "id": "luminaires",
+   "titre": "Luminaires"
+  },
+  {
    "id": "personnages",
    "titre": "Personnages"
   },
   {
-   "id": "meubles",
-   "titre": "Meubles"
-  },
-  {
    "id": "objets",
-   "titre": "Objets"
-  },
-  {
-   "id": "decors",
-   "titre": "Décors"
+   "titre": "Objets à ramasser"
   }
  ],
  "lots": [
@@ -28,8 +56,12 @@
    "titre": "Figurine du jeu, pièce par pièce"
   },
   {
+   "id": "batiments",
+   "titre": "Bâtiments d'Aubrune"
+  },
+  {
    "id": "decors",
-   "titre": "Décors livrés"
+   "titre": "Décors communs"
   },
   {
    "id": "objets",
@@ -37,6 +69,4486 @@
   }
  ],
  "modeles": [
+  {
+   "id": "batiments-ecole",
+   "nom": "L'école-mairie",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/ecole.glb",
+   "noeud": "ecole",
+   "pieces": [],
+   "textures": null,
+   "poids": 552416,
+   "triangles": 5833,
+   "clips": [],
+   "cotes": {
+    "largeur": 8.272,
+    "hauteur": 8.859,
+    "profondeur": 7.591
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/ecole.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-eglise",
+   "nom": "L'église Saint-Aubin",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/eglise.glb",
+   "noeud": "eglise",
+   "pieces": [],
+   "textures": null,
+   "poids": 1343860,
+   "triangles": 14222,
+   "clips": [],
+   "cotes": {
+    "largeur": 22.414,
+    "hauteur": 22.815,
+    "profondeur": 13.578
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/eglise.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-grange",
+   "nom": "La grange",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/grange.glb",
+   "noeud": "grange",
+   "pieces": [],
+   "textures": null,
+   "poids": 438252,
+   "triangles": 4579,
+   "clips": [],
+   "cotes": {
+    "largeur": 9.359,
+    "hauteur": 8.437,
+    "profondeur": 10.843
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/grange.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-halte",
+   "nom": "La halte",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/halte.glb",
+   "noeud": "halte",
+   "pieces": [],
+   "textures": null,
+   "poids": 510316,
+   "triangles": 5384,
+   "clips": [],
+   "cotes": {
+    "largeur": 13.024,
+    "hauteur": 6.89,
+    "profondeur": 7.388
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/halte.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-hameau-b",
+   "nom": "La maison aux volets clos",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/hameau-b.glb",
+   "noeud": "hameau-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 402028,
+   "triangles": 4202,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.397,
+    "hauteur": 9.758,
+    "profondeur": 7.049
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/hameau-b.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-honorine",
+   "nom": "La maison d'Honorine",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/honorine.glb",
+   "noeud": "honorine",
+   "pieces": [],
+   "textures": null,
+   "poids": 482024,
+   "triangles": 5088,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.662,
+    "hauteur": 9.461,
+    "profondeur": 7.499
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/honorine.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-cheminot-e",
+   "nom": "La maison de cheminot (est)",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/cheminot-e.glb",
+   "noeud": "cheminot-e",
+   "pieces": [],
+   "textures": null,
+   "poids": 486816,
+   "triangles": 5154,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.382,
+    "hauteur": 9.095,
+    "profondeur": 7.394
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/cheminot-e.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-cheminot-o",
+   "nom": "La maison de cheminot (ouest)",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/cheminot-o.glb",
+   "noeud": "cheminot-o",
+   "pieces": [],
+   "textures": null,
+   "poids": 485308,
+   "triangles": 5138,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.381,
+    "hauteur": 9.1,
+    "profondeur": 7.434
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/cheminot-o.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-firmin",
+   "nom": "La maison de Firmin",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/firmin.glb",
+   "noeud": "firmin",
+   "pieces": [],
+   "textures": null,
+   "poids": 448628,
+   "triangles": 4698,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.841,
+    "hauteur": 8.939,
+    "profondeur": 7.366
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/firmin.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-lucie",
+   "nom": "La maison de Lucie",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/lucie.glb",
+   "noeud": "lucie",
+   "pieces": [],
+   "textures": null,
+   "poids": 423940,
+   "triangles": 4437,
+   "clips": [],
+   "cotes": {
+    "largeur": 6.84,
+    "hauteur": 9.458,
+    "profondeur": 7.441
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/lucie.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-marthe",
+   "nom": "La maison de Marthe",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/marthe.glb",
+   "noeud": "marthe",
+   "pieces": [],
+   "textures": null,
+   "poids": 401756,
+   "triangles": 4201,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.399,
+    "hauteur": 9.281,
+    "profondeur": 6.84
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/marthe.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-hameau-c",
+   "nom": "La maison du bout",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/hameau-c.glb",
+   "noeud": "hameau-c",
+   "pieces": [],
+   "textures": null,
+   "poids": 404512,
+   "triangles": 4265,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.38,
+    "hauteur": 7.46,
+    "profondeur": 7.361
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/hameau-c.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-maison",
+   "nom": "La maison du garde-barrière",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/maison.glb",
+   "noeud": "maison",
+   "pieces": [],
+   "textures": null,
+   "poids": 552344,
+   "triangles": 5803,
+   "clips": [],
+   "cotes": {
+    "largeur": 12.052,
+    "hauteur": 10.116,
+    "profondeur": 9.406
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/maison.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-forestiere",
+   "nom": "La maison forestière",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/forestiere.glb",
+   "noeud": "forestiere",
+   "pieces": [],
+   "textures": null,
+   "poids": 401804,
+   "triangles": 4242,
+   "clips": [],
+   "cotes": {
+    "largeur": 8.484,
+    "hauteur": 7.006,
+    "profondeur": 7.377
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/forestiere.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-remise",
+   "nom": "La remise de la draisine",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/remise.glb",
+   "noeud": "remise",
+   "pieces": [],
+   "textures": null,
+   "poids": 235240,
+   "triangles": 2428,
+   "clips": [],
+   "cotes": {
+    "largeur": 6.879,
+    "hauteur": 5.336,
+    "profondeur": 6.404
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/remise.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-lavoir",
+   "nom": "Le lavoir",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/lavoir.glb",
+   "noeud": "lavoir",
+   "pieces": [],
+   "textures": null,
+   "poids": 64488,
+   "triangles": 642,
+   "clips": [],
+   "cotes": {
+    "largeur": 5.056,
+    "hauteur": 3.68,
+    "profondeur": 4.701
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/lavoir.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-ferme-logis",
+   "nom": "Le logis de la ferme Delmas",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/ferme-logis.glb",
+   "noeud": "ferme-logis",
+   "pieces": [],
+   "textures": null,
+   "poids": 511240,
+   "triangles": 5364,
+   "clips": [],
+   "cotes": {
+    "largeur": 9.84,
+    "hauteur": 9.275,
+    "profondeur": 7.354
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/ferme-logis.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-moulin",
+   "nom": "Le moulin de la Vanne",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/moulin.glb",
+   "noeud": "moulin",
+   "pieces": [],
+   "textures": null,
+   "poids": 543532,
+   "triangles": 5712,
+   "clips": [],
+   "cotes": {
+    "largeur": 9.374,
+    "hauteur": 11.982,
+    "profondeur": 10.095
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/moulin.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-poste",
+   "nom": "Le poste d'aiguillage",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/poste.glb",
+   "noeud": "poste",
+   "pieces": [],
+   "textures": null,
+   "poids": 324076,
+   "triangles": 3379,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.838,
+    "hauteur": 6.934,
+    "profondeur": 5.736
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/poste.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-presbytere",
+   "nom": "Le presbytère",
+   "famille": "batiments",
+   "lot": "batiments",
+   "fichier": "batiments/presbytere.glb",
+   "noeud": "presbytere",
+   "pieces": [],
+   "textures": null,
+   "poids": 517716,
+   "triangles": 5438,
+   "clips": [],
+   "cotes": {
+    "largeur": 8.273,
+    "hauteur": 9.695,
+    "profondeur": 8.364
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/presbytere.glb",
+   "partage": 1
+  },
+  {
+   "id": "decors-house-town",
+   "nom": "Maison de bourg",
+   "famille": "batiments",
+   "lot": "decors",
+   "fichier": "decors/houses.glb",
+   "noeud": "house-town",
+   "pieces": [],
+   "textures": null,
+   "poids": 465996,
+   "triangles": 7004,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.52,
+    "hauteur": 8.617,
+    "profondeur": 6.99
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/houses.glb",
+   "partage": 3
+  },
+  {
+   "id": "decors-shed",
+   "nom": "Remise",
+   "famille": "batiments",
+   "lot": "decors",
+   "fichier": "decors/houses.glb",
+   "noeud": "shed",
+   "pieces": [],
+   "textures": null,
+   "poids": 465996,
+   "triangles": 900,
+   "clips": [],
+   "cotes": {
+    "largeur": 6.64,
+    "hauteur": 4.452,
+    "profondeur": 5.55
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/houses.glb",
+   "partage": 3
+  },
+  {
+   "id": "decors-shop-front",
+   "nom": "Boutique",
+   "famille": "commerces",
+   "lot": "decors",
+   "fichier": "decors/houses.glb",
+   "noeud": "shop-front",
+   "pieces": [],
+   "textures": null,
+   "poids": 465996,
+   "triangles": 7860,
+   "clips": [],
+   "cotes": {
+    "largeur": 8.8,
+    "hauteur": 8.901,
+    "profondeur": 11.35
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/houses.glb",
+   "partage": 3
+  },
+  {
+   "id": "batiments-horloger",
+   "nom": "L'atelier d'Ambroise",
+   "famille": "commerces",
+   "lot": "batiments",
+   "fichier": "batiments/horloger.glb",
+   "noeud": "horloger",
+   "pieces": [],
+   "textures": null,
+   "poids": 471864,
+   "triangles": 4968,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.833,
+    "hauteur": 9.754,
+    "profondeur": 7.646
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/horloger.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-scierie",
+   "nom": "L'atelier de Basile",
+   "famille": "commerces",
+   "lot": "batiments",
+   "fichier": "batiments/scierie.glb",
+   "noeud": "scierie",
+   "pieces": [],
+   "textures": null,
+   "poids": 425856,
+   "triangles": 4456,
+   "clips": [],
+   "cotes": {
+    "largeur": 13.649,
+    "hauteur": 6.392,
+    "profondeur": 9.386
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/scierie.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-epicerie",
+   "nom": "L'épicerie-pension Ferrand",
+   "famille": "commerces",
+   "lot": "batiments",
+   "fichier": "batiments/epicerie.glb",
+   "noeud": "epicerie",
+   "pieces": [],
+   "textures": null,
+   "poids": 564616,
+   "triangles": 5938,
+   "clips": [],
+   "cotes": {
+    "largeur": 9.632,
+    "hauteur": 9.557,
+    "profondeur": 11.274
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/epicerie.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-forge",
+   "nom": "La forge",
+   "famille": "commerces",
+   "lot": "batiments",
+   "fichier": "batiments/forge.glb",
+   "noeud": "forge",
+   "pieces": [],
+   "textures": null,
+   "poids": 262776,
+   "triangles": 2732,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.384,
+    "hauteur": 7.28,
+    "profondeur": 7.154
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/forge.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-mercerie",
+   "nom": "La mercerie-coiffure",
+   "famille": "commerces",
+   "lot": "batiments",
+   "fichier": "batiments/mercerie.glb",
+   "noeud": "mercerie",
+   "pieces": [],
+   "textures": null,
+   "poids": 468704,
+   "triangles": 4913,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.841,
+    "hauteur": 9.687,
+    "profondeur": 8.664
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/mercerie.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-cafe",
+   "nom": "Le café de la Halte",
+   "famille": "commerces",
+   "lot": "batiments",
+   "fichier": "batiments/cafe.glb",
+   "noeud": "cafe",
+   "pieces": [],
+   "textures": null,
+   "poids": 445776,
+   "triangles": 4669,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.843,
+    "hauteur": 9.276,
+    "profondeur": 7.641
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/cafe.glb",
+   "partage": 1
+  },
+  {
+   "id": "batiments-fournil",
+   "nom": "Le fournil d'Achille",
+   "famille": "commerces",
+   "lot": "batiments",
+   "fichier": "batiments/fournil.glb",
+   "noeud": "fournil",
+   "pieces": [],
+   "textures": null,
+   "poids": 400336,
+   "triangles": 4174,
+   "clips": [],
+   "cotes": {
+    "largeur": 8.121,
+    "hauteur": 9.303,
+    "profondeur": 7.635
+   },
+   "source": "games/la-petite-ligne-2/assets/lieux/aubrune/batiments/fournil.glb",
+   "partage": 1
+  },
+  {
+   "id": "decors-birch-tree",
+   "nom": "Bouleau",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "birch-tree",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 830,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.722,
+    "hauteur": 5.91,
+    "profondeur": 3.348
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-birch-tree-winter",
+   "nom": "Bouleau (hiver)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "birch-tree-winter",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 352,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.178,
+    "hauteur": 6.074,
+    "profondeur": 2.062
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-birch-tree-far",
+   "nom": "Bouleau (lointain)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "birch-tree-far",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 385,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.404,
+    "hauteur": 5.91,
+    "profondeur": 2.891
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-birch-tree-shade",
+   "nom": "Bouleau (ombre)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "birch-tree-shade",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 169,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.67,
+    "hauteur": 5.989,
+    "profondeur": 3.209
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-birch-tree-stump",
+   "nom": "Bouleau (souche)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "birch-tree-stump",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 165,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.7,
+    "hauteur": 0.385,
+    "profondeur": 0.759
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-birch-tree-b-winter",
+   "nom": "Bouleau (variante, hiver)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "birch-tree-b-winter",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 352,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.904,
+    "hauteur": 5.477,
+    "profondeur": 1.991
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-birch-tree-b-far",
+   "nom": "Bouleau (variante, lointain)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "birch-tree-b-far",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 381,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.767,
+    "hauteur": 5.423,
+    "profondeur": 2.903
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-birch-tree-b-shade",
+   "nom": "Bouleau (variante, ombre)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "birch-tree-b-shade",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 166,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.903,
+    "hauteur": 5.508,
+    "profondeur": 3.092
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-birch-tree-b",
+   "nom": "Bouleau (variante)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "birch-tree-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 824,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.081,
+    "hauteur": 5.43,
+    "profondeur": 3.214
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-berry-bush",
+   "nom": "Buisson de baies",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "berry-bush",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 253,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.005,
+    "hauteur": 0.795,
+    "profondeur": 1.141
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-berry-bush-bare",
+   "nom": "Buisson de baies (dégarni)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "berry-bush-bare",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 173,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.005,
+    "hauteur": 0.775,
+    "profondeur": 1.141
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-oak-tree",
+   "nom": "Chêne",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "oak-tree",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 1018,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.199,
+    "hauteur": 5.147,
+    "profondeur": 4.242
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-oak-tree-winter",
+   "nom": "Chêne (hiver)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "oak-tree-winter",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 312,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.913,
+    "hauteur": 5.103,
+    "profondeur": 2.946
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-oak-tree-far",
+   "nom": "Chêne (lointain)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "oak-tree-far",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 473,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.927,
+    "hauteur": 5.147,
+    "profondeur": 4.085
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-oak-tree-shade",
+   "nom": "Chêne (ombre)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "oak-tree-shade",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 165,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.194,
+    "hauteur": 5.167,
+    "profondeur": 4.207
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-oak-tree-stump",
+   "nom": "Chêne (souche)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "oak-tree-stump",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 165,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.02,
+    "hauteur": 0.515,
+    "profondeur": 1.039
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-oak-tree-b-winter",
+   "nom": "Chêne (variante, hiver)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "oak-tree-b-winter",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 312,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.545,
+    "hauteur": 4.555,
+    "profondeur": 2.421
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-oak-tree-b-far",
+   "nom": "Chêne (variante, lointain)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "oak-tree-b-far",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 485,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.834,
+    "hauteur": 4.559,
+    "profondeur": 3.348
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-oak-tree-b-shade",
+   "nom": "Chêne (variante, ombre)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "oak-tree-b-shade",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 171,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.041,
+    "hauteur": 4.481,
+    "profondeur": 3.486
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-oak-tree-b",
+   "nom": "Chêne (variante)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "oak-tree-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 1026,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.057,
+    "hauteur": 4.559,
+    "profondeur": 3.718
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-poppies",
+   "nom": "Coquelicots",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "poppies",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 182,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.586,
+    "hauteur": 0.54,
+    "profondeur": 0.683
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-poppies-b",
+   "nom": "Coquelicots (variante)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "poppies-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 182,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.575,
+    "hauteur": 0.526,
+    "profondeur": 0.597
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-ash-tree",
+   "nom": "Frêne",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "ash-tree",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 915,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.92,
+    "hauteur": 6.297,
+    "profondeur": 3.804
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-ash-tree-winter",
+   "nom": "Frêne (hiver)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "ash-tree-winter",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 312,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.286,
+    "hauteur": 6.116,
+    "profondeur": 2.299
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-ash-tree-far",
+   "nom": "Frêne (lointain)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "ash-tree-far",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 478,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.774,
+    "hauteur": 6.297,
+    "profondeur": 3.37
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-ash-tree-shade",
+   "nom": "Frêne (ombre)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "ash-tree-shade",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 172,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.085,
+    "hauteur": 6.363,
+    "profondeur": 3.63
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-ash-tree-stump",
+   "nom": "Frêne (souche)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "ash-tree-stump",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 165,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.836,
+    "hauteur": 0.415,
+    "profondeur": 0.894
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-ash-tree-b-winter",
+   "nom": "Frêne (variante, hiver)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "ash-tree-b-winter",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 312,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.955,
+    "hauteur": 5.749,
+    "profondeur": 2.197
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-ash-tree-b-far",
+   "nom": "Frêne (variante, lointain)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "ash-tree-b-far",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 481,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.001,
+    "hauteur": 5.777,
+    "profondeur": 3.292
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-ash-tree-b-shade",
+   "nom": "Frêne (variante, ombre)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "ash-tree-b-shade",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 170,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.061,
+    "hauteur": 5.886,
+    "profondeur": 3.553
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-ash-tree-b",
+   "nom": "Frêne (variante)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "ash-tree-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 919,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.269,
+    "hauteur": 5.777,
+    "profondeur": 3.378
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-great-oak-tree",
+   "nom": "Gros chêne",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "great-oak-tree",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 1182,
+   "clips": [],
+   "cotes": {
+    "largeur": 6.501,
+    "hauteur": 6.684,
+    "profondeur": 6.539
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-great-oak-tree-winter",
+   "nom": "Gros chêne (hiver)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "great-oak-tree-winter",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 372,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.536,
+    "hauteur": 6.726,
+    "profondeur": 4.264
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-great-oak-tree-stump",
+   "nom": "Gros chêne (souche)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "great-oak-tree-stump",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 186,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.296,
+    "hauteur": 0.75,
+    "profondeur": 1.443
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-hedge",
+   "nom": "Haie",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "hedge",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 57,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 1.465,
+    "profondeur": 0.81
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-hedge-corner",
+   "nom": "Haie (angle)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "hedge-corner",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 60,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.901,
+    "hauteur": 1.46,
+    "profondeur": 0.972
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-hedge-end",
+   "nom": "Haie (extrémité)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "hedge-end",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 60,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.955,
+    "hauteur": 1.4,
+    "profondeur": 0.761
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-hedge-c",
+   "nom": "Haie (variante C)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "hedge-c",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 57,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 1.542,
+    "profondeur": 0.848
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-hedge-b",
+   "nom": "Haie (variante)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "hedge-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 57,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 1.479,
+    "profondeur": 0.763
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-wild-herbs",
+   "nom": "Herbes sauvages",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "wild-herbs",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 184,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.734,
+    "hauteur": 0.368,
+    "profondeur": 0.696
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-apple-tree",
+   "nom": "Pommier",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "apple-tree",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 1001,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.564,
+    "hauteur": 3.069,
+    "profondeur": 4.131
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-apple-tree-bare",
+   "nom": "Pommier (dégarni)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "apple-tree-bare",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 889,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.564,
+    "hauteur": 3.069,
+    "profondeur": 4.131
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-apple-tree-winter",
+   "nom": "Pommier (hiver)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "apple-tree-winter",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 278,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.039,
+    "hauteur": 3.323,
+    "profondeur": 2.948
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-apple-tree-stump",
+   "nom": "Pommier (souche)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "apple-tree-stump",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 165,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.922,
+    "hauteur": 0.42,
+    "profondeur": 0.928
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-apple-tree-b-bare",
+   "nom": "Pommier (variante, dégarni)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "apple-tree-b-bare",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 880,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.939,
+    "hauteur": 2.893,
+    "profondeur": 3.868
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-apple-tree-b-winter",
+   "nom": "Pommier (variante, hiver)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "apple-tree-b-winter",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 278,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.635,
+    "hauteur": 3.147,
+    "profondeur": 2.616
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-apple-tree-b",
+   "nom": "Pommier (variante)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-arbres.glb",
+   "noeud": "apple-tree-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 1168232,
+   "triangles": 992,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.939,
+    "hauteur": 2.893,
+    "profondeur": 3.868
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-arbres.glb",
+   "partage": 37
+  },
+  {
+   "id": "decors-bramble",
+   "nom": "Ronces à mûres",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "bramble",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 279,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.436,
+    "hauteur": 0.901,
+    "profondeur": 1.306
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-bramble-bare",
+   "nom": "Ronces à mûres (dégarni)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "bramble-bare",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 223,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.436,
+    "hauteur": 0.901,
+    "profondeur": 1.306
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-bramble-b-bare",
+   "nom": "Ronces à mûres (variante, dégarni)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "bramble-b-bare",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 222,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.302,
+    "hauteur": 0.829,
+    "profondeur": 1.367
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-bramble-b",
+   "nom": "Ronces à mûres (variante)",
+   "famille": "arbres",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "bramble-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 278,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.302,
+    "hauteur": 0.829,
+    "profondeur": 1.367
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-dead-branches",
+   "nom": "Branches mortes",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "dead-branches",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 108,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.892,
+    "hauteur": 0.257,
+    "profondeur": 0.947
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-dead-branches-b",
+   "nom": "Branches mortes (variante)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "dead-branches-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 108,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.906,
+    "hauteur": 0.259,
+    "profondeur": 0.809
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-stone",
+   "nom": "Caillou",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "stone",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 64,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.731,
+    "hauteur": 0.188,
+    "profondeur": 0.7
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-stone-c",
+   "nom": "Caillou (variante C)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "stone-c",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 63,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.525,
+    "hauteur": 0.235,
+    "profondeur": 0.571
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-stone-b",
+   "nom": "Caillou (variante)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "stone-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 62,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.734,
+    "hauteur": 0.222,
+    "profondeur": 0.639
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-boulder",
+   "nom": "Gros rocher",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "boulder",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 98,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.421,
+    "hauteur": 0.956,
+    "profondeur": 1.421
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-boulder-chipped",
+   "nom": "Gros rocher (ébréché)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "boulder-chipped",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 144,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.421,
+    "hauteur": 0.956,
+    "profondeur": 1.489
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-boulder-mossy-chipped",
+   "nom": "Gros rocher (moussu, ébréché)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "boulder-mossy-chipped",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 250,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.448,
+    "hauteur": 1.028,
+    "profondeur": 1.427
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-boulder-mossy",
+   "nom": "Gros rocher (moussu)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "boulder-mossy",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 205,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.448,
+    "hauteur": 1.028,
+    "profondeur": 1.427
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-rock",
+   "nom": "Rocher",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "rock",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 63,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.934,
+    "hauteur": 0.484,
+    "profondeur": 0.704
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-rock-chipped",
+   "nom": "Rocher (ébréché)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "rock-chipped",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 111,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.026,
+    "hauteur": 0.484,
+    "profondeur": 0.772
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-rock-mossy-chipped",
+   "nom": "Rocher (moussu, ébréché)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "rock-mossy-chipped",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 191,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.965,
+    "hauteur": 0.558,
+    "profondeur": 0.885
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-rock-mossy",
+   "nom": "Rocher (moussu)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "rock-mossy",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 140,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.961,
+    "hauteur": 0.558,
+    "profondeur": 0.88
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-bank",
+   "nom": "Talus",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "bank",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 46,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 0.71,
+    "profondeur": 1
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-bank-corner-inner",
+   "nom": "Talus (angle, intérieur)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "bank-corner-inner",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 56,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 0.7,
+    "profondeur": 1
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-bank-corner",
+   "nom": "Talus (angle)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "bank-corner",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 52,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 0.725,
+    "profondeur": 1
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-bank-end",
+   "nom": "Talus (extrémité)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "bank-end",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 46,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 0.7,
+    "profondeur": 1
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-bank-b",
+   "nom": "Talus (variante)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "bank-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 46,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 0.721,
+    "profondeur": 1
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-woodpile",
+   "nom": "Tas de bois",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "woodpile",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 300,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.877,
+    "hauteur": 0.786,
+    "profondeur": 0.503
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-woodpile-bare",
+   "nom": "Tas de bois (dégarni)",
+   "famille": "terrain",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "woodpile-bare",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 110,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.877,
+    "hauteur": 0.786,
+    "profondeur": 0.468
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-crop-radis-0-thirsty",
+   "nom": "Culture de radis (stade 0, assoiffé)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-radis-0-thirsty",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 96,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.661,
+    "hauteur": 0.012,
+    "profondeur": 0.667
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-radis-0",
+   "nom": "Culture de radis (stade 0)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-radis-0",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 96,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.661,
+    "hauteur": 0.012,
+    "profondeur": 0.667
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-radis-1-thirsty",
+   "nom": "Culture de radis (stade 1, assoiffé)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-radis-1-thirsty",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 192,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.84,
+    "hauteur": 0.054,
+    "profondeur": 0.851
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-radis-1",
+   "nom": "Culture de radis (stade 1)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-radis-1",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 192,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.788,
+    "hauteur": 0.088,
+    "profondeur": 0.809
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-radis-2",
+   "nom": "Culture de radis (stade 2)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-radis-2",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 336,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.89,
+    "hauteur": 0.183,
+    "profondeur": 0.909
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-tomate-0-thirsty",
+   "nom": "Culture de tomates (stade 0, assoiffé)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-tomate-0-thirsty",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 44,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.479,
+    "hauteur": 0.047,
+    "profondeur": 0.718
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-tomate-0",
+   "nom": "Culture de tomates (stade 0)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-tomate-0",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 44,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.479,
+    "hauteur": 0.047,
+    "profondeur": 0.718
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-tomate-1-thirsty",
+   "nom": "Culture de tomates (stade 1, assoiffé)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-tomate-1-thirsty",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 149,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.785,
+    "hauteur": 1.124,
+    "profondeur": 1.051
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-tomate-1",
+   "nom": "Culture de tomates (stade 1)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-tomate-1",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 149,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.734,
+    "hauteur": 1.124,
+    "profondeur": 0.963
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-tomate-2-thirsty",
+   "nom": "Culture de tomates (stade 2, assoiffé)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-tomate-2-thirsty",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 213,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.824,
+    "hauteur": 1.124,
+    "profondeur": 1.092
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-tomate-2",
+   "nom": "Culture de tomates (stade 2)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-tomate-2",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 213,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.767,
+    "hauteur": 1.124,
+    "profondeur": 0.995
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-crop-tomate-3",
+   "nom": "Culture de tomates (stade 3)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "crop-tomate-3",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 297,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.807,
+    "hauteur": 1.124,
+    "profondeur": 1.026
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-field-row",
+   "nom": "Rang de champ",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "field-row",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 57,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.48,
+    "hauteur": 0.319,
+    "profondeur": 1
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-field-row-b",
+   "nom": "Rang de champ (variante)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-lisieres.glb",
+   "noeud": "field-row-b",
+   "pieces": [],
+   "textures": null,
+   "poids": 60032,
+   "triangles": 57,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.48,
+    "hauteur": 0.309,
+    "profondeur": 1
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-lisieres.glb",
+   "partage": 12
+  },
+  {
+   "id": "decors-garden-bed",
+   "nom": "Terre cultivable",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "garden-bed",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 756,
+   "clips": [],
+   "cotes": {
+    "largeur": 5.99,
+    "hauteur": 0.283,
+    "profondeur": 3.984
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-garden-bed-watered",
+   "nom": "Terre cultivable (arrosé)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "garden-bed-watered",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 202,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.989,
+    "hauteur": 0.168,
+    "profondeur": 0.97
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-garden-bed-tilled",
+   "nom": "Terre cultivable (labouré)",
+   "famille": "potager",
+   "lot": "decors",
+   "fichier": "decors/aubrune-potager.glb",
+   "noeud": "garden-bed-tilled",
+   "pieces": [],
+   "textures": null,
+   "poids": 257412,
+   "triangles": 198,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.992,
+    "hauteur": 0.173,
+    "profondeur": 0.97
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-potager.glb",
+   "partage": 15
+  },
+  {
+   "id": "decors-wardrobe",
+   "nom": "Armoire",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "wardrobe",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 540,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.06,
+    "hauteur": 1.95,
+    "profondeur": 0.627
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-tub",
+   "nom": "Baignoire",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "tub",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 712,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.5,
+    "hauteur": 0.58,
+    "profondeur": 0.72
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-broom",
+   "nom": "Balai",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "broom",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 27,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.24,
+    "hauteur": 1.401,
+    "profondeur": 0.244
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-bench-farm",
+   "nom": "Banc de ferme",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "bench-farm",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 380,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.4,
+    "hauteur": 0.45,
+    "profondeur": 0.388
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-bench-park",
+   "nom": "Banc de square",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "bench-park",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1372,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.8,
+    "hauteur": 0.869,
+    "profondeur": 0.501
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-table-bench",
+   "nom": "Banc de table",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "table-bench",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 36,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.604,
+    "hauteur": 0.462,
+    "profondeur": 0.324
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-bench-platform",
+   "nom": "Banc du quai",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "bench-platform",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1372,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.7,
+    "hauteur": 0.869,
+    "profondeur": 0.501
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-tin-canisters",
+   "nom": "Boîtes à provisions",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "tin-canisters",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 54,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.325,
+    "hauteur": 0.2,
+    "profondeur": 0.111
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-flower-vase",
+   "nom": "Bouquet des champs",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "flower-vase",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 125,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.26,
+    "hauteur": 0.525,
+    "profondeur": 0.23
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-indoor-logs",
+   "nom": "Bûches rangées",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "indoor-logs",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 120,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.626,
+    "hauteur": 0.56,
+    "profondeur": 0.583
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-vegetable-crate",
+   "nom": "Cagette de légumes",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "vegetable-crate",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 209,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.63,
+    "hauteur": 0.36,
+    "profondeur": 0.431
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-chair-bedroom",
+   "nom": "Chaise de chambre",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "chair-bedroom",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 768,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.44,
+    "hauteur": 0.918,
+    "profondeur": 0.452
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-chair-farm",
+   "nom": "Chaise de ferme",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "chair-farm",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 844,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.44,
+    "hauteur": 0.918,
+    "profondeur": 0.452
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-chair-farm-sage",
+   "nom": "Chaise de ferme vert sauge",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "chair-farm-sage",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 844,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.44,
+    "hauteur": 0.918,
+    "profondeur": 0.452
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-rug-runner",
+   "nom": "Chemin de couloir",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "rug-runner",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 26,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.72,
+    "hauteur": 0,
+    "profondeur": 0.72
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-chest",
+   "nom": "Coffre",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "chest",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 492,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.82,
+    "hauteur": 0.655,
+    "profondeur": 0.485
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-comptoir",
+   "nom": "Comptoir de buvette",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "comptoir",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 205,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.902,
+    "hauteur": 1.28,
+    "profondeur": 0.685
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-comptoir-epicerie",
+   "nom": "Comptoir de l'épicerie",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "comptoir-epicerie",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 194,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.903,
+    "hauteur": 1.23,
+    "profondeur": 0.681
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-comptoir-mercerie",
+   "nom": "Comptoir de la mercerie",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "comptoir-mercerie",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 186,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.904,
+    "hauteur": 1.08,
+    "profondeur": 0.684
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-comptoir-cafe",
+   "nom": "Comptoir du café",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "comptoir-cafe",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 167,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.923,
+    "hauteur": 1.25,
+    "profondeur": 0.625
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-comptoir-fournil",
+   "nom": "Comptoir du fournil",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "comptoir-fournil",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 172,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.905,
+    "hauteur": 1.151,
+    "profondeur": 0.683
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-jam-jars",
+   "nom": "Confitures",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "jam-jars",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 96,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.361,
+    "hauteur": 0.15,
+    "profondeur": 0.23
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-bread-basket",
+   "nom": "Corbeille de pain",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "bread-basket",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 52,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.432,
+    "hauteur": 0.166,
+    "profondeur": 0.32
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-cuisiniere",
+   "nom": "Cuisinière",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "cuisiniere",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 165,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.861,
+    "hauteur": 1.9,
+    "profondeur": 0.624
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-enclume",
+   "nom": "Enclume",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "enclume",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 122,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.676,
+    "hauteur": 0.863,
+    "profondeur": 0.673
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-etabli",
+   "nom": "Établi",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "etabli",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 172,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.907,
+    "hauteur": 0.973,
+    "profondeur": 0.816
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-shelf",
+   "nom": "Étagère",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "shelf",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1092,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.9,
+    "hauteur": 1.6,
+    "profondeur": 0.32
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-wall-shelf",
+   "nom": "Étagère garnie",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "wall-shelf",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 104,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.842,
+    "hauteur": 0.444,
+    "profondeur": 0.223
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-etal",
+   "nom": "Étal de tourte",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "etal",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 244,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.84,
+    "hauteur": 0.986,
+    "profondeur": 0.645
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-etal-bare",
+   "nom": "Étal de tourte (dégarni)",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "etal-bare",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 196,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.84,
+    "hauteur": 0.984,
+    "profondeur": 0.645
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-sink-stone",
+   "nom": "Évier de pierre",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "sink-stone",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 664,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 1.178,
+    "profondeur": 0.558
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-four",
+   "nom": "Four",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "four",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 225,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.927,
+    "hauteur": 1.95,
+    "profondeur": 0.951
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-wall-clock",
+   "nom": "Horloge murale",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "wall-clock",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 103,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.361,
+    "hauteur": 0.994,
+    "profondeur": 0.129
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-newspaper",
+   "nom": "Journal",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "newspaper",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 18,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.336,
+    "hauteur": 0.013,
+    "profondeur": 0.265
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-oil-lamp",
+   "nom": "Lampe à pétrole",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "oil-lamp",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 135,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.173,
+    "hauteur": 0.38,
+    "profondeur": 0.145
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-table-lamp",
+   "nom": "Lampe de table",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "table-lamp",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 79,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.32,
+    "hauteur": 0.44,
+    "profondeur": 0.32
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-bed-double",
+   "nom": "Lit double",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "bed-double",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1188,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.51,
+    "hauteur": 0.95,
+    "profondeur": 2
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-bed-single",
+   "nom": "Lit simple",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "bed-single",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1064,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.01,
+    "hauteur": 0.95,
+    "profondeur": 2
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-marmite",
+   "nom": "Marmite de soupe",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "marmite",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 142,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.657,
+    "hauteur": 0.869,
+    "profondeur": 0.646
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-marmite-bare",
+   "nom": "Marmite de soupe (dégarni)",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "marmite-bare",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 142,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.657,
+    "hauteur": 0.869,
+    "profondeur": 0.646
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-picture-oval",
+   "nom": "Médaillon ovale",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "picture-oval",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 77,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.38,
+    "hauteur": 0.52,
+    "profondeur": 0.056
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-meule",
+   "nom": "Meule",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "meule",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 148,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.6,
+    "hauteur": 1.04,
+    "profondeur": 0.75
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-miroir",
+   "nom": "Miroir sur pied",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "miroir",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 104,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.807,
+    "hauteur": 1.642,
+    "profondeur": 0.467
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-laundry-basket",
+   "nom": "Panier à linge",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "laundry-basket",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 74,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.44,
+    "hauteur": 0.45,
+    "profondeur": 0.44
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-coat-rack",
+   "nom": "Patère et manteaux",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "coat-rack",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 124,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.94,
+    "hauteur": 1.13,
+    "profondeur": 0.318
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-picture-landscape",
+   "nom": "Paysage encadré",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "picture-landscape",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 14,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.667,
+    "hauteur": 0.424,
+    "profondeur": 0.043
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-mantel-clock",
+   "nom": "Pendule",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "mantel-clock",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 61,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.407,
+    "hauteur": 0.41,
+    "profondeur": 0.166
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-book-stack",
+   "nom": "Pile de livres",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "book-stack",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 40,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.263,
+    "hauteur": 0.187,
+    "profondeur": 0.199
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-plan-de-travail",
+   "nom": "Plan de travail",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "plan-de-travail",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 195,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.867,
+    "hauteur": 0.995,
+    "profondeur": 0.624
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-wood-stove",
+   "nom": "Poêle à bois",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "wood-stove",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 157,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.563,
+    "hauteur": 2.423,
+    "profondeur": 0.767
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-picture-portrait",
+   "nom": "Portrait encadré",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "picture-portrait",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 15,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.367,
+    "hauteur": 0.486,
+    "profondeur": 0.044
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-stoneware-pots",
+   "nom": "Pots de grès",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "stoneware-pots",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 106,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.375,
+    "hauteur": 0.24,
+    "profondeur": 0.285
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-poulailler",
+   "nom": "Poulailler",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "poulailler",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 156,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.389,
+    "hauteur": 2.036,
+    "profondeur": 1.835
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-ratelier",
+   "nom": "Râtelier de haches forgées",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "ratelier",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 168,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.925,
+    "hauteur": 1.453,
+    "profondeur": 0.428
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-ratelier-bare",
+   "nom": "Râtelier de haches forgées (dégarni)",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "ratelier-bare",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 60,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.925,
+    "hauteur": 1.453,
+    "profondeur": 0.428
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-ratelier-forge",
+   "nom": "Râtelier de la forge",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "ratelier-forge",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 136,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.925,
+    "hauteur": 1.452,
+    "profondeur": 0.425
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-rechaud",
+   "nom": "Réchaud",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-meubles.glb",
+   "noeud": "rechaud",
+   "pieces": [],
+   "textures": null,
+   "poids": 361016,
+   "triangles": 154,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.662,
+    "hauteur": 0.9,
+    "profondeur": 0.581
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-meubles.glb",
+   "partage": 21
+  },
+  {
+   "id": "decors-stove",
+   "nom": "Réchaud (ancien modèle)",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "stove",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1264,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.84,
+    "hauteur": 2.2,
+    "profondeur": 0.678
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-door-curtain",
+   "nom": "Rideau de passage",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "door-curtain",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 52,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.96,
+    "hauteur": 2.105,
+    "profondeur": 0.09
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-bucket",
+   "nom": "Seau",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "bucket",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 56,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.313,
+    "hauteur": 0.406,
+    "profondeur": 0.304
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-table-farm",
+   "nom": "Table de ferme",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "table-farm",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 616,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.4,
+    "hauteur": 0.75,
+    "profondeur": 0.8
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-table-round",
+   "nom": "Table ronde",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "table-round",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 532,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.9,
+    "hauteur": 0.75,
+    "profondeur": 0.9
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-stool",
+   "nom": "Tabouret",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "stool",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 320,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.34,
+    "hauteur": 0.449,
+    "profondeur": 0.341
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-stool-farm",
+   "nom": "Tabouret de ferme",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "stool-farm",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 46,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.341,
+    "hauteur": 0.46,
+    "profondeur": 0.362
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-rug-oval",
+   "nom": "Tapis ovale",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "rug-oval",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 184,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.6,
+    "hauteur": 0.016,
+    "profondeur": 1
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-rug-round",
+   "nom": "Tapis rond tressé",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "rug-round",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 126,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.8,
+    "hauteur": 0,
+    "profondeur": 1.755
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-small-keg",
+   "nom": "Tonnelet",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "small-keg",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 122,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.48,
+    "hauteur": 0.48,
+    "profondeur": 0.494
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-dresser",
+   "nom": "Vaisselier",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/aubrune-objets.glb",
+   "noeud": "dresser",
+   "pieces": [],
+   "textures": null,
+   "poids": 259496,
+   "triangles": 300,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.38,
+    "hauteur": 2.103,
+    "profondeur": 0.504
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-objets.glb",
+   "partage": 29
+  },
+  {
+   "id": "decors-train-wall-corner",
+   "nom": "Angle de caisse",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-wall-corner",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 36,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.14,
+    "hauteur": 2.15,
+    "profondeur": 0.14
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-train-wall-lamp",
+   "nom": "Applique",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-wall-lamp",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 328,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.142,
+    "hauteur": 0.232,
+    "profondeur": 0.178
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-railcar",
+   "nom": "Autorail",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/aubrune-trains.glb",
+   "noeud": "railcar",
+   "pieces": [],
+   "textures": null,
+   "poids": 351444,
+   "triangles": 1126,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.926,
+    "hauteur": 3.69,
+    "profondeur": 14.52
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-trains.glb",
+   "partage": 4
+  },
+  {
+   "id": "decors-train-seat",
+   "nom": "Banquette de train",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-seat",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 528,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 1.15,
+    "profondeur": 0.645
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-train-berth",
+   "nom": "Couchette",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-berth",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 836,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 1.15,
+    "profondeur": 2
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-luggage-van",
+   "nom": "Fourgon à bagages",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/aubrune-trains.glb",
+   "noeud": "luggage-van",
+   "pieces": [],
+   "textures": null,
+   "poids": 351444,
+   "triangles": 674,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.925,
+    "hauteur": 3.744,
+    "profondeur": 9.92
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-trains.glb",
+   "partage": 4
+  },
+  {
+   "id": "decors-tank-engine",
+   "nom": "Locomotive à tender",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/aubrune-trains.glb",
+   "noeud": "tank-engine",
+   "pieces": [],
+   "textures": null,
+   "poids": 351444,
+   "triangles": 996,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.845,
+    "hauteur": 3.12,
+    "profondeur": 9.07
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-trains.glb",
+   "partage": 4
+  },
+  {
+   "id": "decors-train-wall-window",
+   "nom": "Paroi à fenêtre",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-wall-window",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 360,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 2.15,
+    "profondeur": 0.165
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-train-wall-map",
+   "nom": "Paroi au plan de la ligne",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-wall-map",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 204,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 2.15,
+    "profondeur": 0.164
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-train-wall",
+   "nom": "Paroi de voiture",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-wall",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 144,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 2.15,
+    "profondeur": 0.14
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-train-door",
+   "nom": "Porte de voiture",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-door",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 372,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 2.15,
+    "profondeur": 0.146
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-train-luggage-rack",
+   "nom": "Porte-bagages garni",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-luggage-rack",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 784,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.6,
+    "hauteur": 0.33,
+    "profondeur": 0.392
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-train-luggage-rack-empty",
+   "nom": "Porte-bagages vide",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-luggage-rack-empty",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 416,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.6,
+    "hauteur": 0.266,
+    "profondeur": 0.392
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-train-table",
+   "nom": "Tablette",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/train.glb",
+   "noeud": "train-table",
+   "pieces": [],
+   "textures": null,
+   "poids": 142600,
+   "triangles": 348,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.45,
+    "hauteur": 0.75,
+    "profondeur": 0.55
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/train.glb",
+   "partage": 11
+  },
+  {
+   "id": "decors-passenger-coach",
+   "nom": "Voiture de voyageurs",
+   "famille": "trains",
+   "lot": "decors",
+   "fichier": "decors/aubrune-trains.glb",
+   "noeud": "passenger-coach",
+   "pieces": [],
+   "textures": null,
+   "poids": 351444,
+   "triangles": 958,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.926,
+    "hauteur": 3.26,
+    "profondeur": 12.92
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-trains.glb",
+   "partage": 4
+  },
+  {
+   "id": "decors-fence",
+   "nom": "Barrière",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "fence",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 464,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.02,
+    "hauteur": 1.116,
+    "profondeur": 0.155
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-mailbox",
+   "nom": "Boîte aux lettres",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "mailbox",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 468,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.32,
+    "hauteur": 1.37,
+    "profondeur": 0.435
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-crate",
+   "nom": "Caisse",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "crate",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 684,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.6,
+    "hauteur": 0.6,
+    "profondeur": 0.61
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-water-tower",
+   "nom": "Château d'eau",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/aubrune-ouvrages.glb",
+   "noeud": "water-tower",
+   "pieces": [],
+   "textures": null,
+   "poids": 305688,
+   "triangles": 970,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.9,
+    "hauteur": 12.12,
+    "profondeur": 4.903
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-ouvrages.glb",
+   "partage": 6
+  },
+  {
+   "id": "decors-insect-spot",
+   "nom": "Coin à insectes",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "insect-spot",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 86,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.555,
+    "hauteur": 0.791,
+    "profondeur": 0.588
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-fishing-spot",
+   "nom": "Coin de pêche",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "fishing-spot",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 148,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.889,
+    "hauteur": 1.192,
+    "profondeur": 0.722
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-tunnel-portal",
+   "nom": "Entrée de tunnel",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/aubrune-ouvrages.glb",
+   "noeud": "tunnel-portal",
+   "pieces": [],
+   "textures": null,
+   "poids": 305688,
+   "triangles": 399,
+   "clips": [],
+   "cotes": {
+    "largeur": 24,
+    "hauteur": 8.6,
+    "profondeur": 7.05
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-ouvrages.glb",
+   "partage": 6
+  },
+  {
+   "id": "decors-water-crane",
+   "nom": "Grue à eau",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/aubrune-ouvrages.glb",
+   "noeud": "water-crane",
+   "pieces": [],
+   "textures": null,
+   "poids": 305688,
+   "triangles": 283,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.84,
+    "hauteur": 3.57,
+    "profondeur": 2.66
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-ouvrages.glb",
+   "partage": 6
+  },
+  {
+   "id": "decors-signpost",
+   "nom": "Panneau indicateur",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "signpost",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 624,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.62,
+    "hauteur": 2.236,
+    "profondeur": 0.49
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-dovecote",
+   "nom": "Pigeonnier",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/aubrune-ouvrages.glb",
+   "noeud": "dovecote",
+   "pieces": [],
+   "textures": null,
+   "poids": 305688,
+   "triangles": 514,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.217,
+    "hauteur": 10,
+    "profondeur": 4.206
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-ouvrages.glb",
+   "partage": 6
+  },
+  {
+   "id": "decors-water-pump",
+   "nom": "Pompe à eau",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "water-pump",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 908,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.8,
+    "hauteur": 1.35,
+    "profondeur": 0.947
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-platform-sign",
+   "nom": "Poteau du quai",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "platform-sign",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 504,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.1,
+    "hauteur": 2.77,
+    "profondeur": 0.221
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-well",
+   "nom": "Puits",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "well",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 1108,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.104,
+    "hauteur": 2.612,
+    "profondeur": 1.8
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-mill-wheel",
+   "nom": "Roue de moulin",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/aubrune-ouvrages.glb",
+   "noeud": "mill-wheel",
+   "pieces": [],
+   "textures": null,
+   "poids": 305688,
+   "triangles": 700,
+   "clips": [],
+   "cotes": {
+    "largeur": 6.468,
+    "hauteur": 6.984,
+    "profondeur": 3.304
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-ouvrages.glb",
+   "partage": 6
+  },
+  {
+   "id": "decors-semaphore",
+   "nom": "Sémaphore",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/aubrune-ouvrages.glb",
+   "noeud": "semaphore",
+   "pieces": [],
+   "textures": null,
+   "poids": 305688,
+   "triangles": 430,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.829,
+    "hauteur": 9.74,
+    "profondeur": 1.251
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-ouvrages.glb",
+   "partage": 6
+  },
+  {
+   "id": "decors-dig-spot",
+   "nom": "Sol qui scintille",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/aubrune-recoltes.glb",
+   "noeud": "dig-spot",
+   "pieces": [],
+   "textures": null,
+   "poids": 401836,
+   "triangles": 72,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.708,
+    "hauteur": 0.255,
+    "profondeur": 0.731
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-recoltes.glb",
+   "partage": 27
+  },
+  {
+   "id": "decors-log-pile",
+   "nom": "Tas de bûches",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "log-pile",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 1368,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.91,
+    "hauteur": 0.57,
+    "profondeur": 0.87
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-barrel",
+   "nom": "Tonneau",
+   "famille": "reperes",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "barrel",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 540,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.623,
+    "hauteur": 0.86,
+    "profondeur": 0.623
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-lamp-floor",
+   "nom": "Lampadaire d'intérieur",
+   "famille": "luminaires",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "lamp-floor",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 504,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.432,
+    "hauteur": 1.51,
+    "profondeur": 0.432
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-wall-lantern",
+   "nom": "Lanterne de porte",
+   "famille": "luminaires",
+   "lot": "decors",
+   "fichier": "decors/aubrune-luminaires.glb",
+   "noeud": "wall-lantern",
+   "pieces": [],
+   "textures": null,
+   "poids": 37516,
+   "triangles": 82,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.38,
+    "hauteur": 0.535,
+    "profondeur": 0.53
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-luminaires.glb",
+   "partage": 3
+  },
+  {
+   "id": "decors-platform-lantern",
+   "nom": "Lanterne de quai",
+   "famille": "luminaires",
+   "lot": "decors",
+   "fichier": "decors/aubrune-luminaires.glb",
+   "noeud": "platform-lantern",
+   "pieces": [],
+   "textures": null,
+   "poids": 37516,
+   "triangles": 166,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.53,
+    "hauteur": 3.001,
+    "profondeur": 0.959
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-luminaires.glb",
+   "partage": 3
+  },
+  {
+   "id": "decors-street-lantern",
+   "nom": "Réverbère",
+   "famille": "luminaires",
+   "lot": "decors",
+   "fichier": "decors/aubrune-luminaires.glb",
+   "noeud": "street-lantern",
+   "pieces": [],
+   "textures": null,
+   "poids": 37516,
+   "triangles": 138,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.6,
+    "hauteur": 3.28,
+    "profondeur": 0.44
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/aubrune-luminaires.glb",
+   "partage": 3
+  },
+  {
+   "id": "decors-street-lamp",
+   "nom": "Réverbère (ancien modèle)",
+   "famille": "luminaires",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "street-lamp",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 488,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.378,
+    "hauteur": 3.295,
+    "profondeur": 0.378
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
   {
    "id": "figurine-accessory-vest",
    "nom": "Accessoire: gilet",
@@ -1441,386 +5953,6 @@
    "partage": 2
   },
   {
-   "id": "decors-wardrobe",
-   "nom": "Armoire",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "wardrobe",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 540,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.06,
-    "hauteur": 1.95,
-    "profondeur": 0.627
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-tub",
-   "nom": "Baignoire",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "tub",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 712,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.5,
-    "hauteur": 0.58,
-    "profondeur": 0.72
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-bench-farm",
-   "nom": "Banc de ferme",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "bench-farm",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 380,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.4,
-    "hauteur": 0.45,
-    "profondeur": 0.388
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-bench-park",
-   "nom": "Banc de square",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "bench-park",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 1372,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.8,
-    "hauteur": 0.869,
-    "profondeur": 0.501
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-bench-platform",
-   "nom": "Banc du quai",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "bench-platform",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 1372,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.7,
-    "hauteur": 0.869,
-    "profondeur": 0.501
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-chair-bedroom",
-   "nom": "Chaise de chambre",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "chair-bedroom",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 768,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.44,
-    "hauteur": 0.918,
-    "profondeur": 0.452
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-chair-farm",
-   "nom": "Chaise de ferme",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "chair-farm",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 844,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.44,
-    "hauteur": 0.918,
-    "profondeur": 0.452
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-chair-farm-sage",
-   "nom": "Chaise de ferme vert sauge",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "chair-farm-sage",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 844,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.44,
-    "hauteur": 0.918,
-    "profondeur": 0.452
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-chest",
-   "nom": "Coffre",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "chest",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 492,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.82,
-    "hauteur": 0.655,
-    "profondeur": 0.485
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-shelf",
-   "nom": "Étagère",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "shelf",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 1092,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.9,
-    "hauteur": 1.6,
-    "profondeur": 0.32
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-sink-stone",
-   "nom": "Évier de pierre",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "sink-stone",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 664,
-   "clips": [],
-   "cotes": {
-    "largeur": 1,
-    "hauteur": 1.178,
-    "profondeur": 0.558
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-lamp-floor",
-   "nom": "Lampadaire d'intérieur",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "lamp-floor",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 504,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.432,
-    "hauteur": 1.51,
-    "profondeur": 0.432
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-bed-double",
-   "nom": "Lit double",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "bed-double",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 1188,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.51,
-    "hauteur": 0.95,
-    "profondeur": 2
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-bed-single",
-   "nom": "Lit simple",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "bed-single",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 1064,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.01,
-    "hauteur": 0.95,
-    "profondeur": 2
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-stove",
-   "nom": "Réchaud",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "stove",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 1264,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.84,
-    "hauteur": 2.2,
-    "profondeur": 0.678
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-table-farm",
-   "nom": "Table de ferme",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "table-farm",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 616,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.4,
-    "hauteur": 0.75,
-    "profondeur": 0.8
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-table-round",
-   "nom": "Table ronde",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "table-round",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 532,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.9,
-    "hauteur": 0.75,
-    "profondeur": 0.9
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-stool",
-   "nom": "Tabouret",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "stool",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 320,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.34,
-    "hauteur": 0.449,
-    "profondeur": 0.341
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
-   "id": "decors-rug-oval",
-   "nom": "Tapis ovale",
-   "famille": "meubles",
-   "lot": "decors",
-   "fichier": "decors/furniture.glb",
-   "noeud": "rug-oval",
-   "pieces": [],
-   "textures": null,
-   "poids": 434552,
-   "triangles": 184,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.6,
-    "hauteur": 0.016,
-    "profondeur": 1
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
-   "partage": 19
-  },
-  {
    "id": "objets-ablette",
    "nom": "Ablette",
    "famille": "objets",
@@ -2241,26 +6373,6 @@
    "partage": 2
   },
   {
-   "id": "objets-confiture-meshy",
-   "nom": "Confiture (essai Meshy)",
-   "famille": "objets",
-   "lot": "objets",
-   "fichier": "objets/essai-meshy.glb",
-   "noeud": "confiture-meshy",
-   "pieces": [],
-   "textures": null,
-   "poids": 239720,
-   "triangles": 733,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.084,
-    "hauteur": 0.11,
-    "profondeur": 0.084
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/objets/essai-meshy.glb",
-   "partage": 4
-  },
-  {
    "id": "objets-coquelicot",
    "nom": "Coquelicot",
    "famille": "objets",
@@ -2559,26 +6671,6 @@
    },
    "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
    "partage": 13
-  },
-  {
-   "id": "objets-hache-meshy",
-   "nom": "Hache (essai Meshy)",
-   "famille": "objets",
-   "lot": "objets",
-   "fichier": "objets/essai-meshy.glb",
-   "noeud": "hache-meshy",
-   "pieces": [],
-   "textures": null,
-   "poids": 239720,
-   "triangles": 779,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.191,
-    "hauteur": 0.7,
-    "profondeur": 0.039
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/objets/essai-meshy.glb",
-   "partage": 4
   },
   {
    "id": "objets-hache-forgee",
@@ -2939,26 +7031,6 @@
    },
    "source": "games/la-petite-ligne-2/assets/commun/objets/pain.glb",
    "partage": 5
-  },
-  {
-   "id": "objets-pain-meshy",
-   "nom": "Pain (essai Meshy)",
-   "famille": "objets",
-   "lot": "objets",
-   "fichier": "objets/essai-meshy.glb",
-   "noeud": "pain-meshy",
-   "pieces": [],
-   "textures": null,
-   "poids": 239720,
-   "triangles": 779,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.218,
-    "hauteur": 0.15,
-    "profondeur": 0.22
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/objets/essai-meshy.glb",
-   "partage": 4
   },
   {
    "id": "objets-peche",
@@ -3661,26 +7733,6 @@
    "partage": 13
   },
   {
-   "id": "objets-truite-meshy",
-   "nom": "Truite (essai Meshy)",
-   "famille": "objets",
-   "lot": "objets",
-   "fichier": "objets/essai-meshy.glb",
-   "noeud": "truite-meshy",
-   "pieces": [],
-   "textures": null,
-   "poids": 239720,
-   "triangles": 794,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.099,
-    "hauteur": 0.079,
-    "profondeur": 0.32
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/objets/essai-meshy.glb",
-   "partage": 4
-  },
-  {
    "id": "objets-truite",
    "nom": "Truite fario",
    "famille": "objets",
@@ -3719,426 +7771,6 @@
    },
    "source": "games/la-petite-ligne-2/assets/commun/objets/piece.glb",
    "partage": 2
-  },
-  {
-   "id": "decors-tree-round",
-   "nom": "Arbre rond",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/plants.glb",
-   "noeud": "tree-round",
-   "pieces": [],
-   "textures": null,
-   "poids": 253956,
-   "triangles": 1272,
-   "clips": [],
-   "cotes": {
-    "largeur": 4.764,
-    "hauteur": 5.315,
-    "profondeur": 4.46
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
-   "partage": 8
-  },
-  {
-   "id": "decors-fence",
-   "nom": "Barrière",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/street.glb",
-   "noeud": "fence",
-   "pieces": [],
-   "textures": null,
-   "poids": 219244,
-   "triangles": 464,
-   "clips": [],
-   "cotes": {
-    "largeur": 2.02,
-    "hauteur": 1.116,
-    "profondeur": 0.155
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
-   "partage": 10
-  },
-  {
-   "id": "decors-mailbox",
-   "nom": "Boîte aux lettres",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/street.glb",
-   "noeud": "mailbox",
-   "pieces": [],
-   "textures": null,
-   "poids": 219244,
-   "triangles": 468,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.32,
-    "hauteur": 1.37,
-    "profondeur": 0.435
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
-   "partage": 10
-  },
-  {
-   "id": "decors-shop-front",
-   "nom": "Boutique",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/houses.glb",
-   "noeud": "shop-front",
-   "pieces": [],
-   "textures": null,
-   "poids": 465996,
-   "triangles": 7860,
-   "clips": [],
-   "cotes": {
-    "largeur": 8.8,
-    "hauteur": 8.901,
-    "profondeur": 11.35
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/houses.glb",
-   "partage": 3
-  },
-  {
-   "id": "decors-bush-flowering",
-   "nom": "Buisson fleuri",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/plants.glb",
-   "noeud": "bush-flowering",
-   "pieces": [],
-   "textures": null,
-   "poids": 253956,
-   "triangles": 1120,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.134,
-    "hauteur": 0.765,
-    "profondeur": 0.967
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
-   "partage": 8
-  },
-  {
-   "id": "decors-bush-round",
-   "nom": "Buisson rond",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/plants.glb",
-   "noeud": "bush-round",
-   "pieces": [],
-   "textures": null,
-   "poids": 253956,
-   "triangles": 672,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.386,
-    "hauteur": 0.935,
-    "profondeur": 1.182
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
-   "partage": 8
-  },
-  {
-   "id": "decors-crate",
-   "nom": "Caisse",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/street.glb",
-   "noeud": "crate",
-   "pieces": [],
-   "textures": null,
-   "poids": 219244,
-   "triangles": 684,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.6,
-    "hauteur": 0.6,
-    "profondeur": 0.61
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
-   "partage": 10
-  },
-  {
-   "id": "decors-flowers-poppy",
-   "nom": "Coquelicots",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/plants.glb",
-   "noeud": "flowers-poppy",
-   "pieces": [],
-   "textures": null,
-   "poids": 253956,
-   "triangles": 772,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.387,
-    "hauteur": 0.461,
-    "profondeur": 0.324
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
-   "partage": 8
-  },
-  {
-   "id": "decors-house-town",
-   "nom": "Maison de bourg",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/houses.glb",
-   "noeud": "house-town",
-   "pieces": [],
-   "textures": null,
-   "poids": 465996,
-   "triangles": 7004,
-   "clips": [],
-   "cotes": {
-    "largeur": 7.52,
-    "hauteur": 8.617,
-    "profondeur": 6.99
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/houses.glb",
-   "partage": 3
-  },
-  {
-   "id": "decors-signpost",
-   "nom": "Panneau indicateur",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/street.glb",
-   "noeud": "signpost",
-   "pieces": [],
-   "textures": null,
-   "poids": 219244,
-   "triangles": 624,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.62,
-    "hauteur": 2.236,
-    "profondeur": 0.49
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
-   "partage": 10
-  },
-  {
-   "id": "decors-tree-apple",
-   "nom": "Pommier",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/plants.glb",
-   "noeud": "tree-apple",
-   "pieces": [],
-   "textures": null,
-   "poids": 253956,
-   "triangles": 1672,
-   "clips": [],
-   "cotes": {
-    "largeur": 3.219,
-    "hauteur": 3.875,
-    "profondeur": 3.013
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
-   "partage": 8
-  },
-  {
-   "id": "decors-water-pump",
-   "nom": "Pompe à eau",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/street.glb",
-   "noeud": "water-pump",
-   "pieces": [],
-   "textures": null,
-   "poids": 219244,
-   "triangles": 908,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.8,
-    "hauteur": 1.35,
-    "profondeur": 0.947
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
-   "partage": 10
-  },
-  {
-   "id": "decors-platform-sign",
-   "nom": "Poteau du quai",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/street.glb",
-   "noeud": "platform-sign",
-   "pieces": [],
-   "textures": null,
-   "poids": 219244,
-   "triangles": 504,
-   "clips": [],
-   "cotes": {
-    "largeur": 1.1,
-    "hauteur": 2.77,
-    "profondeur": 0.221
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
-   "partage": 10
-  },
-  {
-   "id": "decors-well",
-   "nom": "Puits",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/street.glb",
-   "noeud": "well",
-   "pieces": [],
-   "textures": null,
-   "poids": 219244,
-   "triangles": 1108,
-   "clips": [],
-   "cotes": {
-    "largeur": 2.104,
-    "hauteur": 2.612,
-    "profondeur": 1.8
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
-   "partage": 10
-  },
-  {
-   "id": "decors-shed",
-   "nom": "Remise",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/houses.glb",
-   "noeud": "shed",
-   "pieces": [],
-   "textures": null,
-   "poids": 465996,
-   "triangles": 900,
-   "clips": [],
-   "cotes": {
-    "largeur": 6.64,
-    "hauteur": 4.452,
-    "profondeur": 5.55
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/houses.glb",
-   "partage": 3
-  },
-  {
-   "id": "decors-street-lamp",
-   "nom": "Réverbère",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/street.glb",
-   "noeud": "street-lamp",
-   "pieces": [],
-   "textures": null,
-   "poids": 219244,
-   "triangles": 488,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.378,
-    "hauteur": 3.295,
-    "profondeur": 0.378
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
-   "partage": 10
-  },
-  {
-   "id": "decors-tree-fir",
-   "nom": "Sapin",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/plants.glb",
-   "noeud": "tree-fir",
-   "pieces": [],
-   "textures": null,
-   "poids": 253956,
-   "triangles": 1032,
-   "clips": [],
-   "cotes": {
-    "largeur": 2.73,
-    "hauteur": 6.192,
-    "profondeur": 2.8
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
-   "partage": 8
-  },
-  {
-   "id": "decors-stump",
-   "nom": "Souche",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/plants.glb",
-   "noeud": "stump",
-   "pieces": [],
-   "textures": null,
-   "poids": 253956,
-   "triangles": 504,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.869,
-    "hauteur": 0.4,
-    "profondeur": 0.869
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
-   "partage": 8
-  },
-  {
-   "id": "decors-log-pile",
-   "nom": "Tas de bûches",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/street.glb",
-   "noeud": "log-pile",
-   "pieces": [],
-   "textures": null,
-   "poids": 219244,
-   "triangles": 1368,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.91,
-    "hauteur": 0.57,
-    "profondeur": 0.87
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
-   "partage": 10
-  },
-  {
-   "id": "decors-barrel",
-   "nom": "Tonneau",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/street.glb",
-   "noeud": "barrel",
-   "pieces": [],
-   "textures": null,
-   "poids": 219244,
-   "triangles": 540,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.623,
-    "hauteur": 0.86,
-    "profondeur": 0.623
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
-   "partage": 10
-  },
-  {
-   "id": "decors-grass-tuft",
-   "nom": "Touffe d'herbe",
-   "famille": "decors",
-   "lot": "decors",
-   "fichier": "decors/plants.glb",
-   "noeud": "grass-tuft",
-   "pieces": [],
-   "textures": null,
-   "poids": 253956,
-   "triangles": 144,
-   "clips": [],
-   "cotes": {
-    "largeur": 0.228,
-    "hauteur": 0.345,
-    "profondeur": 0.262
-   },
-   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
-   "partage": 8
   }
  ],
  "ecartes": []

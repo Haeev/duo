@@ -209,6 +209,28 @@ function nomDeRepli(id) {
   return texte.charAt(0).toUpperCase() + texte.slice(1);
 }
 
+/** Dictionnaire d'abord, puis nom du manifeste du jeu, puis base + suffixes d'état (`_suffixes`), puis identifiant mis en forme. */
+function nomFrancais(cle, noms) {
+  if (noms[cle]) return noms[cle];
+  if (NOMS_MANIFESTE.has(cle)) return NOMS_MANIFESTE.get(cle);
+  const suffixes = noms._suffixes ?? {};
+  let base = cle;
+  const etats = [];
+  for (let again = true; again; ) {
+    again = false;
+    for (const [fin, texte] of Object.entries(suffixes)) {
+      if (base.endsWith(`-${fin}`) && base.length > fin.length + 1) {
+        etats.unshift(texte);
+        base = base.slice(0, -(fin.length + 1));
+        again = true;
+        break;
+      }
+    }
+  }
+  if (!etats.length || !noms[base]) return nomDeRepli(cle);
+  return `${noms[base]} (${etats.join(', ')})`;
+}
+
 // ---------------------------------------------------------------- lots
 
 const cotes = (boite) => {
@@ -226,17 +248,43 @@ const listerGlb = (dossier) =>
     .filter((n) => n.toLowerCase().endsWith('.glb'))
     .sort((a, b) => a.localeCompare(b));
 
+const NOMS_MANIFESTE = new Map();
+
+/** Lit le manifeste d'un lot: clé `fichier#noeud` vers { famille, nom }. Formats du jeu: decors.json, index.json des objets, batiments.json. */
+function lireManifeste(lot, dossier) {
+  const m = lot.manifeste;
+  const json = JSON.parse(readFileSync(path.join(dossier, m.fichier), 'utf8'));
+  const liste = new Map();
+  for (const [cle, f] of Object.entries(json[m.cle] ?? {})) {
+    const fichier = f[m.champFichier ?? 'file'];
+    const noeud = m.champNoeud ? (f[m.champNoeud] ?? cle) : cle;
+    const nom = typeof f.nom === 'string' ? f.nom.charAt(0).toUpperCase() + f.nom.slice(1) : null;
+    liste.set(`${fichier}#${noeud}`, { famille: f[m.champFamille ?? 'family'] ?? null, nom });
+  }
+  return liste;
+}
+
 /** Chaque lot rend des modèles dont les fichiers sont des chemins absolus; la publication les copie ensuite. */
 const MODES = {
   // Un GLB regroupe plusieurs modèles: un modèle par noeud racine de la scène.
+  // Avec `manifeste`, seuls les noeuds déclarés par le jeu sont publiés (les essais oubliés dans un GLB restent
+  // dehors), la famille vient du champ `famille` du manifeste (traduit par `familleParFamille`) et le nom français
+  // du champ `nom` s'il existe.
   racines(lot, dossier) {
     const modeles = [];
+    const manifeste = lot.manifeste ? lireManifeste(lot, dossier) : null;
     for (const fichier of listerGlb(dossier)) {
       const mesure = analyser(path.join(dossier, fichier));
       for (const r of mesure.racines) {
+        const fiche = manifeste?.get(`${fichier}#${r.nom}`);
+        if (manifeste && !fiche) continue;
+        if (fiche?.nom) NOMS_MANIFESTE.set(r.nom, fiche.nom);
         modeles.push({
           cle: r.nom,
-          famille: lot.familleParFichier?.[fichier] ?? lot.famille,
+          famille:
+            lot.familleParCle?.[r.nom] ||
+            (fiche?.famille && lot.familleParFamille?.[fiche.famille]) ||
+            (lot.familleParFichier?.[fichier] ?? lot.famille),
           fichier: path.join(dossier, fichier),
           noeud: r.nom,
           pieces: [],
@@ -399,7 +447,7 @@ function main() {
       usages.set(publie(m.fichier), (usages.get(publie(m.fichier)) ?? 0) + 1);
       modeles.push({
         id,
-        nom: noms[m.cle] ?? nomDeRepli(m.cle),
+        nom: nomFrancais(m.cle, noms),
         famille: m.famille,
         lot: lot.id,
         fichier: publie(m.fichier),
