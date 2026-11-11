@@ -100,7 +100,9 @@ describe('vignettes à la plume', () => {
 
   it('chaque vignette a sa source, et chaque source sa vignette', () => {
     expect(ids).toEqual(svgIds(path.join(SRC, 'vignettes')));
-    expect(ids.length).toBeGreaterThanOrEqual(objects.size + placeables.size - WITHOUT_THUMB.size);
+    // Un meuble obtenable porte le même identifiant que son objet: une seule vignette pour les deux.
+    const owners = new Set([...objects, ...placeables]);
+    expect(ids.length).toBeGreaterThanOrEqual(owners.size - WITHOUT_THUMB.size);
   });
 
   it('porte le nom d’un objet, d’un meuble posable ou d’une entrée du carnet', () => {
