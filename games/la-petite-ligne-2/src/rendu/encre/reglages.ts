@@ -328,3 +328,12 @@ export const INK_SETTINGS = {
 } as const;
 
 export type InkSettings = typeof INK_SETTINGS;
+
+/**
+ * Style demandé par l'adresse (`?rendu=aplats` ou `?rendu=encre`), sinon le style par défaut. Le
+ * jeu et l'aperçu de l'éditeur de personnage le lisent ici: le joueur voit le même rendu partout.
+ */
+export function addressStyle(search: string): RenderStyle {
+  const asked = new URLSearchParams(search).get(INK_SETTINGS.styleParam);
+  return asked === 'aplats' || asked === 'encre' ? asked : INK_SETTINGS.style;
+}

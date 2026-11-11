@@ -97,6 +97,12 @@ export interface InkFrame {
   readonly height: number;
 }
 
+/** Options d'un rendu encré. */
+export interface InkKitOptions {
+  /** Outil de mesure (F9) branché sur ce rendu; `false` pour un second rendu (aperçu de l'éditeur). */
+  readonly meter?: boolean;
+}
+
 const NO_LIGHTS: InkLights = { lamps: [], windows: [] };
 const windowLit = (window: WindowLight): boolean => (window.power ?? 1) > 0;
 const MINUTES_PER_DAY = 1440;
@@ -174,6 +180,13 @@ export class InkKit {
   /** Résolution interne adaptative et outil de mesure (ADR 0023, points 11 et 12). */
   private readonly scaler = new InkScale();
   private readonly meter = new InkMeter();
+  /** L'outil de mesure se branche au premier rendu (faux: il reste débranché, sans touche). */
+  private readonly metered: boolean;
+  /**
+   * Hauteur (points) sur laquelle se règle l'épaisseur du trait; `null`: celle du canevas. Un
+   * petit canevas (aperçu de l'éditeur) donne celle de la fenêtre pour tracer le trait du jeu.
+   */
+  strokeHeight: number | null = null;
   private software: boolean | null = null;
   private renderer: WebGLRenderer | null = null;
   private canvasWidth = 1;
@@ -187,8 +200,11 @@ export class InkKit {
   private chartDone = false;
   private readonly chartRead = new Uint8Array(COLOR_CHART.length * 3);
 
-  constructor(book: AmbianceBook = gameAmbiances()) {
+  constructor(book: AmbianceBook = gameAmbiances(), options: InkKitOptions = {}) {
     this.book = book;
+    this.metered = options.meter ?? true;
+    // Débranché, il ne mesure rien (ses relevés attendent un rendu) et F9 reste au jeu.
+    if (!this.metered) this.meter.dispose();
     this.uniforms = createInkUniforms();
     this.layers = createInkLayers();
     this.noise = createNoise();
@@ -421,17 +437,18 @@ export class InkKit {
       const info = gl.getExtension('WEBGL_debug_renderer_info');
       this.software =
         info !== null && SOFTWARE.test(String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)));
-      this.meter.attach(renderer, {
-        snapshot: () => this.snapshot(),
-        cycleScale: () => this.cycleScale(),
-        requestChart: () => {
-          this.chartWanted = true;
-        },
-        setScale: (scale) => {
-          this.scaler.fix(scale);
-          this.chartWanted = true;
-        },
-      });
+      if (this.metered)
+        this.meter.attach(renderer, {
+          snapshot: () => this.snapshot(),
+          cycleScale: () => this.cycleScale(),
+          requestChart: () => {
+            this.chartWanted = true;
+          },
+          setScale: (scale) => {
+            this.scaler.fix(scale);
+            this.chartWanted = true;
+          },
+        });
     }
     this.lastMinutes = frame.minutes;
     this.lastSheet = frame.sheet;
@@ -521,10 +538,13 @@ export class InkKit {
     renderer.render(scene, camera);
     meter.end(2, innerWidth * innerHeight);
     const o = s.outline;
-    const zoom = Math.min(
-      o.zoomRange[1],
-      Math.max(o.zoomRange[0], o.zoomWidth / Math.max(1e-3, camera.right - camera.left)),
-    );
+    const stroke = (this.strokeHeight ?? frame.height) / Math.max(1, frame.height);
+    const zoom =
+      stroke *
+      Math.min(
+        o.zoomRange[1],
+        Math.max(o.zoomRange[0], o.zoomWidth / Math.max(1e-3, camera.right - camera.left)),
+      );
     meter.begin(3);
     this.pass.render(
       renderer,
