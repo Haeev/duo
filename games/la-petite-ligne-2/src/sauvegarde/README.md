@@ -7,13 +7,13 @@ L'état complet (tous les lieux) en JSON, un seul emplacement, écrit par l'hôt
 | `sauvegarde.ts`  | `snapshotOf` (instantané + fiche du salon), `restoreWorld` (relecture complète, ne lève jamais), `summaryOf`/`labelOf` |
 | `format.ts`      | `STAGE_FLOOR`, table `MIGRATIONS`, `readSave` (version, migrations, schéma)                                            |
 | `reprise.ts`     | `matchMembers`/`seatMembers` (règle de l'invité différent), `settleForResume` (remise d'aplomb)                        |
-| `declencheur.ts` | écriture à l'aube et à chaque arrivée en train, sur demande; hors du pas, une à la fois                                |
+| `declencheur.ts` | écriture au coucher, à l'aube et à chaque arrivée en train, sur demande; hors du pas, une à la fois                    |
 | `textes.ts`      | textes français de la fiche du salon et des messages de reprise                                                        |
 | `seance.ts`      | avancement de l'histoire (`storyProgress`), relevé et résumé d'une séance (`tallyOf`, `sessionSummary`)                |
 
 ## Quand ça s'écrit
 
-- Aube (`day_started`) et arrivée en train (`train_arrived`): moment `auto`, lancé après le pas (jamais dedans).
+- Coucher (un joueur se met au lit: `brick_used` de la brique `sleep`), aube (`day_started`) et arrivée en train (`train_arrived`): moment `auto`, lancé après le pas (jamais dedans). Les deux couchés à l'heure permise: la nuit saute dans le même pas, une seule écriture voit le matin.
 - Toutes les 300 s (`autosaveSeconds`), à chaque pause et à la fermeture: le fournisseur `saves.provide` du SDK.
 - Sur demande: `session.saveNow()` (moment `manual`, hôte seulement; chez l'invité: `refused`). Le bouton ou la touche est à brancher par l'interface (L7).
 - Un échec d'écriture est journalisé, jamais fatal; la plateforme garde les copies de secours précédentes (ADR 0009).

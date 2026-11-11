@@ -97,14 +97,21 @@ export type DecorManifest = v.InferOutput<typeof DecorManifestSchema>;
 /** Le manifeste livré, contrôlé à l'exécution (fichier produit hors du code). */
 export const DECOR_MANIFEST: DecorManifest = v.parse(DecorManifestSchema, manifestJson);
 
-/** Assises des modèles livrés, au format de `CHARACTER_SETTINGS.seat.byModel`. */
+/**
+ * Assises des modèles livrés, au format de `CHARACTER_SETTINGS.seat.byModel`. Un modèle sans
+ * assise mesurée (tabouret, banc de table) s'assoit sur son dessus, bord avant à mi-profondeur:
+ * sa vraie taille plutôt que la forme provisoire (0,9 m de haut), qui posait le personnage en
+ * l'air et devant le meuble.
+ */
 export function decorSeats(
   manifest: DecorManifest = DECOR_MANIFEST,
 ): Record<string, { height: number; front: number }> {
   const seats: Record<string, { height: number; front: number }> = {};
   for (const [id, model] of Object.entries(manifest.models))
-    if (model.seat !== undefined)
-      seats[id] = { height: model.seat.height, front: model.seat.front };
+    seats[id] =
+      model.seat === undefined
+        ? { height: model.size.h, front: model.size.d / 2 }
+        : { height: model.seat.height, front: model.seat.front };
   return seats;
 }
 

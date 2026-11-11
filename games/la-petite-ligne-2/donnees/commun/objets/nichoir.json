@@ -2,8 +2,9 @@
   "schema": 1,
   "id": "nichoir",
   "name": "Nichoir",
-  "family": "material",
+  "family": "furniture",
   "stack": 1,
   "food": null,
-  "tool": null
+  "tool": null,
+  "prop": "nichoir"
 }

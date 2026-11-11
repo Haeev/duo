@@ -5,6 +5,7 @@ import { mealPerkOf, shareSpecialMeal } from '../src/simulation/besoins/repas';
 import { soil, wakeUp } from '../src/simulation/besoins/soins';
 import { hasPerk } from '../src/simulation/besoins/repas';
 import { idleInput } from '../src/simulation/noyau/entrees';
+import { createPlaceState } from '../src/simulation/noyau/monde';
 import { RULES } from '../src/simulation/regles/reglages';
 import { act, contentWith, contextOf, wait, withTestProps } from './aides-l3';
 import { NORTH, put } from './aides-noyau';
@@ -165,6 +166,28 @@ describe('besoins', () => {
     expect(sim.world.players[0].needs.hygiene).toBeCloseTo(55, 0);
     expect(events.filter((e) => e.type === 'refused')).toEqual([]);
     expect(sim.world.players[0].gesture).toBeNull();
+  });
+
+  it('fait sa toilette au baquet de la maison du garde: hygiène à 100 en 4 s (cahier 4.4)', () => {
+    const sim = newSim(content);
+    const aubrune = content.places.aubrune;
+    const tub = aubrune?.map.objects.find((o) => o.id === 'maison-rdc-baquet');
+    if (aubrune === undefined || tub === undefined) throw new Error('baquet absent de la maison');
+    // Le baquet est un meuble de la carte, sans mémoire de brique: une partie déjà commencée
+    // le trouve chez elle sans rattrapage.
+    sim.world.common.place = 'aubrune';
+    sim.world.places.aubrune = createPlaceState(content, aubrune);
+    // Façade à l'ouest (rotation 3): on se tient entre le refend et le baquet, tourné vers lui.
+    put(sim, 0, tub.x - 1, tub.y, 0);
+    sim.world.players[0].needs.hygiene = 12;
+    expect(act(sim, 0, { type: 'act' })).toContainEqual({
+      type: 'gesture_started',
+      player: 0,
+      clip: 'wash',
+      target: 'maison-rdc-baquet',
+    });
+    wait(sim, 4.5);
+    expect(sim.world.players[0].needs.hygiene).toBeCloseTo(100, 0);
   });
 
   it('un repas spécial ajouté par un seul fichier se sert à deux à table et donne son bonus', () => {

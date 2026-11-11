@@ -247,6 +247,32 @@ describe('boucle des meubles', () => {
     }
   });
 
+  it('le nichoir (audit B.20): plan donné par Basile, meuble du jardin seulement', () => {
+    const content = gameContent();
+    // La source: la confidence des nichoirs de Basile retient le plan pour les deux joueurs.
+    const secret = content.places.aubrune?.dialogues.find((d) => d.id === 'basile-secret-nichoirs');
+    expect(JSON.stringify(secret)).toContain('fabrication.plan.nichoir');
+    expect(content.plans.nichoir?.source).toBe('villager');
+    const sim = newSim(content);
+    wait(sim, 1 / 30);
+    sim.world.players[0].toolbar[0] = { item: 'nichoir', count: 1 };
+    goHome(sim, 0);
+    act(sim, 0, { type: 'deco_mode', housing: HOUSE, on: true });
+    expect(housing(sim).stock.nichoir).toBe(1);
+    // Dans la salle: refusé; au jardin: posé.
+    const drop = (x: number, y: number): string[] => {
+      act(sim, 0, { type: 'deco_take', housing: HOUSE, prop: 'nichoir', x, y, rotation: 0 });
+      return refused(sim, 0, { type: 'deco_drop', housing: HOUSE });
+    };
+    expect(drop(28.5, 10.5)).toEqual(['deco-wrong-zone']);
+    act(sim, 0, { type: 'deco_cancel', housing: HOUSE });
+    expect(drop(25.5, 15.5)).toEqual([]);
+    expect(sim.world.places[PLACE]?.placed.find((p) => p.type === 'nichoir')).toMatchObject({
+      x: 25.5,
+      y: 15.5,
+    });
+  });
+
   it('refuse un objet meuble sans fiche, ou une fiche qui ne se pose pas', () => {
     const load = (edit: (files: Record<string, Json>) => void): string => {
       try {

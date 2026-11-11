@@ -3,9 +3,13 @@
   "id": "nichoir",
   "name": "Nichoir",
   "makes": {
-    "kind": "item",
-    "item": "nichoir",
-    "count": 1
+    "kind": "furniture",
+    "variants": [
+      {
+        "color": "#c8955a",
+        "item": "nichoir"
+      }
+    ]
   },
   "station": "workbench",
   "materials": [
@@ -15,6 +19,6 @@
     }
   ],
   "work": 24,
-  "source": "quest",
+  "source": "villager",
   "series": null
 }

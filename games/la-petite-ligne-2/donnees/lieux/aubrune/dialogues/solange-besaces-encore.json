@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "solange-besaces-encore",
+  "villager": "solange",
+  "priority": 61,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.besaces"
+    },
+    {
+      "type": "remembered",
+      "key": "dialogues.aubrune.solange-besaces",
+      "equals": true,
+      "of": "actor"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bag_slots_at_least",
+        "slots": 4
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Toujours sans sac ? Ta besace t'attend depuis l'autre jour, pendue au portant.",
+      "emote": "question",
+      "next": "don"
+    },
+    "don": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_bag",
+          "bag": "besace"
+        }
+      ],
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Quatre poches. Remplis-les, et reviens me raconter.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

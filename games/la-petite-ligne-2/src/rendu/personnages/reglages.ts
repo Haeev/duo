@@ -54,8 +54,8 @@ export const CHARACTER_SETTINGS = {
   lean: { perTurn: 0.03, max: 0.14, halfLife: 0.1 },
 
   /**
-   * Assise: hauteur du dessus de l'assise (m) par modèle de meuble; sans entrée, le dessus de la
-   * forme provisoire (les modèles de meubles ne sont pas encore livrés). `clipSeat`: hauteur de
+   * Assise: hauteur du dessus de l'assise (m) par modèle de meuble (assise mesurée, sinon dessus
+   * du modèle); modèle inconnu: le dessus de la forme provisoire. `clipSeat`: hauteur de
    * l'assise sous le bassin dans le clip `sit`, mesurée sur le corps (hanche à 0,608 m, moins
    * l'épaisseur des fesses).
    */

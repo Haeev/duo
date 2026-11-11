@@ -1182,6 +1182,11 @@ HABITE = {
         ('portrait', 'cadre-ovale', 9.5, 3.5, 3, "au mur est, au-dessus de la tête du lit"),
         ('panier', 'panier-a-linge', 9.5, 2.5, 0, "au pied du lit, contre le mur est, hors du passage de la porte"),
         ('seau', 'seau', 9.5, 5.5, 0, "l'eau tirée à la pompe du jardin, posée à côté de la cuisinière"),
+        # Le baquet de la toilette (hygiène à 100, cahier 4.4) avant la salle d'eau: dans la seule pièce couverte au
+        # début, entre le pied du lit et le refend, en long; on s'y lave au chaud à trois pas des feux (l'eau chauffée
+        # à la bouilloire) et du seau de la pompe, hors de la vue de la porte d'entrée. Il laisse 1 m libre le long du
+        # refend, de la porte à l'escalier de l'étage et aux feux.
+        ('baquet', 'baquet', 7.5, 4, 3, "le baquet de la toilette, entre le pied du lit et le refend: au chaud près des feux et du seau de la pompe, hors de la vue de la porte"),
         ('tapis-de-sol', 'tapis-long', 7.5, 2.5, 0, "le passage de la porte vers la cuisine et le lit, là où l'on marche le plus"),
         ('balai', 'balai', 3.5, 1.5, 0, "le balai du déblayage, laissé dans la chambre en ruine"),
         ('seau-gravats', 'seau', 2.5, 0.5, 0, "le seau des gravats de la chambre en ruine"),
@@ -1602,7 +1607,7 @@ DECOR_6 = [
     ('talus', 'herbes-talus-3', 'herbes-hautes', 196.5, 147.5, 0, "l'herbe haute de la pente"),
     ('talus', 'buisson-talus', 'buisson', 199.5, 143.5, 0, "un buisson au coin du logis, côté rivière"),
     ('talus', 'buches-pignon', 'tas-de-buches', 199.5, 148.5, 0, "les bûches empilées contre le pignon ouest du logis"),
-    ('talus', 'baquet-margot', 'baquet', 202, 143.5, 0, "le baquet de lessive de Margot, en haut de la berge: elle rince à la rivière"),
+    ('talus', 'baquet-margot', 'baquet-de-lessive', 202, 143.5, 0, "le baquet de lessive de Margot, en haut de la berge: elle rince à la rivière"),
     # clôture (151, 101.5): le pré des cheminots le long de la voie.
     ('cloture', 'tonneau-cheminots', 'tonneau', 147.5, 102.5, 0, "le tonneau d'eau de pluie du jardin des cheminots"),
     ('cloture', 'herbes-voie-1', 'herbes-hautes', 149.5, 100.5, 0, "l'herbe haute au pied de la clôture de la voie, où la faux ne passe pas"),

@@ -69,6 +69,8 @@ export type Condition =
    * sont pas revenus: les ronces de la maison arrachées (ressource sans retour, `respawnDays: null`).
    */
   | { type: 'harvested'; objects: string[] }
+  | { type: 'sown'; objects: string[]; crop?: string; count: number }
+  | { type: 'bag_slots_at_least'; slots: number }
   /**
    * Celui qui agit porte un instrument désaccordé (un peu faux ou faux, `simulation/musique/accord.ts`);
    * sans joueur qui agit, l'un ou l'autre.
@@ -162,6 +164,21 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
     v.strictObject({
       type: v.literal('harvested'),
       objects: v.pipe(v.array(IdSchema), v.minLength(1), v.maxLength(16)),
+    }),
+    /**
+     * Le vrai geste du potager: au moins `count` cases bêchées et semées (de `crop` s'il est donné)
+     * dans ces terres cultivables (brique `field`) du lieu présent.
+     */
+    v.strictObject({
+      type: v.literal('sown'),
+      objects: v.pipe(v.array(IdSchema), v.minLength(1), v.maxLength(16)),
+      crop: v.exactOptional(IdSchema),
+      count: v.pipe(CountSchema, v.minValue(1)),
+    }),
+    /** Le sac porté (de qui agit, sinon de l'un ou l'autre) a au moins `slots` cases; sans sac: 0. */
+    v.strictObject({
+      type: v.literal('bag_slots_at_least'),
+      slots: v.pipe(CountSchema, v.minValue(1)),
     }),
     v.strictObject({ type: v.literal('instrument_out_of_tune') }),
     v.strictObject({

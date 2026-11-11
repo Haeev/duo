@@ -67,7 +67,7 @@
     "maxBytes": 1048576,
     "moments": ["auto", "exit", "manual"],
     "autosaveSeconds": 300,
-    "help": "Le jeu enregistre à l'aube, toutes les 5 minutes et en quittant. Une partie d'essai peut repartir de zéro."
+    "help": "Le jeu enregistre au coucher, à l'aube, toutes les 5 minutes et en quittant. Une partie d'essai peut repartir de zéro."
   },
   "credits": null
 }

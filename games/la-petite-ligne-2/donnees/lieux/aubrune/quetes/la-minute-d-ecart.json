@@ -969,7 +969,7 @@
         },
         {
           "id": "veille-du-train",
-          "objective": "Le train est annoncé pour demain: une bonne nuit, et une toilette à la pompe.",
+          "objective": "Le train est annoncé pour demain: une bonne nuit, puis une toilette au réveil (la pompe suffit).",
           "target": {
             "point": "maison-lit-g"
           },
@@ -977,7 +977,12 @@
             {
               "type": "need_at_least",
               "need": "sleep",
-              "value": 95
+              "value": 80
+            },
+            {
+              "type": "need_at_least",
+              "need": "hygiene",
+              "value": 55
             }
           ],
           "together": false,

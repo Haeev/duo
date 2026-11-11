@@ -17,7 +17,10 @@ import { bodyCollides } from '../src/simulation/noyau/grille';
 import { currentBlockers } from '../src/simulation/noyau/obstacles';
 import { createSim, type Sim } from '../src/simulation/noyau/pas';
 import { countHeld } from '../src/simulation/regles/conditions';
+import { applyWithGifts } from '../src/simulation/quetes/dons';
 import { remember } from '../src/simulation/regles/memoire';
+import { defaultPlayerLook } from '../src/rendu/personnages/apparence';
+import { equipBag } from '../src/simulation/sac/actions';
 import { faceObject, holdFromToolbar, strikeUntilHarvested } from './aides-geste';
 import { act, contentWith, contextOf, wait } from './aides-l3';
 import { createVirtualLink, memoryLog } from './aides-reseau';
@@ -262,6 +265,112 @@ describe('outils de Basile, étape encore ouverte', () => {
     expect(passed(sim)).toContain('outils');
     expect(talk(sim, 1, 'basile', 'merci')).toContain('basile-outils-encore#fin');
     expect(countHeld(sim.world.players[1], 'hache')).toBe(1);
+  });
+});
+
+describe('besaces de Solange', () => {
+  const bagOf = (sim: Sim, p: PlayerIndex): string | null => sim.world.players[p].bag?.id ?? null;
+
+  it('chacun reçoit la sienne, même après le passage de l’étape (0.22.0: le second jamais)', () => {
+    const sim = aubrune([...BEFORE_BRAMBLES, 'debroussailler'], 'besaces');
+    remember(contextOf(sim), 'aubrune.acte1.besaces', 'ouvert', 'duo');
+    for (const p of [0, 1] as const) sim.world.players[p].bag = null;
+    expect(talk(sim, 0, 'solange', 'merci')).toContain('solange-besaces#fin');
+    wait(sim, 0.5);
+    expect(passed(sim)).toContain('besaces');
+    expect(talk(sim, 1, 'solange', 'merci')).toContain('solange-besaces#fin');
+    expect([bagOf(sim, 0), bagOf(sim, 1)]).toEqual(['besace', 'besace']);
+  });
+
+  it('« Je repasserai » (0.22.0): Solange la redonne; jamais à la place d’un sac plus grand', () => {
+    const sim = aubrune([...BEFORE_BRAMBLES, 'debroussailler'], 'besaces');
+    remember(contextOf(sim), 'aubrune.acte1.besaces', 'ouvert', 'duo');
+    for (const p of [0, 1] as const) {
+      sim.world.players[p].bag = null;
+      remember(contextOf(sim), `dialogues.aubrune.solange-besaces.j${String(p)}`, true, p);
+    }
+    expect(talk(sim, 0, 'solange', 'merci')).toContain('solange-besaces-encore#fin');
+    wait(sim, 0.5);
+    expect(passed(sim)).toContain('besaces');
+    // Le second a déjà un sac à dos: rien ne lui est reproposé, et le don seul ne le remplace pas.
+    sim.world.players[1].bag = { id: 'sac-a-dos', slots: Array.from({ length: 10 }, () => null) };
+    expect(talk(sim, 1, 'solange', 'merci')[0]).not.toMatch(/^solange-besaces/);
+    expect(equipBag(contextOf(sim), 1, 'besace')).toBe(false);
+    expect(bagOf(sim, 1)).toBe('sac-a-dos');
+  });
+});
+
+describe('miroir de la mercerie (cahier Q11)', () => {
+  it('chacun y rouvre l’éditeur, et change d’apparence et de genre gratuitement', () => {
+    const sim = aubrune(BEFORE_BRAMBLES, 'debroussailler');
+    for (const p of [0, 1] as const) {
+      faceObject(sim, p, 'mercerie-miroir');
+      expect(act(sim, p, { type: 'act' })).toContainEqual({
+        type: 'mirror_opened',
+        player: p,
+        target: 'mercerie-miroir',
+      });
+      const me = sim.world.players[p];
+      // Jamais composée dans ce test: celle de départ, comme l'éditeur la montre.
+      const look =
+        me.look ??
+        defaultPlayerLook(
+          p,
+          null,
+          sim.content.settings.start.shapes,
+          '#d9654f',
+          sim.content.catalogue,
+        );
+      const money = me.money;
+      const gender = me.gender === 'f' ? 'm' : 'f';
+      act(sim, p, { type: 'set_look', name: me.name, look: structuredClone(look), gender });
+      expect(me.gender).toBe(gender);
+      expect(me.money).toBe(money);
+      sim.world.players[p].body = { x: 10, y: 10, facing: 0, speed: 0 };
+    }
+  });
+});
+
+describe('dons des scènes et des lettres', () => {
+  it('poches pleines: la scène continue, le don attend sans tomber au sol, puis arrive', () => {
+    const sim = aubrune(BEFORE_BRAMBLES, 'debroussailler');
+    const scene = sim.content.places.aubrune?.scenes['tous-premiers'];
+    const beat = scene?.beats.findIndex((b) => b.do === 'effects') ?? -1;
+    const effects = scene?.beats[beat];
+    if (effects?.do !== 'effects') throw new Error('don de scène absent');
+    fillPockets(sim, 1);
+    emptyPockets(sim, 0);
+    applyWithGifts(
+      contextOf(sim),
+      0,
+      effects.effects,
+      { place: 'aubrune', source: 'tous-premiers', beat },
+      () => undefined,
+    );
+    expect(countHeld(sim.world.players[0], 'soupe-aux-herbes')).toBe(1);
+    expect(countHeld(sim.world.players[1], 'soupe-aux-herbes')).toBe(0);
+    expect(sim.world.progress.memory['dons.aubrune.tous-premiers.j1']).toBeDefined();
+    expect(groundItems(sim)).toEqual([]);
+    // La lettre de Margot, même règle (colis de six graines de carotte).
+    fillPockets(sim, 0);
+    const letter = sim.content.places.aubrune?.orders?.letters['margot-on-arrive'];
+    if (letter === undefined) throw new Error('lettre absente');
+    applyWithGifts(
+      contextOf(sim),
+      0,
+      letter.attach,
+      { place: 'aubrune', source: 'margot-on-arrive', beat: null },
+      () => undefined,
+    );
+    expect(sim.world.progress.memory['dons.aubrune.margot-on-arrive.j0']?.v).toBe('lettre');
+    wait(sim, 2);
+    expect(groundItems(sim)).toEqual([]);
+    emptyPockets(sim, 0);
+    emptyPockets(sim, 1);
+    wait(sim, 1);
+    expect(countHeld(sim.world.players[1], 'soupe-aux-herbes')).toBe(1);
+    expect(countHeld(sim.world.players[0], 'graines-carotte')).toBe(6);
+    expect(Object.keys(sim.world.progress.memory).filter((k) => k.startsWith('dons.'))).toEqual([]);
   });
 });
 

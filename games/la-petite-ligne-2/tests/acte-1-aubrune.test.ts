@@ -13,6 +13,7 @@ import { giveItem } from '../src/simulation/sac/actions';
 import { sceneView } from '../src/simulation/scenes/lecture';
 import { faceObject, holdFromToolbar, strikeUntilHarvested } from './aides-geste';
 import { act, contentWith, contextOf, wait } from './aides-l3';
+import { run, send } from './aides-noyau';
 import { lieDown, propsWithBrick } from './aides-prologue';
 import { visit } from './aides-visite';
 import { newSim } from './aides';
@@ -298,6 +299,35 @@ describe('écriture du prologue et de l’acte 1', () => {
     expect(talk(sim, 0, 'odette', 'prendre')).toContain('odette-graines#fin');
     wait(sim, 0.5);
     both(sim, 'jd');
+    wait(sim, 0.5);
+    // Passer au jardin ne suffit plus: une case bêchée, puis semée de radis (le vrai geste).
+    expect(passed(sim, 'le-train-de-5h12')).not.toContain('potager');
+    holdFromToolbar(sim, 0, 'beche');
+    faceObject(sim, 0, 'potager');
+    const tilled = (): boolean =>
+      (sim.world.places[AUBRUNE]?.objects.potager?.field?.cells ?? []).some((c) => c !== null);
+    for (let i = 0; i < 6 && !tilled(); i++) {
+      send(sim, 0, { type: 'act' });
+      run(sim, 1.6);
+    }
+    expect(tilled()).toBe(true);
+    wait(sim, 0.5);
+    expect(passed(sim, 'le-train-de-5h12')).not.toContain('potager');
+    // Les graines d'Odette passent du sac à la barre, comme à la souris.
+    const me = sim.world.players[0];
+    if (!me.toolbar.some((s) => s?.item === 'graines-radis')) {
+      // Barre pleine: les graines prennent la case de la hache, qui passe au sac.
+      const index = me.bag?.slots.findIndex((s) => s?.item === 'graines-radis') ?? -1;
+      const swap = me.toolbar.findIndex((s) => s === null || s.item === 'hache');
+      send(sim, 0, {
+        type: 'move_stack',
+        from: { area: 'bag', index },
+        to: { area: 'toolbar', index: swap },
+      });
+    }
+    holdFromToolbar(sim, 0, 'graines-radis');
+    send(sim, 0, { type: 'act' });
+    run(sim, 1.6);
     wait(sim, 0.5);
     expect(passed(sim, 'le-train-de-5h12')).toContain('potager');
     talk(sim, 0, 'odette', 'oui');

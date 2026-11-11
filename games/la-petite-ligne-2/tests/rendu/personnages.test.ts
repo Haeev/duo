@@ -372,3 +372,56 @@ describe('sans coiffe au lit', () => {
     expect(root.children.length).toBe(0);
   });
 });
+
+describe('assise sur le meuble', () => {
+  // Capture du client: assis à côté du tabouret (forme provisoire de 0,9 m faute d'assise mesurée).
+  function seated(
+    type: string,
+    brick?: { height?: number; front?: number },
+  ): { y: number; z: number } {
+    const local = gameContent();
+    const def = local.props[type];
+    const halte = local.places['essai-halte'];
+    if (def === undefined || halte === undefined) throw new Error(type);
+    if (brick !== undefined)
+      for (const b of def.bricks) if (b.brick === 'sit') Object.assign(b, brick);
+    (halte.map.objects as unknown[]).push({ id: 'z-siege', type, x: 40.5, y: 40.5, rotation: 0 });
+    const world = createWorld(local, 3, [
+      { id: 'a', name: 'A' },
+      { id: 'b', name: 'B' },
+    ]);
+    const place = createPlaceState(local, halte);
+    world.places['essai-halte'] = place;
+    world.common.place = 'essai-halte';
+    const seats = place.objects['z-siege']?.sit;
+    if (seats === undefined) throw new Error('siège sans places');
+    seats[0] = 0;
+    world.players[0].body = { x: 40.5, y: 40.5, facing: Math.PI / 2, speed: 0 };
+    const root = new Group();
+    const layer = new AssembledCharacters(
+      { root, playerColors: ['#d9654f', '#4f8fd9'] },
+      { content: local, onEvent: () => () => undefined },
+      library,
+    );
+    for (let i = 0; i < 60; i += 1) layer.update({ dt: 1 / 60, world, place, cameraYaw: 0 });
+    const figure = root.getObjectByName('personnage-player-0');
+    const at = {
+      y: (figure?.position.y ?? 0) + CHARACTER_SETTINGS.seat.clipSeat,
+      z: figure?.position.z ?? 0,
+    };
+    layer.dispose();
+    return at;
+  }
+
+  it('s’assoit sur le dessus du tabouret (modèle sans assise mesurée), au milieu', () => {
+    expect(CHARACTER_SETTINGS.seat.byModel['stool-farm']?.height).toBeCloseTo(0.46, 2);
+    const at = seated('tabouret-de-ferme');
+    expect(at.y).toBeCloseTo(0.46, 2);
+    expect(at.z).toBeCloseTo(40.5, 2);
+  });
+
+  it('garde l’assise mesurée de la chaise et le réglage par meuble des données', () => {
+    expect(seated('chaise').y).toBeCloseTo(0.45, 2);
+    expect(seated('tabouret-de-ferme', { height: 0.6 }).y).toBeCloseTo(0.6, 2);
+  });
+});

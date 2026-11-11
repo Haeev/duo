@@ -72,7 +72,7 @@ C'est tout. Ni portrait, ni objectif, ni boutons de caméra, ni barre d'outils p
 | Flèche de quête | G | après 3 s | au sol, devant le personnage, pointée vers l'objectif (cahier, 4.10); si l'objectif est à l'écran, un losange se pose dessus |
 | Repère de l'autre joueur | G | après 3 s | bord de l'écran, jeton à sa couleur et à sa forme |
 | Bulle « j'ai quelque chose » | un habitant a une étape de quête, une demande ou un cadeau pour ce joueur | après lui avoir parlé | au-dessus de l'habitant, visible de loin (taille constante à l'écran, réduite au-delà de 30 m) |
-| Onomatopée | émotion d'un habitant ou d'un joueur (« !! », « ?? », « ... », « Zzz », « ♪ », cœur, « Pouah ») | 1,5 s | au-dessus de la tête, dans le monde |
+| Onomatopée | émotion d'un habitant ou d'un joueur (« !! », « ?? », « ... », « Zzz », « ♪ », cœur, « pff ») | 1,5 s | au-dessus de la tête, dans le monde |
 | Gain | objet ramassé, argent reçu, cœur d'amitié gagné | 1,2 s | part de l'objet et vole vers la barre d'outils, la bourse ou l'habitant |
 | Prise nouvelle | première prise d'une espèce ou d'un trésor (poisson, insecte, fossile): le personnage la brandit face à la caméra, jingle, et un petit bandeau bas avec l'objet en 3D qui tourne, son nom et une ligne; le signet Collections reçoit son point. Une prise déjà connue: seulement le gain qui vole, sans arrêt | Espace, ou 3 s | bas centre |
 | Annonce d'un événement | la veille à partir de 18 h (« Demain : Nuit des lumignons / Sur le parvis, à partir de 10 h », nom, lieu et heure tirés de la fiche), et le jour même à l'ouverture (« En ce moment », jusqu'à l'heure de fin) | 9 s | haut droite, sous l'avis court; aussi une ligne au coup d'œil (G) et en tête de l'onglet Quêtes tant que l'événement n'est pas fini. Captures: `annonce-veille.png`, `annonce-coup-d-oeil.png`, `annonce-carnet.png` |
@@ -93,7 +93,7 @@ Proposition: trois médaillons ronds (faim: bol, sommeil: lune, hygiène: goutte
 | 1 à 20 %: ralenti | **reste affiché** tant que le besoin est sous 20 (cahier, 4.4: un malus qui dure doit rester expliqué): anneau hachuré, bord en pointillé, battement lent | faim: main sur le ventre, gargouillis; sommeil: bâillements, « Zzz »; hygiène: petit nuage et mouches |
 | 0 % | reste affiché, plus grand, picto barré; la bulle d'action ne propose plus que manger (ou dormir) | marche traînante |
 
-Ils apparaissent aussi (à la demande, ce ne sont pas des changements subis): pendant qu'on mange, dort ou se lave (l'anneau se remplit sous les yeux), au coup d'œil (G), et toujours dans l'en-tête du carnet. Hygiène basse: l'habitant affiche « Pouah » avant de parler, et le choix de dialogue qui échouerait porte le picto de la goutte barrée (on sait pourquoi avant de choisir). Chaque joueur ne voit que ses propres médaillons; l'état de l'autre se lit sur son personnage.
+Ils apparaissent aussi (à la demande, ce ne sont pas des changements subis): pendant qu'on mange, dort ou se lave (l'anneau se remplit sous les yeux), au coup d'œil (G), et toujours dans l'en-tête du carnet. Hygiène basse: l'habitant affiche « pff » avant de parler, et le choix de dialogue qui échouerait porte le picto de la goutte barrée (on sait pourquoi avant de choisir). Chaque joueur ne voit que ses propres médaillons; l'état de l'autre se lit sur son personnage.
 
 ### 3.4 Comportement à 1366x768
 
@@ -321,7 +321,7 @@ Règles:
 | Médaillon de besoin (`need`) | picto et anneau | caché, bonus (étoile), normal, bas (hachures, pointillé, battement), zéro |
 | Bulle d'action (`prompt`) | touche, picto, verbe | possible, impossible (ce qui manque en image) |
 | Bulle d'habitant (`npc-bubble`) | « j'ai quelque chose »: histoire (plume), demande (main), cadeau (paquet) | loin (réduite), proche |
-| Onomatopée (`emote`) | signes stylisés dans le monde | « !! », « ?? », « ... », « Zzz », « ♪ », cœur, « Pouah » |
+| Onomatopée (`emote`) | signes stylisés dans le monde | « !! », « ?? », « ... », « Zzz », « ♪ », cœur, « pff » |
 | Bandeau de dialogue (`dialogue`) | portrait, plaque du nom, texte, choix | voir 5.2 |
 | Signet (`tab`) | onglet à image | fermé, ouvert (nom visible), nouveauté |
 | Touche (`key`) | capuchon de touche, libellé selon le clavier réel | |
