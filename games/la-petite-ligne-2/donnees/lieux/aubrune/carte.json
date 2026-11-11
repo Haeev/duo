@@ -860,6 +860,246 @@
       "pourquoi": "contre le mur ouest de la forge, sous l'auvent, au bord de la rue de l'Église: Mado s'y tient côté rue, au poste mado-enclume (amélioration et réparation des outils)"
     },
     {
+      "id": "cageot-ferme-1",
+      "type": "caisse-de-legumes",
+      "x": 212.5,
+      "y": 157.5,
+      "rotation": 0,
+      "pourquoi": "cageots de la récolte du potager de la ferme, au bord du chemin des Champs: la charrette les prend là"
+    },
+    {
+      "id": "cageot-ferme-2",
+      "type": "caisse-de-legumes",
+      "x": 213.5,
+      "y": 157.5,
+      "rotation": 0,
+      "pourquoi": "cageots de la récolte, au bord du chemin"
+    },
+    {
+      "id": "cageot-ferme-3",
+      "type": "caisse-de-legumes",
+      "x": 214.5,
+      "y": 157.5,
+      "rotation": 0,
+      "pourquoi": "cageots de la récolte, au bord du chemin"
+    },
+    {
+      "id": "seau-potager-ferme",
+      "type": "seau",
+      "x": 210.5,
+      "y": 157.5,
+      "rotation": 0,
+      "pourquoi": "le seau d'arrosage, au coin du potager"
+    },
+    {
+      "id": "banc-champs",
+      "type": "banc-de-table",
+      "x": 228,
+      "y": 156.5,
+      "rotation": 0,
+      "pourquoi": "le banc où Margot et Paulin cassent la croûte, au bord du chemin, face à leurs champs"
+    },
+    {
+      "id": "panier-champs",
+      "type": "panier-a-linge",
+      "x": 229.5,
+      "y": 156.5,
+      "rotation": 0,
+      "pourquoi": "le panier du casse-croûte, à côté du banc"
+    },
+    {
+      "id": "tonnelet-labour",
+      "type": "tonnelet",
+      "x": 213.5,
+      "y": 163.5,
+      "rotation": 0,
+      "pourquoi": "le tonnelet d'eau des travailleurs, au coin du labour"
+    },
+    {
+      "id": "seau-labour",
+      "type": "seau",
+      "x": 212.5,
+      "y": 164.5,
+      "rotation": 0,
+      "pourquoi": "le seau des bêtes de trait, au coin du labour"
+    },
+    {
+      "id": "bois-logis-1",
+      "type": "buches-d-interieur",
+      "x": 201.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "le bois de chauffe empilé contre le mur nord du logis, sous l'avant-toit"
+    },
+    {
+      "id": "bois-logis-2",
+      "type": "buches-d-interieur",
+      "x": 202.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "le bois de chauffe contre le mur nord du logis"
+    },
+    {
+      "id": "tonnelet-logis",
+      "type": "tonnelet",
+      "x": 204.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "un tonnelet qui attend le cidre, contre le mur nord, à l'ombre"
+    },
+    {
+      "id": "banc-talus",
+      "type": "banc-de-table",
+      "x": 196,
+      "y": 143.5,
+      "rotation": 2,
+      "pourquoi": "un banc à mi-pente, face à la rivière et au bourg: Margot y écosse"
+    },
+    {
+      "id": "panier-talus",
+      "type": "panier-a-linge",
+      "x": 197.5,
+      "y": 143.5,
+      "rotation": 0,
+      "pourquoi": "le panier de légumes à écosser, à côté du banc"
+    },
+    {
+      "id": "seau-talus",
+      "type": "seau",
+      "x": 192.5,
+      "y": 140.5,
+      "rotation": 0,
+      "pourquoi": "le seau puisé à la rivière, en haut de la berge (Margot descend à la grève le matin)"
+    },
+    {
+      "id": "banc-cheminots",
+      "type": "banc",
+      "x": 152,
+      "y": 101.5,
+      "rotation": 2,
+      "pourquoi": "le banc des cheminots face à la voie: on y regarde passer les trains"
+    },
+    {
+      "id": "bois-cheminots-1",
+      "type": "buches-d-interieur",
+      "x": 157.5,
+      "y": 100.5,
+      "rotation": 0,
+      "pourquoi": "le bois fendu des logements de la Compagnie, au pied de la clôture"
+    },
+    {
+      "id": "bois-cheminots-2",
+      "type": "buches-d-interieur",
+      "x": 158.5,
+      "y": 100.5,
+      "rotation": 0,
+      "pourquoi": "le bois fendu des logements de la Compagnie"
+    },
+    {
+      "id": "cageot-cheminots",
+      "type": "caisse-de-legumes",
+      "x": 147.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "un cageot du jardin des cheminots, au bord de leur chemin"
+    },
+    {
+      "id": "seau-cheminots",
+      "type": "seau",
+      "x": 148.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "le seau d'arrosage du jardin des cheminots"
+    },
+    {
+      "id": "tonnelet-pension",
+      "type": "tonnelet",
+      "x": 188.5,
+      "y": 121.5,
+      "rotation": 0,
+      "pourquoi": "le tonnelet de cidre d'Odette contre le mur sud de la pension, à l'ombre"
+    },
+    {
+      "id": "panier-pension",
+      "type": "panier-a-linge",
+      "x": 191.5,
+      "y": 122.5,
+      "rotation": 0,
+      "pourquoi": "le linge des pensionnaires, qu'Odette étend au soleil de la berge"
+    },
+    {
+      "id": "seau-pension",
+      "type": "seau",
+      "x": 190.5,
+      "y": 122.5,
+      "rotation": 0,
+      "pourquoi": "le seau de la lessive, à côté du panier"
+    },
+    {
+      "id": "bois-flotte-1",
+      "type": "buches-d-interieur",
+      "x": 193.5,
+      "y": 128.5,
+      "rotation": 0,
+      "pourquoi": "du bois flotté tiré de la grève, qui sèche au-dessus de l'eau"
+    },
+    {
+      "id": "bois-flotte-2",
+      "type": "buches-d-interieur",
+      "x": 194.5,
+      "y": 128.5,
+      "rotation": 0,
+      "pourquoi": "du bois flotté qui sèche"
+    },
+    {
+      "id": "seau-pompe",
+      "type": "seau",
+      "x": 208,
+      "y": 114.5,
+      "rotation": 0,
+      "pourquoi": "le seau sous le bec de la pompe de la place"
+    },
+    {
+      "id": "tonnelet-tonnelle",
+      "type": "tonnelet",
+      "x": 195.5,
+      "y": 122.5,
+      "rotation": 0,
+      "pourquoi": "le cidre du souper de la tonnelle, au pied de la pension"
+    },
+    {
+      "id": "panier-lessive",
+      "type": "panier-a-linge",
+      "x": 210.5,
+      "y": 122.5,
+      "rotation": 0,
+      "pourquoi": "la lessive descendue à la rivière, posée en haut de la berge"
+    },
+    {
+      "id": "seau-lessive",
+      "type": "seau",
+      "x": 211.5,
+      "y": 122.5,
+      "rotation": 0,
+      "pourquoi": "le seau de rinçage de la lessive"
+    },
+    {
+      "id": "tonnelet-garage",
+      "type": "tonnelet",
+      "x": 97.5,
+      "y": 94.5,
+      "rotation": 0,
+      "pourquoi": "un tonnelet de graisse d'aiguillage oublié par la Compagnie au bord de la plaine du garage"
+    },
+    {
+      "id": "seau-garage",
+      "type": "seau",
+      "x": 96.5,
+      "y": 94.5,
+      "rotation": 0,
+      "pourquoi": "le seau de graisse, à côté"
+    },
+    {
       "id": "vieux-chene",
       "type": "gros-chene",
       "x": 188,
@@ -993,6 +1233,7 @@
       "x": 112,
       "y": 99.8,
       "rotation": 0,
+      "resource": "fouille-ballast",
       "pourquoi": "le ballast de la voie ouest: boulons, plaques"
     },
     {
@@ -1017,6 +1258,7 @@
       "x": 119,
       "y": 26,
       "rotation": 0,
+      "resource": "fouille-pierre-levee",
       "pourquoi": "la Pierre Levée"
     },
     {
@@ -1025,6 +1267,7 @@
       "x": 268,
       "y": 51,
       "rotation": 0,
+      "resource": "fouille-roche",
       "pourquoi": "la roche aux fossiles"
     },
     {

@@ -43,6 +43,41 @@
       "x": 1,
       "y": 3.5,
       "rotation": 0
+    },
+    {
+      "id": "ecole-patere",
+      "type": "patere",
+      "x": 5.5,
+      "y": 4.5,
+      "rotation": 3
+    },
+    {
+      "id": "ecole-poele",
+      "type": "poele",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "ecole-buches",
+      "type": "buches-d-interieur",
+      "x": 0.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "ecole-balai",
+      "type": "balai",
+      "x": 4.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "ecole-seau",
+      "type": "seau",
+      "x": 1.5,
+      "y": 4.5,
+      "rotation": 0
     }
   ],
   "doors": {

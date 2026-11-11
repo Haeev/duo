@@ -61,6 +61,76 @@
       "x": 7.5,
       "y": 0.5,
       "rotation": 0
+    },
+    {
+      "id": "ferme-logis-etagere",
+      "type": "etagere-murale",
+      "x": 3.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "ferme-logis-horloge",
+      "type": "horloge-murale",
+      "x": 4.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "ferme-logis-patere",
+      "type": "patere",
+      "x": 7.5,
+      "y": 4.5,
+      "rotation": 3
+    },
+    {
+      "id": "ferme-logis-seau",
+      "type": "seau",
+      "x": 3.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "ferme-logis-buches",
+      "type": "buches-d-interieur",
+      "x": 0.5,
+      "y": 2.5,
+      "rotation": 0
+    },
+    {
+      "id": "ferme-logis-caisse",
+      "type": "caisse-de-legumes",
+      "x": 0.5,
+      "y": 3.5,
+      "rotation": 0
+    },
+    {
+      "id": "ferme-logis-tonnelet",
+      "type": "tonnelet",
+      "x": 0.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "ferme-logis-panier",
+      "type": "panier-a-linge",
+      "x": 7.5,
+      "y": 2.5,
+      "rotation": 0
+    },
+    {
+      "id": "ferme-logis-balai",
+      "type": "balai",
+      "x": 3.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "ferme-logis-tapis-de-sol",
+      "type": "tapis-rond",
+      "x": 6,
+      "y": 3,
+      "rotation": 0
     }
   ],
   "doors": {

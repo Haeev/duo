@@ -22,6 +22,27 @@
       "x": 0.5,
       "y": 2.5,
       "rotation": 1
+    },
+    {
+      "id": "poste-cabine-poele",
+      "type": "poele",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "poste-cabine-buches",
+      "type": "buches-d-interieur",
+      "x": 0.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "poste-cabine-plan-voies",
+      "type": "cadre-paysage",
+      "x": 4.5,
+      "y": 0.5,
+      "rotation": 3
     }
   ],
   "doors": {

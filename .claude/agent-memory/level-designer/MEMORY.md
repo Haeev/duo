@@ -142,6 +142,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Un point d'intérieur vit dans le fichier de sa pièce, pas dans `carte.json`: le chargeur les fusionne (`src/donnees/carte.ts`), un script qui ne lit que la carte doit aussi lire `interieurs/*.json`.
 - Captures en jeu d'un intérieur: spec Playwright temporaire dans `tests/e2e/` (sauvegarde `aubrune`, `duo.teleport`, `host.shot`, `LPL2_CAPTURES=<dossier>`), après `npx vite build` et `pnpm --filter @duo/sdk-dev build`; la supprimer ensuite.
 
+## Habiller une pièce (Aubrune, vérifié le 2026-11-11)
+
+- La Petite Ligne 2: caméra par défaut au sud-ouest (`defaultYawDeg: 45`, `towardCamera` x < 0, z > 0): murs nord et est debout, sud et ouest coupés. Objet mural (`deco.layer: wall`, dos à z = -0,5 dans le modèle): mur nord en rotation 0, mur est en rotation 3.
+- Aucun « posé sur » pour les objets de la carte (`base: 0` dans `describePlace`): les objets `top` tomberaient au sol. Le logement des joueurs (`simulation/logement/pose.ts`) sait, lui, poser sur une surface.
+- Tout objet de 1,3 m et plus (`tallObject`) collé à un mur masque la fenêtre de son pan (emprise de la case + 0,08): elle glisse ou disparaît. Le balai (1,4 m) compte. Relevé jetable des fenêtres: vitest `--dir` qui appelle `describePlace`, `doorSills`, `roomFacades` (avec `new PlaceBuildings(undefined, () => new Promise(() => undefined))`) et `roomPlan`; comparer avant et après.
+- Un comptoir d'une case a son client sur la case devant lui (`postes-habitants`): rien de solide là. Toute case pleine dans une rangée de cuisine de 1 m peut enfermer la cuisinière: relancer `controler_plan.py` (règle d'accès) après chaque objet solide.
+- Un identifiant d'objet qui finit par `-tapis` passe pour le paillasson d'une porte (`tests/rendu/chargement.test.ts` compte les volumes): nommer un tapis posé `<pièce>-tapis-de-sol`.
+- Dehors, seuls les types de `donnees/commun/meubles` se posent; rochers, buissons, herbes, tonneau, caisse, puits ont un modèle mais pas de type: les demander, ne pas détourner un type récoltable (`caillou`, `branches`, `tas-de-bois` à brique `gather`).
+
 ## Ce que le rendu lit vraiment (Aubrune, vérifié le 2026-11-11)
 
 - Sol: une nature absente de `GROUND_LOOKS` (`reglages-tuiles.ts`) est peinte en herbe sans bruit (`DEFAULT_LOOK`); le décor ne sème d'arbres que sur `herbe`, `hors-jeu` et `pre` (`tileDecor`). Toute nature inventée par le plan (`sous-bois`, `place`...) est donc un sol d'herbe nu: vérifier la liste avant d'en créer une, préférer un nom déjà connu quand c'est le même sol.

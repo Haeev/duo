@@ -48,6 +48,83 @@
       "x": 5,
       "y": 2.5,
       "rotation": 0
+    },
+    {
+      "id": "fournil-etagere",
+      "type": "etagere-murale",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "fournil-buches",
+      "type": "buches-d-interieur",
+      "x": 4.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "fournil-affiche",
+      "type": "cadre-paysage",
+      "x": 5.5,
+      "y": 1.5,
+      "rotation": 3
+    },
+    {
+      "id": "fournil-etagere-pains",
+      "type": "etagere-murale",
+      "x": 5.5,
+      "y": 2.5,
+      "rotation": 3
+    },
+    {
+      "id": "fournil-horloge",
+      "type": "horloge-murale",
+      "x": 5.5,
+      "y": 3.5,
+      "rotation": 3
+    },
+    {
+      "id": "fournil-patere",
+      "type": "patere",
+      "x": 5.5,
+      "y": 4.5,
+      "rotation": 3
+    },
+    {
+      "id": "fournil-seau",
+      "type": "seau",
+      "x": 0.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "fournil-balai",
+      "type": "balai",
+      "x": 2.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "fournil-tabouret",
+      "type": "tabouret-de-ferme",
+      "x": 0.5,
+      "y": 3.5,
+      "rotation": 0
+    },
+    {
+      "id": "fournil-panier",
+      "type": "panier-a-linge",
+      "x": 0.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "fournil-tapis-de-sol",
+      "type": "tapis-long",
+      "x": 3.5,
+      "y": 2.5,
+      "rotation": 1
     }
   ],
   "doors": {

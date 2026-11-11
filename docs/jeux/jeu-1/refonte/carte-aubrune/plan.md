@@ -511,6 +511,36 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 | coquelicots-verger | coquelicots | `poppies` | 305.5, 124.5 | sud | dans l'herbe haute du verger, qu'on ne fauche qu'en juillet: la seule touffe du bourg (la mercerie les rachète) |
 | coquelicots-champs | coquelicots | `poppies` | 236.5, 162.5 | sud | sur la tournière des champs des Delmas, entre le chemin des Champs et le labour: le coquelicot pousse au bord des blés |
 | enclume-forge | enclume | `enclume` | 262.5, 103.5 | ouest | contre le mur ouest de la forge, sous l'auvent, au bord de la rue de l'Église: Mado s'y tient côté rue, au poste mado-enclume (amélioration et réparation des outils) |
+| cageot-ferme-1 | caisse-de-legumes | `vegetable-crate` | 212.5, 157.5 | sud | cageots de la récolte du potager de la ferme, au bord du chemin des Champs: la charrette les prend là |
+| cageot-ferme-2 | caisse-de-legumes | `vegetable-crate` | 213.5, 157.5 | sud | cageots de la récolte, au bord du chemin |
+| cageot-ferme-3 | caisse-de-legumes | `vegetable-crate` | 214.5, 157.5 | sud | cageots de la récolte, au bord du chemin |
+| seau-potager-ferme | seau | `bucket` | 210.5, 157.5 | sud | le seau d'arrosage, au coin du potager |
+| banc-champs | banc-de-table | `table-bench` | 228, 156.5 | sud | le banc où Margot et Paulin cassent la croûte, au bord du chemin, face à leurs champs |
+| panier-champs | panier-a-linge | `laundry-basket` | 229.5, 156.5 | sud | le panier du casse-croûte, à côté du banc |
+| tonnelet-labour | tonnelet | `small-keg` | 213.5, 163.5 | sud | le tonnelet d'eau des travailleurs, au coin du labour |
+| seau-labour | seau | `bucket` | 212.5, 164.5 | sud | le seau des bêtes de trait, au coin du labour |
+| bois-logis-1 | buches-d-interieur | `indoor-logs` | 201.5, 146.5 | sud | le bois de chauffe empilé contre le mur nord du logis, sous l'avant-toit |
+| bois-logis-2 | buches-d-interieur | `indoor-logs` | 202.5, 146.5 | sud | le bois de chauffe contre le mur nord du logis |
+| tonnelet-logis | tonnelet | `small-keg` | 204.5, 146.5 | sud | un tonnelet qui attend le cidre, contre le mur nord, à l'ombre |
+| banc-talus | banc-de-table | `table-bench` | 196, 143.5 | nord | un banc à mi-pente, face à la rivière et au bourg: Margot y écosse |
+| panier-talus | panier-a-linge | `laundry-basket` | 197.5, 143.5 | sud | le panier de légumes à écosser, à côté du banc |
+| seau-talus | seau | `bucket` | 192.5, 140.5 | sud | le seau puisé à la rivière, en haut de la berge (Margot descend à la grève le matin) |
+| banc-cheminots | banc | `bench-platform` | 152, 101.5 | nord | le banc des cheminots face à la voie: on y regarde passer les trains |
+| bois-cheminots-1 | buches-d-interieur | `indoor-logs` | 157.5, 100.5 | sud | le bois fendu des logements de la Compagnie, au pied de la clôture |
+| bois-cheminots-2 | buches-d-interieur | `indoor-logs` | 158.5, 100.5 | sud | le bois fendu des logements de la Compagnie |
+| cageot-cheminots | caisse-de-legumes | `vegetable-crate` | 147.5, 104.5 | sud | un cageot du jardin des cheminots, au bord de leur chemin |
+| seau-cheminots | seau | `bucket` | 148.5, 104.5 | sud | le seau d'arrosage du jardin des cheminots |
+| tonnelet-pension | tonnelet | `small-keg` | 188.5, 121.5 | sud | le tonnelet de cidre d'Odette contre le mur sud de la pension, à l'ombre |
+| panier-pension | panier-a-linge | `laundry-basket` | 191.5, 122.5 | sud | le linge des pensionnaires, qu'Odette étend au soleil de la berge |
+| seau-pension | seau | `bucket` | 190.5, 122.5 | sud | le seau de la lessive, à côté du panier |
+| bois-flotte-1 | buches-d-interieur | `indoor-logs` | 193.5, 128.5 | sud | du bois flotté tiré de la grève, qui sèche au-dessus de l'eau |
+| bois-flotte-2 | buches-d-interieur | `indoor-logs` | 194.5, 128.5 | sud | du bois flotté qui sèche |
+| seau-pompe | seau | `bucket` | 208, 114.5 | sud | le seau sous le bec de la pompe de la place |
+| tonnelet-tonnelle | tonnelet | `small-keg` | 195.5, 122.5 | sud | le cidre du souper de la tonnelle, au pied de la pension |
+| panier-lessive | panier-a-linge | `laundry-basket` | 210.5, 122.5 | sud | la lessive descendue à la rivière, posée en haut de la berge |
+| seau-lessive | seau | `bucket` | 211.5, 122.5 | sud | le seau de rinçage de la lessive |
+| tonnelet-garage | tonnelet | `small-keg` | 97.5, 94.5 | sud | un tonnelet de graisse d'aiguillage oublié par la Compagnie au bord de la plaine du garage |
+| seau-garage | seau | `bucket` | 96.5, 94.5 | sud | le seau de graisse, à côté |
 <!-- genere:mobilier:fin -->
 
 ### Végétation par zones
@@ -601,28 +631,28 @@ Posés dans l'annexe sous le dehors (y 210), reliés au dehors par une paire de 
 **la halte** (`interieurs/halte.json`, 9 x 5 m, 45 m², niveau 0): le guichet sépare la salle du bureau; la consigne est le coffre commun des deux joueurs.
 
 ```text
-B B . . . . . T T
-. * . . . . . * .
+C B . B . . . T C
+. * . P . . . * P
 . . . . . C * . .
-. . . . . . # # .
-. . P . . . . . C
+B . . . . . # # .
+. . P . . . T C C
 ```
 
-Pièces: salle des pas perdus (5 x 5); guichet (1 x 5); bureau de Firmin (3 x 3); consigne (3 x 2). Meubles: halte-banc (banc), halte-guichet (comptoir, à créer), halte-bureau (table-a-manger), halte-chaise (chaise), halte-consigne (coffre). Points: halte-p-guichet (comptoir, Firmin), halte-p-bureau (siege, Firmin), halte-p-banc (siege).
+Pièces: salle des pas perdus (5 x 5); guichet (1 x 5); bureau de Firmin (3 x 3); consigne (3 x 2). Meubles: halte-banc (banc), halte-guichet (comptoir, à créer), halte-bureau (table-a-manger), halte-chaise (chaise), halte-consigne (coffre), halte-horloge (horloge-murale), halte-affiche (cadre-paysage), halte-reglement (cadre-portrait), halte-patere (patere), halte-poele (poele), halte-buches (buches-d-interieur), halte-balai (balai), halte-colis (caisse-de-legumes), halte-fut (tonnelet). Points: halte-p-guichet (comptoir, Firmin), halte-p-bureau (siege, Firmin), halte-p-banc (siege).
 
 **la maison du garde, rez-de-chaussée** (`interieurs/maison-rdc.json`, 10 x 7 m, 70 m², niveau 0): au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de l'étage part de la cuisine, celui de la cave de la chambre.
 
 ```text
-. . . . A # T T C .
-. . . . . # C . . P
-. . . . . . . . * .
-E . . . . . . . L L
+. . S . A # T T H P
+. . . B . # C . . P
+. . . . . . T T * P
+E . . . . . . . L C
 . . . . . E . . L L
-. . . . . . . * * .
+. . . . . . . * * S
 . . . . . # R P P C
 ```
 
-Pièces: salle commune et cuisine (5 x 7); chambre (5 x 4); troisième pièce (5 x 3). Meubles: maison-cuisiniere (cuisiniere), maison-plan (plan-de-travail), maison-table (table-a-manger), maison-chaise-1 (chaise), maison-chaise-2 (chaise), lit-de-la-maison (lit-double), maison-armoire (armoire), maison-rechaud (rechaud). Points: maison-lit-g (lit), maison-lit-d (lit), maison-cuisine (poste).
+Pièces: salle commune et cuisine (5 x 7); chambre (5 x 4); troisième pièce (5 x 3). Meubles: maison-cuisiniere (cuisiniere), maison-plan (plan-de-travail), maison-table (table-a-manger), maison-chaise-1 (chaise), maison-chaise-2 (chaise), lit-de-la-maison (lit-double), maison-armoire (armoire), maison-rechaud (rechaud), maison-rdc-patere (patere), maison-rdc-horloge (horloge-murale), maison-rdc-portrait (cadre-ovale), maison-rdc-panier (panier-a-linge), maison-rdc-seau (seau), maison-rdc-tapis-de-sol (tapis-long), maison-rdc-balai (balai), maison-rdc-seau-gravats (seau). Points: maison-lit-g (lit), maison-lit-d (lit), maison-cuisine (poste).
 
 **la maison du garde, étage** (`interieurs/maison-etage.json`, 10 x 7 m, 70 m², niveau 1): sous le toit, ouvert à l'acte 2 (chambre d'amis, atelier).
 
@@ -641,120 +671,120 @@ Pièces: grenier aménageable (10 x 7). Meubles: aucun. Points: maison-etage-mil
 **la cave de la maison** (`interieurs/maison-cave.json`, 5 x 4 m, 20 m², niveau -1): la lanterne sans verre (acte 3) y attend; l'escalier descend à l'aplomb de celui de la chambre.
 
 ```text
-. . . . .
+. E . C T
 . . * . .
 . . . . .
 E . . . C
 ```
 
-Pièces: cave voûtée (5 x 4). Meubles: cave-coffre (coffre). Points: cave-lanterne (poste).
+Pièces: cave voûtée (5 x 4). Meubles: cave-coffre (coffre), maison-cave-etagere (etagere-murale), maison-cave-caisse (caisse-de-legumes), maison-cave-tonnelet (tonnelet). Points: cave-lanterne (poste).
 
 **l'épicerie Ferrand** (`interieurs/epicerie-rdc.json`, 7 x 9 m, 63 m², niveau 0): la boutique donne sur la place (porte à l'est), la cuisine derrière.
 
 ```text
-. . . . . E .
+E C . E C E E
 . . . . . . .
 . * C . . . P
-. . C . . . .
-. . . . . . .
+. . C . . . B
+T . . . . . H
 # # # . . # #
-. . . . . . .
-. T T . . . .
-C * . . . . E
+. V V . . P C
+B T T . . . .
+C * T . C T E
 ```
 
-Pièces: boutique (7 x 5); cuisine (7 x 4). Meubles: epicerie-comptoir (comptoir-epicerie), epicerie-etal (etal-de-tourte), epicerie-cuisiniere (cuisiniere), epicerie-table (table-a-manger). Points: odette-comptoir (comptoir, Odette), odette-cuisine (poste, Odette).
+Pièces: boutique (7 x 5); cuisine (7 x 4). Meubles: epicerie-comptoir (comptoir-epicerie), epicerie-etal (etal-de-tourte), epicerie-cuisiniere (cuisiniere), epicerie-table (table-a-manger), epicerie-rdc-etagere-1 (etagere-murale), epicerie-rdc-etagere-2 (etagere-murale), epicerie-rdc-etagere-3 (etagere-murale), epicerie-rdc-caisse-1 (caisse-de-legumes), epicerie-rdc-caisse-2 (caisse-de-legumes), epicerie-rdc-tonnelet (tonnelet), epicerie-rdc-horloge (horloge-murale), epicerie-rdc-balai (balai), epicerie-rdc-portrait (cadre-portrait), epicerie-rdc-buches (buches-d-interieur), epicerie-rdc-seau (seau), epicerie-rdc-vaisselier (vaisselier), epicerie-rdc-panier (panier-a-linge), epicerie-rdc-tonnelet-2 (tonnelet), epicerie-rdc-caisse-3 (caisse-de-legumes), epicerie-rdc-tapis-de-sol (tapis-rond). Points: odette-comptoir (comptoir, Odette), odette-cuisine (poste, Odette).
 
 **la pension Ferrand, étage** (`interieurs/epicerie-etage.json`, 7 x 9 m, 63 m², niveau 1): la chambre du premier soir, deux lits simples; l'escalier arrive sur un palier, la chambre d'Odette à côté.
 
 ```text
-L . L . . . .
-L * L * . . .
-. . . . . . .
-. . . . . . .
-. . . . . . .
+L . L C P . P
+L * L * T . .
+. T T T . . .
+. . . . . . C
+. . . . . . E
 # # # # # . .
 L . . . . . .
-L * . . # . .
-. . . . # . E
+L * T T # . .
+P . T T # . E
 ```
 
-Pièces: chambre de la pension (7 x 5); chambre d’Odette (4 x 3); palier (2 x 4). Meubles: lit-pension-1 (lit-simple), lit-pension-2 (lit-simple), odette-lit (lit-simple). Points: pension-lit-a (lit), pension-lit-b (lit), odette-lit-p (lit, Odette).
+Pièces: chambre de la pension (7 x 5); chambre d’Odette (4 x 3); palier (2 x 4). Meubles: lit-pension-1 (lit-simple), lit-pension-2 (lit-simple), odette-lit (lit-simple), epicerie-etage-gravure (cadre-paysage), epicerie-etage-patere (patere), epicerie-etage-portrait (cadre-portrait), epicerie-etage-etagere (etagere-murale), epicerie-etage-panier (panier-a-linge), epicerie-etage-tapis-de-sol (tapis-long), epicerie-etage-tabouret (tabouret-de-ferme), epicerie-etage-odette-panier (panier-a-linge), epicerie-etage-odette-tapis-rond (tapis-rond). Points: pension-lit-a (lit), pension-lit-b (lit), odette-lit-p (lit, Odette).
 
 **le fournil d'Achille** (`interieurs/fournil.json`, 6 x 5 m, 30 m², niveau 0): le four contre le pignon est, côté ru; la boutique sur la rue.
 
 ```text
-. P P . . F
-. . . . * .
-# # . . C C
-. . . . . .
-. . . P . .
+E P P . B F
+S . B T * C
+# # . T C E
+T . . T . H
+P . . P . P
 ```
 
-Pièces: boutique (6 x 3); fournil (6 x 2). Meubles: fournil-four (four), fournil-petrin (plan-de-travail), fournil-comptoir (comptoir-fournil). Points: achille-four (poste, Achille), achille-comptoir (comptoir, Achille).
+Pièces: boutique (6 x 3); fournil (6 x 2). Meubles: fournil-four (four), fournil-petrin (plan-de-travail), fournil-comptoir (comptoir-fournil), fournil-etagere (etagere-murale), fournil-buches (buches-d-interieur), fournil-affiche (cadre-paysage), fournil-etagere-pains (etagere-murale), fournil-horloge (horloge-murale), fournil-patere (patere), fournil-seau (seau), fournil-balai (balai), fournil-tabouret (tabouret-de-ferme), fournil-panier (panier-a-linge), fournil-tapis-de-sol (tapis-long). Points: achille-four (poste, Achille), achille-comptoir (comptoir, Achille).
 
 **la mercerie-coiffure** (`interieurs/mercerie.json`, 6 x 6 m, 36 m², niveau 0): porte au nord sur la rue; la cabine sert à essayer les tenues.
 
 ```text
-. . . P . .
-. C C . . .
+E E . P . P
+. C C . . C
 . . * . . .
-. . . . # .
-. C * . # *
-. . . . . A
+P T T T # .
+. T * . # *
+B . . . . A
 ```
 
-Pièces: boutique (6 x 3); salon de coiffure (4 x 3); cabine (2 x 3). Meubles: mercerie-comptoir (comptoir-mercerie), mercerie-fauteuil (chaise), mercerie-armoire (armoire). Points: solange-comptoir (comptoir, Solange), jeanne-fauteuil (poste, Jeanne), mercerie-cabine (poste).
+Pièces: boutique (6 x 3); salon de coiffure (4 x 3); cabine (2 x 3). Meubles: mercerie-comptoir (comptoir-mercerie), mercerie-fauteuil (chaise), mercerie-armoire (armoire), mercerie-rubans (etagere-murale), mercerie-boutons (etagere-murale), mercerie-patere (patere), mercerie-affiche (cadre-portrait), mercerie-panier (panier-a-linge), mercerie-balai (balai), mercerie-tapis-de-sol (tapis-rond), mercerie-tabouret (tabouret-de-ferme). Points: solange-comptoir (comptoir, Solange), jeanne-fauteuil (poste, Jeanne), mercerie-cabine (poste).
 
 **la forge** (`interieurs/forge.json`, 5 x 5 m, 25 m², niveau 0): foyer au nord sous la hotte; l'enclume est dehors, sous l'auvent.
 
 ```text
-. . F . .
-. . * . .
+E S F B P
+. . * . E
 C . . * R
-. . . . .
-. . P . .
+T . . . .
+B . P . .
 ```
 
-Pièces: forge (5 x 5). Meubles: forge-foyer (four), forge-haches (ratelier-de-la-forge), forge-coffre (coffre). Points: mado-foyer (poste, Mado), mado-etabli (poste, Mado).
+Pièces: forge (5 x 5). Meubles: forge-foyer (four), forge-haches (ratelier-de-la-forge), forge-coffre (coffre), forge-fers (etagere-murale), forge-patere (patere), forge-outils (etagere-murale), forge-seau (seau), forge-buches (buches-d-interieur), forge-tonnelet (tonnelet), forge-balai (balai). Points: mado-foyer (poste, Mado), mado-etabli (poste, Mado).
 
 **l'atelier de Basile** (`interieurs/atelier-basile.json`, 9 x 7 m, 63 m², niveau 0): atelier d'une pièce, porte à l'est vers l'auvent.
 
 ```text
-. . . P P . . . E
-. . . . * . . . .
+E E . P P S . P E
+. . . . * T . . .
 . . . . . . . . .
 . . . . . . . . P
 . . . . . . . . .
-. . . . . . . . .
-T . . . . . . . .
+T . . . . . . . E
+T . B . . . . . B
 ```
 
-Pièces: atelier (9 x 7). Meubles: basile-etabli (plan-de-travail), basile-bois (tas-de-bois), basile-haches (etal-de-haches). Points: basile-p-etabli (poste, Basile).
+Pièces: atelier (9 x 7). Meubles: basile-etabli (plan-de-travail), basile-bois (tas-de-bois), basile-haches (etal-de-haches), atelier-basile-rabots (etagere-murale), atelier-basile-outils (etagere-murale), atelier-basile-patere (patere), atelier-basile-planches (etagere-murale), atelier-basile-balai (balai), atelier-basile-seau (seau), atelier-basile-tabouret (tabouret-de-ferme), atelier-basile-buches (buches-d-interieur), atelier-basile-tonnelet (tonnelet). Points: basile-p-etabli (poste, Basile).
 
 **le café de la Halte** (`interieurs/cafe.json`, 6 x 5 m, 30 m², niveau 0): salle sur la rue (porte au sud, côté terrasse), comptoir et coin cuisine au nord; allée de 2 m de la porte au comptoir, passage derrière le comptoir à l'est.
 
 ```text
-C P P . * .
-. . . . C .
-T C . . . C
-T C . . . T
-. . . P C T
+C E E . * H
+S . . T C .
+T C . T . C
+T C . T . T
+T . B P C C
 ```
 
-Pièces: cuisine et comptoir (6 x 2); salle (6 x 3). Meubles: cafe-cuisiniere (cuisiniere), cafe-plan (plan-de-travail), cafe-comptoir (comptoir-cafe), cafe-table-1 (table-a-manger), cafe-chaise-1 (chaise), cafe-chaise-2 (chaise), cafe-table-2 (table-a-manger), cafe-chaise-3 (chaise), cafe-chaise-4 (chaise). Points: colette-comptoir (comptoir, Colette).
+Pièces: cuisine et comptoir (6 x 2); salle (6 x 3). Meubles: cafe-cuisiniere (cuisiniere), cafe-plan (plan-de-travail), cafe-comptoir (comptoir-cafe), cafe-table-1 (table-a-manger), cafe-chaise-1 (chaise), cafe-chaise-2 (chaise), cafe-table-2 (table-a-manger), cafe-chaise-3 (chaise), cafe-chaise-4 (chaise), cafe-etagere-1 (etagere-murale), cafe-etagere-2 (etagere-murale), cafe-horloge (horloge-murale), cafe-portrait (cadre-portrait), cafe-tonnelet (tonnelet), cafe-seau (seau), cafe-balai (balai), cafe-tapis-de-sol (tapis-long). Points: colette-comptoir (comptoir, Colette).
 
 **l'école-mairie** (`interieurs/ecole.json`, 6 x 5 m, 30 m², niveau 0): une seule salle: l'instituteur est aussi secrétaire de mairie (armoire des archives, table du registre); les bancs regardent le tableau, au nord.
 
 ```text
-. . . B . A
-. . . * . .
+P . . B . A
+B . . * . .
 B B . . B B
 T T . . . .
-. . . P . .
+. S . P B P
 ```
 
-Pièces: classe et secrétariat de mairie (6 x 5). Meubles: ecole-tableau (blackboard, à créer), ecole-archives (armoire), ecole-banc-1 (banc), ecole-banc-2 (banc), ecole-table-mairie (table-a-manger). Points: armand-tableau (poste, Armand).
+Pièces: classe et secrétariat de mairie (6 x 5). Meubles: ecole-tableau (blackboard, à créer), ecole-archives (armoire), ecole-banc-1 (banc), ecole-banc-2 (banc), ecole-table-mairie (table-a-manger), ecole-patere (patere), ecole-poele (poele), ecole-buches (buches-d-interieur), ecole-balai (balai), ecole-seau (seau). Points: armand-tableau (poste, Armand).
 
 **l'église Saint-Aubin** (`interieurs/eglise.json`, 20 x 11 m, 220 m², niveau 0): portail latéral au sud, chœur à l'est, clocher à l'ouest: on entre face à l'allée, la corde de la cloche pend dans la base du clocher.
 
@@ -762,17 +792,17 @@ Pièces: classe et secrétariat de mairie (6 x 5). Meubles: ecole-tableau (black
 # # # # # # . . . . . . . . . . . . . .
 # # # # # # . . B . . . B . B . . . . .
 # # # # # # . . B . . . B . B . . . . .
-. . . . . # . . . . . . . . . . . . . .
+. . . . B # . . . . . . . . . . . . . .
 . . * . . # . . . . . . . . . . . . . .
-E . . . . . . . . . . . . . . . . * A .
+E . . . . . . T T T T T T T T T . * A .
 . . . . . . . . . . . . . . . . . . . .
-. . . . . # . . B . . . B . B . . . . .
+. . . . S # . . B . . . B . B . . . . .
 # # # # # # . . B . . . B . B . . . . .
 # # # # # # . . . . . . . . . . . . . .
 # # # # # # . . . . P . . . . . . . . .
 ```
 
-Pièces: base du clocher (5 x 5); nef (12 x 11); chœur (2 x 11). Meubles: eglise-autel (altar, à créer), eglise-banc-1 (banc), eglise-banc-2 (banc), eglise-banc-3 (banc), eglise-banc-4 (banc), eglise-banc-5 (banc), eglise-banc-6 (banc). Points: marthe-corde (poste, Marthe), eglise-choeur (poste).
+Pièces: base du clocher (5 x 5); nef (12 x 11); chœur (2 x 11). Meubles: eglise-autel (altar, à créer), eglise-banc-1 (banc), eglise-banc-2 (banc), eglise-banc-3 (banc), eglise-banc-4 (banc), eglise-banc-5 (banc), eglise-banc-6 (banc), eglise-tapis-1 (tapis-long), eglise-tapis-2 (tapis-long), eglise-tapis-3 (tapis-long), eglise-balai (balai), eglise-seau (seau). Points: marthe-corde (poste, Marthe), eglise-choeur (poste).
 
 **la chambre des cloches** (`interieurs/eglise-clocher.json`, 5 x 5 m, 25 m², niveau 1): en haut de l'échelle du sonneur: la cloche au milieu, les abat-son ouverts sur le bourg (la vue de « La robe et la cloche »); le niveau intermédiaire attend l'écriture de la suite.
 
@@ -789,41 +819,41 @@ Pièces: chambre des cloches (5 x 5). Meubles: clocher-cloche (bell, à créer).
 **le poste d'aiguillage, rez-de-chaussée** (`interieurs/poste.json`, 5 x 3 m, 15 m², niveau 0): les tringles des leviers descendent vers la voie; l'escalier monte à la cabine.
 
 ```text
-. . P . .
-. . * . .
-C . . . E
+H . P . P
+. . * . C
+C . . B E
 ```
 
-Pièces: salle des transmissions (5 x 3). Meubles: poste-coffre (coffre). Points: poste-bas (poste).
+Pièces: salle des transmissions (5 x 3). Meubles: poste-coffre (coffre), poste-horloge (horloge-murale), poste-patere (patere), poste-plan-voies (cadre-paysage), poste-balai (balai). Points: poste-bas (poste).
 
 **la cabine des leviers** (`interieurs/poste-cabine.json`, 5 x 3 m, 15 m², niveau 1): les leviers face à la voie (nord), la vitre donne sur le sémaphore: celui du dedans lit les étiquettes, celui du dehors voit le bras.
 
 ```text
-. . L . .
-. . * . .
+P . L . C
+B . * . .
 C . . . E
 ```
 
-Pièces: cabine vitrée (5 x 3). Meubles: poste-leviers (lever-frame, à créer), poste-chaise (chaise). Points: poste-cabine-leviers (poste).
+Pièces: cabine vitrée (5 x 3). Meubles: poste-leviers (lever-frame, à créer), poste-chaise (chaise), poste-cabine-poele (poele), poste-cabine-buches (buches-d-interieur), poste-cabine-plan-voies (cadre-paysage). Points: poste-cabine-leviers (poste).
 
 **le moulin de la Vanne, salle des meules** (`interieurs/moulin.json`, 7 x 7 m, 49 m², niveau 0): porte au nord sur la cour; les meules au milieu, l'arbre de la roue entre par le pignon sud.
 
 ```text
-. . . P . . .
+. . . P . S .
+. T . . . . .
 . . . . . . .
-. . . . . . .
-. . . . * . .
+. . . . * B C
 . . . M . . .
 . . . . . . .
 E . . . . . C
 ```
 
-Pièces: salle des meules (7 x 7). Meubles: moulin-meules (millstones, à créer), moulin-sacs (coffre). Points: berthe-meules (poste, Berthe).
+Pièces: salle des meules (7 x 7). Meubles: moulin-meules (millstones, à créer), moulin-sacs (coffre), moulin-portrait (cadre-portrait), moulin-balai (balai), moulin-tabouret (tabouret-de-ferme), moulin-seau (seau). Points: berthe-meules (poste, Berthe).
 
 **le grenier du moulin** (`interieurs/moulin-etage.json`, 7 x 7 m, 49 m², niveau 1): le grain monté en sacs, la trémie au-dessus des meules; le lit de Berthe au coin nord-ouest: le meunier dort au moulin, il entend la meule et la vanne.
 
 ```text
-L . . . . . C
+L P . P . . C
 L * . . . . C
 . . . . . . .
 . . . * . . .
@@ -832,31 +862,31 @@ L * . . . . C
 E . . . . . .
 ```
 
-Pièces: grenier à grain (7 x 7). Meubles: moulin-grain-1 (coffre), moulin-grain-2 (coffre), berthe-lit (lit-simple). Points: moulin-grenier (poste), berthe-lit-p (lit, Berthe).
+Pièces: grenier à grain (7 x 7). Meubles: moulin-grain-1 (coffre), moulin-grain-2 (coffre), berthe-lit (lit-simple), moulin-etage-patere (patere), moulin-etage-panier (panier-a-linge). Points: moulin-grenier (poste), berthe-lit-p (lit, Berthe).
 
 **le logis de la ferme Delmas** (`interieurs/ferme-logis.json`, 8 x 5 m, 40 m², niveau 0): une salle commune: la cuisine au nord-ouest, la grande table à l'est de l'allée, la porte au midi sur la cour.
 
 ```text
-C P P . . . . A
-. * . . . C . .
-. . . . . T T .
-. . . . . * C .
-. . . . P . . .
+C P P E H . . A
+. * . S . C . .
+B . . . . T T P
+C . . . . * T .
+T . . B P . . P
 ```
 
-Pièces: salle commune (8 x 5). Meubles: logis-cuisiniere (cuisiniere), logis-plan (plan-de-travail), logis-table (table-a-manger), logis-chaise-1 (chaise), logis-chaise-2 (chaise), logis-armoire (armoire). Points: margot-cuisine (poste, Margot), paulin-table (poste, Paulin).
+Pièces: salle commune (8 x 5). Meubles: logis-cuisiniere (cuisiniere), logis-plan (plan-de-travail), logis-table (table-a-manger), logis-chaise-1 (chaise), logis-chaise-2 (chaise), logis-armoire (armoire), ferme-logis-etagere (etagere-murale), ferme-logis-horloge (horloge-murale), ferme-logis-patere (patere), ferme-logis-seau (seau), ferme-logis-buches (buches-d-interieur), ferme-logis-caisse (caisse-de-legumes), ferme-logis-tonnelet (tonnelet), ferme-logis-panier (panier-a-linge), ferme-logis-balai (balai), ferme-logis-tapis-de-sol (tapis-rond). Points: margot-cuisine (poste, Margot), paulin-table (poste, Paulin).
 
 **la maison de Marthe** (`interieurs/marthe.json`, 5 x 5 m, 25 m², niveau 0): la maison de la sonneuse: une salle, le lit au fond contre le mur ouest, la table au midi; 1,5 m libres devant la porte, à l'est sur la rue de l'Église.
 
 ```text
-L . . . .
+C H P E P
 L * . . .
 . . . . P
 . C . . .
 T T . . .
 ```
 
-Pièces: salle (5 x 5). Meubles: marthe-lit (lit-simple), marthe-table (table-a-manger), marthe-chaise (chaise). Points: marthe-lit-p (lit, Marthe).
+Pièces: salle (5 x 5). Meubles: marthe-lit (lit-simple), marthe-table (table-a-manger), marthe-chaise (chaise), marthe-soeur (cadre-ovale), marthe-horloge (horloge-murale), marthe-etagere (etagere-murale), marthe-patere (patere), marthe-panier (panier-a-linge). Points: marthe-lit-p (lit, Marthe).
 
 <!-- genere:interieurs:fin -->
 
@@ -1046,3 +1076,69 @@ Les essais des grands lieux chargent maintenant les points, meubles et portes de
 ### Hors du plan
 
 Train de nuit: les deux joueurs s'assoient en diagonale (mesuré: (2,33; 3,75) et (4,67; 3,25)), parce que chacun prend la première place libre de sa banquette et que deux banquettes face à face numérotent leurs places en miroir. Les données du lieu n'y peuvent rien sans poser une banquette à cheval sur le couloir. Correctif de code proposé: prendre la place libre la plus proche du joueur (`freeSeat` de `simulation/briques/postures.ts`).
+
+## 16. Intérieurs habités et vues du dehors (revue visuelle du 2026-11-11, corrections 2 et 5)
+
+Source: `construire_plan.py`, section « version 5 » (`HABITE`, `DECOR_VUES`); chaque objet porte son `pourquoi` dans `plan.json`. Contrôle: `controler_habillage` de `controler_plan.py`.
+
+### Règles de pose
+
+- **Pas d'objet de plateau.** Le rendu pose tout objet de la carte au sol (`base: 0` dans `rendu/lieu/description.ts`) et le schéma des pièces n'a ni hauteur ni « posé sur »: seuls les objets de sol, les tapis et les objets muraux sont posés. Les objets de plateau attendent ce moyen (liste plus bas).
+- **Murs debout seulement.** La caméra regarde du sud-ouest (lacet 45): les murs nord et est restent debout, les murs sud et ouest sont coupés. Un objet mural va au mur nord (rotation 0) ou au mur est (rotation 3), jamais sur une cloison (le rendu ne la dessine pas).
+- **Fenêtres intactes.** Un objet de 1,3 m et plus collé à un mur fait glisser ou supprime la fenêtre derrière lui (`roomPlan`, `tallObject`); le balai (1,4 m) compte. Relevé du rendu avant et après: les 89 fenêtres des 20 pièces sont aux mêmes places. C'est ce qui a retiré l'affiche du café, la carte et l'horloge de l'école, la gravure et le portrait de mariage de la ferme, la patère et l'étagère du moulin: leurs seuls pans de mur sont entre deux fenêtres trop proches.
+- **Noms.** Un identifiant qui finit par `-tapis` est réservé au paillasson d'une porte (`doorVolumes`, `tests/rendu/chargement.test.ts`): les tapis posés s'appellent `<pièce>-tapis-de-sol`.
+- **Passages.** 1,5 m libres devant chaque porte et chaque escalier (deux cases; un tapis y est permis: c'est un paillasson); rien sur un point; rien dans l'emprise prévue d'un meuble sans modèle (guichet, tableau, meules, autel, leviers, cloche). Le contrôle d'accès (section 14) a fait retirer les bûches du café et de la maison (elles enfermaient la cuisinière ou la place de Colette) et déplacer celles de la ferme et de l'atelier.
+
+### Choix qui ne vont pas de soi
+
+- **La maison du garde reste légère** (8 objets): c'est la maison des joueurs, qu'ils meublent eux-mêmes (stock et décoration du logement). On n'y pose que ce qu'une salle commune a toujours (patère à la porte, horloge, portrait au-dessus du lit, seau près de la cuisinière, panier au pied du lit, tapis de passage) et, dans la moitié en ruine, le balai et le seau du déblayage. L'étage (absent au départ) reste vide; la cave a ses conserves, ses pommes de terre et un tonnelet oublié.
+- **Halte**: l'horloge est au coin du bureau de Firmin, au mur est, vue par le guichet: le mur nord de la salle n'a pas un pan qui ne masque une fenêtre. Le poêle est au milieu de la salle d'attente, à 1 m du mur, comme dans les salles d'attente de gare: les deux cases devant le guichet restent aux voyageurs.
+- **Café**: la case (3; 0) reste vide: c'est le seul passage vers la place de Colette derrière le comptoir. Le tabouret du bout du comptoir (« le tabouret du bout devient le tien ») attend un comptoir de deux cases: devant le comptoir d'une case, il prend la place du client (`tests/postes-habitants.test.ts`).
+- **Épicerie**: le vaisselier est dos à la cloison de la boutique, une case à l'est du mur ouest (collé au mur, il masquait une fenêtre); le portrait de la cuisine est celui de la mère d'Odette (le bocal de cerises).
+- **Fournil**: le tabouret près de la fenêtre ouest, pour Achille « à moitié endormi »; le bois du four est à côté de lui, jamais devant sa gueule.
+- **Moulin**: le portrait de la mère de Berthe face aux meules, qui portent son nom (Marguerite).
+- **Église**: trois tapis dans l'allée centrale, de l'arc du clocher au chœur; Marthe range seau et balai dans la base du clocher. La chambre des cloches reste vide (la cloche n'a pas de modèle).
+
+### Nombre d'objets ajoutés par pièce
+
+| Pièce | Objets ajoutés | Objets de plateau en attente (posés sur) |
+|---|---|---|
+| maison-rdc | 8 | lampe à pétrole, corbeille de pain, journal (table) |
+| maison-cave | 3 | bocaux de confiture, pots de grès (étagère) |
+| halte | 9 | lampe de table, journal (bureau de Firmin) |
+| café | 8 | pendule, bocaux (comptoir); bouquet, corbeille de pain (tables); boîtes à provisions (plan de travail) |
+| épicerie, boutique et cuisine | 16 | bocaux de confiture, boîtes à provisions, pots de grès (étal, comptoir); corbeille de pain, lampe à pétrole (table du souper) |
+| pension (étage) | 9 | lampe de table, pile de livres (tabouret de nuit) |
+| fournil | 11 | corbeilles de pain (comptoir) |
+| mercerie | 8 | boîtes à provisions (comptoir), bouquet |
+| forge | 7 | aucun |
+| atelier de Basile | 9 | pile de livres (établi) |
+| école | 5 | pile de livres, lampe de table (table de la mairie) |
+| ferme, salle commune | 10 | lampe à pétrole, corbeille de pain (table); pots de grès (plan de travail) |
+| Marthe | 5 | lampe à pétrole, journal, bouquet (table) |
+| moulin, meules | 4 | lampe à pétrole (coffre) |
+| moulin, grenier | 2 | lampe à pétrole (coffre à grain) |
+| église | 5 | bouquet (autel, à créer) |
+| poste, cabine | 4, 3 | lampe de table, journal (coffre, chaise: à revoir avec la tablette) |
+| étage de la maison, chambre des cloches | 0, 0 | |
+
+Total: 126 objets. Une pièce de vie en a de 8 à 16 posés, plus 2 à 5 de plateau en attente: le seuil de 12 n'est tenu aujourd'hui que par l'épicerie; avec les objets de plateau, le café, le fournil et la ferme l'atteignent; la maison (les joueurs la meublent), la halte et la pension restent à 11.
+
+### Vues de jour du dehors
+
+30 objets, des types sans brique de récolte (seau, tonnelet, cageot, panier, bûches, banc, banc de table): rien de récoltable n'est ajouté, rien n'est déplacé.
+
+| Vue | Objets | Où et pourquoi |
+|---|---|---|
+| ferme (220; 162) | 8 | cageots de récolte et seau au bord du potager de la ferme, banc et panier du casse-croûte face aux champs, tonnelet et seau au coin du labour |
+| talus (196; 141,5) | 6 | bois et tonnelet contre le mur nord du logis, banc face à la rivière avec son panier, seau en haut de la berge |
+| clôture (151; 101,5) | 5 | banc des cheminots face à la voie, bois fendu au pied de la clôture, cageot et seau de leur jardin |
+| berge (195,5; 127,2) | 5 | tonnelet contre le mur sud de la pension, panier et seau de lessive, bois flotté qui sèche au-dessus de la grève |
+| rue du bourg (204; 124) | 4 | seau sous la pompe, tonnelet de la tonnelle, panier et seau de lessive en haut de la berge |
+| orée (104; 90) | 2 | tonnelet et seau de graisse oubliés au bord de la plaine du garage |
+
+Ces vues ne tiendront pas la règle « aucune zone vide de plus de 4 x 4 m » sans ce qui leur revient vraiment, qui a un modèle livré mais aucun type de meuble (`donnees/commun/meubles`, hors du plan): rochers et blocs (`rock`, `boulder`, moussus), buissons (`berry-bush`), herbes sauvages (`wild-herbs`), tonneau (`barrel`), caisse (`crate`), banc de ferme (`bench-farm`), tas de bûches (`log-pile`), puits (`well`), auge de pierre (`sink-stone`, l'abreuvoir), baquet (`tub`), clôture (`fence`). Il faut pour chacun un type de décor sans brique (non récoltable). Modèles qui manquent tout à fait: brouette, piquets de champ à ruban rouge (ceux de Paulin), fourche et râteau, corde à linge et son linge, meule de foin, tas de traverses et de ballast (orée), barque retournée et nasse (berge).
+
+### Fouilles à fiche propre
+
+`fouille-roche`, `fouille-ballast` et `fouille-pierre-levee` portent `fiche` dans `RESSOURCES`; l'assembleur l'écrit en `resource` sur l'objet du même nom.
