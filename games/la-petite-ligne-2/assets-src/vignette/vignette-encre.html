@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Vignette de La Petite Ligne (refonte)</title>
+    <style>
+      @font-face {
+        font-family: 'Fraunces';
+        src: url('../../src/interface/polices/fraunces-latin-soft-normal.woff2') format('woff2');
+        font-weight: 100 900;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1280px;
+        height: 720px;
+        overflow: hidden;
+        background: #1c1512;
+      }
+      /* Capture du jeu au crépuscule (référence validée par le client): la halte, la voie, les deux joueurs. */
+      .fond {
+        position: absolute;
+        inset: 0;
+        background: url('../../../../docs/jeux/jeu-1/refonte/captures/encre-exterieur-jeu-crepuscule.png')
+          center / cover no-repeat;
+      }
+      /* Voile sombre en bas à gauche seulement: le titre se lit, la scène reste entière. */
+      .voile {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          120% 95% at 0% 100%,
+          rgba(24, 16, 12, 0.92) 0%,
+          rgba(24, 16, 12, 0.7) 32%,
+          rgba(24, 16, 12, 0) 62%
+        );
+      }
+      .titre {
+        position: absolute;
+        left: 56px;
+        bottom: 54px;
+        font-family: 'Fraunces', serif;
+        color: #fbf0d6;
+        line-height: 0.95;
+        text-shadow:
+          0 3px 0 #1c1512,
+          0 0 18px rgba(28, 21, 18, 0.9);
+      }
+      .titre b {
+        display: block;
+        font-size: 104px;
+        font-weight: 700;
+        letter-spacing: -1px;
+      }
+      .titre span {
+        display: inline-block;
+        margin-top: 18px;
+        padding: 6px 18px 8px;
+        border: 3px solid #1c1512;
+        border-radius: 999px;
+        background: #f2b84b;
+        color: #1c1512;
+        font-size: 30px;
+        font-weight: 600;
+        text-shadow: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="fond"></div>
+    <div class="voile"></div>
+    <div class="titre"><b>La Petite Ligne</b><span>la refonte</span></div>
+  </body>
+</html>
