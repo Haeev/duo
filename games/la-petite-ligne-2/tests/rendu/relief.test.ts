@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import * as v from 'valibot';
 import { describe, expect, it, vi } from 'vitest';
 import { MapSchema, type MapDef } from '../../src/donnees/schemas/lieu';
+import { EDGE_SETTINGS } from '../../src/rendu/lieu/reglages-lisieres';
 import { RELIEF_SETTINGS, type ReliefProfile } from '../../src/rendu/lieu/reglages-relief';
 import { createRelief, type Relief } from '../../src/rendu/lieu/relief';
 import { reliefGround } from '../../src/rendu/lieu/relief-sol';
@@ -51,7 +52,7 @@ describe('hauteur du sol', () => {
         low = Math.min(low, h);
         high = Math.max(high, h);
       }
-    expect(low).toBeGreaterThan(-0.5);
+    expect(low).toBeGreaterThan(-0.7);
     expect(high).toBeLessThan(0.16);
     expect(relief.heightAt(-3, 10)).toBe(0);
     expect(relief.heightAt(10, 9999)).toBe(0);
@@ -197,7 +198,8 @@ describe('gabarit: une nature de sol de plus', () => {
   };
 
   it('apparaît dans la hauteur et dans le maillage par une seule entrée de données', () => {
-    const own = createRelief(groundField(small), small, settings);
+    // Limites sur la grille (aucun couple lissé): le profil se vérifie au bord même des cases.
+    const own = createRelief(groundField(small), small, settings, { ...EDGE_SETTINGS, pairs: [] });
     expect(own.heightAt(4, 4)).toBeCloseTo(-0.3, 5);
     // L'herbe voisine descend vers elle en pente douce, sans qu'aucun code ne la connaisse: à
     // mi-pente sur leur bord commun, et le pré intact une case plus loin.

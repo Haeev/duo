@@ -38,27 +38,33 @@ export interface RunSort {
   readonly every?: { readonly axis: 'x' | 'y'; readonly step: number };
   /** Natures vers lesquelles un module tourne ses côtés `facing`. */
   readonly facing?: readonly string[];
-  /** Du plus courant au plus rare: à égalité, le premier l'emporte. */
+  /**
+   * Du plus courant au plus rare: à égalité, le premier l'emporte. Vide: la sorte réserve ses
+   * cases (ni boîte ni autre file) sans rien y poser, parce que le relief du sol les dessine.
+   */
   readonly modules: readonly RunModule[];
+  /** Modules grossis en travers de la file et en hauteur (parts; 1: tels que livrés). */
+  readonly scale?: { readonly across: number; readonly up: number };
+  /**
+   * Ligne du dessus inégale: la hauteur de chaque sommet varie de `amount` (part) selon un bruit
+   * lisse de `span` m tiré de sa place, continu d'un module à l'autre et d'une tuile à l'autre.
+   */
+  readonly crest?: { readonly amount: number; readonly span: number };
 }
 
 /**
  * Sortes de files, dans l'ordre de priorité: une case appartient à la première qui la prend
- * (une lisière au bord de l'eau est un talus, pas une haie). Les clôtures de la voie restent à
+ * (une lisière au bord de l'eau est un talus, pas une haie; ce talus est une berge du relief,
+ * `reglages-relief.ts`, les modules `bank*` du manifeste ne sont plus posés). Les clôtures de la voie restent à
  * `fenceRuns` (modèle `decor.fenceModel`).
  */
 export const RUN_SORTS: Readonly<Record<string, RunSort>> = {
   talus: {
-    pourquoi: "la berge d'une lisière qui touche l'eau: l'herbe en haut, la terre côté eau",
+    pourquoi:
+      "la berge d'une lisière qui touche l'eau: ni haie ni module, le relief du sol y descend en talus (terre, pierres, racines) le long de la ligne d'eau lissée, qu'un module d'un mètre posé d'équerre ne peut pas suivre",
     on: ['lisiere'],
     near: ['eau'],
-    facing: ['eau'],
-    modules: [
-      { model: 'bank', links: ['w', 'e'], facing: ['s'] },
-      { model: 'bank-end', links: ['w'], facing: ['s'], mirror: true },
-      { model: 'bank-corner', links: ['w', 'n'], facing: ['s', 'e'] },
-      { model: 'bank-corner-inner', links: ['e', 's'], facing: ['se'] },
-    ],
+    modules: [],
   },
   haie: {
     pourquoi: 'la lisière qui ferme un pré, partout où elle ne borde ni l’eau ni la voie',
@@ -69,12 +75,15 @@ export const RUN_SORTS: Readonly<Record<string, RunSort>> = {
       { model: 'hedge-end', links: ['w'] },
       { model: 'hedge-corner', links: ['w', 'n'] },
     ],
+    crest: { amount: 0.28, span: 1.9 },
   },
   rang: {
-    pourquoi: 'les rangs nord-sud du labour, une colonne sur deux (on marche entre deux rangs)',
+    pourquoi:
+      'les rangs nord-sud du labour, sur la crête d’un billon sur deux (on marche dans le creux), assez fournis pour se lire de la caméra de jeu',
     on: ['labour'],
     every: { axis: 'x', step: 2 },
     modules: [{ model: 'field-row', links: ['n', 's'] }],
+    scale: { across: 1.7, up: 1.6 },
   },
 };
 

@@ -34,9 +34,10 @@ import {
 } from './decors-manifeste';
 import type { KeepOut } from './emprises';
 import type { RunCell, RunLayout } from './files';
+import type { RunSort } from './reglages-files';
 import { HARVEST_LOOK, type HarvestLookSettings } from './reglages-recoltes';
 import type { TileSettings } from './reglages-tuiles';
-import type { Relief } from './relief';
+import { type Relief, valueNoise } from './relief';
 import { reliefGround } from './relief-sol';
 import {
   type BlobItem,
@@ -334,21 +335,33 @@ function settle(relief: Relief, item: BoxItem): void {
 
 function waterOf(kit: TileKit, tile: number): BufferGeometry | null {
   const { field, settings, map } = kit;
-  const { width, looks, cells } = field;
+  const { width, height, looks, cells } = field;
   const { x0, y0, x1, y1 } = tileRect(map, tile);
   const builder = new GeometryBuilder();
   const white = [color.set('#ffffff')];
   builder.setInk(LAYER.plain, KIND.water);
-  const level = settings.ground.waterLevel;
+  const relief = kit.relief ?? null;
+  const level = relief?.settings.water.level ?? settings.ground.waterLevel;
+  const wet = (x: number, y: number): boolean =>
+    x >= 0 && y >= 0 && x < width && y < height && looks[cells[y * width + x] ?? 0]?.water === true;
+  // Sol en relief: la nappe déborde d'une case sur la terre. La ligne d'eau est alors là où la
+  // berge passe sous la surface (limites adoucies comprises), plus au bord des cases.
+  const covered = (x: number, y: number): boolean => {
+    if (wet(x, y)) return true;
+    if (relief === null) return false;
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++) if (wet(x + dx, y + dy)) return true;
+    return false;
+  };
   for (let y = y0; y < y1; y++) {
     let x = x0;
     while (x < x1) {
-      if (looks[cells[y * width + x] ?? 0]?.water !== true) {
+      if (!covered(x, y)) {
         x++;
         continue;
       }
       let end = x + 1;
-      while (end < x1 && looks[cells[y * width + end] ?? 0]?.water === true) end++;
+      while (end < x1 && covered(end, y)) end++;
       builder.quad(
         [
           [x, level, y],
@@ -548,7 +561,7 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
   const runs = kit.runs ?? null;
   if (runs !== null && kit.plants !== undefined && kit.plants !== null)
     for (const [sort, cells] of runs.inTile(kit.map, tile)) {
-      const geometry = runGeometry(cells, kit.plants, relief);
+      const geometry = runGeometry(cells, kit.plants, relief, runs.sorts[sort]);
       if (geometry === null) continue;
       const mesh = new Mesh(view.tracker.track(geometry), materials.ground);
       mesh.name = `file-${sort}`;
@@ -563,6 +576,8 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     if (relief !== null) {
       for (const pebble of semis.pebbles) pebble.y += relief.heightAt(pebble.x, pebble.z);
       for (const tuft of semis.tufts) settle(relief, tuft);
+      // Les pierres de la berge rejoignent les cailloux: pas d'appel de dessin de plus.
+      semis.pebbles.push(...bankStones(relief, tileRect(kit.map, tile), kit.keepOut ?? null));
     }
     const stones = instances(
       view,
@@ -684,9 +699,13 @@ function runGeometry(
   cells: readonly RunCell[],
   plants: TilePlants,
   relief: Relief | null,
+  sort?: RunSort,
 ): BufferGeometry | null {
   const parts: BufferGeometry[] = [];
   const bury = relief?.settings.mesh.bury ?? 0;
+  const across = sort?.scale?.across ?? 1;
+  const tall = sort?.scale?.up ?? 1;
+  const crest = sort?.crest;
   for (const cell of cells) {
     const source = plants.geometryOf(cell.model);
     if (source === null) continue;
@@ -695,7 +714,7 @@ function runGeometry(
     matrix.compose(
       position.set(cell.x + 0.5, 0, cell.y + 0.5),
       rotation,
-      scale.set(cell.mirror ? -1 : 1, 1, 1),
+      scale.set((cell.mirror ? -1 : 1) * across, tall, 1),
     );
     part.applyMatrix4(matrix);
     // Un miroir retourne les faces: on rend aux triangles leur sens, sinon l'envers se verrait.
@@ -707,12 +726,16 @@ function runGeometry(
         index.setX(i + 2, b);
       }
     const points = part.getAttribute('position');
-    if (relief !== null)
-      for (let i = 0; i < points.count; i++) {
-        const y = points.getY(i);
-        const ground = relief.heightAt(points.getX(i), points.getZ(i));
-        points.setY(i, y + ground - (y < 0.02 ? bury : 0));
-      }
+    for (let i = 0; i < points.count; i++) {
+      const y = points.getY(i);
+      const px = points.getX(i);
+      const pz = points.getZ(i);
+      // Ligne du dessus inégale: une fonction de la place, donc continue d'un module au suivant.
+      const grown =
+        crest === undefined ? y : y * (1 + crest.amount * valueNoise(px, pz, crest.span, 141));
+      const ground = relief === null ? 0 : relief.heightAt(px, pz) - (y < 0.02 ? bury : 0);
+      points.setY(i, grown + ground);
+    }
     const ink = part.getAttribute('aInk');
     for (let i = 0; i < ink.count; i++) {
       // La classe de taille du module reste (hachures), le numéro devient celui de la file.
@@ -727,6 +750,56 @@ function runGeometry(
   merged.computeBoundingBox();
   merged.computeBoundingSphere();
   return merged;
+}
+
+/**
+ * Pierres de la berge d'une tuile: tirées dans les cases qui bordent l'eau et gardées si elles
+ * tombent sur la pente de terre que le relief montre entre l'ourlet d'herbe et l'eau (la ligne
+ * lissée, pas les cases). À demi enterrées; les plus basses trempent dans l'eau.
+ */
+function bankStones(
+  relief: Relief,
+  rect: { x0: number; y0: number; x1: number; y1: number },
+  keepOut: KeepOut | null,
+): BlobItem[] {
+  const bank = relief.settings.bank;
+  const level = relief.settings.water.level;
+  const out: BlobItem[] = [];
+  const wet = (x: number, y: number): boolean => relief.lookAt(x, y)?.water === true;
+  for (let y = rect.y0; y < rect.y1; y++)
+    for (let x = rect.x0; x < rect.x1; x++) {
+      if (!relief.isSoft(x, y)) continue;
+      const own = wet(x, y);
+      // Case de berge: de l'eau d'un côté, de la terre de l'autre.
+      if (
+        own === wet(x - 1, y) &&
+        own === wet(x + 1, y) &&
+        own === wet(x, y - 1) &&
+        own === wet(x, y + 1)
+      )
+        continue;
+      const tries = Math.floor(bank.stones) + (hash01(x, y, 151) < bank.stones % 1 ? 1 : 0);
+      for (let k = 0; k < tries; k++) {
+        const px = x + hash01(x * 3 + k, y, 152);
+        const pz = y + hash01(x, y * 3 + k, 153);
+        const h = relief.heightAt(px, pz);
+        // Sur la terre de la berge, ou dans l'eau jusqu'à 5 cm de fond.
+        if (h < level - 0.05 || relief.waterDistance(px, pz) > bank.earth - 0.08) continue;
+        if (keepOut?.free(px, pz, 0.05) === false) continue;
+        const size =
+          bank.stoneSize[0] + hash01(x + k, y, 154) ** 2 * (bank.stoneSize[1] - bank.stoneSize[0]);
+        out.push({
+          x: px,
+          y: h + size * 0.12,
+          z: pz,
+          rx: size * (0.8 + hash01(x, y + k, 155) * 0.6),
+          ry: size * (0.5 + hash01(x + k, y, 156) * 0.35),
+          rz: size * (0.8 + hash01(x - k, y, 157) * 0.6),
+          color: pick(bank.stoneColors, hash01(x, y + k * 3, 158)) ?? '#b9b2a0',
+        });
+      }
+    }
+  return out;
 }
 
 /** Ancien décor semé (rendu en aplats, ou modèles absents): un tronc et une boule par arbre. */

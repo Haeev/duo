@@ -13,7 +13,7 @@ Le style « bande dessinée encrée » du jeu. `index.ts` (`InkKit`) est ce que 
 | `mesure.ts`, `panneau-mesure.ts`         | outil de mesure: journal des images, relevé en texte, panneau, chronomètres               |
 | `ombres.ts`                              | cartes d'ombre du soleil et de la lampe, mise en route étalée des programmes              |
 | `conversion.ts`                          | pose `aInk` sur une géométrie ou un modèle livré, sans rien nommer                        |
-| `sol.ts`, `lumieres.ts`, `particules.ts` | carte du sol d'un lieu, lampes et fenêtres, particules de l'air                           |
+| `sol.ts`, `lumieres.ts`, `particules.ts` | carte du sol d'un lieu et ses limites adoucies, lampes et fenêtres, particules de l'air   |
 
 Revenir à l'ancien rendu: `?rendu=aplats` dans l'adresse du jeu, ou `RenderOptions.style`.
 

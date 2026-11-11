@@ -52,6 +52,12 @@ export interface ReliefProfile {
   readonly bumps?: number;
   readonly spread?: number;
   /**
+   * Souple: forme de la pente que ce sol impose à ses voisins sur `spread`. 2 (défaut): elle se
+   * creuse près du bord commun (un talus de chemin); 1: pente régulière sur toute la portée (une
+   * berge qui montre sa terre de face comme de dos).
+   */
+  readonly curve?: 1 | 2;
+  /**
    * Bourrelet (hauteur positive) ou fossé (négative) que cette nature pose sur le sol souple qui
    * la borde: le petit talus d'herbe au bord d'un chemin, le fossé au pied du ballast. `width`:
    * 1 m au plus.
@@ -66,6 +72,18 @@ export interface ReliefProfile {
   readonly joins?: readonly string[];
   readonly paving?: PavingProfile;
   readonly kerb?: KerbProfile;
+  /**
+   * Souple: sillons en vrai relief (un labour). `height`: demi-écart entre crête et creux (m);
+   * `pitch`: d'une crête à la suivante (m, 0,5 au moins); `axis`: l'axe que suivent les crêtes
+   * (`y`: nord-sud); `crest`: place d'une crête dans la case (0,5: sous un rang de culture posé
+   * au milieu de sa case).
+   */
+  readonly furrows?: {
+    readonly height: number;
+    readonly pitch: number;
+    readonly axis: 'x' | 'y';
+    readonly crest: number;
+  };
 }
 
 const GRASS: ReliefProfile = {
@@ -85,11 +103,14 @@ const SOIL: ReliefProfile = {
 };
 
 const WATER: ReliefProfile = {
-  pourquoi: 'le fond: la berge descend vers lui en pente douce, l’eau la recouvre',
-  level: -0.42,
+  pourquoi:
+    'le fond: la berge y descend en pente régulière sur un mètre, assez pour montrer sa terre au-dessus de l’eau, et un ourlet d’herbe la couronne',
+  level: -0.62,
   edge: 'souple',
   bumps: 0.02,
-  spread: 0.5,
+  spread: 1,
+  curve: 1,
+  rim: { height: 0.035, width: 1 },
 };
 
 const BUILT: ReliefProfile = {
@@ -136,6 +157,15 @@ export const RELIEF_SETTINGS = {
       bumps: 0,
       spread: 0.5,
       rim: { height: -0.07, width: 0.9 },
+    },
+    labour: {
+      pourquoi:
+        'champ labouré: billons nord-sud d’un mètre, un rang de culture sur une crête, le passage dans le creux',
+      level: -0.065,
+      edge: 'souple',
+      bumps: 0.012,
+      spread: 0.45,
+      furrows: { height: 0.06, pitch: 1, axis: 'y', crest: 0.5 },
     },
     greve: {
       pourquoi: 'la grève descend vers l’eau',
@@ -259,6 +289,46 @@ export const RELIEF_SETTINGS = {
     jointShade: 0.6,
     /** Flanc d'une dalle ou d'une bordure, en part de sa teinte. */
     sideShade: 0.8,
+  },
+
+  /**
+   * Eau: niveau de la surface (m), un peu sous le pré. La ligne d'eau est là où le sol passe
+   * dessous: elle suit la berge du relief, pas les cases.
+   */
+  water: { level: -0.3 },
+
+  /**
+   * Berge: ce que le relief pose sur la pente entre l'herbe et l'eau. À moins de `earth` m de
+   * l'eau, l'herbe laisse voir la terre (le nuanceur la peint, bord tremblé de `earthNoise`);
+   * plus haut reste l'ourlet d'herbe. Pierres à demi enterrées et racines qui sortent de la
+   * terre, tirées de la place.
+   */
+  bank: {
+    earth: 0.8,
+    earthNoise: 0.1,
+    /** Teinte de la terre sèche de la berge. */
+    color: '#8a6a47',
+    /** Terre mouillée sur cette hauteur au-dessus de l'eau (m), et sa teinte (part). */
+    wet: 0.085,
+    wetShade: 0.7,
+    /** Liseré d'eau claire au pied de la berge: hauteur (m) et battement (m). */
+    foam: 0.022,
+    lap: 0.014,
+    /** Pierres: tirages par case de berge (un sur quatre environ tombe sur la pente), tailles (m), teintes. */
+    stones: 1.6,
+    stoneSize: [0.12, 0.3] as const,
+    stoneColors: ['#b9b2a0', '#9c9484', '#cfc8b4', '#8f8a7c'] as const,
+    /**
+     * Racines: une par case de berge avec cette chance, là seulement où des arbres ou une haie
+     * les expliquent (`rootNatures`); longueur (m), épaisseur au départ (m), saillie hors de la
+     * terre (m), teinte.
+     */
+    roots: 0.45,
+    rootNatures: ['lisiere', 'sous-bois', 'hors-jeu', 'verger'] as readonly string[],
+    rootLength: [0.6, 0.95] as const,
+    rootWidth: 0.045,
+    rootLift: 0.05,
+    rootColor: '#5a4330',
   },
 
   /** Distance sur laquelle un chemin monte au niveau du sol rigide qu'il rejoint (m, 1 au plus). */

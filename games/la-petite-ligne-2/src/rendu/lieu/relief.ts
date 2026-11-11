@@ -10,8 +10,14 @@
  * moins de `spread`, reçoit le bourrelet ou le fossé (`rim`) des natures voisines, remonte contre
  * les sols rigides qui le demandent (`apron`) et se met à niveau dans les emprises (`flats`).
  * Chaque terme est continu d'une case souple à l'autre: aucune fente dans le maillage.
+ *
+ * Limites adoucies (`lisieres.ts`): le sol souple affiché au point p est celui de la grille au
+ * point p + décalage(p). Berges, talus de chemin et sillons suivent ainsi la même frontière
+ * lissée que la teinte du sol; le décalage est nul dans et contre tout sol rigide.
  */
 import type { MapDef } from '../../donnees/schemas/lieu';
+import { EdgeField } from './lisieres';
+import { EDGE_SETTINGS, type EdgeSettings } from './reglages-lisieres';
 import type { GroundLook } from './reglages-tuiles';
 import {
   type KerbProfile,
@@ -70,7 +76,7 @@ function smooth01(t: number): number {
 }
 
 /** Bruit de valeurs lisse sur une grille de `span` m, de -1 à 1. */
-function valueNoise(x: number, y: number, span: number, salt: number): number {
+export function valueNoise(x: number, y: number, span: number, salt: number): number {
   const gx = x / span;
   const gy = y / span;
   const fx = Math.floor(gx);
@@ -107,6 +113,19 @@ function check(name: string, profile: ReliefProfile): void {
   }
   if (profile.kerb !== undefined && !(profile.kerb.width > 0 && profile.kerb.width < 0.5))
     fail('largeur de bordure hors bornes');
+  const furrows = profile.furrows;
+  if (furrows !== undefined) {
+    if (profile.edge !== 'souple') fail('des sillons demandent un sol souple');
+    if (!(furrows.pitch >= 0.5) || !(Math.abs(furrows.height) <= 0.2)) fail('sillons hors bornes');
+  }
+}
+
+/** Hauteur des sillons d'un profil au point (x, y): crêtes le long de `axis`, 0 sans sillons. */
+function furrowAt(profile: ReliefProfile, x: number, y: number): number {
+  const furrows = profile.furrows;
+  if (furrows === undefined) return 0;
+  const across = furrows.axis === 'y' ? x : y;
+  return furrows.height * Math.cos((2 * Math.PI * (across - furrows.crest)) / furrows.pitch);
 }
 
 // Tampons du calcul d'un point (jusqu'à 8 natures voisines): aucune allocation par appel.
@@ -122,8 +141,11 @@ export class Relief {
   private readonly kinds: Uint8Array;
   /** Rendu de la nature de chaque profil nommé (teinte des dalles), par case. */
   private readonly looks: readonly GroundLook[];
+  private readonly names: readonly string[];
   private readonly lookOf: Uint8Array;
   private readonly modes: Uint8Array;
+  /** Limites de sol adoucies: le décalage du point lu, partagé avec la teinte du sol. */
+  readonly edges: EdgeField;
   private readonly flats: Flat[] = [];
   private readonly flatCells = new Map<number, number[]>();
   private readonly spans: readonly { span: number; weight: number }[];
@@ -134,6 +156,7 @@ export class Relief {
     field: GroundField,
     map: ReliefMap,
     readonly settings: ReliefSettings = RELIEF_SETTINGS,
+    edges: EdgeSettings = EDGE_SETTINGS,
   ) {
     this.width = field.width;
     this.height = field.height;
@@ -189,6 +212,7 @@ export class Relief {
     });
     this.profiles = distinct;
     this.looks = looks;
+    this.names = names;
     this.lookOf = lookOf;
     this.kinds = new Uint8Array(n);
     for (let i = 0; i < n; i++) this.kinds[i] = profileOfName[lookOf[i] ?? 0] ?? 0;
@@ -263,6 +287,20 @@ export class Relief {
           }
         this.modes[i] = shaped ? SHAPED : PLAIN;
       }
+
+    // Limites adoucies: tout sol qui n'est pas souple garde ses bords droits.
+    const kinds = this.kinds;
+    this.edges = new EdgeField(
+      {
+        width: this.width,
+        height: this.height,
+        names,
+        looks,
+        cells: lookOf,
+        straight: (index) => distinct[kinds[index] ?? 0]?.edge !== 'souple',
+      },
+      edges,
+    );
   }
 
   private addFlat(flat: Flat): void {
@@ -301,6 +339,41 @@ export class Relief {
     return this.looks[this.lookOf[cy * this.width + cx] ?? 0] ?? null;
   }
 
+  /** Nom de la nature de la case (légende de la carte ou nature déduite), `null` hors de la carte. */
+  nameAt(cx: number, cy: number): string | null {
+    if (cx < 0 || cy < 0 || cx >= this.width || cy >= this.height) return null;
+    return this.names[this.lookOf[cy * this.width + cx] ?? 0] ?? null;
+  }
+
+  /** La case est de l'eau ou en touche (coins compris): sa pente est une berge. */
+  besideWater(cx: number, cy: number): boolean {
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++)
+        if (this.lookAt(cx + dx, cy + dy)?.water === true) return true;
+    return false;
+  }
+
+  /**
+   * Distance (m, bornée à 2) du point affiché (x, y) à l'eau, limites adoucies comprises: 0 dans
+   * l'eau. La terre d'une berge paraît près de l'eau, l'ourlet d'herbe plus loin.
+   */
+  waterDistance(x: number, y: number): number {
+    this.edges.sample(x, y);
+    const wx = x + this.edges.sx;
+    const wy = y + this.edges.sy;
+    const cx = Math.floor(wx);
+    const cy = Math.floor(wy);
+    let least = 2;
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++) {
+        if (this.lookAt(cx + dx, cy + dy)?.water !== true) continue;
+        const px = Math.max(cx + dx - wx, 0, wx - (cx + dx + 1));
+        const py = Math.max(cy + dy - wy, 0, wy - (cy + dy + 1));
+        least = Math.min(least, Math.hypot(px, py));
+      }
+    return least;
+  }
+
   isSoft(cx: number, cy: number): boolean {
     return this.profileAt(cx, cy)?.edge === 'souple';
   }
@@ -311,12 +384,31 @@ export class Relief {
     return this.modes[cy * this.width + cx] === SHAPED ? this.settings.mesh.fine : 1;
   }
 
+  /**
+   * Sens des sillons d'une case qui n'a pas d'autre relief (`x` ou `y`: l'axe que suivent les
+   * crêtes), `null` ailleurs: son maillage n'est serré qu'en travers des sillons.
+   */
+  ridged(cx: number, cy: number): 'x' | 'y' | null {
+    if (cx < 0 || cy < 0 || cx >= this.width || cy >= this.height) return null;
+    const i = cy * this.width + cx;
+    if (this.modes[i] !== PLAIN) return null;
+    return this.profiles[this.kinds[i] ?? 0]?.furrows?.axis ?? null;
+  }
+
+  /** Subdivision qu'une case demande à l'un de ses côtés. */
+  private sideResolution(cx: number, cy: number, side: SideIndex): number {
+    const ridged = this.ridged(cx, cy);
+    if (ridged === null) return this.resolution(cx, cy);
+    // Côtés nord et sud (le long de x): serrés si les crêtes suivent y, et inversement.
+    return side < 2 === (ridged === 'y') ? this.settings.mesh.fine : 1;
+  }
+
   /** Subdivision du côté d'une case souple: la plus fine des deux cases qu'il sépare. */
   edgeResolution(cx: number, cy: number, side: SideIndex): number {
-    const own = this.resolution(cx, cy);
+    const own = this.sideResolution(cx, cy, side);
     const s = SIDES[side];
     return this.isSoft(cx + s.dx, cy + s.dy)
-      ? Math.max(own, this.resolution(cx + s.dx, cy + s.dy))
+      ? Math.max(own, this.sideResolution(cx + s.dx, cy + s.dy, OPPOSITE[side] ?? 0))
       : own;
   }
 
@@ -340,7 +432,7 @@ export class Relief {
     const own = this.profiles[ownId];
     if (own === undefined) return 0;
     const n = this.noise(x, y);
-    if (this.modes[i] === PLAIN) return own.level + (own.bumps ?? 0) * n;
+    if (this.modes[i] === PLAIN) return own.level + (own.bumps ?? 0) * n + furrowAt(own, x, y);
 
     // Distance du point à chaque nature voisine (la plus proche de ses cases).
     let count = 0;
@@ -363,6 +455,7 @@ export class Relief {
     let weight = 1;
     let level = own.level;
     let bumps = own.bumps ?? 0;
+    let ridge = furrowAt(own, x, y);
     let lift = 0;
     for (let k = 0; k < count; k++) {
       const q = this.profiles[nearId[k] ?? 0];
@@ -371,19 +464,20 @@ export class Relief {
       if (q.edge === 'souple') {
         // Au bord, moitié de chaque niveau; la pente y est la plus forte et s'éteint à `spread`.
         const u = Math.min(1, d / (q.spread ?? 0.45));
-        const v = (1 - u) * (1 - u);
+        const v = q.curve === 1 ? 1 - u : (1 - u) * (1 - u);
         const w = v / (2 - v);
         nearWeight[k] = w;
         weight += w;
         level += w * q.level;
         bumps += w * (q.bumps ?? 0);
+        ridge += w * furrowAt(q, x, y);
       } else nearWeight[k] = 0;
       if (q.rim !== undefined && d < q.rim.width) {
         const s = Math.sin((Math.PI * d) / q.rim.width);
         lift += q.rim.height * s * s;
       }
     }
-    let h = (level + bumps * n) / weight + lift;
+    let h = (level + bumps * n + ridge) / weight + lift;
     // Sols rigides voisins, dans l'ordre des profils (le même d'une case à l'autre: le résultat
     // ne dépend pas de la case d'où l'on calcule).
     const kinds = this.profiles.length;
@@ -424,7 +518,22 @@ export class Relief {
   softSample(cx: number, cy: number, x: number, y: number): number {
     const px = Math.floor(x);
     const py = Math.floor(y);
-    return this.isSoft(px, py) ? this.softAt(px, py, x, y) : this.softAt(cx, cy, x, y);
+    return this.isSoft(px, py) ? this.shiftedAt(px, py, x, y) : this.softAt(cx, cy, x, y);
+  }
+
+  /**
+   * Hauteur du sol souple au point (x, y) de la case souple (cx, cy), limites adoucies comprises:
+   * la hauteur de la grille au point décalé. Le décalage s'annule contre un sol rigide: le point
+   * décalé reste sur un sol souple.
+   */
+  private shiftedAt(cx: number, cy: number, x: number, y: number): number {
+    const edges = this.edges;
+    if (!edges.sample(x, y)) return this.softAt(cx, cy, x, y);
+    const wx = x + edges.sx;
+    const wy = y + edges.sy;
+    const px = Math.floor(wx);
+    const py = Math.floor(wy);
+    return this.isSoft(px, py) ? this.softAt(px, py, wx, wy) : this.softAt(cx, cy, wx, wy);
   }
 
   /** Ce côté de la case porte-t-il une bordure de pierre ? */
@@ -450,7 +559,7 @@ export class Relief {
     const cy = Math.floor(y);
     if (cx < 0 || cy < 0 || cx >= this.width || cy >= this.height) return 0;
     const i = cy * this.width + cx;
-    if (this.modes[i] !== RIGID) return this.softAt(cx, cy, x, y);
+    if (this.modes[i] !== RIGID) return this.shiftedAt(cx, cy, x, y);
     const own = this.profiles[this.kinds[i] ?? 0];
     if (own === undefined) return 0;
     const kerb = own.kerb;
@@ -689,6 +798,7 @@ export function createRelief(
   field: GroundField,
   map: ReliefMap,
   settings: ReliefSettings = RELIEF_SETTINGS,
+  edges: EdgeSettings = EDGE_SETTINGS,
 ): Relief {
-  return new Relief(field, map, settings);
+  return new Relief(field, map, settings, edges);
 }

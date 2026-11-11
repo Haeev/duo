@@ -275,9 +275,29 @@ export class InkKit {
   }
 
   /** Carte du sol du lieu courant (`null`: sol de repli des lieux sans terrain). */
-  setGround(map: Texture | null, width: number, height: number): void {
+  setGround(
+    map: Texture | null,
+    width: number,
+    height: number,
+    /**
+     * Limites de sol adoucies d'un grand lieu (`createEdgeMap`) et noeuds de leur treillis par
+     * mètre; absentes: la grille telle quelle.
+     */
+    shift: Texture | null = null,
+    steps = 1,
+  ): void {
     this.uniforms.uGroundMap.value = map ?? this.noise;
     this.uniforms.uGroundRect.value.set(0, 0, map === null ? 0 : 1 / width, 1 / height);
+    if (map === null || shift === null) {
+      this.uniforms.uGroundShiftMap.value = this.noise;
+      this.uniforms.uGroundShift.value.set(0, 0, 0, 0);
+      return;
+    }
+    // Un noeud au centre de chaque point de la texture: `width * steps + 1` noeuds par rangée.
+    const columns = width * steps + 1;
+    const rows = height * steps + 1;
+    this.uniforms.uGroundShiftMap.value = shift;
+    this.uniforms.uGroundShift.value.set(steps / columns, steps / rows, 0.5 / columns, 0.5 / rows);
   }
 
   /** Particules de l'air, à mettre dans la scène une fois. */

@@ -9,6 +9,7 @@ import { type BufferGeometry, Color } from 'three';
 import { inkCode, KIND, LAYER } from '../encre/couches';
 import { GeometryBuilder } from './geometrie';
 import { type Relief, SIDES, type SideIndex, sidePoint, type Slab } from './relief';
+import { hash01 } from './terrain-rendu';
 
 /** Pièce du dallage, la même dans toutes les tuiles (grande: son bord prend le trait fort). */
 const PAVING_PIECE = inkCode(0, 99);
@@ -63,9 +64,12 @@ function fineCell(
   const positions: number[] = [];
   const normals: number[] = [];
   const indices: number[] = [];
+  // Case de berge: chaque sommet porte sa distance à l'eau (la terre paraît près d'elle).
+  const shores: number[] | undefined = relief.besideWater(cx, cy) ? [] : undefined;
   for (let j = 0; j <= n; j++)
     for (let i = 0; i <= n; i++) {
       positions.push(cx + i / n, h(i, j), cy + j / n);
+      shores?.push(relief.waterDistance(cx + i / n, cy + j / n));
       const nx = (-(h(i + 1, j) - h(i - 1, j)) * n) / 2;
       const nz = (-(h(i, j + 1) - h(i, j - 1)) * n) / 2;
       const k = 1 / Math.hypot(nx, 1, nz);
@@ -77,7 +81,7 @@ function fineCell(
       const b = a + n + 1;
       indices.push(a, b, b + 1, a, b + 1, a + 1);
     }
-  builder.sheet(positions, normals, indices, white);
+  builder.sheet(positions, normals, indices, white, shores);
 }
 
 /** Case souple lâche: un carré, ou un éventail si un de ses côtés touche une case serrée. */
@@ -119,6 +123,133 @@ function coarseCell(
     for (let k = 0; k < ring; k++) indices.push(ring, k, (k + 1) % ring);
   }
   builder.sheet(positions, normals, indices, white);
+}
+
+/**
+ * Case à sillons sans autre relief: des bandes en travers des crêtes (`n` par case), un seul pas
+ * le long. Les deux bandes du bord reprennent la subdivision de la case voisine (aucune fente).
+ */
+function ridgedCell(
+  builder: GeometryBuilder,
+  relief: Relief,
+  cx: number,
+  cy: number,
+  axis: 'x' | 'y',
+  n: number,
+  e: number,
+): void {
+  const positions: number[] = [];
+  const normals: number[] = [];
+  const indices: number[] = [];
+  // (u, v): u en travers des crêtes, v le long.
+  const put = (u: number, v: number): number => {
+    const x = axis === 'y' ? cx + u : cx + v;
+    const y = axis === 'y' ? cy + v : cy + u;
+    positions.push(x, relief.softSample(cx, cy, x, y), y);
+    normals.push(...normalAt(relief, cx, cy, x, y, e));
+    return positions.length / 3 - 1;
+  };
+  // Côtés en u = 0 et u = 1: ouest et est si les crêtes suivent y, nord et sud sinon.
+  const low = relief.edgeResolution(cx, cy, axis === 'y' ? 2 : 0);
+  const high = relief.edgeResolution(cx, cy, axis === 'y' ? 3 : 1);
+  for (let k = 0; k < n; k++) {
+    const u0 = k / n;
+    const u1 = (k + 1) / n;
+    // Le tour de la bande, dans le sens (u0, 0), (u0, 1), (u1, 1), (u1, 0).
+    const ring: number[] = [put(u0, 0)];
+    const left = k === 0 ? low : 1;
+    for (let j = 1; j < left; j++) ring.push(put(u0, j / left));
+    ring.push(put(u0, 1));
+    const corner = ring.length;
+    ring.push(put(u1, 1));
+    const right = k === n - 1 ? high : 1;
+    for (let j = 1; j < right; j++) ring.push(put(u1, 1 - j / right));
+    ring.push(put(u1, 0));
+    // Éventail depuis le coin (u1, 1), ou depuis (u0, 0) si c'est le côté u1 qui est subdivisé.
+    const hub = right > 1 ? 0 : corner;
+    const count = ring.length;
+    for (let j = 1; j + 1 < count; j++) {
+      const a = ring[hub] ?? 0;
+      const b = ring[(hub + j) % count] ?? 0;
+      const c = ring[(hub + j + 1) % count] ?? 0;
+      // Crêtes le long de x: (u, v) est retourné par rapport à (x, z), le sens des faces aussi.
+      if (axis === 'y') indices.push(a, b, c);
+      else indices.push(a, c, b);
+    }
+  }
+  builder.sheet(positions, normals, indices, white);
+}
+
+/** Racines qui sortent de la terre d'une berge (une pièce chacune: le contour les cerne). */
+function bankRoots(builder: GeometryBuilder, relief: Relief, rect: Rect): void {
+  const bank = relief.settings.bank;
+  const level = relief.settings.water.level;
+  const wet = (x: number, y: number): boolean => relief.lookAt(x, y)?.water === true;
+  tint.set(bank.rootColor);
+  builder.setInk(LAYER.plain);
+  builder.part(null);
+  let made = 0;
+  for (let cy = rect.y0; cy < rect.y1; cy++)
+    for (let cx = rect.x0; cx < rect.x1; cx++) {
+      if (!relief.isSoft(cx, cy) || wet(cx, cy)) continue;
+      if (!bank.rootNatures.includes(relief.nameAt(cx, cy) ?? '')) continue;
+      if (hash01(cx, cy, 161) >= bank.roots) continue;
+      const s = SIDES.find((d) => wet(cx + d.dx, cy + d.dy));
+      if (s === undefined) continue;
+      // Départ: en haut de la pente, là où la terre paraît, en marchant de la case vers l'eau.
+      const side = 0.2 + hash01(cx, cy, 162) * 0.6;
+      let x = cx + 0.5 + s.dx * -0.4 + (s.dx === 0 ? side - 0.5 : 0);
+      let y = cy + 0.5 + s.dy * -0.4 + (s.dy === 0 ? side - 0.5 : 0);
+      let found = false;
+      for (let k = 0; k < 14 && !found; k++) {
+        if (relief.waterDistance(x, y) < bank.earth - 0.04) found = true;
+        else {
+          x += s.dx * 0.1;
+          y += s.dy * 0.1;
+        }
+      }
+      if (!found) continue;
+      const length =
+        bank.rootLength[0] + hash01(cx, cy, 163) * (bank.rootLength[1] - bank.rootLength[0]);
+      const sway = (hash01(cx, cy, 164) - 0.5) * 1.8;
+      const segments = 4;
+      // Noeuds de la racine: elle descend la pente en biaisant, sort de terre puis y replonge.
+      const nodes: [number, number, number, number][] = [];
+      for (let k = 0; k <= segments; k++) {
+        const t = k / segments;
+        const bend = Math.sin(t * Math.PI) * sway * 0.25 + t * sway * 0.3;
+        const px = x + (s.dx * t - s.dy * bend) * length;
+        const py = y + (s.dy * t + s.dx * bend) * length;
+        const lift = k === 0 ? -0.02 : k === segments ? -0.05 : bank.rootLift * (1 - t * 0.4);
+        const h = Math.max(relief.heightAt(px, py), level - 0.06) + lift;
+        nodes.push([px, h, py, bank.rootWidth * (1 - t * 0.55)]);
+      }
+      builder.piece(inkCode(made++, 0.6));
+      for (let k = 0; k < segments; k++) {
+        const a = nodes[k];
+        const b = nodes[k + 1];
+        if (a === undefined || b === undefined) continue;
+        const dx = b[0] - a[0];
+        const dz = b[2] - a[2];
+        const d = Math.hypot(dx, dz) || 1;
+        // Travers de la racine (horizontal), vers la gauche du sens de marche vu du dessus.
+        const tx = dz / d;
+        const tz = -dx / d;
+        const al: [number, number, number] = [a[0] + tx * a[3], a[1], a[2] + tz * a[3]];
+        const ar: [number, number, number] = [a[0] - tx * a[3], a[1], a[2] - tz * a[3]];
+        const bl: [number, number, number] = [b[0] + tx * b[3], b[1], b[2] + tz * b[3]];
+        const br: [number, number, number] = [b[0] - tx * b[3], b[1], b[2] - tz * b[3]];
+        const down = (p: [number, number, number], w: number): [number, number, number] => [
+          p[0],
+          p[1] - w * 1.6 - 0.05,
+          p[2],
+        ];
+        builder.quad([al, ar, br, bl], [0, 1, 0], [tint]);
+        builder.quad([al, bl, down(bl, b[3]), down(al, a[3])], [tx, 0.3, tz], [tint]);
+        builder.quad([ar, down(ar, a[3]), down(br, b[3]), br], [-tx, 0.3, -tz], [tint]);
+      }
+    }
+  builder.piece(0);
 }
 
 /** Marches d'une case rigide vers ses voisines plus basses ou souples. */
@@ -307,7 +438,10 @@ export function* reliefGround(relief: Relief, rect: Rect): Generator<void, Buffe
       if (profile.edge === 'souple') {
         // Teinte et matière lues dans la carte du sol du lieu (rendu encré).
         builder.setInk(LAYER.grass, KIND.ground);
+        builder.shore(2);
+        const ridged = relief.ridged(cx, cy);
         if (relief.resolution(cx, cy) > 1) fineCell(builder, relief, cx, cy, fine);
+        else if (ridged !== null) ridgedCell(builder, relief, cx, cy, ridged, fine, e);
         else coarseCell(builder, relief, cx, cy, e);
         continue;
       }
@@ -329,6 +463,7 @@ export function* reliefGround(relief: Relief, rect: Rect): Generator<void, Buffe
     }
     if ((cy - rect.y0) % ROWS_PER_STEP === ROWS_PER_STEP - 1) yield;
   }
+  bankRoots(builder, relief, rect);
   yield* paving(builder, relief, rect);
   return builder.build();
 }

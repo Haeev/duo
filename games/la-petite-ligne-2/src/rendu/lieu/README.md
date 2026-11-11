@@ -39,7 +39,7 @@ Budget du bois (`semis.light` de `reglages-recoltes.ts`): à plus de `beyond` ca
 
 ### Files et repères livrés (`files.ts`, données dans `reglages-files.ts`)
 
-Haies, talus de berge et rangs du labour sont des modules d'un mètre du manifeste des décors (`assets-src/decors/recoltables-aubrune/`). `layRuns` prend les cases de chaque sorte (`RUN_SORTS`: natures, voisines voulues ou refusées, une colonne sur deux), puis choisit pour chaque case le module et son quart de tour (et son miroir) qui raccordent ses voisines de la même sorte et tournent les côtés `facing` vers l'eau; la forme est tirée de la case (la même chez l'hôte et l'invité). Chaque sorte est fusionnée en un maillage par tuile, posé à l'origine du lieu, chaque file avec son numéro de pièce (tiré de sa première case): aucun trait de contour aux raccords ni d'une tuile à l'autre. Les sommets suivent le relief. Une sorte dont un modèle manque garde ses boîtes.
+Haies et rangs du labour sont des modules d'un mètre du manifeste des décors (`assets-src/decors/recoltables-aubrune/`). Le talus d'une lisière au bord de l'eau n'en est plus un: sa sorte (`talus`, `modules: []`) réserve ses cases, et le relief du sol y descend en berge le long de la ligne d'eau lissée (voir « Limites de sol adoucies »), ce qu'un module posé d'équerre ne peut pas suivre; les modèles `bank*` restent au manifeste, sans emploi. Une sorte peut grossir ses modules (`scale`: les rangs du labour) et rendre inégale sa ligne du dessus (`crest`: la haie, hauteur tirée de la place, continue d'un module et d'une tuile à l'autre, sans un triangle de plus). `layRuns` prend les cases de chaque sorte (`RUN_SORTS`: natures, voisines voulues ou refusées, une colonne sur deux), puis choisit pour chaque case le module et son quart de tour (et son miroir) qui raccordent ses voisines de la même sorte et tournent les côtés `facing` vers l'eau; la forme est tirée de la case (la même chez l'hôte et l'invité). Chaque sorte est fusionnée en un maillage par tuile, posé à l'origine du lieu, chaque file avec son numéro de pièce (tiré de sa première case): aucun trait de contour aux raccords ni d'une tuile à l'autre. Les sommets suivent le relief. Une sorte dont un modèle manque garde ses boîtes.
 
 Repères: `LANDMARK_LOOKS` donne le modèle de chaque nature de repère de la carte (`landmarks.kind`), son orientation (vers la voie, le long de la voie, le long de l'eau, ou cap fixe) et son enfoncement. Il s'efface devant le joueur comme un bâtiment. Ses emprises et celles des modules écartent le semis (`KeepOut`) et les objets posés au sol (`hidingFootprints`).
 
@@ -48,7 +48,7 @@ Ajouter une sorte de file ou une nature de repère (aucun code):
 1. Les modèles existent au manifeste (`construire.sh` du dossier des récoltables): modules de 1 m, le long de x, origine au milieu de la case.
 2. File: copie l'entrée de `RUN_SORTS` la plus proche et donne-lui un nom; sa place dans la table est sa priorité.
 3. `on`, `near`, `notNear`, `every`: les cases qu'elle prend. `pourquoi`: sa raison d'être.
-4. `modules`: le droit d'abord, puis le bout et l'angle, chacun avec ses `links` (côtés où la file continue), `facing` et `mirror` si besoin.
+4. `modules`: le droit d'abord, puis le bout et l'angle, chacun avec ses `links` (côtés où la file continue), `facing` et `mirror` si besoin; `scale` et `crest` pour la grossir ou varier sa hauteur.
 5. Repère: une entrée de `LANDMARK_LOOKS` du nom de sa nature (`kind` de la carte), avec `model`, `facing` (`toward-rail`, `along-rail`, `along-water`, `fixed`), `snap`, `sink`, `fitHeight`.
 6. `pnpm exec vitest run tests/rendu/files.test.ts` (une sorte et une nature factices y sont posées).
 7. Regarde-le: `pnpm exec vite build`, puis `LPL2_VUES=lisiere,moulin pnpm exec playwright test --config tests/rendu-encre/playwright.config.ts ensemble`.
@@ -114,7 +114,7 @@ Le sol d'un grand lieu n'est plus un plan. La hauteur est une affaire d'affichag
 | `relief.ts`          | `Relief`: `heightAt(x, y)` pure et déterministe, tirée de la carte du lieu (natures, bâtiments, portes, voies); dalles et pierres de bordure en données (logique pure, sans Three.js) |
 | `relief-sol.ts`      | le maillage: sol souple en nappe lissée, serrée seulement là où le relief change; marches; dalles et bordures en petits volumes (une pièce de contour, un morceau par pierre)         |
 
-Niveaux: les sols posés par l'homme (rue, route, seuils, voie) restent à y = 0, l'herbe est 5 cm plus bas, les chemins de terre encore 7 cm (creusés, talus d'herbe sur leurs bords), le quai 12 cm plus haut, le fond de l'eau à 42 cm. Un sol `rigide` est plan et finit par une marche ou une bordure; un sol `souple` se raccorde en pente douce à ses voisins. Le sol est plan sous l'emprise de chaque bâtiment, de plain-pied devant chaque porte et sous chaque voie. Ce qui suit la hauteur: le maillage des tuiles, le décor et le semis (`tuile.ts`), les meubles et objets posés (`lieu.ts`), les pieds et l'ombre de contact des personnages (`CharacterFrame.ground`), les repères d'interface (`projectToScreen`).
+Niveaux: les sols posés par l'homme (rue, route, seuils, voie) restent à y = 0, l'herbe est 5 cm plus bas, les chemins de terre encore 7 cm (creusés, talus d'herbe sur leurs bords), le quai 12 cm plus haut, la surface de l'eau à 30 cm sous le plan (`water.level`) et son fond à 62 cm. Un sol `rigide` est plan et finit par une marche ou une bordure; un sol `souple` se raccorde en pente douce à ses voisins. Le sol est plan sous l'emprise de chaque bâtiment, de plain-pied devant chaque porte et sous chaque voie. Ce qui suit la hauteur: le maillage des tuiles, le décor et le semis (`tuile.ts`), les meubles et objets posés (`lieu.ts`), les pieds et l'ombre de contact des personnages (`CharacterFrame.ground`), les repères d'interface (`projectToScreen`).
 
 ### Ajouter une nature de sol en relief (aucun code)
 
@@ -123,8 +123,29 @@ Niveaux: les sols posés par l'homme (rue, route, seuils, voie) restent à y = 0
 3. `pourquoi`: la raison d'être de ce relief, en une phrase.
 4. `level`: hauteur en mètres par rapport au plan de la simulation (négatif: creusé).
 5. `edge`: `souple` (terre, herbe, eau) ou `rigide` (sol posé par l'homme).
-6. Souple: `bumps` (bosses), `spread` (largeur du raccord, 1 m au plus), `rim` (bourrelet ou fossé posé sur les voisins), `joins` (natures rigides rejointes de plain-pied).
+6. Souple: `bumps` (bosses), `spread` (largeur du raccord, 1 m au plus), `curve` (1: pente régulière), `rim` (bourrelet ou fossé posé sur les voisins), `joins` (natures rigides rejointes de plain-pied), `furrows` (sillons en vrai relief: hauteur, pas, axe des crêtes).
 7. Rigide: `apron` (la terre remonte contre lui), `paving` (dalles en volume), `kerb` (bordure de pierre).
 8. Copie le profil le plus proche (`chemin` pour un sol creusé, `rue` pour un dallage) et ne change que ce qui diffère.
 9. `pnpm exec vitest run tests/rendu/relief.test.ts`: le test ajoute une nature factice et vérifie qu'elle paraît dans la hauteur et le maillage; un profil hors bornes est refusé avec son nom.
 10. Regarde le résultat: `pnpm exec vite build`, puis `pnpm exec playwright test --config tests/rendu-encre/playwright.config.ts relief` (captures et compteurs, avec le contrôle de `?rendu=aplats`).
+
+## Limites de sol adoucies (rendu encré)
+
+La frontière entre deux natures de sol ne suit plus les arêtes des cases. `lisieres.ts` (`EdgeField`, logique pure) calcule pour le lieu un champ de décalage, un vecteur par noeud d'un treillis au demi-mètre: le sol affiché au point p est le sol de la grille au point p + décalage(p). La teinte le lit dans une texture (`createEdgeMap`, `groundPoint` du nuanceur), le relief dans `Relief.heightAt`: berges, talus de chemin, sillons et ligne d'eau suivent la même ligne. Les noeuds d'une frontière vont vers le milieu de leurs voisins (coins arrondis, paliers d'escalier inclinés), puis reçoivent une ondulation tirée de leur place; le nuanceur ajoute le tremblé du trait.
+
+- La simulation n'en sait rien: collisions et cases franchissables restent sur la grille. L'écart est donc borné: `reach` (0,21 m) pour le champ, `ragged` (0,08 m par axe) pour le tremblé, 0,32 m au pire, et le test le mesure.
+- Restent droits: tout sol au bord `rigide` (dallage, quai, rue, route, emprise de bâtiment, passerelle), la voie (`straight`), et tout couple absent de `pairs`.
+- Berge (`bank` de `reglages-relief.ts`): pente régulière d'un mètre vers l'eau, ourlet d'herbe en haut, terre à moins de 80 cm de l'eau, terre mouillée et liseré d'eau claire au pied, pierres (instances des cailloux) et racines (dans le maillage du sol, là où des arbres ou une haie les expliquent). L'eau (`water.level`) déborde d'une case sous la terre: sa ligne est là où la berge passe dessous. Frange claire le long des rives: `INK_SETTINGS.water`.
+- Labour (`furrows` du profil `labour`): billons nord-sud d'un mètre dans le maillage (une bande par quart de mètre en travers, un seul pas le long), un rang de culture sur une crête sur deux.
+- Coût: une texture de plus (769 x 513, deux octets par noeud), une lecture filtrée par point de sol, quatre à huit lectures par point d'eau; 60 à 90 ms de calcul à l'entrée du lieu. Triangles et appels au banc `ensemble.spec.ts` (1366 x 768, avant puis après): moulin 232 112 et 131, 235 394 et 130; talus 212 647 et 107, 213 709 et 103; ferme 246 376 et 91, 250 970 et 89; orée 298 903 et 173, 298 963 et 173. L'ancien rendu (`?rendu=aplats`) n'en lit rien.
+
+### Ajouter un couple de natures à lisser (aucun code)
+
+1. Les deux natures existent dans la légende de la carte et ont un bord `souple` (`reglages-relief.ts`): un sol rigide ne se lisse pas.
+2. Dans `reglages-lisieres.ts`, ajoute une entrée à `pairs`: `{ pourquoi, a: [...], b: [...] }`.
+3. `a` et `b`: des noms de nature (`chemin`), des surfaces (`surface:herbe`: toutes les natures de cette surface) ou `*` (toute nature).
+4. `pourquoi`: la raison pour laquelle cette frontière n'est pas droite dans le monde, en une phrase.
+5. Une nature qui doit garder ses bords droits malgré un couple large: son nom dans `straight`.
+6. Ne touche à `reach` et `ragged` qu'avec le game designer: leur somme est l'écart toléré entre l'image et les collisions.
+7. `pnpm exec vitest run tests/rendu/lisieres.test.ts`: un couple factice y est ajouté par données; écart, continuité entre tuiles, bords droits et repli y sont mesurés.
+8. Regarde le résultat: `pnpm exec vite build`, puis `LPL2_VUES=moulin,talus,ferme pnpm exec playwright test --config tests/rendu-encre/playwright.config.ts ensemble`.

@@ -219,3 +219,21 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Couper un volume avec la caméra sans échanger de géométrie: fabriquer le bas d'abord, puis le haut, et régler `geometry.setDrawRange`; le liseré de la cible, qui partage la géométrie, suit tout seul.
 - Ne pas retoucher le groupe `dedans` des ambiances pour les pièces: le wagon s'en sert. Groupe à part (`piece`), `"sun": null` pour rendre le soleil à l'heure.
 - `json.dumps(indent=2)` puis `prettier --write` rend le format du dépôt pour les fichiers de données; RectSchema n'accepte que des entiers.
+
+## Limites de sol adoucies, berges et sillons (2026-11-11, `src/rendu/lieu/lisieres.ts`, `reglages-lisieres.ts`)
+
+- Sortir d'une grille de cases sans toucher à la simulation: un champ de décalage par noeud (treillis au demi-mètre), « sol affiché en p = sol de la grille en p + décalage(p) ». La même formule sert à la teinte (texture RG en filtrage linéaire) et au relief (`heightAt`): la ligne d'eau, la berge et la couleur tombent au même endroit, et l'écart à la grille est borné par construction (norme du vecteur).
+- Piège de signe: si le noeud de frontière doit PARAÎTRE en v + d, le décalage du point lu est -d. À l'envers, les coins se creusent en pointes et les marches penchent du mauvais côté (un test « le coin d'un carré est montré dans l'autre nature » le voit tout de suite).
+- Lissage d'une frontière sous contrainte: filtre (1, 2, 1) / 4 le long de la ligne, écrêté à un rayon autour du noeud (fil tendu dans des disques). Jacobi pur (moyenne des deux voisins) oscille sur un escalier d'un mètre; le filtre amorti non. Un escalier de 1 m sous un écart de 30 cm ne devient jamais une droite: les paliers s'inclinent, les coins se coupent, il reste une ondulation. Le dire au lieu de promettre une courbe.
+- Les passes de finition après le bruit le mangent: quatre passes au demi-mètre retirent les trois quarts d'une onde de 3 m. Une seule.
+- Bruit borné pour un budget d'écart: écrêter (`clamp(bruit x 2,6, -1, 1)`) fait passer le bruit l'essentiel du temps près de son maximum; un bruit brut n'utilise en moyenne que le tiers de l'écart permis et le bord paraît tiré à la règle.
+- Vérifier qu'un champ de déformation ne se replie pas: déterminant du jacobien de p + décalage(p) par différences finies, positif partout (test).
+- Berge visible de dos: avec une caméra à 50 degrés, une pente qui tourne le dos ne montre que L x sin 50 - H x cos 50. Pente régulière et large (1 m pour 25 cm) plutôt que creusée au pied; ne pas rehausser la rive (une levée cache la terre). Peindre la terre selon la distance à l'eau portée par les sommets (variable non `flat`), pas selon la hauteur ni un drapeau par case (bord de case visible).
+- Liseré d'eau au pied d'une berge sans un triangle: le nuanceur du sol peint en clair les points entre le niveau de l'eau et quelques centimètres au-dessus (hauteur qui bat avec le temps). La nappe d'eau déborde d'une case sous la terre, le tampon de profondeur fait la ligne.
+- Frange claire de l'eau: quatre à huit lectures de la carte du sol autour du point (bit « eau » dans l'alpha), rayon tremblé par un bruit.
+- Sillons au pas de l'échantillonnage (pas = 2 mailles): les différences centrées donnent des normales plates, rien ne s'ombre. Il faut au moins 3 mailles par sillon (4: crête, flanc, creux, flanc).
+- Des sillons dans une nature qui porte un meuble plat (le potager) le traversent: pas de sillons sous un meuble.
+- Une sorte de file sans module (`modules: []`) réserve ses cases: ni boîte ni haie, le relief dessine. Les modules d'un mètre posés d'équerre ne peuvent pas suivre une ligne lissée.
+- Budget: l'orée était à 298 903 triangles pour un plafond de 300 000; mesurer la vue la plus serrée avant de choisir une technique (ici: zéro triangle pour l'eau, la terre et le liseré; bandes en travers seulement pour les sillons).
+- Copie isolée: un `python3 - <<EOF` long ou un `mkdir && cat > ... &&` est refusé; écrire le script avec l'outil d'écriture puis `python3 fichier.py` depuis le dossier du jeu. Deux bancs en rendu logiciel et `pnpm test` en même temps: un test à délai (20 s) échoue par manque de processeur, le relancer seul.
+

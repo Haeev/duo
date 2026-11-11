@@ -38,12 +38,18 @@ describe('files de modules', () => {
   const layout = layRuns(field);
   const cells = [...layout.cells.values()];
 
-  it('pose une haie, un talus ou un rang sur chaque case qui en portait une boîte', () => {
+  it('pose une haie ou un rang, ou réserve un talus, sur chaque case qui portait une boîte', () => {
     const count = (sort: string): number => cells.filter((c) => c.sort === sort).length;
     // 233 haies et 144 talus en boîtes: la lisière qui ne touche l'eau que par un coin est
-    // devenue l'angle rentrant de sa berge.
+    // devenue l'angle rentrant de sa berge. Le talus n'a plus de module: ses cases sont
+    // réservées (ni boîte ni haie), le relief du sol y descend en berge.
     expect(count('haie')).toBe(232);
-    expect(count('talus')).toBe(145);
+    expect(count('talus')).toBe(0);
+    expect(layout.reserved.size).toBe(145);
+    for (const i of layout.reserved) {
+      expect(layout.cells.has(i)).toBe(false);
+      expect(layout.covers(i % field.width, Math.floor(i / field.width))).toBe(true);
+    }
     expect(count('rang')).toBeGreaterThan(100);
     const { cols, rows } = tileGrid(map);
     for (let tile = 0; tile < cols * rows; tile++) {
@@ -57,11 +63,9 @@ describe('files de modules', () => {
     }
   });
 
-  it('ne laisse aucun raccord ouvert vers une case sans file, et tourne le talus vers l’eau', () => {
+  it('ne laisse aucun raccord ouvert vers une case sans file', () => {
     const at = (x: number, y: number): string | undefined =>
       layout.cells.get(y * field.width + x)?.sort;
-    const nameAt = (x: number, y: number): string =>
-      field.names[field.cells[y * field.width + x] ?? 0] ?? '';
     let ends = 0;
     const alone: string[] = [];
     for (const cell of cells) {
@@ -90,11 +94,6 @@ describe('files de modules', () => {
         ).toBe(cell.sort);
       }
       if (module.links.length === 1) ends += 1;
-      // Un talus droit montre sa terre (+z) à l'eau.
-      if (cell.sort === 'talus' && module.model === 'bank') {
-        const [dx, dz] = turned('s', cell.quarter, cell.mirror);
-        expect(nameAt(cell.x + dx, cell.y + dz)).toBe('eau');
-      }
       expect(linked).toBeLessThanOrEqual(2);
     }
     expect(ends).toBeGreaterThan(0);
