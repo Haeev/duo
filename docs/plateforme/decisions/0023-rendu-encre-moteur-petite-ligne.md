@@ -102,6 +102,40 @@ Construction des tuiles (même carte, calcul du sol en relief appelé pas à pas
 
 Estimation pour le PC du client à partir de son relevé (non mesurée): scène 10,8 ms et contour 12,8 ms à 2,07 millions de points deviennent environ 5,5 et 6,5 ms à 1,05 million, plus la mise à l'échelle (cinq lectures sur 2,07 millions de points, de l'ordre de 2 à 3 ms) et l'ombre du soleil (1,4 ms): environ 16 ms par image sur le processeur graphique, sous les 33 ms du plancher même si chaque image attend deux battements de l'écran. Plancher de l'échelle adaptative: 70 % du départ, soit 50 % du côté du canevas à 1920 x 1080 (960 x 540): pas besoin de le baisser.
 
+### 2026-11-11: moins de lectures par point, à image égale (point 18)
+
+Ce qui change. L'image du contour (morceau, normale, pièce, profondeur) tient dans un seul point de texture: cible `RG32F`, deux entiers de 24 bits exacts (`AUX_PACKING` de `contour.ts`), la profondeur comptée dans une fenêtre de 96 m plus deux fois la hauteur de la vue autour du point visé (un pas: 1,5 à 2 mm; sur les 399 m de la caméra il vaudrait 6 mm). Une prise du trait coûte une lecture au lieu de deux. Un masque au quart de la définition (deux passes: dix lectures filtrées par carré de quatre points de côté, puis quatre ou neuf pour l'étaler à la portée des prises) dit où un trait est possible; ailleurs le contour lit la couleur et le masque. Le masque est prudent: retiré, l'image est la même au point près (vérifié, 0 point d'écart). Dans la scène: deux lectures d'ombre de moins loin d'un bord d'ombre, hachures lues seulement là où elles se voient, carte du sol lue une fois au lieu de trois loin d'une limite, bruit des plages d'herbe sur l'herbe seulement. Trois extensions deviennent nécessaires (`EXT_color_buffer_float`, `EXT_float_blend`, `OES_texture_float_linear`); sans elles le moteur revient aux aplats.
+
+Pistes chiffrées et écartées. Élargissement séparable d'un masque d'arêtes: au rayon du trait (3 à 7 points) il coûte 8 à 12 lectures, autant que les prises. Passe d'élargissement à définition réduite: le trait bave. Sortie anticipée sur les seules prises longues: déjà écartée (rainures). Cible `RGBA16F` (11 bits exacts par nombre) ou `RGBA32F` (16 octets par point): trop peu de bits, ou trop de mémoire à écrire.
+
+Lectures de texture exécutées par point, mesurées à 1920 x 1080 (sonde hors dépôt qui compte chaque lecture là où le nuanceur la fait; le masque ajoute 0,9 lecture par point au contour, comptée ici):
+
+| Vue | Passe | Avant | Après |
+|---|---|---|---|
+| Intérieur (pièce, 55 % de fond) | scène, volumes | 8,2 | 5,7 |
+| | contour | 22,0 | 7,8 (trait cherché sur 38 % de l'image) |
+| | les deux, par point d'écran | 25,6 | 10,4 |
+| Quai, jour | scène, volumes (91 % de l'image) | 9,0 | 6,1 |
+| | scène, sol | 16,0 | 10,9 |
+| | contour | 22,0 | 13,5 (trait cherché sur 83 %: pavés et dalles) |
+| | les deux, par point d'écran | 31,5 | 20,1 |
+| Quai, nuit (lampes, ombre de lampe) | scène, volumes | 10,9 | 8,1 |
+| | scène, sol | 18,0 | 13,0 |
+| | contour | 22,0 | 13,6 |
+| | les deux, par point d'écran | 33,4 | 22,0 |
+
+Objectifs: contour à 8 lectures tenu dedans, pas sur le quai (partout où un trait est possible, les huit prises restent); sol à 8 et volumes à 5 non atteints sans changer l'image (10,9 et 5,7 à 6,1 de jour). Ce qui les atteindrait change le dessin et attend une décision: un seul bruit au lieu de deux pour le tremblé des ombres (une lecture de moins partout, le bord des ombres tremble autrement), les bruits du sol partagés avec ceux de l'encre (deux de moins sur le sol).
+
+Image avant et après, 1366 x 768, temps figé (planches `captures/cout-point-*.png`): 2 466 points différents sur 1 049 088 dans la pièce (0,24 %), 7 342 sur le quai de jour (0,70 %), 7 533 de nuit (0,72 %), tous isolés le long des traits. Cause établie sur la pièce à 960 x 540: le rendu logiciel lit une texture « au plus proche » avec des coordonnées sur 16 bits, la nouvelle passe lit le point exact; en rejouant cet arrondi, 1 443 points d'écart tombent à 74, dont une vingtaine tiennent à la profondeur sur 16 bits. Deux captures de la même version: 0 point d'écart.
+
+Temps par image en rendu logiciel, 1920 x 1080, trois tours alternés de 40 s: pièce 1 228, 1 188, 1 623 ms avant et 1 273, 1 294, 1 262 ms après; quai 4 010, 4 124, 4 206 ms avant et 5 592, 4 478, 4 313 ms après. Aucun gain, 3 à 8 % de plus: le rendu logiciel exécute les deux côtés de chaque branche, donc toutes les lectures « épargnées », plus les deux passes du masque. Cette mesure ne dit rien du PC; le décompte ci-dessus est ce qu'un processeur graphique à vraies branches exécute.
+
+Estimation pour le PC du client (non mesurée), pièce à 1920 x 1080: contour 12,8 ms vers 4,5 à 7,5 ms, scène 10,8 ms vers 8,5 à 10 ms, ombre 1,4 ms: 14,5 à 19 ms sur le processeur graphique au lieu de 25. Incertitudes: le compilateur de Direct3D peut aplatir une petite branche (lectures d'ombre et de hachures alors non épargnées; la grande branche du contour devrait rester), la cible à virgule coûte 4 octets de plus par point écrit, et les 20 ms hors passes du relevé ne sont pas expliquées par le code (voir plus bas).
+
+Les 20 ms hors passes. Lecture du code: une image par battement demandé (boucle du SDK), canevas opaque sans profondeur, ni pochoir, ni anticrénelage, ni `preserveDrawingBuffer`; aucun `gl.finish`; `readPixels` seulement à l'ouverture du panneau (mire); chronomètres lus sans attendre; aucun flou d'arrière-plan CSS dans le jeu. La seule copie du canevas est celle du carnet de séance (3 par seconde), actif sur le Mac seulement. Reste l'attente de l'écran: une image de 25 ms de processeur graphique, plus la composition de la page, tombe sur deux ou trois battements (33 ou 50 ms); 45 ms de moyenne, c'est une majorité d'images à trois battements. Le rythme du relevé le dira.
+
+Plafond de départ sur Intel intégré: 1600 x 900 (1366 x 768 avant). L'échelle adaptative juge sur l'écart entre deux images: calée à 30 images par seconde sur l'écran, elle sait descendre mais ne remonte pas, donc son départ doit être sûr. La pleine définition se lèvera sur un relevé à l'échelle figée à 100 %.
+
 ## Ce qui est abandonné de l'ancien rendu
 
 - Matériaux standard, lumières physiques, tone mapping et brume de Three.js: inertes en encre (gardés pour `aplats`).

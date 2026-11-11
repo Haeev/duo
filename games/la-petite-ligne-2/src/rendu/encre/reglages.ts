@@ -57,6 +57,31 @@ export const INK_SETTINGS = {
     zoomRange: [0.75, 1.7] as const,
     /** Tremblé du trait, en part de son épaisseur. */
     wobble: 0.7,
+    /** Épaisseur le long du trait, en part de `radius`: du plus fin au plus épais (bruit). */
+    widthRange: [0.55, 1.45] as const,
+    /** Saut de profondeur (m) qui trace un trait dans un même objet (un toit devant son mur). */
+    leapMetres: 0.3,
+    /**
+     * Fenêtre de profondeur de l'image du contour (m), autour du point visé, à laquelle s'ajoute
+     * deux fois la hauteur de la vue: tout ce qui se voit doit y tenir (un clocher devant, le fond
+     * d'une rivière derrière). Plus elle est courte, plus la profondeur y est fine.
+     */
+    depthSpan: 96,
+    /**
+     * Masque du trait (ADR 0023, point 18): il écarte les points où rien ne change à portée de
+     * prise. Prudent par construction, il ne retire aucun trait.
+     * - `sameTolerance`: écart admis entre un point et la moyenne de ses voisins sur le nombre
+     *   « morceau et normale » (un morceau différent l'écarte de 16 384 au moins, un cran de
+     *   normale de 64; l'arrondi d'une moyenne, de 1 au plus).
+     * - `creaseShare`: part du saut de profondeur qu'un pli du sol laisse voir au masque dans le
+     *   pire cas (un quart), prise de moitié par sûreté. Le seuil du masque en découle.
+     * - `minSteps`: sous ce seuil (en pas de profondeur), l'arrondi de la profondeur (deux pas
+     *   au plus sur un écart au plan) ferait marquer des plans: le masque se retire et tout est
+     *   cherché, comme avant (vue d'ensemble, dont la profondeur s'étend sur deux kilomètres).
+     * - `steepShare`: part du saut de profondeur admise sur un plan vu presque de chant, où le
+     *   tremblé du trait suffit à tracer.
+     */
+    mask: { sameTolerance: 3, creaseShare: 0.125, minSteps: 2.05, steepShare: 0.5 },
     /** Un rang de trait apparaît quand ce qu'il cerne dépasse `fadeFrom` points, plein à `fadeTo`. */
     fadeFrom: 12,
     fadeTo: 28,
@@ -371,8 +396,14 @@ export const INK_SETTINGS = {
      * de la pleine définition du canevas (le PC de référence affichait 1920 x 1080 internes pour
      * un écran de 1536 x 864 points). Ses paliers s'appliquent ensuite à ce départ. Rien ne
      * change ailleurs (Mac, rendu logiciel), ni quand l'échelle est figée.
+     *
+     * 1600 x 900 depuis la baisse du coût par point (ADR 0023, point 18; 1366 x 768 avant). Le
+     * plafond reste parce que l'échelle adaptative juge sur l'écart entre deux images: à 30 images
+     * par seconde calées sur l'écran, elle sait descendre mais ne remonte pas. Elle part donc
+     * d'un départ sûr; la pleine définition se lève ici quand un relevé du PC à l'échelle figée
+     * à 100 % la montre tenable dehors.
      */
-    integrated: { match: 'intel', maxPixels: 1366 * 768 },
+    integrated: { match: 'intel', maxPixels: 1600 * 900 },
   },
 
   /**

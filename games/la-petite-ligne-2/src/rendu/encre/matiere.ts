@@ -5,8 +5,9 @@
  *
  * Un seul nuanceur de volumes pour le sol, le décor, le semis instancié, la végétation et les
  * personnages (variantes `CHARACTER` et `ATLAS`, squelette et morphoses compris). Il écrit deux
- * sorties: la couleur, et une seconde image (normale, numéro de morceau, numéro de pièce) que la
- * passe de contour lit ensuite pour tracer le trait.
+ * sorties: la couleur, et l'image du contour (morceau, normale, pièce et profondeur rangés dans
+ * deux nombres, `AUX_PACKING` de `contour.ts`) que la passe de contour lit ensuite pour tracer le
+ * trait.
  *
  * Ce que le nuanceur attend d'une géométrie: `position`, `normal`, une couleur de sommet
  * (`color`, linéaire, comme partout dans le moteur) et, s'il existe, `aInk` (x couche de traits,
@@ -33,6 +34,7 @@ import {
   ZeroFactor,
 } from 'three';
 import type { Ambiance } from './ambiances';
+import { AUX_GLSL } from './contour';
 import { EDGE_SETTINGS } from '../lieu/reglages-lisieres';
 import { RELIEF_SETTINGS } from '../lieu/reglages-relief';
 import { fireBeat, hex, KEEP_INK, KIND, LAYER, type Rgb, SLEEK_PART, TILE_METRES } from './couches';
@@ -169,6 +171,8 @@ export interface InkUniforms {
   uShadowTexel: IUniform<number>;
   uLayers: IUniform<DataArrayTexture | null>;
   uNoise: IUniform<Texture | null>;
+  /** Fenêtre de profondeur de l'image du contour (`depthWindow` de `contour.ts`). */
+  uAuxDepth: IUniform<Vector2>;
   /** Carte du sol du lieu: teinte de chaque case, couche de traits et dureté dans l'alpha. */
   uGroundMap: IUniform<Texture | null>;
   /** xy décalage, zw échelle (mètres vers la carte); z nul: pas de carte, teinte de repli. */
@@ -227,6 +231,7 @@ export function createInkUniforms(): InkUniforms {
     uShadowTexel: { value: 1 / INK_SETTINGS.sunShadow.size },
     uLayers: { value: null },
     uNoise: { value: null },
+    uAuxDepth: { value: new Vector2(0, 1) },
     uGroundMap: { value: null },
     uGroundRect: { value: new Vector4(0, 0, 0, 0) },
     uGroundShiftMap: { value: null },
@@ -404,9 +409,14 @@ float sunSeen(vec3 wp, vec3 N, vec2 tremble) {
   // Lecture au niveau 0 (la carte n'a pas d'autres niveaux): permise dans une branche.
   float seen = textureLod(uShadowMap, vec3(sc.xy, z), 0.0) * 0.4
     + textureLod(uShadowMap, vec3(sc.xy + vec2(t, t * 0.4), z), 0.0) * 0.15
-    + textureLod(uShadowMap, vec3(sc.xy + vec2(-t * 0.4, t), z), 0.0) * 0.15
-    + textureLod(uShadowMap, vec3(sc.xy + vec2(-t, -t * 0.4), z), 0.0) * 0.15
-    + textureLod(uShadowMap, vec3(sc.xy + vec2(t * 0.4, -t), z), 0.0) * 0.15;
+    + textureLod(uShadowMap, vec3(sc.xy + vec2(-t * 0.4, t), z), 0.0) * 0.15;
+  // Les deux dernières lectures pèsent 0,3 à elles deux: loin d'un bord d'ombre, les trois
+  // premières ont déjà passé le seuil (0,58) ou ne peuvent plus l'atteindre (0,42), et le
+  // résultat est le même sans elles.
+  if (seen < 0.58 && seen > 0.1199)
+    seen = seen
+      + textureLod(uShadowMap, vec3(sc.xy + vec2(-t, -t * 0.4), z), 0.0) * 0.15
+      + textureLod(uShadowMap, vec3(sc.xy + vec2(t * 0.4, -t), z), 0.0) * 0.15;
   return mix(1.0, smoothstep(0.42, 0.58, seen), uHatch.w);
 }
 
@@ -418,11 +428,14 @@ float lampSeen(vec3 wp, vec3 N, vec2 tremble) {
   if (p.x < 0.01 || p.x > 0.99 || p.y < 0.01 || p.y > 0.99 || p.z > 1.0) return 1.0;
   float z = p.z - 0.0012;
   float t = uLampShadowTexel * 1.2;
-  float seen = texture(uLampShadowMap, vec3(p.xy, z)) * 0.4
-    + texture(uLampShadowMap, vec3(p.xy + vec2(t, t * 0.4), z)) * 0.15
-    + texture(uLampShadowMap, vec3(p.xy + vec2(-t * 0.4, t), z)) * 0.15
-    + texture(uLampShadowMap, vec3(p.xy + vec2(-t, -t * 0.4), z)) * 0.15
-    + texture(uLampShadowMap, vec3(p.xy + vec2(t * 0.4, -t), z)) * 0.15;
+  float seen = textureLod(uLampShadowMap, vec3(p.xy, z), 0.0) * 0.4
+    + textureLod(uLampShadowMap, vec3(p.xy + vec2(t, t * 0.4), z), 0.0) * 0.15
+    + textureLod(uLampShadowMap, vec3(p.xy + vec2(-t * 0.4, t), z), 0.0) * 0.15;
+  // Comme pour le soleil: les deux dernières lectures seulement près d'un bord d'ombre.
+  if (seen < 0.58 && seen > 0.1199)
+    seen = seen
+      + textureLod(uLampShadowMap, vec3(p.xy + vec2(-t, -t * 0.4), z), 0.0) * 0.15
+      + textureLod(uLampShadowMap, vec3(p.xy + vec2(t * 0.4, -t), z), 0.0) * 0.15;
   return smoothstep(0.42, 0.58, seen);
 }
 
@@ -539,13 +552,22 @@ vec3 inkLight(vec3 base, vec3 wp, vec3 flatN, vec3 N, float foot, float inkGain,
   float glow = max(pool, spill);
   vec3 color = base * light;
 
-  // Plan de projection des hachures choisi par la normale: une seule lecture de texture.
+  // Plan de projection des hachures choisi par la normale: une seule lecture de texture, et
+  // seulement là où elles se voient (ombre propre ou portée hachurée, pied d'un objet). Ailleurs
+  // tout ce qu'elles pèsent est nul: un sol au soleil, un personnage, ne les lisent pas.
   vec3 an = abs(flatN);
-  vec2 huv = an.y > 0.7 ? wp.xz : (an.x > an.z ? wp.zy : wp.xy);
-  vec2 hatch = texture(uLayers, vec3(huv / ${TILE_METRES.toFixed(1)}, ${String(LAYER.hatch)}.0)).rg;
+  vec2 huv = (an.y > 0.7 ? wp.xz : (an.x > an.z ? wp.zy : wp.xy)) / ${TILE_METRES.toFixed(1)};
+  vec2 hatchDx = dFdx(huv);
+  vec2 hatchDy = dFdy(huv);
   float away = 1.0 - smoothstep(0.0, 0.08, ndl);
   float own = away * (1.0 - sun);
   float thrown = (1.0 - seen) * facing;
+  float upright = (1.0 - smoothstep(0.45, 0.7, an.y)) * step(-0.02, foot);
+  float dampTop = 0.2 + nz.g * 0.45;
+  vec2 hatch = vec2(0.0);
+  if (inkGain > 0.0 && uDetail.y > 0.0
+      && (own * uHatch.x > 0.0 || thrown * uHatch.y > 0.0 || (upright > 0.0 && foot < dampTop)))
+    hatch = textureGrad(uLayers, vec3(huv, ${String(LAYER.hatch)}.0), hatchDx, hatchDy).rg;
   // La densité suit la lumière: hachures lâches à peine détourné, serrées franchement à l'ombre.
   float deep = smoothstep(-0.15, -0.45, ndl);
   float ownHatch = mix(hatch.g, max(hatch.r, hatch.g), deep);
@@ -560,9 +582,8 @@ vec3 inkLight(vec3 base, vec3 wp, vec3 flatN, vec3 N, float foot, float inkGain,
   dark = max(dark, black) * (1.0 - glow) * inkGain;
 
   // Pied de l'objet: un liseré d'encre pleine au ras du sol, puis des hachures qui s'éclaircissent.
-  float upright = (1.0 - smoothstep(0.45, 0.7, an.y)) * step(-0.02, foot);
   float base0 = upright * step(foot, 0.03 + fine.r * 0.06);
-  float damp = upright * (1.0 - smoothstep(0.0, 0.2 + nz.g * 0.45, foot)) * hatch.g * uDetail.y;
+  float damp = upright * (1.0 - smoothstep(0.0, dampTop, foot)) * hatch.g * uDetail.y;
   dark = max(dark, max(base0, damp) * uRelief.y * inkGain);
   color = mix(color, uInk, dark);
 
@@ -592,12 +613,13 @@ vec3 reliefNormal(vec3 N, vec3 wp, vec2 uv, vec2 slope) {
   return normalize(N - (T * slope.x + B * slope.y) * uRelief.x);
 }
 
-// Normale sur deux canaux (octaèdre): les deux autres portent les numéros de morceau et de pièce.
+// Normale sur deux octets (octaèdre), arrondis comme le ferait une texture de huit bits.
 vec2 packNormal(vec3 n) {
   n /= abs(n.x) + abs(n.y) + abs(n.z);
   vec2 e = n.z >= 0.0 ? n.xy : (1.0 - abs(n.yx)) * vec2(n.x >= 0.0 ? 1.0 : -1.0, n.y >= 0.0 ? 1.0 : -1.0);
-  return e * 0.5 + 0.5;
+  return floor((e * 0.5 + 0.5) * 255.0 + 0.5);
 }
+${AUX_GLSL}
 `;
 
 /**
@@ -784,6 +806,16 @@ uniform vec4 uOwn;
     vec2 d = texture(uGroundShiftMap, g * uGroundShift.xy + uGroundShift.zw).rg * 255.0 - 128.0;
     return g + d * ${(EDGE_SETTINGS.span / 127).toFixed(6)};
   }
+  // Deux points (m) tombent-ils dans la même case de la carte du sol ? La carte se lit au plus
+  // proche: une seule lecture vaut alors pour les deux. À moins d'un centième de case d'un bord,
+  // on ne se prononce pas (le choix de la case y dépend de l'arrondi du processeur graphique).
+  bool sameGroundCell(vec2 a, vec2 b) {
+    vec2 size = vec2(textureSize(uGroundMap, 0));
+    vec2 ta = (a * uGroundRect.zw + uGroundRect.xy) * size;
+    vec2 tb = (b * uGroundRect.zw + uGroundRect.xy) * size;
+    vec2 edge = min(min(fract(ta), 1.0 - fract(ta)), min(fract(tb), 1.0 - fract(tb)));
+    return floor(ta) == floor(tb) && min(edge.x, edge.y) > 0.01;
+  }
   // La case lue est-elle de l'eau ? (bit 5 de l'alpha de la carte du sol)
   float waterCell(vec2 p) {
     float code = floor(texture(uGroundMap, p * uGroundRect.zw + uGroundRect.xy).a * 255.0 + 0.5);
@@ -886,14 +918,22 @@ void main() {
         // Tremblé du trait: un bruit serré, écrêté (il passe l'essentiel du temps près de son
         // maximum: le bord tremble franchement sans jamais dépasser l'écart permis).
         vec2 warp = clamp((nA.rg - 0.5) * 2.6 + (nB.gb - 0.5) * 0.8, -1.0, 1.0) * uGroundTones.z;
-        vec4 straight = texture(uGroundMap, gs * uGroundRect.zw + uGroundRect.xy);
-        vec4 bent = texture(uGroundMap, (gs + warp) * uGroundRect.zw + uGroundRect.xy);
+        // Loin d'une limite, le point tremblé et son voisin retombent dans la même case: la
+        // carte n'est lue qu'une fois (trois près d'une limite).
+        vec4 straight = textureLod(uGroundMap, gs * uGroundRect.zw + uGroundRect.xy, 0.0);
+        vec4 bent = straight;
+        if (!sameGroundCell(gs, gs + warp))
+          bent = textureLod(uGroundMap, (gs + warp) * uGroundRect.zw + uGroundRect.xy, 0.0);
         float hard = max(step(127.5, straight.a * 255.0), step(127.5, bent.a * 255.0));
         cell = mix(bent, straight, hard);
-        vec2 probe = mix(gs + warp, gs, hard) + vec2(0.07, 0.05);
-        vec4 next = texture(uGroundMap, probe * uGroundRect.zw + uGroundRect.xy);
         // Trait interrompu le long du bord, de près seulement.
-        border = step(0.012, distance(next.rgb, cell.rgb)) * step(0.3, nA.b) * uDetail.y;
+        float dashed = step(0.3, nA.b) * uDetail.y;
+        vec2 from = mix(gs + warp, gs, hard);
+        vec2 probe = from + vec2(0.07, 0.05);
+        if (dashed > 0.0 && !sameGroundCell(from, probe)) {
+          vec4 next = textureLod(uGroundMap, probe * uGroundRect.zw + uGroundRect.xy, 0.0);
+          border = step(0.012, distance(next.rgb, cell.rgb)) * dashed;
+        }
         code = floor(cell.a * 255.0 + 0.5);
       }
       code = mod(code, 128.0);
@@ -921,8 +961,9 @@ void main() {
         float lap = ${RELIEF_SETTINGS.bank.foam.toFixed(3)} + ${RELIEF_SETTINGS.bank.lap.toFixed(3)} * sin(uTime * 0.8 + nB.r * 19.0 + nA.g * 5.0);
         foam = step(above, lap);
       }
-      // Herbe: trois tons en grandes plages, qui se déplacent avec l'heure comme sur un pré bosselé.
-      vec3 big = texture(uNoise, g * 0.021).rgb;
+      // Herbe: trois tons en grandes plages, qui se déplacent avec l'heure comme sur un pré
+      // bosselé. Les plages ne pèsent que sur l'herbe: leur bruit n'est pas lu ailleurs.
+      vec3 big = grassy > 0.5 ? textureLod(uNoise, g * 0.021, 0.0).rgb : vec3(0.0);
       vec2 lay = vec2(big.r + nB.b * 0.7, big.g + nB.r * 0.7) - 0.85;
       vec2 sunward = normalize(uSunDir.xz + 1e-4);
       // Sol en relief: la pente vraie s'ajoute aux plages de l'herbe et vaut pour toute nature de
@@ -1041,7 +1082,7 @@ void main() {
   gColor = vec4(color, uOpacity);
   // Un volume effacé (mur coupé, toit en fondu) ne laisse aucune trace dans l'image du contour:
   // avec le mélange alpha, une sortie nulle garde ce qui était dessous.
-  gAux = uFaded > 0.5 ? vec4(0.0) : vec4(packNormal(N), vMeta.w / 255.0, vMeta.y / 255.0);
+  gAux = uFaded > 0.5 ? vec4(0.0) : packAux(packNormal(N), vMeta.w, vMeta.y);
 }
 `;
 
@@ -1059,7 +1100,8 @@ void main() {
 /**
  * Ombre de contact: une tache anguleuse posée au sol sous les pieds, qui multiplie la couleur du
  * dessous par le ton d'ombre de l'ambiance. La seconde sortie vaut 1 partout: la multiplication
- * la laisse intacte, donc aucun trait de contour autour de la tache.
+ * la laisse intacte (au bit près, ses nombres sont à virgule), donc aucun trait de contour autour
+ * de la tache.
  */
 const CONTACT_FRAGMENT = /* glsl */ `
 layout(location = 0) out highp vec4 gColor;
@@ -1095,20 +1137,25 @@ layout(location = 0) out highp vec4 gColor;
 layout(location = 1) out highp vec4 gAux;
 in vec3 vColor;
 uniform vec3 uShade;
+${AUX_GLSL}
 void main() {
   gColor = vec4(vColor * mix(vec3(1.0), uShade, 0.8), 1.0);
-  gAux = vec4(0.5, 1.0, 0.0, 0.0);
+  gAux = packAux(vec2(0.0), 0.0, 0.0);
 }
 `;
+
+/** Pièce de l'aplat sans lumière: un numéro à lui, de la plus grande classe de taille. */
+const FLAT_PIECE = 62;
 
 /** Aplat sans lumière (liseré de l'objet visé): une couleur d'écran, sa propre pièce de contour. */
 const FLAT_FRAGMENT = /* glsl */ `
 layout(location = 0) out highp vec4 gColor;
 layout(location = 1) out highp vec4 gAux;
 uniform vec3 uFlat;
+${AUX_GLSL}
 void main() {
   gColor = vec4(uFlat, 1.0);
-  gAux = vec4(0.5, 0.5, 0.0, 62.0 / 255.0);
+  gAux = packAux(vec2(0.0), 0.0, ${String(FLAT_PIECE)}.0);
 }
 `;
 
@@ -1316,6 +1363,7 @@ export function createFlatMaterial(
   color: string,
   push: number,
   side: ShaderMaterialParameters['side'],
+  shared: Pick<InkUniforms, 'uAuxDepth'>,
 ): ShaderMaterial {
   const value = Number.parseInt(color.slice(1), 16);
   return new ShaderMaterial({
@@ -1328,6 +1376,7 @@ export function createFlatMaterial(
         ),
       },
       uPush: { value: push },
+      uAuxDepth: shared.uAuxDepth,
     },
     glslVersion: GLSL3,
     vertexShader: FLAT_VERTEX,

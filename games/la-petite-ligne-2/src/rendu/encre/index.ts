@@ -20,7 +20,7 @@ import {
 import { keySpan, lightDirection } from '../lumiere';
 import { RENDER_SETTINGS } from '../reglages';
 import { type Ambiance, ambianceAt, type AmbianceBook, gameAmbiances } from './ambiances';
-import { COLOR_CHART, detailShare, InkPass } from './contour';
+import { COLOR_CHART, depthWindow, detailShare, InkPass } from './contour';
 import { hex } from './couches';
 import { InkScale, scaleFromAddress } from './echelle';
 import {
@@ -112,6 +112,16 @@ const BYTES_PER_MEGABYTE = 1024 * 1024;
 /** Rendu logiciel (tests, banc): reconnu au nom du processeur graphique. */
 const SOFTWARE = /swiftshader|llvmpipe|software|basic render/i;
 const CHART_EXPECTED: readonly number[] = COLOR_CHART.flat();
+/**
+ * Extensions WebGL2 dont le rendu encré a besoin: une cible à virgule de 32 bits (image du
+ * contour), qui se mêle (fondus) et se lit filtrée (masque du trait). Présentes sur tout
+ * processeur graphique de bureau; sans elles, `inkContext` ne rend pas de contexte.
+ */
+const INK_EXTENSIONS = [
+  'EXT_color_buffer_float',
+  'EXT_float_blend',
+  'OES_texture_float_linear',
+] as const;
 /** Distances de `nearest`, réutilisées d'un appel à l'autre. */
 const distances: number[] = [];
 
@@ -135,6 +145,21 @@ export function inkContext(canvas: HTMLCanvasElement): WebGL2RenderingContext | 
       desynchronized: s.desynchronized,
     }) ?? undefined
   );
+}
+
+let supported: boolean | null = null;
+
+/**
+ * Le rendu encré peut-il tourner ici ? Essayé une fois sur un canevas à part (celui du jeu ne
+ * peut pas changer de contexte après coup): WebGL2 et `INK_EXTENSIONS`. Hors navigateur: oui.
+ */
+export function inkSupported(): boolean {
+  if (supported !== null) return supported;
+  if (typeof document === 'undefined') return true;
+  const gl = document.createElement('canvas').getContext('webgl2');
+  supported = gl !== null && INK_EXTENSIONS.every((name) => gl.getExtension(name) !== null);
+  gl?.getExtension('WEBGL_lose_context')?.loseContext();
+  return supported;
 }
 
 /**
@@ -361,7 +386,7 @@ export class InkKit {
 
   /** Aplat sans lumière (liseré de la cible), poussé le long des normales. */
   flatMaterial(color: string, push: number, side: Material['side']): ShaderMaterial {
-    return createFlatMaterial(color, push, side);
+    return createFlatMaterial(color, push, side, this.uniforms);
   }
 
   /** Carte du sol du lieu courant (`null`: sol de repli des lieux sans terrain). */
@@ -415,8 +440,10 @@ export class InkKit {
     const s = INK_SETTINGS;
     const shadows = (s.sunShadow.size ** 2 + s.lampShadow.size ** 2) * 4;
     const scale = this.scaler.scale() * this.cap;
-    // Deux sorties et la profondeur (12 octets par point), plus l'image finie avant sa mise à l'échelle.
-    const inner = width * height * scale * scale * (this.pass.scaled ? 16 : 12);
+    // Couleur (4 octets par point), image du contour (8) et profondeur (4), plus l'image finie
+    // avant sa mise à l'échelle; le masque du trait: deux octets par carré de quatre points de côté.
+    const points = width * height * scale * scale;
+    const inner = points * (this.pass.scaled ? 20 : 16) + points / 8;
     return Math.round(layers + 128 * 128 * 4 + shadows + inner);
   }
 
@@ -516,6 +543,9 @@ export class InkKit {
       const gl = renderer.getContext();
       const info = gl.getExtension('WEBGL_debug_renderer_info');
       this.gpu = info === null ? '' : String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL));
+      // L'image du contour est à virgule (`AUX_PACKING`): le fondu d'un mur et l'ombre de contact
+      // s'y mêlent, ce qu'une cible de 32 bits ne permet qu'avec cette extension.
+      for (const name of INK_EXTENSIONS) gl.getExtension(name);
       this.software = info !== null && SOFTWARE.test(this.gpu);
       if (this.metered)
         this.meter.attach(renderer, {
@@ -614,6 +644,15 @@ export class InkKit {
     if (caster >= 0) meter.end(1, this.lamp.size * this.lamp.size);
     else meter.skip(1);
 
+    // Profondeur de l'image du contour: une fenêtre autour du point visé, bien plus fine que
+    // l'étendue de la caméra.
+    const depth = depthWindow(
+      this.dirA.copy(this.focus).sub(camera.position).dot(camera.getWorldDirection(this.dirB)),
+      camera.near,
+      camera.far,
+      (camera.top - camera.bottom) / camera.zoom,
+    );
+    u.uAuxDepth.value.set(depth.from, depth.scale);
     meter.begin(2);
     renderer.setRenderTarget(this.pass.target);
     // La cible garde des valeurs d'écran (sRGB), comme tout ce que le matériau encré y écrit:
@@ -621,6 +660,7 @@ export class InkKit {
     // pour une cible (le fond sortait bien plus sombre que la donnée).
     renderer.setClearColor(this.clear.setRGB(...ambiance.background), 1);
     renderer.clear();
+    this.pass.clearAux(renderer, ambiance.background);
     renderer.render(scene, camera);
     meter.end(2, innerWidth * innerHeight);
     const o = s.outline;
@@ -637,12 +677,19 @@ export class InkKit {
       camera,
       pixelsPerMetre,
       frame.exposure,
+      depth.span,
       zoom,
       frame.width,
       frame.height,
     );
-    // Contour à l'échelle interne, plus la mise à l'échelle vers le canevas quand il y en a une.
-    meter.end(3, innerWidth * innerHeight + (scale >= 1 ? 0 : frame.width * frame.height));
+    // Contour à l'échelle interne et son masque, plus la mise à l'échelle vers le canevas quand
+    // il y en a une.
+    meter.end(
+      3,
+      innerWidth * innerHeight +
+        this.pass.maskPixels +
+        (scale >= 1 ? 0 : frame.width * frame.height),
+    );
     scene.background = background;
     meter.frame(this.lastDrawnAt === 0 ? 0 : now - this.lastDrawnAt, performance.now() - now, now);
     this.lastDrawnAt = now;

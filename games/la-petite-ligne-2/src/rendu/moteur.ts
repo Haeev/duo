@@ -51,6 +51,7 @@ import {
   INK_SETTINGS,
   InkKit,
   inkContext,
+  inkSupported,
   type InkFrame,
   type InkLights,
   inkTag,
@@ -392,7 +393,9 @@ class Engine implements GameRenderer {
 
   constructor(private readonly options: RenderOptions) {
     const settings = RENDER_SETTINGS.renderer;
-    const style = options.style ?? INK_SETTINGS.style;
+    const wanted = options.style ?? INK_SETTINGS.style;
+    // Sans les extensions du rendu encré (cible à virgule): l'ancien rendu, plutôt qu'un écran noir.
+    const style: RenderStyle = wanted === 'encre' && !inkSupported() ? 'aplats' : wanted;
     this.renderer = new WebGLRenderer({
       canvas: options.canvas,
       ...(style === 'encre' ? { context: inkContext(options.canvas) } : {}),

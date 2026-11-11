@@ -148,6 +148,12 @@ export const RENDER_SETTINGS = {
      * cachent rien d'utile, et effacés ils deviendraient des fantômes au milieu de la pièce.
      */
     minHeight: 1.35,
+    /**
+     * Un grand modèle posé comme repère (emprise d'au moins `minSpan` m dans les deux sens: le
+     * coteau du tunnel) ne remplit pas sa boîte: on relève ses hauteurs par cases de `cell` m, et
+     * il ne s'efface que si le rayon du personnage vers la caméra passe sous son dessus.
+     */
+    profile: { minSpan: 8, cell: 0.5 },
   },
 
   target: {

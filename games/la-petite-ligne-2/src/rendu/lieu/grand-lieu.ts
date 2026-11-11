@@ -21,6 +21,7 @@ import {
   type Material,
   MeshStandardMaterial,
   type Texture,
+  Vector3,
   Vector4,
   type WebGLProgramParametersWithUniforms,
 } from 'three';
@@ -37,7 +38,13 @@ import { INK_INNER, type InkInner, type Lamp, type WindowLight } from '../encre/
 import { INK_SETTINGS } from '../encre/reglages';
 import { createEdgeMap, createGroundMap } from '../encre/sol';
 import { Fadable } from '../fondu';
-import { Occlusion, rayHitsBox, type Vec3 } from '../occultation';
+import {
+  type HeightProfile,
+  heightProfile,
+  Occlusion,
+  rayHitsBox,
+  type Vec3,
+} from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
 import { DECOR_MANIFEST } from './decors-manifeste';
@@ -142,6 +149,21 @@ interface RoomView {
   readonly lights: PlaceLights;
   /** Aucune fenêtre (cave): il y fait nuit à toute heure, lampes allumées. */
   readonly blind: boolean;
+}
+
+const corner = new Vector3();
+
+/** Relevé des hauteurs d'un repère posé, dans le repère du monde (occultation d'un grand volume). */
+function landmarkProfile(mesh: Mesh, cell: number): HeightProfile {
+  const position = mesh.geometry.getAttribute('position');
+  const world = new Float32Array(position.count * 3);
+  for (let i = 0; i < position.count; i++) {
+    corner.fromBufferAttribute(position, i).applyMatrix4(mesh.matrixWorld);
+    world[i * 3] = corner.x;
+    world[i * 3 + 1] = corner.y;
+    world[i * 3 + 2] = corner.z;
+  }
+  return heightProfile(world, mesh.geometry.index?.array ?? null, cell);
 }
 
 const NO_LIGHTS: PlaceLights = { lamps: [], windows: [] };
@@ -736,7 +758,18 @@ export class TiledPlace {
     mesh.updateMatrixWorld(true);
     const box = new Box3().setFromObject(mesh);
     const id = mesh.name;
-    if (this.occlusion.add({ id, min: box.min.clone(), max: box.max.clone() }))
+    // Un grand repère (le coteau du tunnel) ne remplit pas sa boîte: il ne s'efface que si le
+    // rayon du joueur vers la caméra passe sous lui, d'après le relevé de ses hauteurs.
+    const { minSpan, cell } = RENDER_SETTINGS.occlusion.profile;
+    const large = box.max.x - box.min.x >= minSpan && box.max.z - box.min.z >= minSpan;
+    if (
+      this.occlusion.add({
+        id,
+        min: box.min.clone(),
+        max: box.max.clone(),
+        ...(large ? { profile: landmarkProfile(mesh, cell) } : {}),
+      })
+    )
       this.landmarkFades.set(id, new Fadable(mesh, new Color(0, 0, 0)));
     // Repère qui éclaire (le feu du sémaphore): sa lampe, et son verre allumé avec elle.
     const light = DECOR_MANIFEST.models[pose.model]?.light;
