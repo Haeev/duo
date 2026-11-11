@@ -29,6 +29,7 @@ import { checkRecipes } from '../simulation/cuisine/valider';
 import { validateHousings } from '../simulation/logement/valider';
 import { validatePassages } from '../simulation/lieux/valider';
 import { checkPlans } from '../simulation/fabrication/valider';
+import { validateMusic } from '../simulation/musique/valider';
 
 /** Décision à deux citée par une condition ou un effet: déclarée par une étape, option connue. */
 function checkDecision(
@@ -806,5 +807,6 @@ export function validateContent(content: Content): string[] {
   problems.push(...validateStory(content, { condition: checkCondition, effect: checkEffect }));
   problems.push(...validateHousings(content));
   problems.push(...validatePassages(content));
+  problems.push(...validateMusic(content));
   return problems;
 }

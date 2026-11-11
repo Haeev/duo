@@ -431,6 +431,11 @@ export function createKitchen(
       case 'reward_given':
       case 'decision_changed':
       case 'map_object_changed':
+      case 'music_opened':
+      case 'music_started':
+      case 'music_note':
+      case 'music_finished':
+      case 'music_closed':
       case 'shelter_collected':
       case 'shelter_filled':
       case 'shelter_opened':

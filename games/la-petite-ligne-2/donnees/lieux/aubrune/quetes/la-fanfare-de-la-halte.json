@@ -383,6 +383,12 @@
             },
             {
               "type": "give_item",
+              "item": "cornet",
+              "count": 1,
+              "to": "duo"
+            },
+            {
+              "type": "give_item",
               "item": "graines-oeillet",
               "count": 3
             }

@@ -1,0 +1,458 @@
+/*
+ * Musique jouée: cahier de fanfare, partition encrée, mot de la fin. Panneaux du thème (sombres
+ * sous `data-lpl-style="encre"`), la partition est une page de papier posée dessus, à l'encre.
+ * Les tailles suivent la fenêtre (`cqw`, `cqh` de la racine): lisible à 1366 x 768 comme à
+ * 960 x 540. Seuls transform et opacity s'animent; rien ne s'anime en mouvement réduit, sauf la
+ * plume, qui est l'information.
+ */
+.lpl-mus {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 0 1.25rem;
+  box-sizing: border-box;
+  pointer-events: none;
+  container-type: size;
+  font-family: 'Nunito Sans Variable', system-ui, sans-serif;
+  color: var(--ink, #2a2522);
+}
+.lpl-mus[data-kind='book'],
+.lpl-mus[data-kind='wait'],
+.lpl-mus[data-kind='result'] {
+  align-items: center;
+  padding: 0;
+}
+.lpl-mus-panel {
+  box-sizing: border-box;
+  width: min(34rem, 94cqw);
+  max-height: 96cqh;
+  padding: 0.875rem 1.125rem;
+  background: var(--paper, #fbf6e9);
+  border: 0.125rem solid var(--line, #2a2522);
+  border-radius: 0.875rem;
+  box-shadow: var(--shadow-3, 0 0.375rem 0 rgb(42 37 34 / 0.35));
+  overflow: hidden;
+}
+.lpl-mus-panel header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0 0 0.5rem;
+}
+.lpl-mus-panel h2 {
+  margin: 0;
+  font: 700 1.375rem/1.2 var(--font-display, Georgia, serif);
+}
+.lpl-mus-who,
+.lpl-mus-pageno,
+.lpl-mus-panel .muted {
+  margin: 0;
+  color: var(--ink-muted, #5a4a3c);
+  font-size: 0.9375rem;
+}
+.lpl-mus-pageno {
+  margin-left: auto;
+}
+.lpl-mus-panel footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.25rem;
+  margin-top: 0.625rem;
+  color: var(--ink-muted, #5a4a3c);
+  font-size: 0.875rem;
+}
+.lpl-mus kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-width: 1.75rem;
+  margin-right: 0.25rem;
+  padding: 0.0625rem 0.4375rem;
+  border: 0.125rem solid var(--line, #2a2522);
+  border-radius: 0.4375rem;
+  background: var(--paper-raised, #fff);
+  color: var(--ink, #2a2522);
+  font:
+    800 0.875rem/1.5 'Nunito Sans Variable',
+    system-ui,
+    sans-serif;
+}
+
+/* Cahier de fanfare: la liste des airs. */
+.lpl-mus-duo {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: var(--ink-muted, #5a4a3c);
+}
+.lpl-mus-duo.on {
+  color: var(--accent, #8a5a1b);
+  font-weight: 800;
+}
+.lpl-mus-book ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.1875rem;
+}
+.lpl-mus-row {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr) auto auto;
+  grid-template-areas: 'rank name pips stars' 'rank detail detail stars';
+  align-items: center;
+  column-gap: 0.625rem;
+  padding: 0.25rem 0.625rem;
+  border: 0.125rem solid transparent;
+  border-radius: 0.5rem;
+  background: var(--paper-sunken, #efe6cf);
+}
+.lpl-mus-row.sel {
+  border-color: var(--accent, #2a2522);
+  background: var(--chosen-bg, #f3dc9c);
+}
+.lpl-mus-row .rank {
+  grid-area: rank;
+  font: 700 1.125rem/1 var(--font-display, Georgia, serif);
+  color: var(--ink-muted, #5a4a3c);
+}
+.lpl-mus-row .name {
+  grid-area: name;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lpl-mus-detail {
+  grid-area: detail;
+  justify-self: start;
+  font-size: 0.8125rem;
+  color: var(--ink-muted, #5a4a3c);
+}
+.lpl-mus-row.unknown .name,
+.lpl-mus-row.locked .name {
+  color: var(--ink-muted, #5a4a3c);
+  font-weight: 600;
+}
+.lpl-mus-row.unknown,
+.lpl-mus-row.locked {
+  border-style: dashed;
+  border-color: var(--line, #9c8a6c);
+  background: none;
+}
+.lpl-mus-row.sel:is(.unknown, .locked) {
+  border-color: var(--accent, #2a2522);
+}
+/* Difficulté: une à trois croches pleines (forme, pas couleur). */
+.lpl-mus-row .pips {
+  grid-area: pips;
+  display: flex;
+  gap: 0.1875rem;
+}
+.lpl-mus-row .pips i {
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 0.125rem solid var(--ink, #2a2522);
+  border-radius: 50%;
+}
+.lpl-mus-row .pips i.on {
+  background: var(--ink, #2a2522);
+}
+.lpl-mus-stars {
+  grid-area: stars;
+  display: inline-flex;
+  gap: 0.125rem;
+}
+.lpl-mus-stars i {
+  width: 0.875rem;
+  height: 0.875rem;
+  clip-path: polygon(
+    50% 0,
+    62% 35%,
+    100% 38%,
+    70% 60%,
+    80% 100%,
+    50% 78%,
+    20% 100%,
+    30% 60%,
+    0 38%,
+    38% 35%
+  );
+  background: var(--line, #9c8a6c);
+  opacity: 0.45;
+}
+.lpl-mus-stars i.on {
+  background: var(--accent, #8a5a1b);
+  opacity: 1;
+}
+.lpl-mus-empty {
+  margin: 0.5rem 0;
+}
+
+/* Partition: une page de papier, à l'encre, sur le panneau. */
+.lpl-mus-sheet {
+  width: min(56rem, 94cqw, 150cqh);
+}
+.lpl-mus-paper {
+  --paper: #efe2c4;
+  --paper-raised: #f7edd6;
+  --ink: #231a17;
+  --ink-muted: #5a4a3c;
+  --stamp: #962b1b;
+  position: relative;
+  padding: 0.375rem 0.5rem 0.25rem;
+  border-radius: 0.375rem;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 0.0625rem rgb(35 26 23 / 0.35);
+}
+.lpl-mus-now {
+  position: relative;
+}
+.lpl-mus-line {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.lpl-mus-next {
+  width: 56%;
+  margin: 0.125rem auto 0 6%;
+  opacity: 0.5;
+}
+.lpl-mus-sheet.duo .lpl-mus-next {
+  width: 46%;
+}
+.lpl-mus-line .staff {
+  stroke: var(--ink);
+  stroke-width: 2;
+  opacity: 0.55;
+}
+.lpl-mus-line .staff.mate {
+  stroke-width: 1;
+  opacity: 0.4;
+}
+.lpl-mus-line .bar {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  opacity: 0.35;
+}
+.lpl-mus-line .bar.end {
+  stroke-width: 3;
+  opacity: 0.6;
+}
+/* Une teinte d'encre par touche, en plus de la forme et de la ligne. */
+.lpl-mus-line .l0 {
+  --tint: #2c3b57;
+}
+.lpl-mus-line .l1 {
+  --tint: #3f6453;
+}
+.lpl-mus-line .l2 {
+  --tint: #8a4b12;
+}
+.lpl-mus-line .l3 {
+  --tint: #7a2a4d;
+}
+.lpl-mus-line .clef .shape {
+  fill: var(--tint);
+  stroke: var(--ink);
+  stroke-width: 2.5;
+  transform: scale(1.15);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.lpl-mus-line .clef text {
+  fill: #f7edd6;
+  font:
+    800 15px/1 'Nunito Sans Variable',
+    system-ui,
+    sans-serif;
+  text-anchor: middle;
+}
+.lpl-mus-line .clef.down .shape {
+  transform: scale(1.4);
+}
+.lpl-mus-line .note .shape {
+  fill: var(--paper-raised);
+  stroke: var(--tint, var(--ink));
+  stroke-width: 4;
+  stroke-linejoin: round;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.lpl-mus-line .note .hold {
+  stroke: var(--tint, var(--ink));
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: 0.35;
+}
+.lpl-mus-line .note .tick,
+.lpl-mus-line .note .cross {
+  display: none;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* Juste: la note est encrée, pleine. */
+.lpl-mus-line .note:is([data-v='just'], [data-v='early'], [data-v='late']) .shape {
+  fill: var(--ink);
+  stroke: var(--ink);
+  animation: lpl-mus-pop var(--d-base, 140ms) ease-out;
+}
+.lpl-mus-line .note:is([data-v='just'], [data-v='early'], [data-v='late']) .hold {
+  stroke: var(--ink);
+  opacity: 0.8;
+}
+/* Un peu tôt, un peu tard: pleine, avec un chevron du côté où elle est tombée. */
+.lpl-mus-line .note[data-v='early'] .tick.early,
+.lpl-mus-line .note[data-v='late'] .tick.late {
+  display: inline;
+}
+/* Fausse: barrée. Manquée: en pointillé, pâle. */
+.lpl-mus-line .note[data-v='false'] .shape {
+  fill: none;
+  stroke: var(--stamp);
+}
+.lpl-mus-line .note[data-v='false'] .cross {
+  display: inline;
+  stroke: var(--stamp);
+}
+.lpl-mus-line .note[data-v='missed'] {
+  opacity: 0.4;
+}
+.lpl-mus-line .note[data-v='missed'] .shape {
+  stroke-dasharray: 5 5;
+}
+.lpl-mus-line .note.mate .shape {
+  stroke-width: 2;
+}
+/* La plume: un trait et sa pointe. */
+.lpl-mus-line .cursor line {
+  stroke: var(--stamp);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.lpl-mus-line .cursor path {
+  fill: var(--stamp);
+}
+.lpl-mus-count {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  padding: 0.125rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--paper-raised);
+  box-shadow: 0 0 0 0.125rem var(--ink);
+  font: 700 2.25rem/1.2 var(--font-display, Georgia, serif);
+}
+.lpl-mus-word {
+  position: absolute;
+  top: -0.25rem;
+  margin: 0;
+  transform: translateX(-50%);
+  padding: 0 0.5rem;
+  border-radius: 0.375rem;
+  background: var(--ink);
+  color: var(--paper-raised);
+  font-weight: 800;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+}
+.lpl-mus-word:empty {
+  display: none;
+}
+.lpl-mus-word[data-v='false'] {
+  background: var(--stamp);
+  rotate: -4deg;
+}
+.lpl-mus-mate {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+.lpl-mus-mate[data-playing='non'] {
+  font-style: italic;
+  opacity: 0.6;
+}
+.lpl-mus-keys {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+.lpl-mus-keys kbd svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 4;
+}
+.lpl-mus-keys kbd.down {
+  background: var(--accent, #f2c14e);
+  color: var(--on-accent, #1d1a17);
+  transform: translateY(0.125rem);
+}
+
+/* Mot de la fin. */
+.lpl-mus-result .line {
+  margin: 0 0 0.625rem;
+}
+.lpl-mus-result .tallies {
+  list-style: none;
+  margin: 0 0 0.625rem;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+.lpl-mus-result .tallies li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.875rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+  background: var(--paper-sunken, #efe6cf);
+  font-size: 0.9375rem;
+}
+.lpl-mus-result .tallies .lpl-mus-stars {
+  margin-left: auto;
+}
+.lpl-mus-result .gains p {
+  margin: 0.125rem 0;
+}
+.lpl-mus-result .first,
+.lpl-mus-result .together,
+.lpl-mus-result .hat {
+  font-weight: 800;
+  color: var(--accent, #8a5a1b);
+}
+.lpl-mus-wait p {
+  margin: 0.25rem 0;
+}
+
+@keyframes lpl-mus-pop {
+  from {
+    transform: scale(1.5);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.lpl-mus[data-motion='reduced'] .note .shape {
+  animation: none;
+}
+.lpl-mus[data-motion='reduced'] .lpl-mus-word[data-v='false'] {
+  rotate: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lpl-mus .note .shape {
+    animation: none;
+  }
+}

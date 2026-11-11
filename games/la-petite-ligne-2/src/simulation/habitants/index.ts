@@ -23,6 +23,7 @@ import { bodyCollides } from '../noyau/grille';
 import { placeBlockers } from '../noyau/obstacles';
 import { type AvoidSegment, findRoute, type Route } from './chemins';
 import { closedDoorSet, closedLockSet } from '../lieux/chemins';
+import { listeningTo } from './ecoute';
 import { currentEntry, goalOf, type Goal } from './planning';
 import { attend, giveGift, showEmote } from './presence';
 import { VILLAGERS } from './reglages';
@@ -626,7 +627,9 @@ function liveOne(
   }
   // En conversation, il s'arrête et écoute; le trajet en cours (planning changé pendant qu'on
   // lui parle) attend la fin de la conversation au lieu d'être tenu pour fini.
-  const busy = villager.talkingWith !== null;
+  // De même quand il écoute un joueur qui joue de la musique (`ecoute.ts`).
+  const listening = listeningTo(sim.world, def.id);
+  const busy = villager.talkingWith !== null || listening !== null;
   if (rt.route !== null && state.pose !== (busy ? 'stand' : 'walk')) {
     state.pose = busy ? 'stand' : 'walk';
     sim.touch('place');
@@ -652,9 +655,19 @@ function liveOne(
     settle(sim, place, def.id, life, villager, state, rt);
   }
   if (busy) body.speed = 0;
-  if (near || state.gaze !== null) {
+  if (near || state.gaze !== null || listening !== null) {
     const partner = partnerOf(content, place, def.id, life, state);
-    attend(sim, def, life, villager, state, rt.route === null, partner, rt.lastReact);
+    attend(
+      sim,
+      def,
+      life,
+      villager,
+      state,
+      rt.route === null || listening !== null,
+      partner,
+      rt.lastReact,
+      listening,
+    );
   }
 }
 

@@ -41,6 +41,7 @@ import { RailVehicleSchema, type RailVehicleDef } from './schemas/vehicule';
 import { SpeciesSchema, type SpeciesDef } from './schemas/elevage';
 import { SettingsSchema, type Settings } from './schemas/reglages';
 import { BagsFileSchema, type BagsFile } from './schemas/sacs';
+import { PlayableAirSchema, type PlayableAirDef } from './schemas/air';
 import {
   loadTimeAndBook,
   validateTimeAndBook,
@@ -91,6 +92,8 @@ export interface Content {
   readonly resources: ById<ResourceDef>;
   /** Espèces de la basse-cour (`schemas/elevage.ts`). */
   readonly species: ById<SpeciesDef>;
+  /** Airs jouables à l'instrument (`schemas/air.ts`), par identifiant de leur fiche du carnet. */
+  readonly airs: ById<PlayableAirDef>;
   readonly pieces: ById<PieceDef>;
   readonly places: ById<PlaceContent>;
   /** Calendrier, climats et événements des lieux (`charger-temps.ts`). */
@@ -174,6 +177,7 @@ export function loadContent(files: Files): Content {
   const crops = parseFolder(CropSchema, files, 'commun/cultures', problems);
   const resources = parseFolder(ResourceSchema, files, 'commun/ressources', problems);
   const species = parseFolder(SpeciesSchema, files, 'commun/especes', problems);
+  const airs = parseFolder(PlayableAirSchema, files, 'commun/airs', problems);
 
   const places: Record<string, PlaceContent> = {};
   for (const path of Object.keys(files).sort()) {
@@ -256,6 +260,7 @@ export function loadContent(files: Files): Content {
     crops,
     resources,
     species,
+    airs,
     pieces,
     places,
     ...timeAndBook,

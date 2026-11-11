@@ -12,6 +12,9 @@
   "series": "gare",
   "bricks": [
     {
+      "brick": "perform"
+    },
+    {
       "brick": "sit",
       "seats": 2,
       "restPerMinute": 6

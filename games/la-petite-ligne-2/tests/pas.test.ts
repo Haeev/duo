@@ -89,6 +89,7 @@ describe('pas de simulation vide', () => {
       'logement',
       'peche',
       'elevage',
+      'musique',
     ]);
   });
 });

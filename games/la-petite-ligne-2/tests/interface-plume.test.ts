@@ -65,6 +65,10 @@ const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>([
     'baronne',
     'prise unique qui reste à l’épuisette (`toBag: false`): elle ne passe jamais par le sac ni la boutique',
   ],
+  // Musique jouée (2026-11-11): objets et meuble livrés avec le mini-jeu, vignettes demandées à l'artiste 2D.
+  ['clarinette', 'instrument de la musique jouée: vignette à dessiner'],
+  ['cornet', 'instrument de la musique jouée: vignette à dessiner'],
+  ['pupitre', 'pupitre de musique: vignette à dessiner'],
 ]);
 /**
  * Entrées du carnet des collections qui ne sont pas des objets (insectes, trésors de l'histoire):

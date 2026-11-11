@@ -1,0 +1,55 @@
+// GABARIT: un air jouable à l'instrument (mini-jeu de musique, cahier 4.7).
+// Créer: pnpm nouveau air-jouable <id>     -> donnees/commun/airs/<id>.json
+// Puis:  pnpm partition <id>               -> écrit le bloc "score" (les notes), tiré du MIDI
+// Schéma: src/donnees/schemas/air.ts. Moteur: src/simulation/musique/README.md
+{
+  "schema": 1,
+  // Identifiant = nom du fichier = identifiant de la fiche du carnet (commun/carnet/<id>.json,
+  // source "tune") = identifiant du morceau dans src/audio/musique/donnees/musique.json: c'est
+  // lui qui donne l'accompagnement. On ne joue un air que s'il est dans la collection du duo.
+  "id": "air-exemple",
+  // Rang dans le cahier de fanfare (unique). Un instrument de base joue les trois premiers rangs,
+  // un instrument amélioré les six premiers, un instrument fin tous (cahier 4.5).
+  "order": 90,
+  // Difficulté affichée: 1 (lent, notes espacées), 2, 3.
+  "difficulty": 1,
+  "source": {
+    // Fichier MIDI de l'air, dans assets-src/son/musique/midi/ (écrit par generer.py).
+    "midi": "air-marche-de-la-halte.mid",
+    // Extrait joué: première mesure (0 = début de la boucle) et nombre de mesures. Vise 25 à 45 s.
+    "fromBar": 0,
+    "bars": 16,
+    // Écart minimal entre deux notes à frapper (ms): 450 à 500 pour une difficulté 1, 240 à 400
+    // pour 2, 200 pour 3. Les notes plus serrées restent à l'orchestre.
+    "minGapMs": 450,
+    // Facultatif: "laneBars": 4. Les hauteurs se rangent sur les quatre touches (grave à gauche)
+    // par groupes de tant de mesures; 2 pour un air lent.
+  },
+  "voices": {
+    // La voix d'un joueur seul: une ou plusieurs pistes du MIDI (pnpm partition --pistes <id> les
+    // liste). Une piste peut se limiter à des mesures ("fromBar", "toBar" exclue) et se
+    // transposer ("transpose": 12 remonte d'une octave).
+    "solo": { "name": "Chant", "parts": [{ "track": "bugle" }] },
+    // Les deux voix du duo (facultatif; sans elles, à deux on joue "solo" à l'unisson). Elles se
+    // complètent: appel et réponse (les mêmes pistes par tranches de mesures), ou chant et
+    // contrechant (deux pistes). Celui qui tient le cahier prend la première.
+    "duo": [
+      {
+        "name": "Appel",
+        "parts": [
+          { "track": "bugle", "fromBar": 0, "toBar": 4 },
+          { "track": "bugle", "fromBar": 8, "toBar": 12 },
+        ],
+      },
+      {
+        "name": "Réponse",
+        "parts": [
+          { "track": "bugle", "fromBar": 4, "toBar": 8 },
+          { "track": "bugle", "fromBar": 12, "toBar": 16 },
+        ],
+      },
+    ],
+  },
+  // "score": ne s'écrit jamais à la main. `pnpm partition <id>` le recalcule depuis le MIDI, et le
+  // test refuse une partition qui n'en sort pas. Sans "score", l'air n'est pas au cahier.
+}

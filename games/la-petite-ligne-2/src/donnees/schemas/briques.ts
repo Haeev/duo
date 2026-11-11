@@ -124,6 +124,12 @@ export const BRICK_SCHEMAS = [
   }),
   /** Se regarder: rouvre l'éditeur de personnage de ce joueur, avec son apparence courante. */
   v.strictObject({ brick: v.literal('mirror') }),
+  /**
+   * Jouer ici: instrument en main, on ouvre le cahier de fanfare et l'on joue un air, seul ou à
+   * deux (`simulation/musique/`). À mettre en tête des briques d'un meuble qui sert aussi à autre
+   * chose (un banc): sans instrument en main, elle s'efface devant les suivantes.
+   */
+  v.strictObject({ brick: v.literal('perform') }),
 ] as const;
 
 export const BrickSchema = v.variant('brick', [...BRICK_SCHEMAS]);

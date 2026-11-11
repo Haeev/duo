@@ -77,6 +77,16 @@ export interface MusicDirector {
   stopListening(): void;
   /** Air écouté, `null`: aucun (l'écoute finie d'elle-même revient à `null`). */
   listening(): string | null;
+  /**
+   * La musique du lieu se tait (`true`) le temps que les joueurs jouent eux-mêmes un air à
+   * l'instrument, puis revient (`false`). Les jingles passent toujours.
+   */
+  hush(on: boolean): void;
+  /**
+   * Entrée au niveau du joueur (volume de la musique, coupure): une source jouée en plus des
+   * morceaux de la table s'y branche, comme l'air joué à l'instrument (`scene.ts`).
+   */
+  input(): AudioNode;
   dispose(): void;
 }
 
@@ -210,6 +220,8 @@ export function createMusicDirector(options: MusicOptions): MusicDirector {
    */
   const listenFade = timing.listenFadeSeconds ?? 1;
   let listened: { readonly track: string; voice: Voice | null; endsAt: number } | null = null;
+  /** Les joueurs jouent eux-mêmes: la musique du lieu se tait. */
+  let hushed = false;
 
   function startVoice(
     id: string,
@@ -367,7 +379,7 @@ export function createMusicDirector(options: MusicOptions): MusicDirector {
     const step = pacer.update(dt, wanted, pacing);
     quiet = step.mode === 'quiet';
     // Pendant une écoute, l'ambiance se tait; le rythme continue de compter.
-    follow(listened === null ? step.track : null);
+    follow(listened === null && !hushed ? step.track : null);
     const t = ctx.currentTime;
     tone.frequency.setTargetAtTime(lastChoice.lowpassHz ?? OPEN_HZ, t, 2);
     shade.gain.setTargetAtTime(dbToGain(lastChoice.gainDb), t, 2);
@@ -402,7 +414,7 @@ export function createMusicDirector(options: MusicOptions): MusicDirector {
   }
 
   function pacerTrackNow(): string | null {
-    return quiet || clock < holdUntil || listened !== null ? null : lastChoice.track;
+    return quiet || clock < holdUntil || listened !== null || hushed ? null : lastChoice.track;
   }
 
   function listen(trackId: string): boolean {
@@ -473,6 +485,16 @@ export function createMusicDirector(options: MusicOptions): MusicDirector {
       stopListening();
     },
     listening: () => listened?.track ?? null,
+    hush(on) {
+      if (disposed || hushed === on) return;
+      hushed = on;
+      if (!on) follow(pacerTrackNow());
+      else if (active !== null) {
+        release(active, listenFade);
+        active = null;
+      }
+    },
+    input: () => level,
     dispose() {
       disposed = true;
       unsubscribe();

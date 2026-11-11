@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>La Petite Ligne (refonte): démonstration de la musique jouée</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: system-ui, sans-serif;
+        background: #2b3a2c;
+      }
+      /* Le décor: une capture du jeu quand elle existe, à la place du rendu 3D. */
+      #fond {
+        position: fixed;
+        inset: 0;
+        background: #56704f center / cover no-repeat;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="fond"></div>
+    <script type="module" src="./demo.ts"></script>
+  </body>
+</html>

@@ -20,7 +20,7 @@ import { createGameObjectViewer } from './rendu/objets/index';
 import { createSession } from './session';
 import { createGameAudio } from './audio/index';
 import { createSurfaceLookup } from './audio/sol';
-import { createGameMusic } from './audio/musique/index';
+import { createGameMusic, createGameStage } from './audio/musique/index';
 import { DEFAULT_UI_SETTINGS } from './interface/carnet/lectures';
 import { memorySettings } from './interface/carnet/options';
 import { parsePlan } from './interface/carnet/plan';
@@ -80,6 +80,15 @@ const music = createGameMusic({
   audio: duo.audio,
   view: session.view,
   random: duo.random('musique'),
+  warn: (message, data) => {
+    duo.log.warn(message, data);
+  },
+});
+// Musique jouée à l'instrument: l'accompagnement et les notes, calés sur l'heure de session.
+const stageSound = createGameStage({
+  audio: duo.audio,
+  music,
+  sessionNow: () => duo.net.sessionTimeMs(),
   warn: (message, data) => {
     duo.log.warn(message, data);
   },
@@ -145,6 +154,7 @@ const ui =
           },
         },
         objectViewer,
+        stage: { sound: stageSound, sessionNow: () => duo.net.sessionTimeMs() },
         editorAtStart: !probed,
       });
 // Reprise de partie: ce que la sauvegarde a donné à dire (partie neuve, invité remplacé).
@@ -208,6 +218,7 @@ duo.loop.start({
 duo.on('stop', () => {
   offNetAlert();
   ui?.dispose();
+  stageSound.dispose();
   music.dispose();
   sound.dispose();
   objectViewer.dispose();
