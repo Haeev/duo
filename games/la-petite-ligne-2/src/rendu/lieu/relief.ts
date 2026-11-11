@@ -105,11 +105,13 @@ function check(name: string, profile: ReliefProfile): void {
     fail('dalles et bordures demandent un sol rigide');
   const paving = profile.paving;
   if (paving !== undefined) {
-    if (!Number.isInteger(paving.rows) || paving.rows < 1 || paving.rows > 4) fail('rows de 1 à 4');
+    if (!Number.isInteger(paving.rows) || paving.rows < 1 || paving.rows > 8) fail('rows de 1 à 8');
     if (!(paving.length >= 0.2) || paving.jitter < 0 || paving.jitter > 0.4)
       fail('dalle hors bornes');
-    if (profile.kerb !== undefined && profile.kerb.width >= 1 / paving.rows - 0.05)
-      fail('bordure plus large qu’un rang de dalles');
+    if (!(paving.stroke > 0)) fail('taille de trait des dalles hors bornes');
+    // Les rangs se partagent ce que les deux bordures laissent de la case.
+    if (profile.kerb !== undefined && (1 - 2 * profile.kerb.width) / paving.rows < 0.08)
+      fail('rangs de dalles trop étroits entre les bordures');
   }
   if (profile.kerb !== undefined && !(profile.kerb.width > 0 && profile.kerb.width < 0.5))
     fail('largeur de bordure hors bornes');
@@ -659,9 +661,12 @@ export class Relief {
         const south = this.kerbOn(cx, cy, 1) !== null;
         const xa = start + (this.kerbOn(start, cy, 2) !== null ? kerb : 0);
         const xb = end - (this.kerbOn(end - 1, cy, 3) !== null ? kerb : 0);
+        // Rangs égaux entre les bordures: aucun rang réduit à un liseré contre la pierre.
+        const top = cy + (north ? kerb : 0);
+        const pitch = (cy + 1 - (south ? kerb : 0) - top) / paving.rows;
         for (let r = 0; r < paving.rows; r++) {
-          const za = cy + r / paving.rows + (r === 0 && north ? kerb : 0);
-          const zb = cy + (r + 1) / paving.rows - (r === paving.rows - 1 && south ? kerb : 0);
+          const za = top + r * pitch;
+          const zb = top + (r + 1) * pitch;
           const span = { xa, xb, za, zb, from: rect.x0, to: rect.x1 };
           this.rowSlabs(profile.level, paving, cy * paving.rows + r, span, out);
         }

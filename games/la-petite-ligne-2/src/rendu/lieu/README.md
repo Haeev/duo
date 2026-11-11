@@ -124,7 +124,7 @@ Niveaux: les sols posés par l'homme (rue, route, seuils, voie) restent à y = 0
 4. `level`: hauteur en mètres par rapport au plan de la simulation (négatif: creusé).
 5. `edge`: `souple` (terre, herbe, eau) ou `rigide` (sol posé par l'homme).
 6. Souple: `bumps` (bosses), `spread` (largeur du raccord, 1 m au plus), `curve` (1: pente régulière), `rim` (bourrelet ou fossé posé sur les voisins), `joins` (natures rigides rejointes de plain-pied), `furrows` (sillons en vrai relief: hauteur, pas, axe des crêtes).
-7. Rigide: `apron` (la terre remonte contre lui), `paving` (dalles en volume), `kerb` (bordure de pierre).
+7. Rigide: `apron` (la terre remonte contre lui), `paving` (dalles en volume: longueur, rangs par case, `stroke` pour le rang du joint à l'encre, `layer` `face` ou `tile`; sous `mesh.flankFrom` une dalle n'a que son dessus), `kerb` (bordure de pierre).
 8. Copie le profil le plus proche (`chemin` pour un sol creusé, `rue` pour un dallage) et ne change que ce qui diffère.
 9. `pnpm exec vitest run tests/rendu/relief.test.ts`: le test ajoute une nature factice et vérifie qu'elle paraît dans la hauteur et le maillage; un profil hors bornes est refusé avec son nom.
 10. Regarde le résultat: `pnpm exec vite build`, puis `pnpm exec playwright test --config tests/rendu-encre/playwright.config.ts relief` (captures et compteurs, avec le contrôle de `?rendu=aplats`).

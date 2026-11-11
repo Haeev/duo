@@ -1,7 +1,7 @@
 // Pièces du rendu encré (ADR 0023): plan tiré des données (portes, fenêtres des façades ou
 // déclarées, appliques), géométries des murs entiers et coupés, style choisi par un champ, coque
 // d'ombre, ambiances `piece`. Logique pure: aucun contexte WebGL.
-import { Mesh, Scene } from 'three';
+import { Color, Mesh, Scene } from 'three';
 import { describe, expect, it } from 'vitest';
 import * as v from 'valibot';
 import { InteriorSchema } from '../../src/donnees/schemas/lieu';
@@ -10,7 +10,7 @@ import { createInkUniforms, InkMaterial } from '../../src/rendu/encre/matiere';
 import { SHADOW_ONLY, StageSort, SUN_LAYER } from '../../src/rendu/encre/ombres';
 import { doorVolumes } from '../../src/rendu/lieu/description';
 import { DOOR_CUT_COUNT, standInGeometry } from '../../src/rendu/lieu/formes';
-import { buildRoom } from '../../src/rendu/lieu/piece-geometrie';
+import { buildRoom, darkenLightness } from '../../src/rendu/lieu/piece-geometrie';
 import {
   type BuildingSheet,
   type RoomDef,
@@ -240,6 +240,33 @@ describe('gabarit: un style de pièce se choisit par un champ', () => {
       ...built.walls.map((w) => w.full),
     ])
       expect(geometry.getAttribute('aInk').count).toBe(geometry.getAttribute('position').count);
+  });
+
+  it('dessus d’un mur coupé: ton du mur assombri de 20 points de L*, liseré d’encre aux arêtes', () => {
+    const lightness = (hex: string): number => {
+      const c = new Color(hex);
+      const y = 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+      return y > 216 / 24389 ? 116 * Math.cbrt(y) - 16 : (y * 24389) / 27;
+    };
+    const style = roomStyle(undefined);
+    const top = darkenLightness(style.wall.color, style.cap.darken);
+    expect(lightness(style.wall.color) - lightness(top)).toBeCloseTo(style.cap.darken, 0);
+    // Ni noir pur ni l'enduit lui-même.
+    expect(lightness(top)).toBeGreaterThan(40);
+    const plan = roomPlan(ROOM, [DOOR], FACADE, []);
+    const stub = buildRoom(plan).walls[0]?.stub;
+    if (stub === undefined) throw new Error('mur coupé absent');
+    const colors = stub.getAttribute('color');
+    const normals = stub.getAttribute('normal');
+    const position = stub.getAttribute('position');
+    const tops = new Set<string>();
+    for (let i = 0; i < position.count; i++)
+      if (normals.getY(i) === 1 && Math.abs(position.getY(i) - style.cut) < 1e-4)
+        tops.add(new Color(colors.getX(i), colors.getY(i), colors.getZ(i)).getHexString());
+    // Le dessus: l'aplat et son liseré, deux teintes.
+    expect(tops).toEqual(
+      new Set([new Color(top).getHexString(), new Color(style.cap.rimColor).getHexString()]),
+    );
   });
 
   it('budget: une grande pièce du style par défaut reste sous 12 000 triangles affichés', () => {

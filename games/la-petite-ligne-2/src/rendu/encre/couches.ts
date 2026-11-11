@@ -37,6 +37,12 @@ export const LAYER = {
   tile: 13,
 } as const;
 export const LAYER_COUNT = 14;
+
+/**
+ * Ajouté au numéro de couche: le morceau garde hachures et noirs de l'ombre bien qu'il soit petit
+ * (un pavé: son joint n'est tracé qu'au zoom serré, mais il est du sol, qui s'encre à l'ombre).
+ */
+export const KEEP_INK = 16;
 export type LayerName = keyof typeof LAYER;
 
 /** Côté d'un carreau de texture, en mètres: 512 points pour 4 m, un trait de 3 points fait 2,3 cm. */

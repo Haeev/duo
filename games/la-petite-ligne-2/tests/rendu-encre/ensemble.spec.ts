@@ -72,6 +72,8 @@ const VIEWS: readonly View[] = [
   // La pièce du rez-de-chaussée de la maison du garde (`interieurs/maison-rdc.json`, en 14, 210).
   { name: 'maison-midi', x: 17.5, y: 213.5, minutes: 12 * 60 },
   { name: 'maison-soir', x: 17.5, y: 213.5, minutes: 20 * 60 + 30 },
+  // Le dortoir de la pension (`interieurs/epicerie-etage.json`): ses cloisons coupées.
+  { name: 'pension-midi', x: 61.5, y: 214.5, minutes: 12 * 60 },
   // Contrôles des volumes remplacés: la clôture de la voie (modèle livré), l'église (son clocher
   // est dans le modèle: plus de tour provisoire par-dessus).
   { name: 'cloture', x: 151, y: 101.5, minutes: 16 * 60, yaw: 0, width: 16 },

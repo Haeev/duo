@@ -44,8 +44,12 @@ export interface RoomStyle {
   readonly timber: { readonly color: string; readonly every: number } | null;
   /** Soubassement vu du dehors (pied des murs du devant): teinte, couche, profondeur sous le plancher (m). */
   readonly footing: { readonly color: string; readonly layer: LayerName; readonly drop: number };
-  /** Tranche d'un mur coupé: un aplat sombre, comme sur un plan d'architecte. */
-  readonly capColor: string;
+  /**
+   * Dessus d'un mur coupé (coupe d'architecte): le ton de son enduit assombri de `darken` points
+   * de clarté (L*), bordé sur ses deux grandes arêtes d'un liseré d'encre de `rim` m. Un aplat
+   * noir se lisait comme une poutre posée sur le mur (revue du 2026-11-11).
+   */
+  readonly cap: { readonly darken: number; readonly rim: number; readonly rimColor: string };
   readonly floor: RoomFloorStyle;
   /**
    * Fenêtres. `facades`: celles du bâtiment de la pièce (manifeste des bâtiments), sinon une par
@@ -83,7 +87,7 @@ const base: RoomStyle = {
   plinth: { height: 0.13, out: 0.025, color: '#5d4a38' },
   timber: { color: '#6a4a30', every: 1.7 },
   footing: { color: '#8d8272', layer: 'slab', drop: 0.34 },
-  capColor: '#2a1f1a',
+  cap: { darken: 20, rim: 0.025, rimColor: '#2a1f1a' },
   floor: {
     kind: 'lames',
     colors: ['#b98a55', '#c79a62', '#ad7f4c', '#c08f58'],

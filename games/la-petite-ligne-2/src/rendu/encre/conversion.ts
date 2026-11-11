@@ -32,9 +32,19 @@ export interface InkTagOptions {
    * matériau) gardent ainsi des morceaux distincts de l'une à l'autre.
    */
   readonly partStart?: number;
+  /**
+   * Le modèle a des vitres (famille de `INK_SETTINGS.models.glass`): ses morceaux à la teinte
+   * d'un verre sont des vitres (`KIND.window`), qui suivent l'heure comme celles des façades.
+   */
+  readonly glass?: boolean;
 }
 
 const tagged = new WeakSet<BufferGeometry>();
+
+/** Un modèle de cette famille a-t-il des vitres à reconnaître ? */
+export function glassFamily(family: string | undefined): boolean {
+  return family !== undefined && INK_SETTINGS.models.glass.families.includes(family);
+}
 
 function toScreen(c: number): number {
   return c <= 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
@@ -172,12 +182,23 @@ export function inkTag(geometry: BufferGeometry, options: InkTagOptions = {}): B
       diagonalOf(min, max, p * 3, p * 3),
     );
     const n = Math.max(1, sum[p * 4 + 3] ?? 1);
-    const rule =
-      color === undefined
-        ? null
-        : layerRuleOf((sum[p * 4] ?? 0) / n, (sum[p * 4 + 1] ?? 0) / n, (sum[p * 4 + 2] ?? 0) / n);
+    const mean = [
+      (sum[p * 4] ?? 0) / n,
+      (sum[p * 4 + 1] ?? 0) / n,
+      (sum[p * 4 + 2] ?? 0) / n,
+    ] as const;
+    const found = color === undefined ? null : layerRuleOf(...mean);
+    // Un objet manufacturé (à vitres) n'a pas de feuillage: une caisse verte reste une caisse,
+    // sans bord d'ombre dentelé ni noir plein dessous.
+    const glazed = options.glass === true;
+    const rule = glazed && found?.leafy === true ? INK_SETTINGS.models.glass.body : found;
     layers[p] = options.layer ?? LAYER[rule?.layer ?? INK_SETTINGS.models.fallback];
-    kinds[p] = options.kind ?? (rule?.leafy === true ? KIND.leaf : KIND.none);
+    const pane =
+      glazed &&
+      color !== undefined &&
+      layerRuleOf(...mean, [INK_SETTINGS.models.glass.rule]) !== null;
+    kinds[p] = options.kind ?? (pane ? KIND.window : rule?.leafy === true ? KIND.leaf : KIND.none);
+    if (pane) layers[p] = LAYER.plain;
   }
   const ink = new Float32Array(position.count * 4);
   for (let i = 0; i < position.count; i++) {
@@ -215,10 +236,14 @@ function isMesh(object: Object3D): object is Mesh {
  * Passe un modèle livré au matériau encré: chaque maillage reçoit `aInk` (une fois par
  * géométrie) et le matériau commun. Les matériaux d'origine restent à leur source.
  */
-export function inkifyModel(root: Object3D, material: Material): Object3D {
+export function inkifyModel(
+  root: Object3D,
+  material: Material,
+  options: Pick<InkTagOptions, 'glass'> = {},
+): Object3D {
   root.traverse((object) => {
     if (!isMesh(object)) return;
-    inkTag(object.geometry);
+    inkTag(object.geometry, options);
     object.material = material;
   });
   return root;
